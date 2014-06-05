@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="oa" id="1">
+        <createTable tableName="board">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="board_pkey"/>
+            </column>
+            <column name="critical_max" type="FLOAT4(8,8)"/>
+            <column name="critical_min" type="FLOAT4(8,8)"/>
+            <column name="exclude_from_nagios" type="bool"/>
+            <column name="filter_critical_values" type="bool"/>
+            <column name="last_result_time" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_rssi" type="int2"/>
+            <column name="origin" type="text">
+                <constraints nullable="false" unique="true"/>                
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="sampling_interval" type="int4"/>
+            <column name="status_complete" type="int4"/>
+            <column name="status_complete_msg" type="VARCHAR(255)"/>
+            <column name="status_valid" type="int4"/>
+            <column name="status_valid_msg" type="VARCHAR(255)"/>
+            <column name="warning_max" type="FLOAT4(8,8)"/>
+            <column name="warning_min" type="FLOAT4(8,8)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="2">
+        <createTable tableName="channel">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="channel_pkey"/>
+            </column>
+            <column name="aggr_function_id" type="int8"/>
+            <column name="aggr_interval_id" type="int8"/>
+            <column name="board_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="critical_max" type="FLOAT4(8,8)"/>
+            <column name="critical_min" type="FLOAT4(8,8)"/>
+            <column name="db_series_id" type="int4"/>
+            <column name="exclude_from_nagios" type="bool"/>
+            <column name="filter_critical_values" type="bool"/>
+            <column name="label" type="TEXT"/>
+            <column name="last_count" type="int4"/>
+            <column name="last_result_time" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="nr" type="int4">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phenomena" type="VARCHAR(255)"/>
+            <column name="sampling_interval" type="int4"/>
+            <column name="spline_id" type="int8"/>
+            <column name="status_complete" type="int4"/>
+            <column name="status_complete_msg" type="VARCHAR(255)"/>
+            <column name="status_valid" type="int4"/>
+            <column name="status_valid_msg" type="VARCHAR(255)"/>
+            <column name="unit_id" type="int8"/>
+            <column name="warning_max" type="FLOAT4(8,8)"/>
+            <column name="warning_min" type="FLOAT4(8,8)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="3">
+        <createTable tableName="function">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="function_pkey"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="4">
+        <createTable tableName="interval">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="interval_pkey"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="5">
+        <createTable tableName="knot_point">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="knot_point_pkey"/>
+            </column>
+            <column name="spline_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x" type="FLOAT4(8,8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="y" type="FLOAT4(8,8)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="6">
+        <createTable tableName="message">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="message_pkey"/>
+            </column>
+            <column name="content" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="origin" type="text">
+                <constraints nullable="false"/>                
+            </column>
+            <column name="result_time" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="7">
+        <createTable tableName="observation">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="observation_pkey"/>
+            </column>
+            <column name="channel_id" type="int4">
+                <constraints nullable="false"/>
+            </column>
+            <column name="channel_nr" type="int4">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false" name="imported" type="bool"/>
+            <column name="origin" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result_time" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result_value" type="FLOAT4(8,8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rssi" type="int2"/>
+            <column name="status_valid" type="int4"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="8">
+        <createTable tableName="spline">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="spline_pkey"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="9">
+        <createTable tableName="unit">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="unit_pkey"/>
+            </column>
+            <column name="abbrevation" type="VARCHAR(255)"/>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="oa" id="10">
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="users_pkey"/>
+            </column>
+            <column name="login" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    
+    
+       
+    <changeSet id="11" author="oa">
+   		 <createIndex indexName="board_origin_idx" tableName="board" unique="true">
+            <column name="origin"/>
+        </createIndex>
+    </changeSet>
+    
+  
+    <changeSet author="oa" id="12">
+        <addUniqueConstraint columnNames="login" constraintName="users_login_key" deferrable="false" disabled="false" initiallyDeferred="false" tableName="users"/>
+    </changeSet>
+    <changeSet author="oa" id="13">
+        <addForeignKeyConstraint baseColumnNames="aggr_function_id" baseTableName="channel" baseTableSchemaName="public" constraintName="fk2c0b7d03cc75d396" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="function" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="oa" id="14">
+        <addForeignKeyConstraint baseColumnNames="aggr_interval_id" baseTableName="channel" baseTableSchemaName="public" constraintName="fk2c0b7d03a1cb9076" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="interval" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="oa" id="15">
+        <addForeignKeyConstraint baseColumnNames="board_id" baseTableName="channel" baseTableSchemaName="public" constraintName="fk2c0b7d03b4ecbfb0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="board" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="oa" id="16">
+        <addForeignKeyConstraint baseColumnNames="spline_id" baseTableName="channel" baseTableSchemaName="public" constraintName="fk2c0b7d037d458b24" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="spline" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="oa" id="17">
+        <addForeignKeyConstraint baseColumnNames="unit_id" baseTableName="channel" baseTableSchemaName="public" constraintName="fk2c0b7d03c86784c4" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="unit" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="oa" id="18">
+        <addForeignKeyConstraint baseColumnNames="spline_id" baseTableName="knot_point" baseTableSchemaName="public" constraintName="fk7b8a01197d458b24" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="spline" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="oa" id="19">
+        <createIndex indexName="knote_point_idx" tableName="knot_point" unique="false">
+            <column name="id"/>
+            <column name="x"/>
+        </createIndex>
+    </changeSet>
+   
+    
+     
+	<!-- Types -->
+	<changeSet author="oa" id="25" >
+	<sql>
+	<![CDATA[
+	CREATE TYPE time_value AS
+   (result_time timestamp with time zone,
+    result_value real);
+	]]>
+	</sql>
+	</changeSet>
+	
+	<changeSet author="oa" id="26">
+	<sql>
+	<![CDATA[
+	CREATE TYPE check_result AS
+   (code integer, msg text);
+	]]>
+	</sql>
+	 </changeSet>
+    
+	<!-- Procedures  -->
+	<changeSet author="oa" id="27" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION check_obs_valid(_result_value real, _channel_id bigint)
+  RETURNS check_result AS
+$BODY$
+declare
+rec record;
+chk_re check_result;
+begin			
+	if (_result_value is null or _channel_id is null) then
+		chk_re.code = 3; chk_re.msg = 'Invalid arguments.';
+		return chk_re;
+	end if;
+	 	
+	select into rec * from check_device where channel_id = _channel_id;	
+	if (not found) then
+		chk_re.code = 3; chk_re.msg = 'Missing parameters.';
+		return chk_re;
+	end if;
+	
+	if (rec.critical_max is null and rec.critical_min is null and rec.warning_max is null and rec.warning_min is null) then
+		chk_re.code = 3; chk_re.msg = 'Missing parameters.' ;
+		return chk_re;
+	end if;
+	
+	if (rec.critical_max is not null and _result_value > rec.critical_max) then
+    		chk_re.code = 2; chk_re.msg = 'Value ' || _result_value || ' above critical max.';		 
+	elsif (rec.warning_max is not null and _result_value > rec.warning_max) then
+			chk_re.code = 1; chk_re.msg = 'Value ' || _result_value || ' above warning max.';		
+	elsif (rec.critical_min is not null and _result_value < rec.critical_min) then
+			chk_re.code = 2; chk_re.msg = 'Value ' || _result_value || ' below critical min.';		
+	elsif (rec.warning_min is not null and _result_value < rec.warning_min) then
+			chk_re.code = 1; chk_re.msg = 'Value ' || _result_value || ' below warning min.';		
+	else 
+			chk_re.code = 0; chk_re.msg = 'Value ok.';		
+	end if;
+                    	
+    return chk_re;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+	]]>
+	</createProcedure>
+	</changeSet>
+	
+	<changeSet author="oa" id="28" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION _update_board_channel()
+  RETURNS trigger AS
+$BODY$
+    DECLARE
+	_bid bigint;	
+	_crec record;
+	_chk record;
+	_counts int;
+	_sampling_interval int;	
+    BEGIN       
+        SELECT INTO _bid id FROM board WHERE origin = NEW.origin;
+        IF NOT FOUND THEN
+			select into _bid nextval('board_id_seq');
+			if not found then
+				raise exception 'Sequence board_id_seq not found'; 
+			end if;		
+			INSERT INTO board (id, origin,last_result_time,last_rssi) VALUES (_bid, NEW.origin,NEW.result_time,NEW.rssi);	
+		ELSE 
+			UPDATE board set last_result_time = NEW.result_time, last_rssi = NEW.rssi where id = _bid;	
+		END IF;
+	
+        -- Check that there is a channel and update last-attributes
+        SELECT INTO _crec * FROM channel WHERE board_id = _bid and nr = NEW.channel_nr;
+        IF NOT FOUND THEN
+			select into NEW.channel_id nextval('channel_id_seq');
+			if not found then
+				raise exception 'Sequence channel_id_seq not found'; 
+			end if;		
+			INSERT INTO channel (id,board_id,nr,last_result_time) VALUES (NEW.channel_id,_bid,NEW.channel_nr,NEW.result_time);	
+		ELSE
+			NEW.channel_id := _crec.id;			
+			
+			-- Validation Checks 
+			select into _chk * from check_obs_valid(real_value(NEW.result_value,_crec.spline_id),_crec.id) ;
+			
+			-- calculate completeness and persist values
+			-- missing values since last update are handled by function get_channel_count			 
+			select into _sampling_interval sampling_interval from check_device where channel_id = _crec.id;			
+			if (_sampling_interval is not null) then
+				select into _counts count(*) + 1 from observation where channel_id = _crec.id and result_time >= now() - ((10 * _sampling_interval) || ' seconds')::interval;			
+			end if;
+						
+			UPDATE channel set status_valid = _chk.code, status_valid_msg = _chk.msg , last_count = _counts, last_result_time = now() where id = _crec.id;
+			NEW.status_valid := _chk.code;
+		END IF;                 
+        RETURN NEW;        
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+  	]]>
+	</createProcedure>
+	</changeSet>
+  
+  <changeSet author="oa" id="29" >
+	<sql>
+	<![CDATA[
+	CREATE TRIGGER trg_update_board_channel
+  BEFORE INSERT
+  ON observation
+  FOR EACH ROW
+  EXECUTE PROCEDURE _update_board_channel(); 	
+	]]>
+	</sql>
+	 </changeSet>
+	
+	<changeSet author="oa" id="30" context="su" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION init_spline(id integer)
+	RETURNS void AS
+	$BODY$use Math::Derivative;
+	use Math::Spline;
+	my $id=$_[0];
+	my $plan=spi_prepare('select x,y from knot_point where spline_id=$1 order by x','INTEGER');
+	my $res=spi_query_prepared($plan,$id);
+	my @x=();
+	my @y=();
+	my $row;
+	while (defined ($row = spi_fetchrow($res))) {
+		push(@x,$row->{x});
+		push(@y,$row->{y});
+	}
+	$_SHARED{"spline$id"}=new Math::Spline(\@x,\@y);
+	$BODY$
+	LANGUAGE plperlu VOLATILE
+	COST 100;
+	]]>
+	</createProcedure>
+	</changeSet>
+	
+	
+	<changeSet author="oa" id="31" context="su" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION real_value(adc double precision, id bigint)
+	RETURNS real AS
+	$BODY$
+	use strict;
+	if (! defined $_[1]) {
+		return $_[0];
+	}
+	if(! exists $_SHARED{"spline$_[1]"}){
+		spi_exec_query("select init_spline($_[1])");
+	}
+	return $_SHARED{"spline$_[1]"}->evaluate($_[0]);
+	$BODY$
+	LANGUAGE plperlu VOLATILE
+	COST 100;
+	]]>
+	</createProcedure>
+	</changeSet>
+	
+<changeSet author="oa" id="32" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION sort(anyarray)
+	RETURNS anyarray AS
+	$BODY$
+	select array(select $1[i] from generate_series(array_lower($1,1),
+	array_upper($1,1)) g(i) order by 1)
+	$BODY$
+	LANGUAGE sql IMMUTABLE STRICT
+	COST 100;
+	]]>
+	</createProcedure>
+	</changeSet>
+	
+<changeSet author="oa" id="33" runOnChange="true">
+	<createProcedure>
+		<![CDATA[
+	CREATE OR REPLACE FUNCTION _float_median(_value anyarray)
+  RETURNS double precision AS
+$BODY$
+declare
+n bigint;
+a float[];
+begin
+a = sort(_value);
+n = array_upper(a,1);
+if (n%2=0) then
+ return 0.5*(a[n/2] + a[n/2+1]);	
+else 
+ return a[(n+1)/2];
+end if;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+	]]>
+	</createProcedure>
+	</changeSet>
+
+<changeSet author="oa" id="34" >
+	<sql>
+		<![CDATA[
+  CREATE AGGREGATE median(anyelement) (
+  SFUNC=array_append,
+  STYPE=anyarray,
+  FINALFUNC=_float_median,
+  INITCOND='{}'
+);
+]]>
+	</sql>
+</changeSet>
+
+<changeSet author="oa" id="35" runOnChange="true">
+	<createProcedure>
+			<![CDATA[
+	CREATE OR REPLACE FUNCTION date_truncate(timestamp with time zone, interval)
+  RETURNS timestamp with time zone AS
+$BODY$
+select to_timestamp(
+  floor(extract(epoch from $1)/extract(epoch from $2))*extract(epoch from $2)
+  );
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+  ]]>
+	</createProcedure>
+	</changeSet>
+
+<changeSet author="oa" id="38" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	create or replace function get_channel_count(_counts integer, _last_result_time timestamp with time zone, _sampling_interval integer ) RETURNS int AS
+	$$
+	DECLARE
+	c int;
+	BEGIN
+	c:= ceil(_counts - EXTRACT(EPOCH FROM (now()-_last_result_time))/_sampling_interval);
+	if (c < 0) THEN 
+		c:= 0 ;
+	end if;
+	return c;
+	END; 
+	$$ LANGUAGE plpgsql;
+	]]>
+	</createProcedure>
+	</changeSet>
+	<changeSet author="oa" id="39" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION get_channel_time_value(ctime timestamp with time zone, channel_id bigint, spline_id bigint, afunction text, ainterval text)
+  RETURNS SETOF time_value AS
+$BODY$
+declare
+ret time_value%rowtype;
+begin
+  if (ctime is null or channel_id is null) then 
+	return;
+  end if;
+
+  if (spline_id is null and afunction is null) then 
+	-- original			
+	return query execute 'select result_time,result_value from observation where result_time < $1 and channel_id = $2 and imported = false order by 1'
+	using ctime,channel_id;	
+  elsif (spline_id is not null and afunction is null)  then 
+	-- interpolation 
+	return query execute 'select result_time,real_value(result_value,$1) as result_value
+		from observation where result_time < $2 and channel_id = $3 and imported = false order by 1'
+		using spline_id, ctime, channel_id;	
+  elsif (spline_id is null and afunction is not null)  then 
+	-- original and aggregation 
+	return query execute 'select date_truncate(result_time,interval ''' || ainterval || ''')  as result_time, ' || afunction || '(result_value)::real as result_value from observation
+                         where result_time < date_truncate($1, interval ''' || ainterval || ''') and channel_id = $2 and imported = false
+                         group by date_truncate(result_time, interval ''' || ainterval || ''') order by 1'
+               using ctime, channel_id;
+  elsif (spline_id is not null and afunction is not null)  then 
+	-- interpolation and aggregation 	
+	return query execute 'select date_truncate(result_time,interval ''' || ainterval || ''')  as result_time, ' || afunction || '(real_value(result_value,$1))::real as result_value from observation
+                         where result_time < date_truncate($2, interval ''' || ainterval || ''') and channel_id = $3 and imported = false
+                         group by date_truncate(result_time, interval ''' || ainterval || ''') order by 1'
+               using spline_id, ctime, channel_id;	
+  end if;
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+  ]]>
+	</createProcedure>	
+	</changeSet>	
+    <changeSet author="oa" id="40">
+        <createView schemaName="public" viewName="check_device">SELECT b.id AS board_id, b.origin AS board_origin, c.id AS channel_id, c.nr AS channel_nr, COALESCE(c.critical_max, b.critical_max) AS critical_max, COALESCE(c.critical_min, b.critical_min) AS critical_min, COALESCE(c.warning_max, b.warning_max) AS warning_max, COALESCE(c.warning_min, b.warning_min) AS warning_min, COALESCE(c.sampling_interval, b.sampling_interval) AS sampling_interval, COALESCE(c.filter_critical_values, b.filter_critical_values) AS filter_critical_values, COALESCE(c.exclude_from_nagios, b.exclude_from_nagios) AS exclude_from_nagios FROM board b, channel c WHERE (b.id = c.board_id);</createView>
+    </changeSet>
+	<changeSet author="oa" id="41">
+        <createView schemaName="public" viewName="channel_status">SELECT a.board_id, a.id, a.nr, a.label, a.status_valid, a.status_valid_msg, CASE WHEN (a.last_count IS NULL) THEN 3 WHEN (a.last_count &gt; 8) THEN 0 WHEN (a.last_count = 0) THEN 2 ELSE 1 END AS status_complete, CASE WHEN (a.last_count IS NULL) THEN 'Missing parameters.'::text ELSE ((a.last_count * 10) || '% completeness'::text) END AS status_complete_msg, a.last_result_time FROM (SELECT c.board_id, c.id, c.nr, c.label, c.status_valid, c.status_valid_msg, c.last_result_time, get_channel_count(c.last_count, (c.last_result_time)::timestamp with time zone, cd.sampling_interval) AS last_count FROM channel c, check_device cd WHERE (c.id = cd.channel_id)) a;</createView>
+    </changeSet>
+    <changeSet author="oa" id="42">
+        <createView schemaName="public" viewName="suspect_channel">SELECT a.board_id, a.id, a.nr, a.status_valid, a.status_valid_msg, a.last_result_time, a.last_count, CASE WHEN (a.last_count IS NULL) THEN 3 WHEN (a.last_count &gt; 8) THEN 0 WHEN (a.last_count = 0) THEN 2 ELSE 1 END AS status_complete, CASE WHEN (a.last_count IS NULL) THEN 'Missing parameters.'::text ELSE ((a.last_count * 10) || '% completeness'::text) END AS status_complete_msg FROM (SELECT c.board_id, c.id, c.nr, c.status_valid, c.status_valid_msg, c.last_result_time, get_channel_count(c.last_count, (c.last_result_time)::timestamp with time zone, cd.sampling_interval) AS last_count FROM channel c, check_device cd WHERE ((c.id = cd.channel_id) AND ((c.status_valid &gt; 0) OR (get_channel_count(c.last_count, (c.last_result_time)::timestamp with time zone, cd.sampling_interval) &lt; 9)))) a;</createView>
+    </changeSet>
+	<changeSet author="oa" id="43">
+        <createView schemaName="public" viewName="board_status">
+        SELECT b.id, b.origin, b.name, b.last_rssi, b.last_result_time, a.status_valid, a.status_complete
+   FROM board b, ( SELECT b.id, max(sc.status_valid) AS status_valid, max(sc.status_complete) AS status_complete
+           FROM board b, channel_status sc where b.id = sc.board_id GROUP BY b.id) a
+  WHERE b.id = a.id;
+        </createView>
+    </changeSet>
+	<changeSet author="oa" id="44" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION check_nrpe()
+RETURNS check_result AS
+$BODY$
+declare
+re check_result;
+rec_board  record;
+rec_channel record;
+
+begin
+	re.code := 0;
+	re.msg := '<check_result>';	
+	
+	for rec_board in select id, origin from board where not COALESCE(exclude_from_nagios,false) order by origin
+	loop
+		re.msg := re.msg || '<board id="'|| rec_board.id || '" origin="' || rec_board.origin ||  '">';
+		
+		for rec_channel in select c.id, c.nr, sc.status_complete, sc.status_complete_msg, sc.status_valid, sc.status_valid_msg 
+		from channel c, suspect_channel sc where not COALESCE(c.exclude_from_nagios,false) 
+		and c.id = sc.id and sc.board_id = c.board_id and rec_board.id = c.board_id order by c.nr asc
+		loop
+			re.msg := re.msg || '<channel id="' || rec_channel.id ||  '" nr="' || rec_channel.nr ||  '">';
+			if (rec_channel.status_complete  > 0) then
+				re.msg := re.msg || '<check type="completeness" code="' || rec_channel.status_complete || '">' || rec_channel.status_complete_msg || '</check>' ;
+			end if;
+		
+			if (rec_channel.status_valid > 0) then
+				re.msg := re.msg || '<check type="validation" code="' || rec_channel.status_valid || '">' || rec_channel.status_valid_msg || '</check>' ;
+			end if;			
+			re.msg := re.msg || '</channel>';
+						
+			--  Get Code for Gateway 
+			if (rec_channel.status_complete > re.code) then
+				re.code := rec_channel.status_complete; 
+			end if;		
+			if (rec_channel.status_valid > re.code) then
+				re.code := rec_channel.status_valid; 
+			end if;									
+		end loop;
+		
+		re.msg := re.msg || '</board>';
+	
+	end loop;
+	re.msg := re.msg || '</check_result>';
+return re;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+  ]]>
+	</createProcedure>
+</changeSet>
+	
+<changeSet author="oa" id="45">
+<comment>Default Data </comment>
+<sql>
+<![CDATA[
+	SELECT pg_catalog.setval('function_id_seq', 4, true);
+	SELECT pg_catalog.setval('interval_id_seq', 4, true);
+	SELECT pg_catalog.setval('knot_point_id_seq', 45, true);
+	SELECT pg_catalog.setval('spline_id_seq', 1, true);
+	SELECT pg_catalog.setval('unit_id_seq', 2, true);
+	SELECT pg_catalog.setval('users_id_seq', 2, true);
+	
+	
+	ALTER TABLE function DISABLE TRIGGER ALL;
+	INSERT INTO function VALUES (1, 'avg');
+	INSERT INTO function VALUES (2, 'count');
+	INSERT INTO function VALUES (3, 'median');
+	INSERT INTO function VALUES (4, 'sum');
+	ALTER TABLE function ENABLE TRIGGER ALL;
+
+	ALTER TABLE "interval" DISABLE TRIGGER ALL;
+	INSERT INTO "interval" VALUES (1, '1 min');
+	INSERT INTO "interval" VALUES (2, '10 min');
+	INSERT INTO "interval" VALUES (3, '30 min');
+	INSERT INTO "interval" VALUES (4, '1 hour');
+	ALTER TABLE "interval" ENABLE TRIGGER ALL;
+
+	ALTER TABLE spline DISABLE TRIGGER ALL;
+	INSERT INTO spline VALUES (1, 'Siemens 836');
+	ALTER TABLE spline ENABLE TRIGGER ALL;
+
+	ALTER TABLE knot_point DISABLE TRIGGER ALL;
+	INSERT INTO knot_point VALUES (1, 1, 106.910004, 48);
+	INSERT INTO knot_point VALUES (2, 1, 114.550003, 46);
+	INSERT INTO knot_point VALUES (3, 1, 122.709999, 44);
+	INSERT INTO knot_point VALUES (4, 1, 131.5, 42);
+	INSERT INTO knot_point VALUES (5, 1, 140.949997, 40);
+	INSERT INTO knot_point VALUES (6, 1, 151.100006, 38);
+	INSERT INTO knot_point VALUES (7, 1, 161.889999, 36);
+	INSERT INTO knot_point VALUES (8, 1, 173.470001, 34);
+	INSERT INTO knot_point VALUES (9, 1, 185.919998, 32);
+	INSERT INTO knot_point VALUES (10, 1, 199.130005, 30);
+	INSERT INTO knot_point VALUES (11, 1, 213.220001, 28);
+	INSERT INTO knot_point VALUES (12, 1, 228.25, 26);
+	INSERT INTO knot_point VALUES (13, 1, 236.080002, 25);
+	INSERT INTO knot_point VALUES (14, 1, 244.160004, 24);
+	INSERT INTO knot_point VALUES (15, 1, 260.98999, 22);
+	INSERT INTO knot_point VALUES (16, 1, 278.839996, 20);
+	INSERT INTO knot_point VALUES (17, 1, 297.619995, 18);
+	INSERT INTO knot_point VALUES (18, 1, 317.429993, 16);
+	INSERT INTO knot_point VALUES (19, 1, 338.170013, 14);
+	INSERT INTO knot_point VALUES (20, 1, 359.829987, 12);
+	INSERT INTO knot_point VALUES (21, 1, 382.420013, 10);
+	INSERT INTO knot_point VALUES (22, 1, 405.809998, 8);
+	INSERT INTO knot_point VALUES (23, 1, 429.959991, 6);
+	INSERT INTO knot_point VALUES (24, 1, 454.790009, 4);
+	INSERT INTO knot_point VALUES (25, 1, 480.23999, 2);
+	INSERT INTO knot_point VALUES (26, 1, 506.200012, 0);
+	INSERT INTO knot_point VALUES (27, 1, 532.450012, -2);
+	INSERT INTO knot_point VALUES (28, 1, 558.950012, -4);
+	INSERT INTO knot_point VALUES (29, 1, 585.52002, -6);
+	INSERT INTO knot_point VALUES (30, 1, 612.059998, -8);
+	INSERT INTO knot_point VALUES (31, 1, 638.400024, -10);
+	INSERT INTO knot_point VALUES (32, 1, 664.27002, -12);
+	INSERT INTO knot_point VALUES (33, 1, 689.630005, -14);
+	INSERT INTO knot_point VALUES (34, 1, 714.380005, -16);
+	INSERT INTO knot_point VALUES (35, 1, 738.369995, -18);
+	INSERT INTO knot_point VALUES (36, 1, 761.5, -20);
+	INSERT INTO knot_point VALUES (37, 1, 783.570007, -22);
+	INSERT INTO knot_point VALUES (38, 1, 804.590027, -24);
+	INSERT INTO knot_point VALUES (39, 1, 824.51001, -26);
+	INSERT INTO knot_point VALUES (40, 1, 843.289978, -28);
+	INSERT INTO knot_point VALUES (41, 1, 860.880005, -30);
+	INSERT INTO knot_point VALUES (42, 1, 877.169983, -32);
+	INSERT INTO knot_point VALUES (43, 1, 892.289978, -34);
+	INSERT INTO knot_point VALUES (44, 1, 906.25, -36);
+	INSERT INTO knot_point VALUES (45, 1, 919.070007, -38);
+	ALTER TABLE knot_point ENABLE TRIGGER ALL;
+
+	ALTER TABLE unit DISABLE TRIGGER ALL;
+	INSERT INTO unit VALUES (1, NULL, 'Celsius');
+	INSERT INTO unit VALUES (2, NULL, 'Volts');
+	ALTER TABLE unit ENABLE TRIGGER ALL;
+
+	ALTER TABLE users DISABLE TRIGGER ALL;	
+	-- INSERT INTO users VALUES (1, 'demo', 'zZZSEKOCeaHyuf4TDN8/vubx+8g=');	
+	INSERT INTO users VALUES (1, 'demo', 'zZZSEO+/ve+/vXnvv73vv73vv70TDO+/vT/vv73vv73vv70=');	
+		-- demo:xbee -- 
+	ALTER TABLE users ENABLE TRIGGER ALL;
+	 ]]>
+	 </sql>
+	</changeSet>
+	
+	
+	<changeSet author="oa" id="47" >
+	<sql>
+	<![CDATA[
+	CREATE TYPE bayeos_observation AS (
+	db_series_id integer,
+	result_time timestamp with time zone,
+	result_value real
+);
+	]]>
+	</sql>
+	</changeSet>
+	
+	<changeSet author="oa" id="48">
+	<createView viewName="channel_detail">
+SELECT c.id, c.db_series_id, c.spline_id, f.name AS f_name, i.name AS i_name, cd.filter_critical_values
+   FROM board b, check_device cd, channel c
+   LEFT JOIN function f ON f.id = c.aggr_function_id
+   LEFT JOIN "interval" i ON i.id = c.aggr_interval_id
+  WHERE c.id = cd.channel_id AND b.id = c.board_id
+  ORDER BY b.origin, c.nr;
+	</createView>
+	</changeSet>
+	
+			
+		
+<changeSet author="oa" id="49" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE or replace FUNCTION get_bayeos_obs(ctime timestamp with time zone) RETURNS SETOF bayeos_observation
+    LANGUAGE plpgsql
+    AS '
+declare
+b bayeos_observation%rowtype;
+cha record;
+begin
+for cha in select * from channel_detail where db_series_id is not null 
+loop 
+ for b in select cha.db_series_id, c.result_time, c.result_value from get_channel_time_value(ctime,cha.id,cha.spline_id,cha.f_name,cha.i_name) as c
+ loop
+  return next b;
+ end loop;
+end loop;
+return;
+end;';
+	]]>
+</createProcedure>		
+</changeSet>
+	
+	
+<changeSet author="oa" id="50" runOnChange="true">
+	<createProcedure>
+<![CDATA[	
+  CREATE OR REPLACE FUNCTION delete_obs(ctime timestamp with time zone)
+  RETURNS void AS
+$BODY$
+declare
+ cha record;
+begin
+ for cha in select * from channel_detail where db_series_id is not null 
+ loop
+ -- Imported flag setzen
+	if cha.i_name is not null then 
+	  update observation set imported = true where channel_id = cha.id and result_time < date_truncate(ctime, cha.i_name::interval) and imported = false;
+	else 
+	  update observation set imported = true where channel_id = cha.id and result_time < ctime and imported = false;
+	end if;	
+ end loop; 
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ ]]>
+	</createProcedure>
+	</changeSet> 
+	
+	
+	<changeSet author="oa" id="51">
+        <createIndex indexName="observation_ch_id_result_time" tableName="observation" unique="false">
+            <column name="channel_id"/>
+            <column name="result_time"/>
+        </createIndex>
+    </changeSet>
+    
+    <changeSet author="oa" id="52">
+        <createIndex indexName="observation_imported_result_time" tableName="observation" unique="false">
+            <column name="imported"/>
+            <column name="result_time"/>
+        </createIndex>
+    </changeSet>
+	
+    <changeSet author="oa" id="53">
+        <createIndex indexName="observation_ch_id_id" tableName="observation" unique="false">
+            <column name="channel_id"/>
+            <column name="id"/>
+        </createIndex>
+    </changeSet>
+        
+	 
+</databaseChangeLog>

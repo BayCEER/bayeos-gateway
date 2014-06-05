@@ -1,0 +1,8 @@
+Package: [[name]]
+Version: [[version]]
+Section: server
+Priority: optional
+Architecture: all
+Depends: java7-runtime-headless, postgresql (>= 9.0), postgresql-contrib, postgresql-plperl, libpq-dev, tomcat6, tomcat6-admin, libmath-spline-perl, apache2, libapache2-mod-jk
+Description: BayEOS Gateway
+Maintainer: oliver.archner@uni-bayreuth.de

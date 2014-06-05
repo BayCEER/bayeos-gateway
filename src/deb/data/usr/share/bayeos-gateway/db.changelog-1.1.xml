@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    
+    <changeSet author="oa" id="54" context="board template">
+    	<createTable tableName="board_template">
+    		<column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="board_template_pkey"/>
+            </column>
+            
+            <column name="name" type="TEXT">
+            	<constraints nullable="false"/>
+            </column> 
+            <column name="description" type="TEXT"/>                                          
+            <column name="data_sheet" type="TEXT"/>                                             
+            <column name="revision" type="TEXT"/>
+            
+            <!--  filled by hibernate  -->   
+            <column name="last_updated" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+            
+            <!--  Inherited from CheckDevice  -->
+            <column name="sampling_interval" type="int4"/>
+            <column name="critical_max" type="FLOAT4(8,8)"/>
+            <column name="critical_min" type="FLOAT4(8,8)"/>
+            <column name="warning_max" type="FLOAT4(8,8)"/>
+            <column name="warning_min" type="FLOAT4(8,8)"/>                                                                                                                                   
+    	</createTable>    
+    </changeSet>
+    
+   
+    
+    <changeSet author="oa" id="55" context="board template">
+    	<createTable tableName="channel_template">
+    		<column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="channel_template_pkey"/>
+            </column>
+            <column name="nr" type="int4">
+                <constraints nullable="false"/>
+            </column>            
+            <column name="label" type="TEXT">
+            	<constraints nullable="false"/>
+            </column>            
+            <column name="phenomena" type="VARCHAR(255)">
+            	<constraints nullable="false"/>
+            </column>            
+            <column name="unit_id" type="int8"/>                        
+            <column name="spline_id" type="int8"/>                           
+            <column name="aggr_interval_id" type="int8"/>            
+            <column name="aggr_function_id" type="int8"/>
+            <column name="board_template_id" type="int8">
+                <constraints nullable="false"/>                
+            </column>                                    
+            <column name="channel_templates_idx" type="int4"/>                        
+            <!--  Inherited from CheckDevice  -->
+            <column name="sampling_interval" type="int4"/>
+            <column name="critical_max" type="FLOAT4(8,8)"/>
+            <column name="critical_min" type="FLOAT4(8,8)"/>
+            <column name="warning_max" type="FLOAT4(8,8)"/>
+            <column name="warning_min" type="FLOAT4(8,8)"/>
+                                                                                                                                                                                              
+    	</createTable>    
+    	    	   
+	</changeSet>
+	
+	 <changeSet author="oa" id="56" context="board template">
+	 <sql>
+    	alter table channel_template add constraint fk_ch_template_brd_template foreign key (board_template_id) references board_template on delete cascade;
+		alter table channel_template add constraint fk_ch_template_interval foreign key (aggr_interval_id) references interval;
+		alter table channel_template add constraint fk_ch_template_spline foreign key (spline_id) references spline;
+		alter table channel_template add constraint fk_ch_template_function foreign key (aggr_function_id) references function;
+		alter table channel_template add constraint fk_ch_template_unit foreign key (unit_id) references unit;
+		alter table channel_template add constraint fk_ch_template_nr unique (board_template_id, nr);
+    	</sql>
+	 </changeSet>
+	 
+	 <changeSet author="oa" id="57" context="minimize observation table">	 
+	 	<dropColumn tableName="observation" columnName="origin"/>	 
+	 	<dropColumn tableName="observation" columnName="channel_nr"/>
+	 	<dropColumn tableName="observation" columnName="rssi"/>	 
+	 </changeSet>
+	 	 
+	 <changeSet id="58" author="oa" context="minimize observation table">
+	 	<sql>drop trigger trg_update_board_channel on observation;</sql>
+	 	<sql>drop function _update_board_channel();</sql>
+	 </changeSet>	 
+	 
+	<changeSet id="59" author="oa" context="minimize observation table">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION _chk_observation()
+  RETURNS trigger AS
+$BODY$
+    DECLARE	
+	_crec record;
+	_chk record;
+	_counts int;	
+    BEGIN       
+        
+        SELECT INTO _crec coalesce(b.sampling_interval, c.sampling_interval) as sampling_interval, c.spline_id FROM channel c, board b WHERE b.id = c.board_id and c.id = NEW.channel_id;
+        -- RAISE NOTICE 'Check device (%)', NEW.channel_id;
+        if found then
+		-- Validation  
+		select into _chk * from check_obs_valid(real_value(NEW.result_value,_crec.spline_id),NEW.channel_id) ;
+		NEW.status_valid := _chk.code;
+		-- RAISE NOTICE 'Validation (%)', _chk.code;
+		
+		-- Completeness 
+		-- missing values since last update are handled by function get_channel_count			 
+		if (_crec.sampling_interval is not null) then
+			select into _counts count(*) + 1 from observation where channel_id = NEW.channel_id and result_time >= now() - ((10 * _crec.sampling_interval) || ' seconds')::interval;			
+		end if;
+
+		-- RAISE NOTICE 'Counts (%)', _counts;			
+		UPDATE channel set status_valid = _chk.code, status_valid_msg = _chk.msg , last_count = _counts where id = NEW.channel_id;		
+        end if;	
+        RETURN NEW;        
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;			 	
+	]]>
+	</createProcedure>
+	</changeSet>
+	 
+	 
+ 
+	 
+<changeSet author="oa" id="60" context="minimize observation table">
+<sql>
+	DROP TRIGGER IF EXISTS trg_chk_observation on observation;
+	CREATE TRIGGER trg_chk_observation
+  	BEFORE INSERT
+  	ON observation
+  	FOR EACH ROW
+  	EXECUTE PROCEDURE _chk_observation();
+</sql>
+</changeSet>	
+	 
+<changeSet id="61" author="oa" context="minimize observation table" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION insert_observation(_origin text, _result_time timestamp with time zone, _rssi integer, _channel_nr integer[], _result_value double precision[])
+  RETURNS boolean AS
+$BODY$declare
+		_bid bigint;
+		_cid bigint;
+		_crec record;
+		begin
+		-- Check if board already exists 
+		select into _bid id from board where origin = _origin;
+		if not found then 
+  			select into _bid nextval('board_id_seq');
+  			if not found then
+	 			raise exception 'Sequence board_id_seq not found'; 
+  			end if;
+  			insert into board(id,origin,last_result_time,last_rssi) values (_bid,_origin,_result_time,_rssi) ;
+  		else 
+  			update board set last_result_time = _result_time, last_rssi = _rssi where id = _bid;
+		end if;
+
+		-- Check if channel exists 
+		for i IN 1..array_upper(_channel_nr, 1) LOOP
+   			select into _crec * from channel where nr = _channel_nr[i] and board_id = _bid; 
+   			if not found then
+   				select into _crec.id nextval('channel_id_seq');
+				if not found then
+					raise exception 'Sequence channel_id_seq not found'; 
+				end if;		   			
+				insert into channel (id,nr,board_id,last_result_time) values (_crec.id,_channel_nr[i],_bid,_result_time);  
+   			else 
+   				update channel set last_result_time = _result_time where id = _crec.id;
+   			end if;
+   			insert into observation (channel_id,result_time,result_value) values (_crec.id,_result_time,_result_value[i]);	 
+ 		end loop;		
+
+		return true;
+end$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+  	]]>
+	</createProcedure>
+
+</changeSet>
+
+
+
+<changeSet author="oa" id="62" context="minimize observation table">
+<sql>
+	delete from observation where channel_id not in (select id from channel);
+	alter table observation add constraint fk_obs_channel foreign key (channel_id) references channel on delete cascade;
+</sql>     
+</changeSet>
+
+<changeSet id="63" author="oa">
+<sql>drop table if exists phenomena</sql>
+</changeSet>
+
+<changeSet id="64" author="oa">
+<comment>AutoExport</comment>
+<addColumn tableName="board"><column name="db_folder_id" type="int4"></column></addColumn>
+<rollback>
+<dropColumn tableName="board" columnName="db_folder_id"/>
+</rollback>
+</changeSet>
+
+<changeSet id="65" author="oa">
+<comment>AutoExport</comment>
+<addColumn tableName="board"><column name="db_auto_export" type="bool"></column></addColumn>
+<rollback>
+<dropColumn tableName="board" columnName="db_auto_export"/>
+</rollback>
+</changeSet>
+
+<changeSet id="66" author="oa">
+<comment>AutoExport</comment>
+<addColumn tableName="channel"><column name="db_exclude_auto_export" type="bool"></column></addColumn>
+<rollback><dropColumn tableName="channel" columnName="db_exclude_auto_export"/></rollback>
+</changeSet>
+
+<changeSet id="68" author="oa">
+<comment>AutoExport</comment>
+<addColumn tableName="unit"><column name="db_unit_id" type="int4"></column></addColumn>
+<rollback><dropColumn tableName="unit" columnName="db_unit_id"/></rollback>
+</changeSet>
+
+<changeSet id="69" author="oa">
+<comment>Add Aggregation Functions</comment>
+<insert tableName="function"><column name="name">min</column></insert>
+<insert tableName="function"><column name="name">max</column></insert>
+<insert tableName="function"><column name="name">stddev</column></insert>
+<insert tableName="function"><column name="name">sum</column></insert>
+<insert tableName="function"><column name="name">variance</column></insert>
+</changeSet>
+
+<changeSet id="70" author="oa">
+<comment>Add Aggregation Intervals</comment>
+<insert tableName="interval"><column name="name">15 min</column></insert>
+<insert tableName="interval"><column name="name">45 min</column></insert>
+<insert tableName="interval"><column name="name">2 hour</column></insert>
+<insert tableName="interval"><column name="name">3 hour</column></insert>
+<insert tableName="interval"><column name="name">4 hour</column></insert>
+<insert tableName="interval"><column name="name">1 day</column></insert>
+<insert tableName="interval"><column name="name">1 week</column></insert>
+<insert tableName="interval"><column name="name">1 month</column></insert>
+</changeSet>
+
+<changeSet id="71" author="oa">
+<comment>Ignore duplicate entries in observation table. Occurs when import of files is started twice.</comment>
+<sql>CREATE OR REPLACE RULE observation_inserts AS ON INSERT TO observation
+   WHERE ( SELECT true AS bool FROM observation WHERE channel_id = new.channel_id AND result_time = new.result_time) DO INSTEAD NOTHING;
+</sql>
+</changeSet>
+
+<changeSet author="oa" id="72">
+<comment>Remove constraint phenomena is not null on channel_template. Prevent null constraint error when calling Board.SaveAsTemplate on boards with channel.phenomena is null.</comment>
+<sql>
+	ALTER TABLE channel_template 
+	ALTER COLUMN phenomena DROP NOT NULL;
+</sql>     
+</changeSet>
+
+<changeSet author="oa" id="73">
+<comment>Improve delete performance with extra table</comment>
+<createTable tableName="observation_exp">
+ 			<column name="id" type="bigserial">
+      			<constraints nullable="false" primaryKey="true" primaryKeyName="observation_exp_pkey"/>
+        	</column>        	        	
+        	        	
+            <column name="channel_id" type="int4">
+                <constraints nullable="false"/>
+            </column>            
+            <column name="result_time" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result_value" type="FLOAT4(8,8)">
+                <constraints nullable="false"/>
+            </column>            
+            <column name="status_valid" type="int4"/>
+</createTable>     
+</changeSet>
+
+<changeSet author="oa" id="74">
+	<comment>Improve delete performance with extra table</comment>
+	<sql>insert into observation_exp select id, channel_id, result_time, result_value, status_valid from observation where imported = true</sql>
+	<dropIndex schemaName="public" tableName="observation" indexName="observation_imported_result_time"/>
+	<sql>delete from observation where imported = true</sql>	
+	<dropColumn schemaName="public" tableName="observation" columnName="imported"/>
+	<createIndex schemaName="public" tableName="observation_exp" indexName="obs_exp_cha_id">
+		 <column name="channel_id"/>        
+	</createIndex>
+	<createIndex schemaName="public" tableName="observation_exp" indexName="obs_exp_res_time">
+		 <column name="result_time"/>        
+	</createIndex>	
+</changeSet>
+
+
+<changeSet author="oa" id="75" runOnChange="true">
+<comment>Improve delete performance with extra table</comment>
+	<createProcedure>
+<![CDATA[	
+CREATE OR REPLACE FUNCTION delete_obs(ctime timestamp with time zone)
+  RETURNS void AS
+$BODY$
+declare
+ cha record;
+begin
+ for cha in select id,i_name, date_truncate(ctime, i_name::interval) dtime from channel_detail where db_series_id is not null 
+ loop
+     if (cha.i_name is null) then    
+	RAISE INFO 'Moving records of id:% to observation_exp', cha.id; 
+	insert into observation_exp select * from observation where channel_id = cha.id and result_time < ctime;	    	
+	RAISE INFO 'Deleting records of id:% in observation', cha.id; 
+	delete from observation where channel_id = cha.id and result_time < ctime;
+    else 
+	RAISE INFO 'Moving records of id:% to observation_exp', cha.id; 
+	insert into observation_exp select * from observation where channel_id = cha.id and result_time < cha.dtime;	    		
+	RAISE INFO 'Deleting records of id:% in observation', cha.id; 
+	delete from observation where channel_id = cha.id and result_time < cha.dtime;
+    end if;    
+ end loop;  
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ ]]>
+</createProcedure>
+</changeSet>
+
+
+
+
+<changeSet author="oa" id="77" runOnChange="true">
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION get_channel_time_value(ctime timestamp with time zone, channel_id bigint, spline_id bigint, afunction text, ainterval text)
+  RETURNS SETOF time_value AS
+$BODY$
+declare
+ret time_value%rowtype;
+begin
+  if (ctime is null or channel_id is null) then 
+	return;
+  end if;
+
+  if (spline_id is null and afunction is null) then 
+	-- original			
+	return query execute 'select result_time,result_value from observation where result_time < $1 and channel_id = $2 order by 1'
+	using ctime,channel_id;	
+  elsif (spline_id is not null and afunction is null)  then 
+	-- interpolation 
+	return query execute 'select result_time,real_value(result_value,$1) as result_value
+		from observation where result_time < $2 and channel_id = $3 order by 1'
+		using spline_id, ctime, channel_id;	
+  elsif (spline_id is null and afunction is not null)  then 
+	-- original and aggregation 
+	return query execute 'select date_truncate(result_time,interval ''' || ainterval || ''')  as result_time, ' || afunction || '(result_value)::real as result_value from observation
+                         where result_time < date_truncate($1, interval ''' || ainterval || ''') and channel_id = $2
+                         group by date_truncate(result_time, interval ''' || ainterval || ''') order by 1'
+               using ctime, channel_id;
+  elsif (spline_id is not null and afunction is not null)  then 
+	-- interpolation and aggregation 	
+	return query execute 'select date_truncate(result_time,interval ''' || ainterval || ''')  as result_time, ' || afunction || '(real_value(result_value,$1))::real as result_value from observation
+                         where result_time < date_truncate($2, interval ''' || ainterval || ''') and channel_id = $3
+                         group by date_truncate(result_time, interval ''' || ainterval || ''') order by 1'
+               using spline_id, ctime, channel_id;	
+  end if;
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+  ]]>
+	</createProcedure>	
+	</changeSet>
+
+
+
+<changeSet id="78" author="oa">
+	<comment>Observation Export Table</comment>
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION _chk_observation()
+  RETURNS trigger AS
+$BODY$
+    DECLARE	
+	_crec record;
+	_chk record;
+	_c_obs int;
+	_c_exp int;
+	
+    BEGIN               
+        SELECT INTO _crec coalesce(b.sampling_interval, c.sampling_interval) as sampling_interval, c.spline_id FROM channel c, board b WHERE b.id = c.board_id and c.id = NEW.channel_id;
+        -- RAISE NOTICE 'Check device (%)', NEW.channel_id;
+        if found then
+		-- Validation  
+		select into _chk * from check_obs_valid(real_value(NEW.result_value,_crec.spline_id),NEW.channel_id) ;
+		NEW.status_valid := _chk.code;
+		-- RAISE NOTICE 'Validation (%)', _chk.code;
+		
+		-- Completeness 
+		-- missing values since last update are handled by function get_channel_count			 
+		if (_crec.sampling_interval is not null) then								  
+			select into _c_obs count(*) from observation where channel_id = NEW.channel_id and result_time >= now() - ((10 * _crec.sampling_interval) || ' seconds')::interval; 
+			select into _c_exp count(*) from observation_exp where channel_id = NEW.channel_id and result_time >= now() - ((10 * _crec.sampling_interval) || ' seconds')::interval;
+		end if;
+
+		-- RAISE NOTICE 'Counts (%)', _c_obs + _c_exp + 1;			
+		UPDATE channel set status_valid = _chk.code, status_valid_msg = _chk.msg , last_count = _c_obs + _c_exp + 1 where id = NEW.channel_id;		
+        end if;	
+        RETURN NEW;        
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;			 	
+	]]>
+	</createProcedure>
+	</changeSet>	
+
+
+	
+	<changeSet id="79" author="oa">
+		<comment>Observation Export Table</comment>
+	    <sql>
+	        CREATE INDEX obs_exp_ch_id_result_time
+  			ON observation_exp
+  			USING btree
+  			(channel_id, result_time);	        
+	    </sql>	   	    
+	</changeSet>
+	
+	<changeSet id="80" author="oa">
+		<comment>Board Group</comment>
+	    <createTable tableName="board_group">
+	        <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="board_group_pkey"/>
+            </column>            
+            <column name="name" type="TEXT">
+            	<constraints nullable="false"/>
+            </column> 
+	    </createTable>
+	</changeSet>
+	
+	  
+	
+	 
+	
+	<changeSet id="82" author="oa">	
+		<comment>Board Group</comment>
+	    <addColumn tableName="board"><column name="board_group_id" type="int4"></column></addColumn>	   	    	    
+	</changeSet>
+	
+	
+	<changeSet id="83" author="oa">
+		<comment>Board Group</comment>
+	    <sql>alter table board add constraint fk_board_board_group foreign key (board_group_id) references board_group on delete cascade;</sql>	    
+	</changeSet>
+	
+	<changeSet id="84" author="oa">
+	   <comment>Check with delay</comment>
+		<addColumn tableName="board"><column type="integer" name="check_delay"/></addColumn>			
+	</changeSet>
+	
+		
+	<changeSet id="85" author="oa" runOnChange="true">
+	<comment>Check with delay</comment>
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION _chk_observation()
+  RETURNS trigger AS
+$BODY$
+    DECLARE	
+	_crec record;
+	_chk record;
+	_c_obs int;
+	_c_exp int;
+	_c_total int;
+	
+    BEGIN               
+        SELECT INTO _crec coalesce(b.sampling_interval, c.sampling_interval) as sampling_interval, coalesce(check_delay,0) as check_delay, 
+        c.spline_id FROM channel c, board b WHERE b.id = c.board_id and c.id = NEW.channel_id;        
+        -- RAISE NOTICE 'Check device (%)', NEW.channel_id;
+        if found then
+			-- Validation  
+			select into _chk * from check_obs_valid(real_value(NEW.result_value,_crec.spline_id),NEW.channel_id) ;
+			NEW.status_valid := _chk.code;
+			-- RAISE NOTICE 'Validation (%)', _chk.code;
+		
+			-- Completeness 
+			-- missing values since last update are handled by function get_channel_count			 
+			if (_crec.sampling_interval is not null) then																					
+				select into _c_obs count(*) from observation where channel_id = NEW.channel_id and result_time between 
+					(now() - ( (10*_crec.sampling_interval+_crec.check_delay) || ' seconds')::interval) and 
+					(now() - (_crec.check_delay || ' seconds')::interval);			
+				select into _c_exp count(*) from observation_exp where channel_id = NEW.channel_id and result_time between 
+					(now() - ( (10*_crec.sampling_interval+_crec.check_delay) || ' seconds')::interval) and 
+					(now() - (_crec.check_delay || ' seconds')::interval);
+				_c_total := _c_obs + _c_exp;
+				if (_crec.check_delay=0) then
+					_c_total := _c_total + 1;
+				end if;				
+			-- RAISE NOTICE 'Counts (%)', _c_total;
+			end if;
+			UPDATE channel set status_valid = _chk.code, status_valid_msg = _chk.msg , last_count = _c_total where id = NEW.channel_id;			 
+		end if;						 		        	
+        RETURN NEW;        
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;			 	
+	]]>
+	</createProcedure>	
+	</changeSet>
+	
+	
+		
+<changeSet id="88" author="oa">
+		<comment>Check with delay</comment>
+		<dropView viewName="suspect_channel"/>
+		<dropView viewName="board_status"/>
+		<dropView viewName="channel_status"/>
+		<dropView viewName="channel_detail"/>
+		<dropView viewName="check_device"/>					
+</changeSet>
+	
+	
+<changeSet id="89" author="oa">
+		<comment>Check with delay</comment>
+		<sql>DROP FUNCTION get_channel_count(integer, timestamp with time zone, integer);</sql>
+		<createProcedure>
+		<![CDATA[
+		CREATE OR REPLACE FUNCTION get_channel_count(_counts integer, _lrt timestamp with time zone, _sampling_interval integer, _check_delay integer)
+  		RETURNS integer AS
+		$BODY$
+		DECLARE
+			c int;
+			id interval;			
+		BEGIN
+			id:= _check_delay * interval '1 second';			
+			if (_lrt < now()-id) then		
+			   c:= ceil(_counts - extract(EPOCH from now()-id-_lrt)/_sampling_interval);
+			else 
+			   c:= _counts;
+			end if;
+			if (c < 0) THEN 
+				c:= 0;
+			end if;
+			return c;
+		END; 
+		$BODY$
+  		LANGUAGE plpgsql VOLATILE
+  		COST 100;		
+
+		]]>		
+		</createProcedure>  							
+</changeSet>
+
+<changeSet id="90" author="oa">
+<comment>Check with delay</comment>
+<createView viewName="check_device">
+SELECT b.id AS board_id, b.origin AS board_origin, COALESCE(b.check_delay,0) as check_delay, c.id AS channel_id, c.nr AS channel_nr, 
+ COALESCE(c.critical_max, b.critical_max) AS critical_max, 
+ COALESCE(c.critical_min, b.critical_min) AS critical_min, 
+ COALESCE(c.warning_max, b.warning_max) AS warning_max, 
+ COALESCE(c.warning_min, b.warning_min) AS warning_min, 
+ COALESCE(c.sampling_interval, b.sampling_interval) AS sampling_interval, 
+ COALESCE(c.filter_critical_values, b.filter_critical_values) AS filter_critical_values, 
+ COALESCE(c.exclude_from_nagios, b.exclude_from_nagios) AS exclude_from_nagios
+   FROM board b, channel c
+  WHERE b.id = c.board_id;
+  </createView></changeSet>
+  
+  
+<changeSet id="91" author="oa">
+<comment>Check with delay</comment>
+<createView viewName="channel_detail">
+	SELECT c.id, c.db_series_id, c.spline_id, f.name AS f_name, i.name AS i_name, cd.filter_critical_values
+   FROM board b, check_device cd, channel c
+   LEFT JOIN function f ON f.id = c.aggr_function_id
+   LEFT JOIN "interval" i ON i.id = c.aggr_interval_id
+  WHERE c.id = cd.channel_id AND b.id = c.board_id
+  ORDER BY b.origin, c.nr;</createView>
+</changeSet>
+	
+<changeSet id="92" author="oa">
+<comment>Check with delay</comment>
+<createView viewName="channel_status">
+		SELECT a.board_id, a.id, a.nr, a.label, a.status_valid, a.status_valid_msg, 
+		CASE WHEN (a.last_count IS NULL) THEN 3 WHEN (a.last_count &gt; 8) THEN 0 WHEN (a.last_count = 0) THEN 2 ELSE 1 END
+		AS status_complete, CASE WHEN (a.last_count IS NULL) THEN 'Missing parameters.'::text ELSE ((a.last_count * 10) || '% completeness'::text) END AS status_complete_msg, 
+		a.last_result_time FROM (SELECT c.board_id, c.id, c.nr, c.label, c.status_valid, c.status_valid_msg, c.last_result_time, 
+		get_channel_count(c.last_count, (c.last_result_time)::timestamp with time zone, cd.sampling_interval, cd.check_delay) AS last_count 
+		FROM channel c, check_device cd WHERE (c.id = cd.channel_id)) a;
+	</createView>
+</changeSet>
+	
+<changeSet id="93" author="oa">
+<comment>Check with delay</comment>
+<createView viewName="board_status">
+		select board_group.id as group_id, board_group.name as group_name, board.id, board.name, board.origin, board.last_rssi, board.last_result_time, a.status_valid, a.status_complete from board left outer join board_group on (board.board_group_id = board_group.id), 
+		( SELECT b.id, max(sc.status_valid) AS status_valid, max(sc.status_complete) AS status_complete FROM board b, channel_status sc
+         WHERE b.id = sc.board_id GROUP BY b.id) a WHERE board.id = a.id;
+	</createView>
+</changeSet>
+
+<changeSet author="oa" id="94">
+<comment>Check with delay</comment>
+<createView viewName="nagios_status">select board_group.id as group_id, board_group.name as group_name,b.id as board_id, b.origin as board_origin, c.id as channel_id, c.nr as channel_nr, c.label as channel_label, c.status_complete, c.status_complete_msg, c.status_valid, c.status_valid_msg from board b left outer join board_group on (board_group.id = b.board_group_id), channel_status c where c.board_id = b.id and (c.status_complete &gt; 0 or c.status_valid &gt; 0) order by group_name, b.origin, c.nr;
+</createView>
+</changeSet>
+
+<changeSet author="oa" id="95" runOnChange="true">
+<comment>Board Group View</comment>
+<sql>drop view if exists group_status</sql>
+<createView viewName="group_status">
+SELECT board_group.id, board_group.name, s.lrt, s.board_count, s.status 
+FROM board_group left outer join 
+(SELECT board_status.group_id, max(board_status.last_result_time) AS lrt, count(board_status.id) AS board_count, GREATEST(board_status.status_valid, board_status.status_complete) AS status 
+FROM board_status GROUP BY board_status.group_id, board_status.status_valid, board_status.status_complete) as s
+ on (board_group.id = s.group_id) order by board_group.name;
+</createView>	
+</changeSet>
+
+<changeSet author="oa" id="96">
+<comment>Work with default values in all boolean fields</comment>
+<update tableName="board"><column name="exclude_from_nagios">false</column><where>exclude_from_nagios is null</where></update>
+<update tableName="board"><column name="filter_critical_values">false</column><where>filter_critical_values is null</where></update>
+<update tableName="board"><column name="db_auto_export">false</column><where>db_auto_export is null</where></update>
+<update tableName="channel"><column name="exclude_from_nagios">false</column><where>exclude_from_nagios is null</where></update>
+<update tableName="channel"><column name="filter_critical_values">false</column><where>filter_critical_values is null</where></update>
+<update tableName="channel"><column name="db_exclude_auto_export">false</column><where>db_exclude_auto_export is null</where></update>
+</changeSet>
+
+<changeSet author="oa" id="97">
+<comment>Work with default values in all boolean fields</comment>
+<sql>create or replace view check_device as SELECT b.id AS board_id, b.origin AS board_origin,
+ COALESCE(b.check_delay, 0) AS check_delay, 
+ c.id AS channel_id, 
+ c.nr AS channel_nr, 
+ COALESCE(c.critical_max, b.critical_max) AS critical_max, 
+ COALESCE(c.critical_min, b.critical_min) AS critical_min, 
+ COALESCE(c.warning_max, b.warning_max) AS warning_max, 
+ COALESCE(c.warning_min, b.warning_min) AS warning_min, 
+ COALESCE(c.sampling_interval, b.sampling_interval) AS sampling_interval, 
+ c.filter_critical_values or b.filter_critical_values AS filter_critical_values, 
+ c.exclude_from_nagios or b.exclude_from_nagios AS exclude_from_nagios
+   FROM board b, channel c
+  WHERE b.id = c.board_id;
+  </sql>
+  </changeSet>
+  
+  <changeSet author="oa" id="98" runOnChange="true">
+  <comment>Work with default values in all boolean fields</comment>
+  <sql>ALTER TABLE board ALTER COLUMN exclude_from_nagios SET DEFAULT false;</sql>  
+  <sql>update board set exclude_from_nagios = false where exclude_from_nagios is null;</sql>
+  <sql>ALTER TABLE board ALTER COLUMN exclude_from_nagios SET NOT NULL;</sql>
+ 
+  <sql>ALTER TABLE board ALTER COLUMN filter_critical_values SET DEFAULT false;</sql>  
+  <sql>update board set filter_critical_values = false where filter_critical_values is null;</sql>
+  <sql>ALTER TABLE board ALTER COLUMN filter_critical_values SET NOT NULL;</sql>
+  
+  <sql>ALTER TABLE board ALTER COLUMN db_auto_export SET DEFAULT false;</sql>
+  <sql>update board set db_auto_export = false where db_auto_export is null;</sql>  
+  <sql>ALTER TABLE board ALTER COLUMN db_auto_export SET NOT NULL;</sql>
+ 
+  <sql>ALTER TABLE channel ALTER COLUMN exclude_from_nagios SET DEFAULT false;</sql>
+  <sql>update channel set exclude_from_nagios = false where exclude_from_nagios is null;</sql>  
+  <sql>ALTER TABLE channel ALTER COLUMN exclude_from_nagios SET NOT NULL;</sql>
+  
+  <sql>ALTER TABLE channel ALTER COLUMN filter_critical_values SET DEFAULT false;</sql>
+  <sql>update channel set filter_critical_values = false where filter_critical_values is null;</sql>  
+  <sql>ALTER TABLE channel ALTER COLUMN filter_critical_values SET NOT NULL;</sql>
+  
+  <sql>ALTER TABLE channel ALTER COLUMN db_exclude_auto_export SET DEFAULT false;</sql>
+  <sql>update channel set db_exclude_auto_export = false where db_exclude_auto_export is null;</sql>  
+  <sql>ALTER TABLE channel ALTER COLUMN db_exclude_auto_export SET NOT NULL;</sql>
+  </changeSet>
+  
+  
+  <changeSet author="oa" id="99">
+  <comment>Set Board.Group to null on delete off group</comment>
+  <sql>ALTER TABLE board DROP CONSTRAINT fk_board_board_group;</sql>
+  <sql>ALTER TABLE board
+  	  ADD CONSTRAINT fk_board_board_group FOREIGN KEY (board_group_id)
+      REFERENCES board_group (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE SET NULL;
+  </sql>    
+  </changeSet>
+  
+  <changeSet id="100" author="oa">
+  <comment>Add exclude function to nagios_status</comment>
+  <sql>
+  CREATE OR REPLACE VIEW nagios_status AS 
+ SELECT board_group.id AS group_id, board_group.name AS group_name, 
+	b.id AS board_id, b.origin AS board_origin, 
+	c.id AS channel_id, c.nr AS channel_nr, c.label AS channel_label, 
+	cs.status_complete, cs.status_complete_msg, cs.status_valid, cs.status_valid_msg
+   FROM board b LEFT JOIN board_group ON board_group.id = b.board_group_id, 
+   channel c,
+   channel_status cs
+  WHERE b.id = c.board_id and cs.id = c.id AND (cs.status_complete > 0 OR cs.status_valid > 0)
+  AND not (b.exclude_from_nagios or c.exclude_from_nagios)
+  ORDER BY board_group.name, b.origin, c.nr;
+  </sql>
+  </changeSet>
+  
+  
+  
+  
+  <changeSet id="103" author="oa" context="BUG #8" runOnChange="true">  
+  <sql>CREATE OR REPLACE VIEW group_status AS
+ SELECT board_group.id, board_group.name, s.lrt, s.board_count, s.status
+   FROM board_group
+   LEFT JOIN (SELECT board_status.group_id, board_status.group_name, max(board_status.last_result_time) AS lrt, count(board_status.id) AS board_count, 
+   max(GREATEST(board_status.status_valid, board_status.status_complete)) AS status
+   FROM board_status GROUP BY 1,2) s on board_group.id = s.group_id order by board_group.name;
+  </sql>  
+  </changeSet>
+  
+
+<changeSet id="104" author="oa" context="BUG #12">
+<sql>
+CREATE OR REPLACE VIEW board_status AS 
+ SELECT board_group.id AS group_id, board_group.name AS group_name, board.id, board.name, board.origin, board.last_rssi, board.last_result_time, a.status_valid, a.status_complete
+   FROM board
+   LEFT JOIN board_group ON board.board_group_id = board_group.id, ( SELECT b.id, max(channel_status.status_valid) AS status_valid, max(channel_status.status_complete) AS status_complete
+      FROM board b
+   LEFT JOIN channel_status ON b.id = channel_status.board_id
+  GROUP BY b.id) a
+  WHERE board.id = a.id;
+</sql>
+</changeSet>
+
+
+<changeSet id="105" author="oa" context="Feature #10">
+  <sql>ALTER USER xbee NOSUPERUSER;</sql>
+ </changeSet>
+</databaseChangeLog>

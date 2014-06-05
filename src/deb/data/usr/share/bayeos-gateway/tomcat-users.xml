@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users>
+   <role rolename="manager"/>
+   <!-- For nagios check -->
+  <user username="root" password="bayeos" roles="manager"/>
+</tomcat-users>

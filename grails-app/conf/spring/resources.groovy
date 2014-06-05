@@ -1,0 +1,5 @@
+
+
+beans = {	
+	customPropertyEditorRegistrar(CustomPropertyEditorRegistrar)
+}

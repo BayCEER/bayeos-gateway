@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+<changeSet id="101" author="oa">
+  <comment>File Import</comment>
+  <createTable tableName="file_format">
+  <column autoIncrement="true" name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="file_format_pkey"/>
+            </column>            
+            <column name="name" type="TEXT">
+            	<constraints nullable="false"/>
+            </column> 
+            <column name="xml" type="TEXT">
+            	<constraints nullable="false"/>
+            </column>
+  </createTable>
+  </changeSet>
+  
+  <changeSet id="102" author="oa">
+  <comment>Frame storage</comment>
+  <sql>ALTER TABLE board add COLUMN frame_storage boolean not null default false;</sql>  
+  </changeSet>
+  
+<changeSet id="105" author="oa" context="Feature #22" runOnChange="true">
+<comment>Spring Security</comment>
+<sql>
+
+-- This will delete all current users
+drop table if exists user_role;
+drop table if exists role;
+drop table if exists users;
+
+
+create table role (id bigserial not null, version bigint , authority varchar(255) not null unique, primary key (id));
+create table users (id bigserial not null, version bigint , account_expired boolean not null, account_locked boolean not null, enabled boolean not null, "password" varchar(255) not null, password_expired boolean not null, username varchar(255) not null unique, primary key (id));
+create table user_role (role_id bigserial not null, user_id bigint not null, primary key (role_id, user_id));
+
+alter table user_role add constraint FK143BF46A2B8BC784 foreign key (role_id) references role;
+alter table user_role add constraint FK143BF46AD0B68B64 foreign key (user_id) references "users";
+
+
+-- Default Roles 
+insert into role(id, version, authority) values (1, 0, 'ROLE_ADMIN');
+insert into role(id, version, authority) values (2, 0, 'ROLE_USER');
+insert into role(id, version, authority) values (3, 0, 'ROLE_CHECK');
+insert into role(id, version, authority) values (4, 0, 'ROLE_IMPORT');
+select setval('role_id_seq',4); 
+
+-- Create one unlocked admin user with password "xbee"
+insert into users (version, account_expired, account_locked, enabled, password, password_expired, username) values (0, false, false, true, 'zZZSEKOCeaHyuf4TDN8/vubx+8g=', false, 'admin');
+insert into user_role values (1,1);
+
+-- Locked accounts with password "xbee"  
+insert into users (version, account_expired, account_locked, enabled, password, password_expired, username) values (0, false, true, true, 'zZZSEKOCeaHyuf4TDN8/vubx+8g=', false, 'nagios');
+insert into users (version, account_expired, account_locked, enabled, password, password_expired, username) values (0, false, true, true, 'zZZSEKOCeaHyuf4TDN8/vubx+8g=', false, 'import');
+
+insert into user_role (role_id, user_id) select 3, id from users where username like 'nagios';
+insert into user_role (role_id, user_id) select 4, id from users where username like 'import';
+
+drop table if exists acl_entry;
+drop table if exists acl_object_identity;
+drop table if exists acl_sid;
+drop table if exists acl_class;
+
+create table acl_class (id bigserial not null, class varchar(255) not null, primary key (id));
+create table acl_entry (id bigserial not null, ace_order integer not null, acl_object_identity bigint not null, audit_failure boolean not null, audit_success boolean not null, granting boolean not null, mask integer not null, sid bigint not null, primary key (id), unique (acl_object_identity, ace_order));
+create table acl_object_identity (id bigserial not null, object_id_class bigint not null, entries_inheriting boolean not null, object_id_identity bigint not null, owner_sid bigint, parent_object bigint, primary key (id), unique (object_id_class, object_id_identity));
+create table acl_sid (id bigserial not null, principal boolean not null, sid varchar(255) not null, primary key (id), unique (sid, principal));
+
+alter table acl_entry add constraint FK5302D47D8FDB88D5 foreign key (sid) references acl_sid;
+alter table acl_entry add constraint FK5302D47DB0D9DC4D foreign key (acl_object_identity) references acl_object_identity;
+alter table acl_object_identity add constraint FK2A2BB009A50290B8 foreign key (parent_object) references acl_object_identity;
+alter table acl_object_identity add constraint FK2A2BB00970422CC5 foreign key (object_id_class) references acl_class;
+alter table acl_object_identity add constraint FK2A2BB00990EC1949 foreign key (owner_sid) references acl_sid;
+
+insert into acl_class (class) values ('gateway.Board');
+insert into acl_class (class) values ('gateway.BoardGroup');
+insert into acl_class (class) values ('gateway.BoardTemplate');
+insert into acl_class (class) values ('gateway.Channel');
+insert into acl_class (class) values ('gateway.ChannelTemplate');
+insert into acl_class (class) values ('gateway.FileFormat');
+insert into acl_class (class) values ('gateway.Function');
+insert into acl_class (class) values ('gateway.Interval');
+insert into acl_class (class) values ('gateway.KnotPoint');
+insert into acl_class (class) values ('gateway.Message');
+insert into acl_class (class) values ('gateway.MessageType');
+insert into acl_class (class) values ('gateway.Observation');
+insert into acl_class (class) values ('gateway.Spline');
+insert into acl_class (class) values ('gateway.Unit');
+insert into acl_class (class) values ('gateway.User');
+</sql>
+</changeSet>
+
+<changeSet id="106" author="oa">
+<comment>Job Tables</comment>
+<sql>
+create table delete_job_config (id bigserial not null, delay_interval int4 not null, enabled bool not null, 
+max_message_interval_name text not null, max_result_interval_name text not null, primary key (id));
+
+insert into delete_job_config (delay_interval,enabled,max_message_interval_name,max_result_interval_name) values 
+('120',true,'60 days','60 days');
+
+create table export_job_config (id bigserial not null, db_home_folder_id int4, db_home_unit_id int4, 
+delay_interval int4 not null, enabled bool not null, password text, records_per_bulk int4 not null, url text not null, user_name text, primary key (id));
+
+insert into export_job_config (delay_interval,enabled,records_per_bulk,url,user_name) values 
+(10,true,10000,'http://localhost/BayEOS-Server/XMLServlet','import');
+
+insert into acl_class (class) values ('gateway.DeleteJobConfig');
+insert into acl_class (class) values ('gateway.ExportJobConfig');
+
+</sql>
+ </changeSet>
+  
+  
+  <changeSet id="109" author="oa">
+  <comment>Add last_result_value field to channel</comment>
+  <addColumn tableName="channel"><column name="last_result_value" type="real"></column></addColumn>
+  </changeSet>
+    
+  <changeSet id="110" author="oa" runOnChange="true">
+	<comment>Persist lrv values</comment>
+	<createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION _chk_observation()
+  RETURNS trigger AS
+$BODY$
+    DECLARE	
+	_crec record;
+	_chk record;
+	_c_obs int;
+	_c_exp int;
+	_c_total int;
+	_lrv real;
+	
+    BEGIN               
+        SELECT INTO _crec coalesce(b.sampling_interval, c.sampling_interval) as sampling_interval, coalesce(check_delay,0) as check_delay, 
+        c.spline_id FROM channel c, board b WHERE b.id = c.board_id and c.id = NEW.channel_id;        
+        -- RAISE NOTICE 'Check device (%)', NEW.channel_id;
+        if found then
+		-- Real Value
+		select into _lrv real_value(NEW.result_value,_crec.spline_id);
+		-- Validation  
+		select into _chk * from  check_obs_valid(_lrv,NEW.channel_id);
+			NEW.status_valid := _chk.code;
+			-- RAISE NOTICE 'Validation (%)', _chk.code;
+		
+			-- Completeness 
+			-- missing values since last update are handled by function get_channel_count			 
+			if (_crec.sampling_interval is not null) then																					
+				select into _c_obs count(*) from observation where channel_id = NEW.channel_id and result_time between 
+					(now() - ( (10*_crec.sampling_interval+_crec.check_delay) || ' seconds')::interval) and 
+					(now() - (_crec.check_delay || ' seconds')::interval);			
+				select into _c_exp count(*) from observation_exp where channel_id = NEW.channel_id and result_time between 
+					(now() - ( (10*_crec.sampling_interval+_crec.check_delay) || ' seconds')::interval) and 
+					(now() - (_crec.check_delay || ' seconds')::interval);
+				_c_total := _c_obs + _c_exp;
+				if (_crec.check_delay=0) then
+					_c_total := _c_total + 1;
+				end if;				
+			-- RAISE NOTICE 'Counts (%)', _c_total;
+			end if;
+			UPDATE channel set status_valid = _chk.code, status_valid_msg = _chk.msg , last_count = _c_total, last_result_value = _lrv where id = NEW.channel_id;			 
+		end if;						 		        	
+        RETURN NEW;        
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;			 	
+	]]>
+	</createProcedure>	
+	</changeSet>
+	
+	
+	<changeSet id="111" author="oa">
+	<comment>Add lrt values of channel</comment>
+	<sql>
+	CREATE OR REPLACE VIEW channel_status AS 
+ SELECT a.board_id, a.id, a.nr, a.label, a.status_valid, a.status_valid_msg,
+        CASE
+            WHEN a.last_count IS NULL THEN 3
+            WHEN a.last_count > 8 THEN 0
+            WHEN a.last_count = 0 THEN 2
+            ELSE 1
+        END AS status_complete, 
+        CASE
+            WHEN a.last_count IS NULL THEN 'Missing parameters.'::text
+            ELSE (a.last_count * 10) || '% completeness'::text
+        END AS status_complete_msg, a.last_result_time, a.last_result_value
+   FROM ( SELECT c.board_id, c.id, c.nr, c.label, c.status_valid, c.status_valid_msg, c.last_result_time, c.last_result_value, get_channel_count(c.last_count, c.last_result_time, cd.sampling_interval, cd.check_delay) AS last_count
+           FROM channel c, check_device cd
+          WHERE c.id = cd.channel_id) a;
+	</sql>
+	</changeSet>
+	
+  <changeSet id="113" author="oa">
+  <comment>Fill last_result_value on channel</comment>
+  <createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION insert_observation(_origin text, _result_time timestamp with time zone, _rssi integer, _channel_nr integer[], _result_value double precision[])
+  RETURNS boolean AS
+$BODY$declare
+		_bid bigint;
+		_cid bigint;
+		_crec record;
+		begin
+		-- Check if board already exists 
+		select into _bid id from board where origin = _origin;
+		if not found then 
+  			select into _bid nextval('board_id_seq');
+  			if not found then
+	 			raise exception 'Sequence board_id_seq not found'; 
+  			end if;
+  			insert into board(id,origin,last_result_time,last_rssi) values (_bid,_origin,_result_time,_rssi) ;
+  		else 
+  			update board set last_result_time = _result_time, last_rssi = _rssi where id = _bid;
+		end if;
+
+		-- Check if channel exists 
+		for i IN 1..array_upper(_channel_nr, 1) LOOP
+   			select into _crec * from channel where nr = _channel_nr[i] and board_id = _bid; 
+   			if not found then
+   				select into _crec.id nextval('channel_id_seq');
+				if not found then
+					raise exception 'Sequence channel_id_seq not found'; 
+				end if;		   			
+				insert into channel (id,nr,board_id,last_result_time, last_result_value) values (_crec.id,_channel_nr[i],_bid,_result_time,_result_value[i]);  
+   			else 
+   				update channel set last_result_time = _result_time, last_result_value = _result_value[i] where id = _crec.id;
+   			end if;
+   			insert into observation (channel_id,result_time,result_value) values (_crec.id,_result_time,_result_value[i]);	 
+ 		end loop;		
+
+		return true;
+end$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+  	]]>
+	</createProcedure> 
+  </changeSet>
+  <changeSet id="114" author="oa">
+  <comment>view all observation</comment>  	 
+  	<sql>
+  	create or replace view all_observation as select * from observation union select * from observation_exp;
+  	</sql>
+  </changeSet>
+  <changeSet id="115" author="oa">
+  <comment>Simplify delete process by insert timestamp attribute in tables </comment>
+  <sql>
+  	ALTER TABLE observation ADD COLUMN insert_time timestamp with time zone DEFAULT current_timestamp;
+  	update observation set insert_time = now();
+  	ALTER TABLE observation_exp ADD COLUMN insert_time timestamp with time zone;
+  	update observation_exp set insert_time = now();
+  	ALTER TABLE message ADD COLUMN insert_time timestamp with time zone DEFAULT current_timestamp;
+  	update message set insert_time = now();  	  	
+  </sql>
+  </changeSet>
+  
+  <changeSet id="116" author="oa" context="Rename of delayInterval to sleepInterval in ExportJobConfig">
+  <sql>
+  	ALTER TABLE export_job_config RENAME delay_interval to sleep_interval;
+  </sql>
+  </changeSet>
+  
+  <changeSet id="117" author="sh" context="BUG#62">
+  <sql>
+  create type time_value_flag as (
+  result_time timestamptz,
+  result_value real,
+  flag numeric
+  );  
+  </sql>
+  <createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION get_channel_time_value_flag(_ctime timestamp with time zone, _channel_id bigint, _spline_id bigint, _afunction text, _ainterval text)
+  RETURNS SETOF time_value_flag AS
+$BODY$
+declare
+ret time_value_flag%rowtype;
+rec record;
+-- Function will return time - value - flag. 
+-- If flag ==0 -> addByteRows, 
+-- elsif flag<1 ->  upsertByteRows 
+-- else ->  flag == 1 only "exported" -> ignore'
+begin
+  if (_ctime is null or _channel_id is null) then 
+	return;
+  end if;
+
+-- check if there are new values in the observation table
+  select into rec channel_id from observation where channel_id=_channel_id and result_time<_ctime limit 1;
+  if not found then
+    return;
+  end if;
+
+  if (_spline_id is null and _afunction is null) then 
+	-- original			
+	return query execute 'select result_time,result_value,0 as flag from observation where result_time < $1 and channel_id = $2 order by 1'
+	using _ctime,_channel_id;	
+  elsif (_spline_id is not null and _afunction is null)  then 
+	-- interpolation 
+	return query execute 'select result_time,real_value(result_value,$1) as result_value, 0 as flag
+		from observation where result_time < $2 and channel_id = $3 order by 1'
+		using _spline_id, _ctime, _channel_id;	
+  elsif (_spline_id is null and _afunction is not null)  then 
+	-- original and aggregation 
+	-- union form observation and observeration_exp
+	return query execute 'select date_truncate(result_time,interval ''' || _ainterval || ''')  as result_time, ' || _afunction || '(result_value)::real as result_value,avg(flag) as flag from 
+ (select result_time,result_value,0 as flag from observation
+  where result_time < date_truncate($1, interval ''' || _ainterval || ''') and channel_id = $2
+union
+ select result_time,result_value,1 as flag from observation_exp
+ where channel_id = $2 and result_time < date_truncate($1, interval ''' || _ainterval || ''') 
+ and result_time>= (select min(date_truncate(result_time, interval ''' || _ainterval || ''')) from observation where result_time < date_truncate($1, interval ''' || _ainterval || ''') and channel_id = $2) ) a
+
+                         group by date_truncate(result_time, interval ''' || _ainterval || ''') order by 1'
+               using _ctime, _channel_id;
+  elsif (_spline_id is not null and _afunction is not null)  then 
+	-- interpolation and aggregation 	
+	return query execute 'select date_truncate(result_time,interval ''' || _ainterval || ''')  as result_time, ' || _afunction || '(real_value(result_value,$1))::real as result_value,avg(flag) from 	(select result_time,result_value,0 as flag from observation
+  where result_time < date_truncate($2, interval ''' || _ainterval || ''') and channel_id = $3
+ union
+ select result_time,result_value,1 as flag from observation_exp
+  where result_time < date_truncate($2, interval ''' || _ainterval || ''') 
+  and result_time>= (select min(date_truncate(result_time, interval ''' || _ainterval || ''')) from observation where result_time < date_truncate($2, interval ''' || _ainterval || ''') and channel_id = $3) and channel_id = $3) a
+  group by date_truncate(result_time, interval ''' || _ainterval || ''') order by 1'
+               using _spline_id, _ctime, _channel_id;	
+  end if;
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+  	]]>
+  </createProcedure>
+  
+  
+  <sql>
+   DROP FUNCTION get_bayeos_obs(_ctime timestamp with time zone);
+  </sql>
+  
+  
+  <createProcedure>
+  <![CDATA[
+  CREATE FUNCTION get_bayeos_obs(_ctime timestamp with time zone)
+  RETURNS SETOF bayeos_observation AS
+$BODY$
+declare
+b bayeos_observation%rowtype;
+cha record;
+begin
+for cha in select * from channel_detail where db_series_id is not null 
+loop 
+ for b in select cha.db_series_id, c.result_time, c.result_value from 
+	get_channel_time_value_flag(_ctime,cha.id,cha.spline_id,cha.f_name,cha.i_name) as c where c.flag < 1
+ loop
+  return next b;
+ end loop;
+end loop;
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+  ]]>  
+  </createProcedure>  
+  <sql>
+  DROP FUNCTION get_channel_time_value(ctime timestamp with time zone, channel_id bigint, spline_id bigint, afunction text, ainterval text);
+  </sql>    
+  </changeSet>
+  
+  <changeSet id="118" author="oa" context="BUG#53">
+  <sql>create unique index knot_point_spline_id_x on knot_point(spline_id,x);</sql>  
+  </changeSet>
+  
+  <changeSet id="119" author="oa" context="BUG numeric flag values">
+  <createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION get_channel_time_value_flag(_ctime timestamp with time zone, _channel_id bigint, _spline_id bigint, _afunction text, _ainterval text)
+  RETURNS SETOF time_value_flag AS
+$BODY$
+declare
+ret time_value_flag%rowtype;
+rec record;
+-- Function will return time - value - flag. 
+-- If flag ==0 -> addByteRows, 
+-- elsif flag<1 ->  upsertByteRows 
+-- else ->  flag == 1 only "exported" -> ignore'
+begin
+  if (_ctime is null or _channel_id is null) then 
+	return;
+  end if;
+
+-- check if there are new values in the observation table
+  select into rec channel_id from observation where channel_id=_channel_id and result_time<_ctime limit 1;
+  if not found then
+    return;
+  end if;
+
+  if (_spline_id is null and _afunction is null) then 
+	-- original			
+	return query execute 'select result_time,result_value,0::numeric as flag from observation where result_time < $1 and channel_id = $2 order by 1'
+	using _ctime,_channel_id;	
+  elsif (_spline_id is not null and _afunction is null)  then 
+	-- interpolation 
+	return query execute 'select result_time,real_value(result_value,$1) as result_value, 0::numeric as flag
+		from observation where result_time < $2 and channel_id = $3 order by 1'
+		using _spline_id, _ctime, _channel_id;	
+  elsif (_spline_id is null and _afunction is not null)  then 
+	-- original and aggregation 
+	-- union form observation and observeration_exp
+	return query execute 'select date_truncate(result_time,interval ''' || _ainterval || ''')  as result_time, ' || _afunction || '(result_value)::real as result_value,avg(flag)::numeric as flag from 
+ (select result_time,result_value,0::numeric as flag from observation
+  where result_time < date_truncate($1, interval ''' || _ainterval || ''') and channel_id = $2
+union
+ select result_time,result_value,1::numeric as flag from observation_exp
+ where channel_id = $2 and result_time < date_truncate($1, interval ''' || _ainterval || ''') 
+ and result_time>= (select min(date_truncate(result_time, interval ''' || _ainterval || ''')) from observation where result_time < date_truncate($1, interval ''' || _ainterval || ''') and channel_id = $2) ) a
+
+                         group by date_truncate(result_time, interval ''' || _ainterval || ''') order by 1'
+               using _ctime, _channel_id;
+  elsif (_spline_id is not null and _afunction is not null)  then 
+	-- interpolation and aggregation 	
+	return query execute 'select date_truncate(result_time,interval ''' || _ainterval || ''')  as result_time, ' || _afunction || '(real_value(result_value,$1))::real as result_value,avg(flag)::numeric from 	(select result_time,result_value,0::numeric as flag from observation
+  where result_time < date_truncate($2, interval ''' || _ainterval || ''') and channel_id = $3
+ union
+ select result_time,result_value,1 as flag from observation_exp
+  where result_time < date_truncate($2, interval ''' || _ainterval || ''') 
+  and result_time>= (select min(date_truncate(result_time, interval ''' || _ainterval || ''')) from observation where result_time < date_truncate($2, interval ''' || _ainterval || ''') and channel_id = $3) and channel_id = $3) a
+  group by date_truncate(result_time, interval ''' || _ainterval || ''') order by 1'
+               using _spline_id, _ctime, _channel_id;	
+  end if;
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+  	]]>
+  </createProcedure>
+  </changeSet>
+  
+  
+</databaseChangeLog>

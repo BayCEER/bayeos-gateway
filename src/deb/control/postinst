@@ -1,0 +1,40 @@
+#!/bin/bash
+set -e
+
+cd /usr/share/bayeos-gateway
+chmod +x *.sh
+
+echo "Update database as postgres"
+su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
+
+echo "Update database as xbee"
+java -jar liquibase.jar \
+--driver=org.postgresql.Driver \
+--classpath=postgresql-9.0-801.jdbc4.jar \
+--changeLogFile=changelog.xml \
+--url="jdbc:postgresql://localhost/xbee" \
+--username="xbee" \
+--password="0b64debf8fae4239a7ca845f39878a3d" \
+--defaultSchemaName="public" \
+update 2>&1
+
+# Fix missing dirs which are referenced by catalina.properties
+echo "Create Tomcat related stuff"
+if [ ! -e /usr/share/tomcat6/shared/classes ] 
+then
+	mkdir -p /usr/share/tomcat6/shared/classes 
+fi
+
+if [ ! -e /usr/share/tomcat6/server/classes ] 
+then
+	mkdir -p /usr/share/tomcat6/server/classes 
+fi
+
+chown -R tomcat6 /usr/share/tomcat6
+
+# This modifies a file of package tomcat6
+cp /usr/share/bayeos-gateway/server-jk.xml /etc/tomcat6/server.xml
+
+a2enmod jk
+/etc/init.d/tomcat6 restart
+/etc/init.d/apache2 restart
