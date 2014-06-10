@@ -13,7 +13,7 @@ hibernate {
 environments {
     development {
         dataSource {           
-            url = "jdbc:postgresql://192.168.56.102/xbee" 			
+            url = "jdbc:postgresql://bayeos-dev/xbee" 			
 			username="xbee"
 			password="0b64debf8fae4239a7ca845f39878a3d"
 			loggingSql = true
@@ -23,7 +23,7 @@ environments {
 	
 	test {
         dataSource {           
-        	url = "jdbc:postgresql://192.168.56.102/xbee"       
+        	url = "jdbc:postgresql://bayeos-dev/xbee"       
 			username="xbee"
 			password="0b64debf8fae4239a7ca845f39878a3d"
 			loggingSql = true
