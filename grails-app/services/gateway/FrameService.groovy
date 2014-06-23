@@ -26,11 +26,7 @@ class FrameService {
 
 	def dataSource
 	def boardService
-	
-	
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+01")
-	
-			
+				
 	private void parseFrames(FrameParser parser, String sender, Date from, String[] frames) {
 		if (frames == null)	return
 		log.info("Received ${frames.length} frames from: ${sender}")
@@ -137,7 +133,9 @@ class FrameService {
 		def lrtChas = [:]		
 	}	
 	
-	class MatrixHandler extends AbstractFrameHandler {				
+	class MatrixHandler extends AbstractFrameHandler {
+		
+		private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+01")
 		
 		// A temporary cash to omit multiple checks on board and channel definition 
 		def boardRecords = [:]
