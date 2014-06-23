@@ -30,14 +30,12 @@ class FrameService {
 	
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+01")
 	
-	FrameParser parser = new FrameParser()
-
-	
-	
-	private void parseFrames(String sender, Date from, String[] frames) {
+			
+	private void parseFrames(FrameParser parser, String sender, Date from, String[] frames) {
 		if (frames == null)	return
 		log.info("Received ${frames.length} frames from: ${sender}")
 		long errorFrameCount = 0
+		
 		for(String f:frames) {
 			try {				
 				if (!Base64.isBase64(f)) {
@@ -55,10 +53,11 @@ class FrameService {
 		
 	}
 	
-	def saveMatrixFrames(String sender, Date from, String[] frames) {
-		MatrixHandler h = new MatrixHandler()													
+	def saveMatrixFrames(String sender, Date from, String[] frames) {		
+		MatrixHandler h = new MatrixHandler()
+		FrameParser parser = new FrameParser()
 		parser.setFrameHandler(h)
-		parseFrames(sender,from,frames)			
+		parseFrames(parser,sender,from,frames)			
 		def db = new Sql(dataSource)		
 		h.boardRecords.each{ origin, br ->			
 			br.lrtChas.each { nr, date ->			
@@ -66,13 +65,16 @@ class FrameService {
 			}			 					
 			db.executeUpdate("update board set last_result_time = ? where id = ?",[new Timestamp(br.lrt.getTime()),br.id])
 		}
-		db.close()		
+		db.close()
+		parser = null			
 		return true
 	}
 	
-	def saveFlatFrames(String sender, Date from, String[] frames) {		
+	def saveFlatFrames(String sender, Date from, String[] frames) {
+		FrameParser parser = new FrameParser()
 		parser.setFrameHandler(new FlatHandler())
-		parseFrames(sender, from, frames)
+		parseFrames(parser, sender, from, frames)
+		parser = null		
 		return true
 	}
 
