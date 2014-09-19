@@ -439,5 +439,40 @@ end;$BODY$
   </createProcedure>
   </changeSet>
   
+  <changeSet id="120" author="oa" context="BUG delete_obs moves not exported new rows to exported table.">    
+    <sql>
+        drop function if exists delete_obs(ctime timestamp with time zone, maxid bigint)        
+    </sql>  
+    <createProcedure>
+	<![CDATA[
+	CREATE OR REPLACE FUNCTION delete_obs(ctime timestamp with time zone, maxid bigint)
+  RETURNS void AS
+$BODY$
+declare
+ cha record;
+begin
+ for cha in select id,i_name, date_truncate(ctime, i_name::interval) dtime from channel_detail where db_series_id is not null 
+ loop
+     if (cha.i_name is null) then    
+	RAISE INFO 'Moving records of id:% to observation_exp', cha.id; 
+	insert into observation_exp select * from observation where channel_id = cha.id and result_time < ctime and id <= maxid;	    	
+	RAISE INFO 'Deleting records of id:% in observation', cha.id; 
+	delete from observation where channel_id = cha.id and result_time < ctime and id <= maxid;
+    else 
+	RAISE INFO 'Moving records of id:% to observation_exp', cha.id; 
+	insert into observation_exp select * from observation where channel_id = cha.id and result_time < cha.dtime and id <= maxid;	    		
+	RAISE INFO 'Deleting records of id:% in observation', cha.id; 
+	delete from observation where channel_id = cha.id and result_time < cha.dtime and id <= maxid;
+    end if;    
+ end loop;  
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+	]]>
+  </createProcedure>
+      
+  </changeSet>
+  
   
 </databaseChangeLog>

@@ -139,28 +139,38 @@ class ExportJob implements Runnable  {
 		def bout  = new ByteArrayOutputStream(8*1024)
 		def dout = new DataOutputStream(bout)
 		try {
+			
+			
 			long row = 0			
-			db.eachRow("SELECT * from get_bayeos_obs(${ts})") {
-				dout.writeInt(it.db_series_id)
-				dout.writeLong(it.result_time.getTime())
-				dout.writeFloat(it.result_value)
-				row++
-				if (row%config.recordsPerBulk==0){
-					log.info("Uploaded ${row} observations")					
-					cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);					
-					bout.reset()
+			def rows = db.firstRow("select max(id) from observation")						
+			if (rows!=null){				
+				db.eachRow("SELECT * from get_bayeos_obs(${ts})") {
+					dout.writeInt(it.db_series_id)
+					dout.writeLong(it.result_time.getTime())
+					dout.writeFloat(it.result_value)
+					row++
+					if (row%config.recordsPerBulk==0){
+						log.info("Uploaded ${row} observations")
+						cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
+						bout.reset()
+					}
 				}
-			}
-			dout.flush()
-			if (row == 0) {
-				log.info("Nothing to do.")
-				return
+				dout.flush()
+				if (row == 0) {
+					log.info("Nothing to do.")
+					return
+				} else {
+					log.info("Uploading ${row} observations")
+					cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
+				}
+				log.info("Move records to archive table.")
+				db.call("{ call delete_obs(?,?) }",[ts,rows.max])												
 			} else {
-				log.info("Uploading ${row} observations")
-				cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);	
+				log.info("Nothing to do.")
 			}
-			log.info("Move records to archive table.")
-			db.call("{ call delete_obs(?) }",ts)
+			
+						
+			
 		} catch (Exception e){
 			log.error(e.getMessage())
 		} finally {
