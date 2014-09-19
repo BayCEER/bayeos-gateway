@@ -441,7 +441,7 @@ end;$BODY$
   
   <changeSet id="120" author="oa" context="BUG delete_obs moves not exported new rows to exported table.">    
     <sql>
-        drop function if exists delete_obs(ctime timestamp with time zone, maxid bigint)        
+        drop function if exists delete_obs(ctime timestamp with time zone)                
     </sql>  
     <createProcedure>
 	<![CDATA[
