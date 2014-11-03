@@ -78,7 +78,7 @@
                     </tbody>
                 </table> 
                 <div class="pagination">                       
-            		<bootstrap:paginate total="${total}"/>
+            		<bootstrap:paginate total="${total}" params="[group:"${group}"]"/>
             	</div>
             </div>
         </div>
