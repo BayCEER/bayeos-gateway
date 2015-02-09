@@ -8,6 +8,11 @@ class Message {
 	String content	
 	Date result_time
 	
+	public void setContent(String value){
+		// Hotfix 1.9.12
+		// replace all null chars with space 
+		this.content = value.replace((char)0x00,(char)0x20).trim()
+	}
 	
 	static constraints = {
 	
