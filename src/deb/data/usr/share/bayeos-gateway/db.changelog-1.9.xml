@@ -488,15 +488,15 @@ end;$BODY$
       <comment>Export stats table to be used by NagiosService.msgExporter() </comment>
       <sql>
           create table export_job_stat (id bigserial not null, start_time timestamp with time zone, end_time timestamp with time zone , exported int, status int, primary key (id));
-          COMMENT ON COLUMN export_job_stat.status IS 'Unix like exit status: 0-> success; 1 -> error';                            
+          COMMENT ON COLUMN export_job_stat.status IS 'Unix like exit status: 0:=success; 1:= error';                            
       </sql>
       <sql>alter table delete_job_config add column max_stat_interval_name text default '60 days'</sql>      
   </changeSet>
   
-  <changeset id="123 author="oa">
+  <changeSet id="123" author="oa">
       <comment>Allow decode of export users password</comment>
       <sql>update export_job_config set password = null</sql>      
-  </changeset>
+  </changeSet>
   
   
     
