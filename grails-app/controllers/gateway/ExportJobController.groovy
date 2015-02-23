@@ -7,16 +7,13 @@ class ExportJobController {
 
 	def edit() {
 
-		def config = ExportJobConfig.first()
-
+		ExportJobConfig config = ExportJobConfig.first()				
 		switch (request.method) {
-			case 'GET':
+			case 'GET':						
 				[name:"Export Job", config:config, started:exportObservationService.started(), nagiosMsg:nagiosService.msgExporter()]				
 				break
-			case 'POST':
-
-				config.properties = params
-				
+			case 'POST':				
+				config.properties = params																	
 				if (!config.save(flush:true)) {
 					flash.message = "Failed to save settings."					
 					flash.level = "danger"										
@@ -32,11 +29,14 @@ class ExportJobController {
 					}
 
 				} else {
-					if (!exportObservationService.stop()) {
-						flash.message = "Failed to stop service."
-						flash.level = "danger"
-					}
-				}				
+					if (exportObservationService.started()) {
+						if (!exportObservationService.stop()) {
+							flash.message = "Failed to stop service."
+							flash.level = "danger"
+						}
+					}					
+				}
+			
 				[name:"Export Job", config:config, started:exportObservationService.started(),nagiosMsg:nagiosService.msgExporter()]
 				break
 		}

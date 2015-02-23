@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.util.Date
 import java.util.Vector
 import java.lang.Byte
 
@@ -38,13 +37,14 @@ class ExportJob implements Runnable  {
 			try {
 			log.info("ExportJob running")
 			cli = Client.getInstance()			
-			db = new Sql(dataSource)			
-			
-			
-			try {
-				cli.connect(config.url.toString(),config.userName,config.password)
-				om = new ObjektNodeModel()
-				
+			db = new Sql(dataSource)												
+			// Stats			 			 			
+			def rows  = db.executeInsert "INSERT INTO export_job_stat (start_time) values (${new Date().toTimestamp()});"							
+			def id = rows[0][0]
+			try {				
+				cli.connect(config.url.toString(),config.userName,config.password)				
+				om = new ObjektNodeModel()				
+
 				// Units
 				Integer dbHomeUnitId = config.dbHomeUnitId
 				if (dbHomeUnitId) {
@@ -54,16 +54,27 @@ class ExportJob implements Runnable  {
 				Integer dbHomeFolderId = config.dbHomeFolderId				
 				syncBoards(dbHomeFolderId)
 				
-				// Data
-				exportObs()
-
+				// Data				
+				exportObs(id)
+				
+				// Stats
+				db.execute "UPDATE export_job_stat set status=0 WHERE id = $id;"
+															
 			} catch (Exception e){
-				log.error(e.getMessage())
-			} finally {
+				db.execute "UPDATE export_job_stat set status=1 WHERE id = $id;"
+				log.error(e.getMessage())				
+			} finally {						
 				try{cli.close()} catch(XmlRpcException e){}
-				try{db.close()} catch(SQLException e){}
+				try{					
+					db.execute "UPDATE export_job_stat set end_time = ${new Date().toTimestamp()} WHERE id = $id;"
+					db.close()
+				} catch(SQLException e){}				
 				log.info("ExportJob finished")
 			}
+			
+			
+			
+			
 				Thread.sleep(1000*60* config.sleepInterval)
 			} catch (InterruptedException e) {
 			break;
@@ -72,7 +83,7 @@ class ExportJob implements Runnable  {
 	}
 
 
-	private void syncUnits(Integer dbHomeUnitId) {
+	private def syncUnits(Integer dbHomeUnitId) {
 		try {
 			def rows = db.rows("SELECT id, name from unit where db_unit_id is null")
 			log.info("Syncing ${rows.size} units")
@@ -85,7 +96,7 @@ class ExportJob implements Runnable  {
 		}
 	}
 
-	private void syncBoards(Integer dbHomeFolderId) {
+	private def syncBoards(Integer dbHomeFolderId) {
 		try {
 			def rows = db.rows("SELECT id, name, db_folder_id from board where board.db_auto_export and name is not null order by id")
 			log.info("Syncing ${rows.size} boards")
@@ -108,7 +119,7 @@ class ExportJob implements Runnable  {
 		}
 	}
 
-	private void syncChannels(Long boardId, Integer dbFolderId){
+	private def syncChannels(Long boardId, Integer dbFolderId){
 		try {
 			
 			def rows = db.rows("""select c.id, c.label, u.db_unit_id,
@@ -132,49 +143,49 @@ class ExportJob implements Runnable  {
 			log.error(e.getMessage())
 		}
 	}
-
-	private void exportObs() {
-		log.info("Exporting observations")
-		def ts = new java.sql.Timestamp(new Date().getTime())
+	
+	private def exportObs(Long statId) {
+		log.info("Exporting observations")	
+		def ts = new Date().toTimestamp()
 		def bout  = new ByteArrayOutputStream(8*1024)
-		def dout = new DataOutputStream(bout)
-		try {
-			
-			
-			long row = 0			
-			def rows = db.firstRow("select max(id) from observation")						
-			if (rows!=null){				
-				db.eachRow("SELECT * from get_bayeos_obs(${ts})") {
+		def dout = new DataOutputStream(bout)		
+		Integer exported = 0		
+		Integer bulkSize = config.recordsPerBulk						 
+		try {																				
+			def id = db.firstRow("select max(id) from observation")
+			if (id == null){
+				log.info("Nothing to export");
+				db.executeUpdate("update export_job_stat set exported = 0 where id = ?",statId)								
+			} else {
+				int row = 0
+				db.eachRow("SELECT * from get_bayeos_obs(${ts})"){
 					dout.writeInt(it.db_series_id)
 					dout.writeLong(it.result_time.getTime())
 					dout.writeFloat(it.result_value)
 					row++
-					if (row%config.recordsPerBulk==0){
-						log.info("Uploaded ${row} observations")
+					if (row%bulkSize==0){
+						log.info("Exporting ${bulkSize} observations")
 						cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
+						exported += bulkSize
+						db.executeUpdate("update export_job_stat set exported = ? where id = ?",exported,statId)												
 						bout.reset()
+						row = 0						
 					}
 				}
 				dout.flush()
-				if (row == 0) {
-					log.info("Nothing to do.")
-					return
-				} else {
-					log.info("Uploading ${row} observations")
+				if (row > 0) {
+					log.info("Exporting ${row} observations")
 					cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
+					exported += row					
 				}
+				db.executeUpdate("update export_job_stat set exported = ? where id = ?",exported,statId)
 				log.info("Move records to archive table.")
-				db.call("{ call delete_obs(?,?) }",[ts,rows.max])												
-			} else {
-				log.info("Nothing to do.")
-			}
-			
-						
-			
+				db.call("{ call delete_obs(?,?) }",[ts,id.max])							
+			}																								
 		} catch (Exception e){
 			log.error(e.getMessage())
 		} finally {
-			dout.close()
-		}
+			dout.close()			
+		}		
 	}
 }

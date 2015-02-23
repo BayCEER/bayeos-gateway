@@ -26,12 +26,21 @@ class DeleteJob implements Runnable {
 				String dt = config.maxResultInterval.toString()
 				log.info("Deleting observations older than ${dt}.")
 				db.execute("delete from observation where insert_time < now() - ?::interval",[dt])
+				
 				log.info("Deleting exorted observations older than ${dt}.")
 				db.execute("delete from observation_exp where insert_time < now() - ?::interval",[dt])				
-				dt = config.maxMessageInterval.toString()
+				
+				dt = config.maxMessageInterval.toString()				
 				log.info("Deleting messages older than ${dt}.")
-				db.execute("delete from message where insert_time < now() - ?::interval",[dt])				
+				db.execute("delete from message where insert_time < now() - ?::interval",[dt])
+								
+				dt = config.maxStatInterval.toString()
+				log.info("Deleting statistics older than ${dt}.")
+				db.execute("delete from export_job_stat where start_time < now() - ?::interval",[dt])
+				
 				// Achtung: Matrix Boards Daten in _board_data Tabellen werden nicht gelöscht.
+				
+				
 			} catch (SQLException e){
 				log.error(e)
 			} finally {

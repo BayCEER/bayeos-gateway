@@ -1,9 +1,8 @@
 package gateway;
 
 public class ExportJobConfig {
-	
-		def springSecurityService
-	
+		
+	    	
 		URL url = new URL("http://localhost/BayEOS-Server/XMLServlet")
 		String userName = "import"
 		String password = ""
@@ -16,27 +15,15 @@ public class ExportJobConfig {
 		Boolean enabled	= true	
 		
 		static constraints = {
-			password nullable:true, blank:true
+			password nullable:true, blank:true, size:0..32	
 			dbHomeFolderId nullable:true
 			dbHomeUnitId nullable:true 			 
 			userName nullable:true, blank:true
 		}
 		
-		def beforeInsert() {			
-				encodeValue()						
+		static mapping = {
+			password type: EncryptedString
 		}
 		
-		def beforeUpdate() {
-			if (isDirty('password')) {
-				encodeValue()
-			}
-		}
-	
-		protected void encodeValue() {
-			if (!password.isEmpty()){
-				password = springSecurityService.encodePassword(password)
-			}
-	
-		}
 
 }
