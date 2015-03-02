@@ -88,23 +88,37 @@ class NagiosService {
 		
 		int rps = 0
 		long runtime = 0
+		int exported = 0
 		 
-		if (stat != null){						  									
+		if (stat != null){	
+			
 			if (stat.end_time == null){
-				// Running job
 				runtime = (new Date().getTime() - stat.start_time.getTime())
-				rps = getSpeed(runtime, stat.exported)											
+			} else {
+				runtime = (stat.end_time.getTime() - stat.start_time.getTime())
+			}
+			
+			
+			if (stat.exported == null){
+				exported = 0
+			} else {
+				exported = stat.exported 
+			}
+			
+			rps = getSpeed(runtime, exported)			
+			def perf = "runtime: ${runtime/1000} [sec] records:${exported} rate: ${rps} [rps]|time=${runtime}ms recs=${exported} rate=${rps}"
+								  									
+			if (stat.end_time == null){
+				// Running job																						
 				if (rps < 100) {
 					// Running Job too slow					
-					return new NagiosMessage(text:"Rate to low: rate: ${rps} [rps], time: ${runtime/1000} [sec]" + perf, status:ReturnCode.WARN.getValue())
+					return new NagiosMessage(text:"Rate to low: " + perf, status:ReturnCode.WARN.getValue())
 				} else {
 					// Running Job in time
-					return new NagiosMessage(text:"Job is running: rate: ${rps} [rps], time: ${runtime/1000} [sec]" + perf, status:ReturnCode.OK.getValue())
+					return new NagiosMessage(text:"Job is running: " + perf, status:ReturnCode.OK.getValue())
 				}
 			} else {
-				// Finished Job
-				runtime = (stat.end_time.getTime() - stat.start_time.getTime())
-				rps = getSpeed(runtime, stat.exported)								
+				// Finished Job									
 				int finished = (new Date().getTime() - stat.end_time.getTime())/1000				
 				if (finished > 2*60*conf.sleep_interval){
 					// Too old
@@ -113,7 +127,7 @@ class NagiosService {
 					// In time
 					if (stat.status == 0){
 						// Finished job
-						return new NagiosMessage(text:"Job exported ${stat.exported} records: rate: ${rps} [rps], time: ${runtime/1000} [sec]|time=${runtime}ms recs=${stat.exported} rate=${rps}", status:ReturnCode.OK.getValue())
+						return new NagiosMessage(text:"Job finished: " + perf, status:ReturnCode.OK.getValue())
 					} else {
 						// Cancelled job
 						return new NagiosMessage(text:"Job failed with error.", status:ReturnCode.CRITICAL.getValue())
@@ -127,6 +141,7 @@ class NagiosService {
 		}
 
 	}
+
 
 
 	private NagiosMessage getNagiosMsg(List channels){
