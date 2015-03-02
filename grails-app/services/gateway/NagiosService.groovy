@@ -110,7 +110,7 @@ class NagiosService {
 								  									
 			if (stat.end_time == null){
 				// Running job																						
-				if (rps < 100) {
+				if (rps < 100 && exported > 100) {
 					// Running Job too slow					
 					return new NagiosMessage(text:"Rate to low: " + perf, status:ReturnCode.WARN.getValue())
 				} else {
@@ -125,9 +125,14 @@ class NagiosService {
 					return new NagiosMessage(text:"Job is not running.", status:ReturnCode.CRITICAL.getValue())
 				} else {
 					// In time
-					if (stat.status == 0){
+					if (stat.status == 0){						
 						// Finished job
-						return new NagiosMessage(text:"Job finished: " + perf, status:ReturnCode.OK.getValue())
+						if (rps < 100 && exported > 100){
+							return new NagiosMessage(text:"Rate to low: " + perf, status:ReturnCode.WARN.getValue())
+						} else {
+							return new NagiosMessage(text:"Job finished: " + perf, status:ReturnCode.OK.getValue())
+						} 
+					
 					} else {
 						// Cancelled job
 						return new NagiosMessage(text:"Job failed with error.", status:ReturnCode.CRITICAL.getValue())
