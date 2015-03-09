@@ -498,6 +498,61 @@ end;$BODY$
       <sql>update export_job_config set password = null</sql>      
   </changeSet>
   
+  <changeSet id="124" author="oa">
+      <comment>Overriding sampling interval in channel does not work #11 </comment>
+      <createProcedure>
+    	<![CDATA[
+    	CREATE OR REPLACE FUNCTION _chk_observation()
+  RETURNS trigger AS
+$BODY$
+    DECLARE	
+	_crec record;
+	_chk record;
+	_c_obs int;
+	_c_exp int;
+	_c_total int;
+	_lrv real;
+	
+    BEGIN               
+        SELECT INTO _crec coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, coalesce(check_delay,0) as check_delay, 
+        c.spline_id FROM channel c, board b WHERE b.id = c.board_id and c.id = NEW.channel_id;        
+        -- RAISE NOTICE 'Check device (%)', NEW.channel_id;
+        if found then
+		-- Real Value
+		select into _lrv real_value(NEW.result_value,_crec.spline_id);
+		-- Validation  
+		select into _chk * from  check_obs_valid(_lrv,NEW.channel_id);
+			NEW.status_valid := _chk.code;
+			-- RAISE NOTICE 'Validation (%)', _chk.code;
+		
+			-- Completeness 
+			-- missing values since last update are handled by function get_channel_count			 
+			if (_crec.sampling_interval is not null) then																					
+				select into _c_obs count(*) from observation where channel_id = NEW.channel_id and result_time between 
+					(now() - ( (10*_crec.sampling_interval+_crec.check_delay) || ' seconds')::interval) and 
+					(now() - (_crec.check_delay || ' seconds')::interval);			
+				select into _c_exp count(*) from observation_exp where channel_id = NEW.channel_id and result_time between 
+					(now() - ( (10*_crec.sampling_interval+_crec.check_delay) || ' seconds')::interval) and 
+					(now() - (_crec.check_delay || ' seconds')::interval);
+				_c_total := _c_obs + _c_exp;
+				if (_crec.check_delay=0) then
+					_c_total := _c_total + 1;
+				end if;				
+			-- RAISE NOTICE 'Counts (%)', _c_total;
+			end if;
+			UPDATE channel set status_valid = _chk.code, status_valid_msg = _chk.msg , last_count = _c_total, last_result_value = _lrv where id = NEW.channel_id;			 
+		end if;						 		        	
+        RETURN NEW;        
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+    	 ]]>     
+          
+      </createProcedure>
+	
+  </changeSet>
+  
   
     
 </databaseChangeLog>
