@@ -30,7 +30,7 @@
                     <tbody>
                     <g:each in="${result}" status="i" var="res">
                         <tr>                        
-                            <td><g:link action="edit" id="${res.id}">${res.origin}</g:link></td>                            
+                            <td><g:link action="edit" id="${res.id}" params="${['offset':offset, 'group':group]}" >${res.origin}</g:link></td>                            
                             <td class="hidden-xs">${res.name}</td>
                             <td class="hidden-xs"><xbee:rssiChart rssi="${res.last_rssi}"/></td>
                             <td><g:formatDate date="${res.last_result_time}" format="dd.MM.yyyy HH:mm:ss z"/></td>                                                        
@@ -45,7 +45,7 @@
                             
                             <td class="link">
                                                          	                            	
-                            	<g:link action="edit" id="${res.id}" class="btn btn-xs btn-default">
+                            	<g:link action="edit" id="${res.id}" params="${['offset':offset, 'group':group]}" class="btn btn-xs btn-default">
                             		<span class="glyphicon glyphicon-edit"></span> <g:message code="default.button.edit.label"/>
                             	</g:link>
                             	<g:link action="chart" id="${res.id}" class="btn btn-xs btn-default">

@@ -261,10 +261,10 @@ class BoardController {
 
 			if (group != null) {
 				log.debug("Fetch boards for group:" + group.id)
-				[groups: groups, group:group.name, result: boardService.findBoardsByGroup(group.id, max, offset), total:Board.findAllByBoardGroup(group).size()]
+				[groups: groups, group:group.name, result: boardService.findBoardsByGroup(group.id, max, offset), total:Board.findAllByBoardGroup(group).size(), offset: offset]
 			} else {
 				log.debug("Fetch all boards")
-				[groups: groups, group:'All' , result: boardService.findAllBoards(max, offset), total:Board.count()]
+				[groups: groups, group:'All' , result: boardService.findAllBoards(max, offset), total:Board.count(), offset: offset]
 			}
 
 		}
@@ -286,8 +286,8 @@ class BoardController {
 
 			switch (request.method) {
 				case 'GET':
-				[boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance)]
-				break
+					[boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance), offset: params.offset, group: params.group]
+					break
 				case 'POST':
 				if (params.version) {
 					def version = params.version.toLong()
@@ -296,7 +296,7 @@ class BoardController {
 						[
 							message(code: 'unit.label', default: 'Unit')] as Object[],
 						"Another user has updated this Board while you were editing")
-						render view: 'edit', model: [boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance)]
+						render view: 'edit', model: [boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance),offset: params.offset, group: params.group]
 						return
 					}
 				}
@@ -304,7 +304,7 @@ class BoardController {
 				boardInstance.properties = params
 
 				if (!boardInstance.save(flush: true)) {
-					render view: 'edit', model: [boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance)]
+					render view: 'edit', model: [boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance),offset: params.offset, group: params.group]
 					return
 				}
 
@@ -312,7 +312,7 @@ class BoardController {
 					message(code: 'board.label', default: 'Board'),
 					boardInstance.id
 				])
-				redirect action: 'list'
+				redirect(action: 'list', params: [offset:params.offset, group: params.group])
 				break
 			}
 		}
