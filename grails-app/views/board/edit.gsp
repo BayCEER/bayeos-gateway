@@ -20,8 +20,7 @@
 		<g:form class="form"  role="form" action="edit"
 			id="${boardInstance?.id}">
 			<g:hiddenField name="version" value="${boardInstance?.version}" />
-			<g:hiddenField name="offset" value="${offset}" />
-			<g:hiddenField name="group" value="${group}" />
+
 			<div class="block">
 				<div class="block-header">
 					Board:${boardInstance.origin}
