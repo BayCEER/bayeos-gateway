@@ -72,7 +72,7 @@ class NagiosService {
 			def conf = db.firstRow('select * from export_job_config')				
 			if (conf.enabled){
 				def stat = db.firstRow("""
-				select s.id, s.start_time, s.end_time, coalesce(s.exported,0) as exported, extract(EPOCH FROM s.end_time - s.start_time) as runtime,  round(coalesce(s.exported,0)/extract(EPOCH FROM s.end_time - s.start_time)) as rps
+				select s.id, s.start_time, s.end_time, coalesce(s.exported,0) as exported, s.status, extract(EPOCH FROM s.end_time - s.start_time) as runtime,  round(coalesce(s.exported,0)/extract(EPOCH FROM s.end_time - s.start_time)) as rps
 				from export_job_stat s, export_job_config c where end_time is not null and now() - end_time < (2 * c.sleep_interval * '1 minutes'::interval) order by id desc limit 1
 				""")						 
 				if (stat != null){
