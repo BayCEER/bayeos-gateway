@@ -1,5 +1,7 @@
 package gateway
 
+import java.sql.SQLException;
+
 import groovy.sql.DataSet;
 import groovy.sql.Sql
 
@@ -61,88 +63,42 @@ class NagiosService {
 		}
 	}
 
-	
-	/* Returns the speed in recs/sec
-     * runTime: duration in millis
-     * recs:	number of records
-     * 
-     */
-	private int getSpeed(Long runtime, Integer recs){		
-		if (recs == null || runtime == null || runtime == 0) {
-			return 0
-		} else {
-			return Math.round((double)recs/runtime*1000)
-		}															
-	}
+		
 	
 	NagiosMessage msgExporter() {
 		log.info("Query status of export job")
-		def db = new Sql(dataSource)
-		def conf = db.firstRow('select * from export_job_config')
-		def stat = db.firstRow('select * from export_job_stat order by id desc limit 1')
-		db.close()
-
-		if (!conf.enabled){
-			return new NagiosMessage(text:"Job is disabled.", status:ReturnCode.CRITICAL.getValue())
-		}
-		
-		int rps = 0
-		long runtime = 0
-		int exported = 0
-		 
-		if (stat != null){	
-			
-			if (stat.end_time == null){
-				runtime = (new Date().getTime() - stat.start_time.getTime())
-			} else {
-				runtime = (stat.end_time.getTime() - stat.start_time.getTime())
-			}
-			
-			
-			if (stat.exported == null){
-				exported = 0
-			} else {
-				exported = stat.exported 
-			}
-			
-			rps = getSpeed(runtime, exported)			
-			def perf = "runtime: ${runtime/1000} [sec] records:${exported} rate: ${rps} [rps]|time=${runtime}ms recs=${exported} rate=${rps}"
-								  									
-			if (stat.end_time == null){
-				// Running job																						
-				if (rps < 100 && exported > 100) {
-					// Running Job too slow					
-					return new NagiosMessage(text:"Rate to low: " + perf, status:ReturnCode.WARN.getValue())
-				} else {
-					// Running Job in time
-					return new NagiosMessage(text:"Job is running: " + perf, status:ReturnCode.OK.getValue())
-				}
-			} else {
-				// Finished Job									
-				int finished = (new Date().getTime() - stat.end_time.getTime())/1000				
-				if (finished > 2*60*conf.sleep_interval){
-					// Too old
-					return new NagiosMessage(text:"Job is not running.", status:ReturnCode.CRITICAL.getValue())
-				} else {
+		def db = new Sql(dataSource)				
+		try {
+			def conf = db.firstRow('select * from export_job_config')				
+			if (conf.enabled){
+				def stat = db.firstRow("""
+				select s.id, s.start_time, s.end_time, coalesce(s.exported,0) as exported, extract(EPOCH FROM s.end_time - s.start_time) as runtime,  round(coalesce(s.exported,0)/extract(EPOCH FROM s.end_time - s.start_time)) as rps
+				from export_job_stat s, export_job_config c where end_time is not null and now() - end_time < (2 * c.sleep_interval * '1 minutes'::interval) order by id desc limit 1
+				""")						 
+				if (stat != null){
 					// In time
-					if (stat.status == 0){						
+					if (stat.status == 0){
 						// Finished job
-						if (rps < 100 && exported > 100){
-							return new NagiosMessage(text:"Rate to low: " + perf, status:ReturnCode.WARN.getValue())
-						} else {
-							return new NagiosMessage(text:"Job finished: " + perf, status:ReturnCode.OK.getValue())
-						} 
-					
+						return new NagiosMessage(text:"Job finished: runtime: ${stat.runtime} [sec] records:${stat.exported} rate: ${stat.rps} [rps]|time=${stat.runtime}ms recs=${stat.exported} rate=${stat.rps}" ,
+							status:ReturnCode.OK.getValue())
 					} else {
 						// Cancelled job
 						return new NagiosMessage(text:"Job failed with error.", status:ReturnCode.CRITICAL.getValue())
 					}
+				} else {
+					// 	kein Eintrag -> CRITICAL
+					return new NagiosMessage(text:"Job is not running.", status:ReturnCode.CRITICAL.getValue())
 				}
+							
+			} else {
+				// Disabled job
+				return new NagiosMessage(text:"Job is disabled.", status:ReturnCode.CRITICAL.getValue())				
 			}
-
-		} else {
-			// 	kein Eintrag -> CRITICAL
-			return new NagiosMessage(text:"Job is not running.", status:ReturnCode.CRITICAL.getValue())
+		
+		} catch (SQLException e){
+			log.error(e.getMessage())
+		} finally {
+			db.close()
 		}
 
 	}
