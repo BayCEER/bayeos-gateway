@@ -115,6 +115,7 @@ grails.plugins.springsecurity.filterChain.chainMap = [
 	'/nagios/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
 	'/frame/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
 	'/board/rawData': 'JOINED_FILTERS,-exceptionTranslationFilter',
+	'/message/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
 	'/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
  ]
 
