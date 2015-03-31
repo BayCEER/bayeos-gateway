@@ -23,6 +23,10 @@ class Board extends CheckDevice {
 	
 	Boolean frameStorage = false
     BoardGroup boardGroup
+	
+	static hasMany = [comments: Comment]
+	
+	
 					
     static constraints = {					
 		origin(nullable:false,editable:false,unique:true)
@@ -33,10 +37,12 @@ class Board extends CheckDevice {
 		checkDelay(nullable:true, min:0)
 		boardGroup(nullable:true)
 		frameStorage(nullable:false)
+		comments(sort: "insert_time")
     }
 	
 	static mapping = {
-		origin(sqlType:"text", index: 'board_origin_idx')				
+		origin(sqlType:"text", index: 'board_origin_idx')		
+		comments cascade: "all"		
 	}
 	
 	def beforeDelete(){

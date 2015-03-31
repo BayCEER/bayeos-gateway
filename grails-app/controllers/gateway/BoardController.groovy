@@ -10,7 +10,8 @@ class BoardController {
 
 	def dataSource
 	def observationService
-	def boardService
+	def boardService	
+	def springSecurityService
 
 	def chkProps = [
 		'samplingInterval',
@@ -217,13 +218,6 @@ class BoardController {
 		}
 		
 
-
-
-
-
-
-
-
 		}
 
 
@@ -271,8 +265,14 @@ class BoardController {
 
 
 		def edit() {
-
-			def boardInstance = Board.get(params.id)
+			
+			def boardInstance = Board.get(params.id)			
+			def tab
+			if (params.containsKey("tab")) {
+				tab = params.tab
+			} else {
+				tab = "channels"
+			}
 			if (!boardInstance) {
 				flash.message = message(code: 'default.not.found.message', args: [
 					message(code: 'board.label', default: 'Board'),
@@ -286,7 +286,11 @@ class BoardController {
 
 			switch (request.method) {
 				case 'GET':
-				[boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance)]
+								
+				[boardInstance: boardInstance, 
+				 channelStati: boardService.getChannelStati(boardInstance), 
+				 boardStatus:boardService.getBoardStatus(boardInstance),tab:tab
+				 ]
 				break
 				case 'POST':
 				if (params.version) {
@@ -378,8 +382,8 @@ class BoardController {
 				redirect(action: "edit", id:params.id)
 			}
 		}
-
-
+		
+				
 
 		def editTemplate() {
 			def boardInstance = Board.get(params.id)
@@ -399,7 +403,6 @@ class BoardController {
 
 
 		def findByOrigin() {
-
 			def board = Board.findByOriginIlikeAndFrameStorage(params.origin + "%", true)
 			if (board) render(board as JSON)
 		}
@@ -413,7 +416,68 @@ class BoardController {
 			}
 			render ''
 		}
-
-
+		
+		def createComment() {									
+				switch (request.method) {
+				case 'GET':
+					[commentInstance: new Comment(params), boardId: params.boardId]
+					break
+				case 'POST':
+					def commentInstance = new Comment(params)							
+					commentInstance.user = User.get(springSecurityService.principal.id)					
+					commentInstance.save()																					
+					Board.get(params.boardId).addToComments(commentInstance)																													
+					flash.message = message(code: 'default.created.message', args: [message(code: 'comment.label', default: 'Comment'), commentInstance.id])
+					redirect action: 'edit', id: params.boardId, fragment: "comments"
+					break
+				}
+		}
+		
+		def deleteComment(){			
+		    Board.get(params.boardId).removeFromComments(Comment.get(params.id))						
+			redirect action: 'edit', id: params.boardId, fragment: "comments"			
+		}
+		
+		def editComment(){
+			switch (request.method) {
+				case 'GET':
+					def commentInstance = Comment.get(params.id)
+					if (!commentInstance) {
+						flash.message = message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), params.id])
+						flash.level = 'danger'
+						redirect action: 'edit', id: params.boardId, fragment: "comments"
+						return
+					}
+		
+					[commentInstance: commentInstance, boardId: params.boardId]
+					break
+				case 'POST':
+					def commentInstance = Comment.get(params.id)
+					if (!commentInstance) {
+						flash.message = message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), params.id])
+						flash.level = 'danger'
+						redirect action: 'edit', id: params.boardId, fragment: "comments"
+						return
+					}
+							
+		
+					commentInstance.properties = params
+		
+					if (!commentInstance.save(flush: true)) {
+						flash.message = message(code: 'default.not.saved.message', args: [message(code: 'comment.label', default: 'Comment'), params.id])
+						flash.level = 'danger'						
+						redirect action: 'edit', id: params.boardId, fragment: "comments"
+						return
+					}
+		
+					flash.message = message(code: 'default.updated.message', args: [message(code: 'comment.label', default: 'Comment'), commentInstance.id])
+					redirect action: 'edit', id: params.boardId, fragment: "comments"
+					break
+				}
+			
+			
+		}
+			
+		
 
 	}

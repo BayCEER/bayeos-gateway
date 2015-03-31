@@ -7,6 +7,7 @@ class Message {
 	String type
 	String content	
 	Date result_time
+	Date insert_time
 	
 	public void setContent(String value){
 		// Hotfix 1.9.12

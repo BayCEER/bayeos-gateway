@@ -11,7 +11,7 @@
 		<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
 		<link rel="shortcut icon" href="${resource(dir:'images',file:'gateway.png')}" type="image/png" />				
 		<r:layoutResources />
-		<script src="${resource(dir:'js',file:'bootstrap-switch.js')}"></script>
+		<script src="${resource(dir:'js',file:'bootstrap-switch.js')}"></script>		
 </head>
 <body>
 	<div id="wrap">

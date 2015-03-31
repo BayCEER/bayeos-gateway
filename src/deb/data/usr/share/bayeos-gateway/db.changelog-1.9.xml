@@ -553,6 +553,25 @@ $BODY$
 	
   </changeSet>
   
+  <changeSet id="125" author="oa">      
+     <comment>Comments on board</comment>
+      <sql>
+       create table comment (id  bigserial not null, content text not null, insert_time timestamp not null, user_id int8 not null, primary key (id));    
+      </sql>
+      <sql>
+	   create table board_comment (board_comments_id int8, comment_id int8);                    
+      </sql>
+      <sql>
+	   alter table board_comment add constraint FK877C3E0628A1F209 foreign key (board_comments_id) references board;          
+      </sql>
+	  <sql>
+       alter table board_comment add constraint FK877C3E062F2E4B90 foreign key (comment_id) references comment;	    
+	  </sql>
+	  <sql>
+	   alter table comment add constraint FK38A5EE5FD0B68B64 foreign key (user_id) references users;	    
+	  </sql> 
+  </changeSet>
+  
   
     
 </databaseChangeLog>

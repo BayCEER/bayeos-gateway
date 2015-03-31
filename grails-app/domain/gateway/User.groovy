@@ -36,11 +36,17 @@ class User {
 		}
 	}
 	
+	
 	protected void encodePassword() {
 		password = springSecurityService.encodePassword(password)
 	}
 	
+	
 	def beforeDelete() {
 		UserRole.removeAll(this)
 	}
+	
+	def String toString() {
+		return username
+	};
 }
