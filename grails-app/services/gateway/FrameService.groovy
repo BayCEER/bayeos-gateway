@@ -101,8 +101,8 @@ class FrameService {
 	
 		@Override
 		public void message(String o, Date timeStamp, String message)	 {
-			try {				
-				new Message(content:message,origin:o,result_time:timeStamp, type:"INFO").save()
+			try {												
+				new Message(content:message,origin:o,resultTime:timeStamp,type:"INFO").save()																
 				log.debug("Info message saved")
 			} catch (SQLException e) {
 				log.error(e)				
@@ -113,7 +113,7 @@ class FrameService {
 		@Override
 		public void error(String o, Date timeStamp, String message)  {
 			try {				
-				new Message(content:message,origin:o,result_time:timeStamp, type:"ERROR").save()				
+				new Message(content:message,origin:o,resultTime:timeStamp,type:"ERROR").save()							
 				log.debug("Error message saved")
 			} catch (SQLException e) {
 				log.error(e)

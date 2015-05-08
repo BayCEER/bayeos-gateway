@@ -6,8 +6,8 @@ class Message {
 	String origin		
 	String type
 	String content	
-	Date result_time
-	Date insert_time
+	Date resultTime
+	Date insertTime = new Date()
 	
 	public void setContent(String value){
 		// Hotfix 1.9.12
@@ -16,7 +16,6 @@ class Message {
 	}
 	
 	static constraints = {
-	
 		origin(nullable:false,editable:false,unique:true)
 	}
 	
