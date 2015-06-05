@@ -16,7 +16,7 @@ class Message {
 	}
 	
 	static constraints = {
-		origin(nullable:false,editable:false,unique:true)
+		origin(nullable:false,editable:false)
 	}
 	
 	static mapping = {
