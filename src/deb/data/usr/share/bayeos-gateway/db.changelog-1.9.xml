@@ -572,6 +572,39 @@ $BODY$
 	  </sql> 
   </changeSet>
   
+  <changeSet id="126" author="sh">
+      	<comment>Performance issue #15</comment>
+      <createProcedure>
+    	<![CDATA[
+    	CREATE OR REPLACE FUNCTION delete_obs(ctime timestamp with time zone, maxid bigint)
+  RETURNS void AS
+$BODY$
+declare
+ cha record;
+begin
+ insert into observation_exp select o.* from observation o, channel_detail c 
+ where o.id<=maxid and c.db_series_id is not null
+ and c.id=o.channel_id and (
+   (c.i_name is null and o.result_time<ctime) or 
+   (c.i_name is not null and o.result_time< date_truncate(ctime, c.i_name::interval) )
+ );
+
+ delete from observation as o
+ using channel_detail c 
+ where o.id<=maxid and c.db_series_id is not null
+ and c.id=o.channel_id and (
+   (c.i_name is null and o.result_time<ctime) or 
+   (c.i_name is not null and o.result_time< date_truncate(ctime, c.i_name::interval) )
+ ); 
+
+return;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+    	
+    	 ]]>               
+      </createProcedure>
+  </changeSet>
   
     
 </databaseChangeLog>
