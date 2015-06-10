@@ -108,11 +108,10 @@
 
 				
 			<div class="block-action">
-				
+			
 				
 				<button type="submit" class="btn btn-primary">
-					<span class="glyphicon glyphicon-ok"></span> <g:message
-							code="default.button.update.label" default="Update" />
+					<span class="glyphicon glyphicon-ok"></span> <g:message	code="default.button.ok.label" default="Ok" />
 				</button>
 				<button type="submit" class="btn btn-danger" name="_action_delete" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
 					formnovalidate>

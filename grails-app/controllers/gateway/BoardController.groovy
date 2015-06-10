@@ -262,17 +262,10 @@ class BoardController {
 			}
 
 		}
-
-
-		def edit() {
-			
-			def boardInstance = Board.get(params.id)			
-			def tab
-			if (params.containsKey("tab")) {
-				tab = params.tab
-			} else {
-				tab = "channels"
-			}
+		
+		
+		def save() {			
+			def boardInstance = Board.get(params.id)						
 			if (!boardInstance) {
 				flash.message = message(code: 'default.not.found.message', args: [
 					message(code: 'board.label', default: 'Board'),
@@ -282,43 +275,31 @@ class BoardController {
 				redirect action: 'list'
 				return
 			}
+			
+			boardInstance.properties = params
+			if (boardInstance.save(flush: true)) {
+				flash.message = message(code: 'default.updated.message', args: [message(code: 'board.label', default: 'Board'),params.id])
+			} else {
+				flash.message = message(code: 'default.not.updated.message', args: [message(code: 'board.label', default: 'Board'),params.id])
+				flash.level = 'danger'
+			}			
+			redirect(action: 'edit', params: [id:boardInstance.id])
+		}
 
 
-			switch (request.method) {
-				case 'GET':
-								
-				[boardInstance: boardInstance, 
-				 channelStati: boardService.getChannelStati(boardInstance), 
-				 boardStatus:boardService.getBoardStatus(boardInstance),tab:tab
-				 ]
-				break
-				case 'POST':
-				if (params.version) {
-					def version = params.version.toLong()
-					if (boardInstance.version > version) {
-						boardInstance.errors.rejectValue('version', 'default.optimistic.locking.failure',
-						[
-							message(code: 'unit.label', default: 'Unit')] as Object[],
-						"Another user has updated this Board while you were editing")
-						render view: 'edit', model: [boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance)]
-						return
-					}
-				}
-
-				boardInstance.properties = params
-
-				if (!boardInstance.save(flush: true)) {
-					render view: 'edit', model: [boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance)]
-					return
-				}
-
-				flash.message = message(code: 'default.updated.message', args: [
+		def edit() {			
+			def boardInstance = Board.get(params.id)			
+			if (!boardInstance) {
+				flash.message = message(code: 'default.not.found.message', args: [
 					message(code: 'board.label', default: 'Board'),
-					boardInstance.id
+					params.id
 				])
+				flash.level = 'warning'
 				redirect action: 'list'
-				break
+				return
 			}
+				
+			[boardInstance: boardInstance, channelStati: boardService.getChannelStati(boardInstance), boardStatus:boardService.getBoardStatus(boardInstance)]
 		}
 
 
@@ -333,13 +314,13 @@ class BoardController {
 				}
 				catch (org.springframework.dao.DataIntegrityViolationException e) {
 					flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'board.label', default: 'Board'), params.id])}"
-					flash.message = 'error'
+					flash.level = 'danger'
 					redirect(action: "edit", id: params.id)
 				}
 			}
 			else {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'board.label', default: 'Board'), params.id])}"
-				flash.message = 'warning'
+				flash.level = 'warning'
 				redirect(action: "list")
 			}
 

@@ -648,5 +648,75 @@ $BODY$
   ]]>               
       </createProcedure>
   </changeSet>
+  
+  <changeSet id="128" author="oa">
+      	<comment>Enhancement #8: Changed check result for channels without check definition from 'unknown' to null</comment>
+      <createProcedure>
+    	<![CDATA[
+    	CREATE OR REPLACE FUNCTION check_obs_valid(_result_value real, _channel_id bigint)
+  RETURNS check_result AS
+$BODY$
+declare
+rec record;
+chk_re check_result;
+begin			
+	if (_result_value is null or _channel_id is null) then
+		chk_re.code = 3; chk_re.msg = 'Invalid arguments.';
+		return chk_re;
+	end if;
+	 	
+	select into rec * from check_device where channel_id = _channel_id;	
+	if (not found) then
+		chk_re.code = 3; chk_re.msg = 'Failed to get channel settings.';
+		return chk_re;
+	end if;
+
+	if (rec.critical_max is null) and (rec.critical_min is null) and (rec.warning_max is null) and (rec.warning_min is null) then 
+		chk_re.code = null; chk_re.msg = null;		
+	else 				
+		if (rec.critical_max is not null and _result_value > rec.critical_max) then
+			chk_re.code = 2; chk_re.msg = 'Value ' || _result_value || ' above critical max.';		 
+		elsif (rec.warning_max is not null and _result_value > rec.warning_max) then
+			chk_re.code = 1; chk_re.msg = 'Value ' || _result_value || ' above warning max.';		
+		elsif (rec.critical_min is not null and _result_value < rec.critical_min) then
+			chk_re.code = 2; chk_re.msg = 'Value ' || _result_value || ' below critical min.';		
+		elsif (rec.warning_min is not null and _result_value < rec.warning_min) then
+			chk_re.code = 1; chk_re.msg = 'Value ' || _result_value || ' below warning min.';		
+		else 
+		        chk_re.code = 0; chk_re.msg = 'Value Ok';		
+		end if;
+	end if;
+                    	
+    return chk_re;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+  ]]>               
+  </createProcedure>
+  <sql>
+  CREATE OR REPLACE VIEW channel_status AS 
+ SELECT a.board_id, a.id, a.nr, a.label, a.status_valid, a.status_valid_msg, 
+        CASE
+            WHEN a.last_count IS NULL THEN NULL::integer
+            WHEN a.last_count > 8 THEN 0
+            WHEN a.last_count = 0 THEN 2
+            ELSE 1
+        END AS status_complete, 
+        CASE
+            WHEN a.last_count IS NULL THEN NULL::text
+            ELSE (a.last_count * 10) || '% completeness'::text
+        END AS status_complete_msg, a.last_result_time, a.last_result_value
+   FROM ( SELECT c.board_id, c.id, c.nr, c.label, c.status_valid, c.status_valid_msg, c.last_result_time, c.last_result_value, get_channel_count(c.last_count, c.last_result_time, cd.sampling_interval, cd.check_delay) AS last_count
+           FROM channel c, check_device cd
+          WHERE c.id = cd.channel_id) a;    
+  </sql>
+  </changeSet>
+  
+  
+  
+  
+  		
+  
     
 </databaseChangeLog>

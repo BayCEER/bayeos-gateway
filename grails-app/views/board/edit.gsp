@@ -22,10 +22,8 @@
 
 
 
-		<g:form class="form" role="form" action="edit"
-			id="${boardInstance?.id}">
-			<g:hiddenField name="version" value="${boardInstance?.version}" />
-
+		<g:form class="form" role="form" action="save"
+			id="${boardInstance?.id}">			
 
 			<div class="block">
 
@@ -51,18 +49,14 @@
 				<div role="tabpanel">
 					<!-- Nav tabs -->
 					<ul class="nav nav-tabs" role="tablist" id="myTab">
-						<li role="presentation"><a href="#channels"
-							aria-controls="channels" role="tab" data-toggle="tab">Channels</a>
+						<li role="presentation"><a href="#channels"	aria-controls="channels" role="tab" data-toggle="tab">Channels</a>
 						</li>
-						<li role="presentation"><a href="#settings"
-							aria-controls="settings" role="tab" data-toggle="tab">Settings</a>
+						<li role="presentation"><a href="#settings"	aria-controls="settings" role="tab" data-toggle="tab">Settings</a>
 						</li>
-						<li role="presentation"><a href="#messages"
-							aria-controls="messages" role="tab" data-toggle="tab">Messages
+						<li role="presentation"><a href="#messages"	aria-controls="messages" role="tab" data-toggle="tab">Messages
 								<span class="badge" id="msgBadge"></span>
 						</a></li>
-						<li role="presentation">
-							<a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments <span class="badge" id="comBadge">${boardInstance.comments.size()}</span></a>
+						<li role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments <span class="badge" id="comBadge">${boardInstance.comments.size()}</span></a>
 						</li>
 					</ul>
 
@@ -208,9 +202,9 @@
 
 
 			<div class="block-action">
-				<button type="submit" class="btn btn-primary">
-					<span class="glyphicon glyphicon-ok"></span>
-					<g:message code="default.button.update.label" default="Update" />
+				<button type="submit" class="btn btn-primary">	
+					<span class="glyphicon glyphicon-save"></span>
+					<g:message code="default.button.save.label" default="Save" />										
 				</button>
 				<button type="submit" class="btn btn-default" name="_action_remove"
 					onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
@@ -265,7 +259,7 @@
         </g:each>
 
      	// Select tab by name
-        $('#myTab a[href="#${tab}"]').tab('show')        					   	   		
+        $('#myTab a[href="#channels"]').tab('show')        					   	   		
 
 		$("#msgBackward").bind("click", msgBackward);
 		$("#msgForward").bind("click", msgForward);

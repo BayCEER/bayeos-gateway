@@ -38,7 +38,7 @@
 			<div class="form-group block-action">
 				<button type="submit" class="btn btn-primary">
 					<span class="glyphicon glyphicon-ok"></span>
-					<g:message code="default.button.create.label" default="Create" />
+					<g:message code="default.button.ok.label" default="Ok" />
 				</button>
 			</div>
 		</g:form>

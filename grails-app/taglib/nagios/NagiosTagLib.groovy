@@ -10,9 +10,10 @@ class NagiosTagLib {
 	
 	
 	def statusMsg = { attrs ->				
-			def cssClass = "label-default"
-			def code = attrs?.returnCode
-			def msg = "Unknown"
+			def cssClass
+			def msg
+			
+			def code = attrs?.returnCode			
 			if (code == ReturnCode.OK.getValue()) {
 				cssClass = "label-success"
 				msg = "Ok"
@@ -22,33 +23,39 @@ class NagiosTagLib {
 			} else if (code == ReturnCode.CRITICAL.getValue()){
 				cssClass = "label-danger"
 				msg = "Critical"
-			} 
-			
-			if (attrs.tip != null) {
-				out << "<span class=\"label $cssClass data-toggle=\"tooltip\" title=\"${attrs.tip}\">" << msg << "</span>"
+			} else if (code == ReturnCode.UNKNOWN.getValue()){
+				cssClass = "label-active"
+				msg = "Unknown"
 			} else {
-				out << "<span class=\"label $cssClass\">" << msg << "</span>"
-			}						
-		
+				cssClass = "label-default"
+				msg = ""
+			}			
+			out << "<span class=\"label $cssClass\""
+			if (attrs.tip != null) 	out << " data-toggle=\"tooltip\" title=\"${attrs.tip}\""
+			out << ">" << msg << "</span>"							
 	}
 	
 
 	def statusCell = { attrs, body   ->		
-			def cssClass = "active"			
+			def cssClass 			
 			def code = attrs?.returnCode						
+
 			if (code == ReturnCode.OK.getValue()) {
 				cssClass = "success"			
 			} else if (code == ReturnCode.WARN.getValue()){
 				cssClass = "warning"			
 			} else if (code == ReturnCode.CRITICAL.getValue()){
 				cssClass = "danger"			
-			}
-			
-			if (attrs.tip != null) {
-				out << "<td class=\"$cssClass\" data-toggle=\"tooltip\" title=\"${attrs.tip}\">" << body() << "</td>"
+			} else if (code == ReturnCode.UNKNOWN.getValue()){
+				cssClass = "active"			
 			} else {
-				out << "<td class=\"$cssClass\">" << body()  << "</td>"
-			}		
+				cssClass = null				
+			}			
+			out << "<td" 
+			if (cssClass != null) out << " class=\"$cssClass\""
+			if (attrs.tip != null) out << " data-toggle=\"tooltip\" title=\"${attrs.tip}\""			
+			out << ">" << body()  << "</td>"
+					
 		
 	}
 	
