@@ -36,8 +36,8 @@ class ExportJob implements Runnable  {
 		while(true) {
 			try {
 			log.info("ExportJob running")
-			cli = Client.getInstance()			
-			db = new Sql(dataSource)												
+			def cli = Client.getInstance()			
+			def db = new Sql(dataSource)												
 			// Stats			 			 			
 			def rows  = db.executeInsert "INSERT INTO export_job_stat (start_time) values (${new Date().toTimestamp()});"							
 			def id = rows[0][0]
@@ -45,14 +45,25 @@ class ExportJob implements Runnable  {
 				cli.connect(config.url.toString(),config.userName,config.password)				
 				om = new ObjektNodeModel()				
 
-				// Units
-				Integer dbHomeUnitId = config.dbHomeUnitId
-				if (dbHomeUnitId) {
-					syncUnits(dbHomeUnitId)
+  
+				// Set unit destination to root unit when not set
+				if (config.dbHomeUnitId == null) {
+					config.dbHomeUnitId = om.getRoot(ObjektArt.KEY_MESS_EINHEIT).id
+					config.save()					
+				}				
+				if (config.dbHomeUnitId) {
+					syncUnits(config.dbHomeUnitId)
 				}
-				// Folder
-				Integer dbHomeFolderId = config.dbHomeFolderId				
-				syncBoards(dbHomeFolderId)
+
+				// Set folder destination to root folder when not set
+				if (config.dbHomeFolderId == null) {
+					config.dbHomeFolderId = om.getRoot(ObjektArt.KEY_MESSUNG_ORDNER).id
+					config.save()	
+				}
+				
+				if (config.dbHomeFolderId) {
+					syncBoards(dbHomeFolderId)
+				}				
 				
 				// Data				
 				exportObs(id)
@@ -71,9 +82,7 @@ class ExportJob implements Runnable  {
 				} catch(SQLException e){}				
 				log.info("ExportJob finished")
 			}
-			
-			
-			
+									
 			
 				Thread.sleep(1000*60* config.sleepInterval)
 			} catch (InterruptedException e) {
