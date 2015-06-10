@@ -713,10 +713,11 @@ $BODY$
   </sql>
   </changeSet>
   
-  
-  
-  
-  		
-  
+  <changeSet id="129" author="oa">
+      <comment>Synchronize settings with server</comment>
+      <sql>update users set username = 'root' where username like 'admin';</sql>
+      <!--  Set root password to 'bayeos' if it is not changed yet -->
+      <sql>update users set password = '8340uWG/1+Ca8V7rqyBRdQE8QTE=' where username like 'root' and password like 'zZZSEKOCeaHyuf4TDN8/vubx+8g=';</sql>                  
+  </changeSet>    		  
     
 </databaseChangeLog>
