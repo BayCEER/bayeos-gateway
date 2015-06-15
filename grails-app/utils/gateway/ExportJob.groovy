@@ -36,8 +36,8 @@ class ExportJob implements Runnable  {
 		while(true) {
 			try {
 			log.info("ExportJob running")
-			def cli = Client.getInstance()			
-			def db = new Sql(dataSource)												
+			cli = Client.getInstance()			
+			db = new Sql(dataSource)												
 			// Stats			 			 			
 			def rows  = db.executeInsert "INSERT INTO export_job_stat (start_time) values (${new Date().toTimestamp()});"							
 			def id = rows[0][0]
@@ -48,8 +48,11 @@ class ExportJob implements Runnable  {
   
 				// Set unit destination to root unit when not set
 				if (config.dbHomeUnitId == null) {
-					config.dbHomeUnitId = om.getRoot(ObjektArt.KEY_MESS_EINHEIT).id
-					config.save()					
+					config.dbHomeUnitId = om.getRoot(ObjektArt.MESS_EINHEIT).id
+					if (config.dbHomeUnitId != null){
+						db.execute "UPDATE export_job_config set db_home_unit_id = ${config.dbHomeUnitId};"
+					}
+										
 				}				
 				if (config.dbHomeUnitId) {
 					syncUnits(config.dbHomeUnitId)
@@ -57,12 +60,15 @@ class ExportJob implements Runnable  {
 
 				// Set folder destination to root folder when not set
 				if (config.dbHomeFolderId == null) {
-					config.dbHomeFolderId = om.getRoot(ObjektArt.KEY_MESSUNG_ORDNER).id
-					config.save()	
+					config.dbHomeFolderId = om.getRoot(ObjektArt.MESSUNG_ORDNER).id
+					if (config.dbHomeFolderId != null){
+						db.execute "UPDATE export_job_config set db_home_folder_id = ${config.dbHomeFolderId};"
+					}
+					
 				}
 				
 				if (config.dbHomeFolderId) {
-					syncBoards(dbHomeFolderId)
+					syncBoards(config.dbHomeFolderId)
 				}				
 				
 				// Data				
@@ -94,9 +100,8 @@ class ExportJob implements Runnable  {
 
 	private def syncUnits(Integer dbHomeUnitId) {
 		try {
-			def rows = db.rows("SELECT id, name from unit where db_unit_id is null")
-			log.info("Syncing ${rows.size} units")
-			rows.each {
+			db.eachRow("SELECT id, name from unit where db_unit_id is null"){ it ->
+				log.info("Syncing unit: ${it.name}")
 				Integer dbUnitId = om.newNode(dbHomeUnitId, it.name, ObjektArt.MESS_EINHEIT).getId()
 				db.executeUpdate("update unit set db_unit_id = ? where id = ?",[dbUnitId, it.id])
 			}
@@ -107,9 +112,7 @@ class ExportJob implements Runnable  {
 
 	private def syncBoards(Integer dbHomeFolderId) {
 		try {
-			def rows = db.rows("SELECT id, name, db_folder_id from board where board.db_auto_export and name is not null order by id")
-			log.info("Syncing ${rows.size} boards")
-			rows.each{
+			db.eachRow("SELECT id, name, db_folder_id from board where board.db_auto_export and name is not null order by id"){ it ->						
 				log.info("Syncing board: ${it.name}")
 				Integer fId = it.db_folder_id
 				if (fId == null && dbHomeFolderId != null){
@@ -131,13 +134,11 @@ class ExportJob implements Runnable  {
 	private def syncChannels(Long boardId, Integer dbFolderId){
 		try {
 			
-			def rows = db.rows("""select c.id, c.label, u.db_unit_id,
+			db.eachRow("""select c.id, c.label, u.db_unit_id,
 			CASE WHEN c.aggr_interval_id is not null THEN extract(EPOCH from i.name::interval)::int ELSE d.sampling_interval END
 			from check_device d, channel c LEFT JOIN unit u on u.id = c.unit_id LEFT JOIN interval i on i.id = c.aggr_interval_id
 			where c.board_id = ? and c.db_series_id is null and d.channel_id = c.id
-			and c.label is not null and (c.db_exclude_auto_export is null or c.db_exclude_auto_export is false) order by c.nr asc""",[boardId])
-												
-			rows.each{								
+			and c.label is not null and (c.db_exclude_auto_export is null or c.db_exclude_auto_export is false) order by c.nr asc""",[boardId]){ it ->																										
 				log.info("Syncing channel: ${it.label}")
 				Integer id = (om.newNode(dbFolderId, it.label, ObjektArt.MESSUNG_MASSENDATEN)).getId()
 				cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id,ObjektArt.MESSUNG_MASSENDATEN.toString(),[it.label,"Automated created by Gateway",it.sampling_interval,null,null,1,2] as Object[])
