@@ -34,3 +34,5 @@ release.properties
 
 # "temporary" build files
 /target
+/scripts
+/bin
