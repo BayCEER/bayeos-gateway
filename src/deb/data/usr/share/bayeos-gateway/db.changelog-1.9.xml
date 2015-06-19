@@ -713,18 +713,17 @@ $BODY$
   </sql>
   </changeSet>
   
-  <changeSet id="129" author="oa">
-      <comment>Harmonize settings with BayEOS Server</comment>
-      <!--  Change admin user to root  -->
-      <sql>update users set username = 'root' where username like 'admin';</sql>
+  <changeSet id="129" author="oa" runOnChange="true">
+      <comment>Harmonize settings with BayEOS Server</comment>      
+      <!--  Change admin user to root when there is no root user -->
+      <sql>update users set username = 'root' where username like 'admin' and NOT EXISTS (select username from users where username like 'root');</sql>
       <!--  Set root password to 'bayeos' if password is not changed -->
       <sql>update users set password = '8340uWG/1+Ca8V7rqyBRdQE8QTE=' where username like 'root' and password like 'zZZSEKOCeaHyuf4TDN8/vubx+8g=';</sql>
       <!--  Enable import user and set password to 'import' if password is not changed -->
       <sql>update users set account_locked = false, password = 'Yv371V0ZsqRnEQKte8oX2HX4IHo=' where username like 'import' and password like 'zZZSEKOCeaHyuf4TDN8/vubx+8g=';</sql>
-      <!--  Switch username for export from import to root and password to 'bayeos' -->
-      <sql>update export_job_config set user_name = 'root', password = 'UlBLVltG' ;</sql>
-      
-                        
-  </changeSet>    		  
-    
+      <!--  Switch username for export from import to root and password to 'bayeos' for local exports only -->
+      <sql>update export_job_config set user_name = 'root', password = 'UlBLVltG' where url like 'http://localhost/BayEOS-Server/XMLServlet';</sql>
+  </changeSet>    
+  
+     
 </databaseChangeLog>
