@@ -4,13 +4,9 @@
     <meta name="layout" content="main"/>                   
   </head>
   <body> 
-  <script src="${resource(dir:'js/flot',file:'jquery.flot.min.js')}" type="text/javascript"></script>
-  <script src="${resource(dir:'js/flot',file:'jquery.flot.time.js')}" type="text/javascript"></script>
-  
-  
-				
-
-          
+  <script src="${resource(dir:'javascripts',file:'jquery.flot.min.js')}" type="text/javascript"></script>
+  <script src="${resource(dir:'javascripts',file:'jquery.flot.time.min.js')}" type="text/javascript"></script>
+ 
   <div class="container">
   
   <div class="hidden" id="timeOutWarning">

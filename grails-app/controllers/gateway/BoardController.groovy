@@ -29,6 +29,67 @@ class BoardController {
 		'aggrFunction'
 	]
 
+
+	def listData() {
+		def search = "%%"
+		if (params['search[value]']){
+			search = "%" + params['search[value]']  + "%"
+		}
+
+		def max = params.int('length',10)
+		def offset = params.int('start',0)
+		def recordsTotal = Board.count()
+		def res = [draw: params["draw"], recordsTotal: recordsTotal]
+
+		// Ordering
+		def sort = []
+		for (int i = 0; i < 2; i++) {
+			def c = params["order[${i}][column]"]
+			if (c) {
+				sort.add(params["columns[${c}][data]"] + " " + params["order[${i}][dir]"])
+			}
+		}
+		// Default ordering
+		if (sort.size() == 0) {
+			sort.add("1 desc")
+		}
+
+		// Nothing found
+		if (recordsTotal == 0) {
+			res['recordsFiltered'] = 0
+			res['data'] = []
+
+		} else if (search.length() == 2) {
+			// No search string
+			res['recordsFiltered'] = recordsTotal
+			def db = new Sql(dataSource)
+			def sql = "SELECT group_id,group_name,id,origin,name,last_rssi, extract(epoch from date_trunc('milliseconds',last_result_time)) * 1000 as last_result_time, greatest(status_valid, status_complete) as status FROM board_status " +
+				" order by " + sort.join(",") + " LIMIT ? OFFSET ?"
+			res['data'] = db.rows(sql,[max, offset])
+
+			db.close()
+
+		} else {
+			// Search String
+			def db = new Sql(dataSource)
+			def commentsFound = db.firstRow("SELECT count(*) from board_status where (group_name ilike ? or origin ilike ? or name ilike ?)", [search, search,search])[0]
+			res['recordsFiltered'] = commentsFound
+			if (commentsFound == 0) {
+				res['data'] = []
+			} else {
+				// Filter with max and offset
+				def sql = "SELECT group_id, group_name, id, origin, name, last_rssi, extract(epoch from date_trunc('milliseconds',last_result_time)) * 1000 as last_result_time," +
+						"greatest(status_valid, status_complete) as status FROM board_status " +
+						"where (group_name ilike ? or origin ilike ? or name ilike ?) order by " + sort.join(",") + " LIMIT ? OFFSET ?"
+				res['data'] = db.rows(sql,[search, search, search, max, offset])
+
+			}
+			db.close()
+		}
+		render res as JSON
+
+	}
+	
 	def chartData()  {
 		def rowId = params.long("lastRowId")
 		def boardId = params.int("boardId")
@@ -223,7 +284,7 @@ class BoardController {
 
 
 
-		def chart() {
+	def chart() {
 			def boardInstance = Board.get(params.id)
 			if (!boardInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'board.label', default: 'Board'), params.id])}"
@@ -238,33 +299,20 @@ class BoardController {
 
 				[boardInstance: boardInstance, channels:channels, channelList: channelList]
 			}
-		}
+	}
 
-		def index() {
+	def index() {
 			redirect(action:"list", params:params)
-		}
+	}
 
-		def list() {
+	def list() {
 
-			def max = Math.min(params.max?.toInteger()?:10,100)
-			def offset = params.offset?.toInteger()?:0
-			def group = BoardGroup.findByName(params?.group)
 
-			def groups = BoardGroup.listOrderByName()*.name
-			groups.add(0,"All")
 
-			if (group != null) {
-				log.debug("Fetch boards for group:" + group.id)
-				[groups: groups, group:group.name, result: boardService.findBoardsByGroup(group.id, max, offset), total:Board.findAllByBoardGroup(group).size()]
-			} else {
-				log.debug("Fetch all boards")
-				[groups: groups, group:'All' , result: boardService.findAllBoards(max, offset), total:Board.count()]
-			}
-
-		}
+	}
 		
 		
-		def save() {			
+	def save() {			
 			def boardInstance = Board.get(params.id)						
 			if (!boardInstance) {
 				flash.message = message(code: 'default.not.found.message', args: [
