@@ -31,6 +31,24 @@ function statusClass(status) {
     }
 }
 
+
+function truncate(number)
+{
+    return number > 0
+         ? Math.floor(number)
+         : Math.ceil(number);
+}
+
+function getDateString(date) {
+	var sign = (date.getTimezoneOffset()>0) ? '-':'+';			
+	var hour = ("0" + Math.abs(truncate(date.getTimezoneOffset()/60))).slice(-2);
+	var min =  ("0" + date.getTimezoneOffset()%60).slice(-2);
+	var tz = " " + sign + hour + min;
+	return ("0" + date.getDate()).slice(-2) + "." + ("0"+(date.getMonth()+1)).slice(-2) + "." +
+    date.getFullYear() + " " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2) + ":" + ("0" + date.getSeconds()).slice(-2) + tz ;	
+	
+}
+
 function statusText(status) {
     if (status == 0){
         // OK

@@ -36,13 +36,12 @@ class Board extends CheckDevice {
 		lastResultTime(editable:false,nullable:true)
 		checkDelay(nullable:true, min:0)
 		boardGroup(nullable:true)
-		frameStorage(nullable:false)
-		comments(sort: "insert_time")
+		frameStorage(nullable:false)		
     }
 	
 	static mapping = {
 		origin(sqlType:"text", index: 'board_origin_idx')		
-		comments cascade: "all"		
+		comments cascade: "all"	
 	}
 	
 	def beforeDelete(){

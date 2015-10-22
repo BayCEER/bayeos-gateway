@@ -723,7 +723,12 @@ $BODY$
       <sql>update users set account_locked = false, password = 'Yv371V0ZsqRnEQKte8oX2HX4IHo=' where username like 'import' and password like 'zZZSEKOCeaHyuf4TDN8/vubx+8g=';</sql>
       <!--  Switch username for export from import to root and password to 'bayeos' for local exports only -->
       <sql>update export_job_config set user_name = 'root', password = 'UlBLVltG' where url like 'http://localhost/BayEOS-Server/XMLServlet';</sql>
-  </changeSet>    
+  </changeSet>  
+  
+  <changeSet id="130" author="oa">
+      <comment>Issue #21: Change DB-Type of message.content from varchar(255) to text </comment>
+      <sql>ALTER TABLE message ALTER COLUMN content TYPE text;</sql>
+  </changeSet>
   
      
 </databaseChangeLog>

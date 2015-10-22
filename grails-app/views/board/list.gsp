@@ -74,7 +74,7 @@
             		// LRT
             		{"targets": 3, "render":
             			function ( data, type, row ) {
-            			 	return new Date(row.last_result_time).toString();
+            			 	return getDateString(new Date(row.last_result_time));
                 		}
 
             		},

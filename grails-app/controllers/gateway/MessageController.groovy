@@ -1,6 +1,7 @@
 package gateway
 
 import groovy.sql.Sql
+import grails.converters.JSON
 
 class MessageController {
 			
@@ -13,32 +14,50 @@ class MessageController {
 	}
 	
 	def deleteMessage(){	
-		log.debug("getMessage")
+		log.debug("deleteMessage")
 		def message = Message.get(params.id)		
 		message.delete(flush:true)
+		render ''
 	}
 		
-	def getMessagesByOrigin(){
-		log.debug("getMessageByOrigin")		
-		def db = new Sql(dataSource)		
+	def listData(){
+		log.debug("listData")
 		def origin = params.get("origin")
-		def max = Math.min(params.max?.toInteger()?:10,100)
-		def offset = params.offset?.toInteger()?:0
+		def max = params.int('length',10)
+		def offset = params.int('start',0)										
+		def recordsTotal = Message.countByOrigin(origin) 		
+		def res = [draw: params["draw"], recordsTotal: recordsTotal]
+				
+			
+		// Ordering
+		def sort = []
+		for (int i = 0; i < 2; i++) {
+			def c = params["order[${i}][column]"]
+			if (c) {
+				sort.add(params["columns[${c}][data]"] + " " + params["order[${i}][dir]"])
+			}
+		}
+		// Default ordering
+		if (sort.size() == 0) {
+			sort.add("1 desc")
+		}
 		
-		// log.info(params)
-		def mgs = db.rows("select id, result_time, type, content from message where origin like ? order by id LIMIT ? OFFSET ?",[origin,max,offset])		 
-		def c =  db.firstRow("select count(*) from message where origin like ?", [origin])
-				
-				
-		render(contentType:"text/json") {
-				messages = array {
-					for(m in mgs) {
-						msg id:m.id, result_time:m.result_time.time,type:m.type,content:m.content
-					}
-				}
-				count = c.count
-		}					
-		db.close()		
+		
+		// Nothing found
+		if (recordsTotal == 0) {
+			res['recordsFiltered'] = 0
+			res['data'] = []
+
+		} else {
+			res['recordsFiltered'] = recordsTotal
+			def db = new Sql(dataSource)
+			def sql = "select id, result_time, type, content from message where origin like ? order by " + sort.join(",") + " LIMIT ? OFFSET ?"
+			res['data'] = db.rows(sql,[origin, max, offset])
+			db.close()		
+		} 
+
+		render res as JSON
+						
 	}
 
 

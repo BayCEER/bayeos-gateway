@@ -7,14 +7,19 @@
   <script src="${resource(dir:'javascripts',file:'jquery.flot.min.js')}" type="text/javascript"></script>
   <script src="${resource(dir:'javascripts',file:'jquery.flot.time.min.js')}" type="text/javascript"></script>
  
-  <div class="container">
+
   
   <div class="hidden" id="timeOutWarning">
   	<bootstrap:alert class="alert-warning">Data loading stopped. Please reload the page.</bootstrap:alert>
   </div>
-                
+         
+  <div class="row">       
    <div class="block">
     <div class="block-header">Data of Board: ${boardInstance.origin}</div>
+    <div class="btn-group btn-group-default" role="group" aria-label="Selection">
+    <button class="btn" id="allChannels" aria-label="Select All" data-toggle="tooltip" title="Select all channels"><span class="glyphicon glyphicon-ok"></span></button>    
+    <button class="btn" id="noChannel" aria-label="Select None" data-toggle="tooltip" title="Delselect all channels"><span class="glyphicon glyphicon-remove"></span></button>
+    </div>
     <table class="table">    
       <tr>      
         <th>Channel</th>
@@ -30,15 +35,24 @@
         <td id="ct${channel.nr}"/>
       </tr>
       </g:each>       
-    </table>     
-  <div id="chart" class="col-sm-12" style="height:300px;">   
-  </div>
+    </table>
+    </div>
+   </div> 
+  
+   <div class="row">
+  		<div id="chart" class="col-sm-12" style="height:300px;">
+  		</div>
+   </div>
+        
+     
+  
    
-  </div>  
- </div>   
+  
+   
      
  <script type="text/javascript">
-    var channels = ${channelList}; 
+    var channels = ${channelList};
+    var colors = [];     
     var series = [];
                
     var refreshCounts;
@@ -51,8 +65,63 @@
       xaxis: {mode: "time",  timeformat: "%H:%M:%S\n%d.%m",timezone: "browser", zoomRange: [0.1, 10], panRange: [-10, 10] },
       yaxis: { zoomRange: [0.1, 10], panRange: [-10, 10] }     
     };
-    
-     
+
+    $('#allChannels').click(function(){
+    	$(".block").find("input").prop("checked",true);
+    	drawChart();
+    });
+
+	$('#noChannel').click(function(){
+		$(".block").find("input").prop("checked",false);
+		drawChart();        
+    });
+
+
+	$(".block").find("input").change( function() {
+		drawChart();
+	});
+
+
+	function drawChart(){
+		 // Plot series according to choices 
+        var points = [];                          
+        $(".block").find("input:checked").each(function () {
+          var key = $(this).attr("name");
+          points.push({data:series[key], color:colors[parseInt(key)]});            
+        }); 
+        var plot = $.plot($("#chart"),points,options);     
+		
+	}
+
+
+    function fetchData() {
+	 	// Show a message and stop loading after 10 min         
+	 	if (++refreshCounts > 60){
+	 	 		clearInterval(interval)
+	 	 		$("#timeOutWarning").removeClass("hidden") 	 		
+	 	 		return;
+	 	}
+	         
+	    $.ajax(
+	        {
+	          url: '${createLink(controller: 'board', action: 'chartData')}',          
+	          dataType: "json",
+	          cache: false,            
+	          data: "lastRowId="+lastRowId+"&boardId="+${boardInstance.id} ,          
+	          timeout: 5000, 
+	          success: function(data){    
+	            lastRowId = data.lastRowId;  	        
+	            $.each(data.observations, function(key, val) {              
+	              $('#cv' + val.ch).html(val.value);                       
+	              $('#ct' + val.ch).html(getDateString(new Date(val.millis)));
+	              var s = series[val.ch];
+	              s.push([val.millis,val.value]);              
+	            });
+	            drawChart();                                          	            
+	          },
+	         }) // ajax end 
+    } // fetch Data end 
+
     
     $(document).ready(function(){
 
@@ -70,54 +139,14 @@
           
      // Plot empty chart to get some colors !
      var p = $.plot($("#chart"),dummy,options);  
-     var d = p.getData();
-     var colors = [];
-          
+     var d = p.getData();              
      for(var i = 0;i<channels.length;++i){       
        colors[channels[i]] = d[i].color;
        $(".cell" + channels[i]).css("background-color",d[i].color);
      }
      
-                       
-        
-     function fetchData() {
- 	 	// Show a message and stop loading after 10 min         
- 		if (++refreshCounts > 60){
- 	 		clearInterval(interval)
- 	 		$("#timeOutWarning").removeClass("hidden") 	 		
- 	 		return;
- 	 	}
-         
-        $.ajax(
-        {
-          url: '${createLink(controller: 'board', action: 'chartData')}',          
-          dataType: "json",
-          cache: false,            
-          data: "lastRowId="+lastRowId+"&boardId="+${boardInstance.id} ,          
-          timeout: 5000, 
-          success: function(data){    
-            lastRowId = data.lastRowId;            
-            $.each(data.observations, function(key, val) {              
-              $('#cv' + val.ch).html(val.value);                       
-              $('#ct' + val.ch).html(new Date(val.millis).toString());
-              var s = series[val.ch];
-              s.push([val.millis,val.value]);              
-            });
-
-            // Plot series according to choices 
-            var points = [];                          
-            $(".block").find("input:checked").each(function () {
-              var key = $(this).attr("name");
-              points.push({data:series[key], color:colors[parseInt(key)]});            
-            }); 
-            var plot = $.plot($("#chart"),points,options);                                                
-            
-          },
-         }) // ajax end 
-       } // fetch Data end 
-
-       fetchData()
-       interval = setInterval(fetchData,10000);
+     fetchData()
+     interval = setInterval(fetchData,10000);
    
     });      
     </script>    

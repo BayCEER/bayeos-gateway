@@ -23,7 +23,7 @@
 
 
 		<g:form class="form" role="form" action="save"
-			id="${boardInstance?.id}">			
+			id="${boardInstance?.id}">
 
 			<div class="block">
 
@@ -49,15 +49,22 @@
 				<div role="tabpanel">
 					<!-- Nav tabs -->
 					<ul class="nav nav-tabs" role="tablist" id="myTab">
-						<li role="presentation"><a href="#channels"	aria-controls="channels" role="tab" data-toggle="tab">Channels</a>
+						<li role="presentation"><a href="#channels"
+							aria-controls="channels" role="tab" data-toggle="tab">Channels</a>
 						</li>
-						<li role="presentation"><a href="#settings"	aria-controls="settings" role="tab" data-toggle="tab">Settings</a>
+						<li role="presentation"><a href="#settings"
+							aria-controls="settings" role="tab" data-toggle="tab">Settings</a>
 						</li>
-						<li role="presentation"><a href="#messages"	aria-controls="messages" role="tab" data-toggle="tab">Messages
+						<li role="presentation"><a href="#messages"
+							aria-controls="messages" role="tab" data-toggle="tab">Messages
 								<span class="badge" id="msgBadge"></span>
 						</a></li>
-						<li role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments <span class="badge" id="comBadge">${boardInstance.comments.size()}</span></a>
-						</li>
+						<li role="presentation"><a href="#comments"
+							aria-controls="comments" role="tab" data-toggle="tab">Comments
+								<span class="badge" id="comBadge">
+									${boardInstance.comments.size()}
+							</span>
+						</a></li>
 					</ul>
 
 					<!-- Tab panes -->
@@ -91,7 +98,7 @@
 											<nagios:statusCell returnCode="${c?.status_complete}"
 												tip="${c?.status_complete_msg}">
 												<g:formatDate date="${c?.last_result_time}"
-													format="dd.MM.yyyy HH:mm:ss z" />
+													format="dd.MM.yyyy HH:mm:ss Z" />
 											</nagios:statusCell>
 
 											<td>
@@ -121,23 +128,17 @@
 
 						<div role="tabpanel" class="tab-pane fade" id="messages">
 
-							<table id="messages" class="table table-condensed col-sm-12">
+							<table id="tab-messages" class="table table-condensed col-sm-12">
 								<thead>
 									<tr>
 										<th class="col-sm-1">Type</th>
-										<th class="col-sm-2">Time</th>
-										<th class="col-sm-7">Content</th>
-										<th class="col-sm-2"></th>
+										<th class="col-sm-3">Time</th>
+										<th class="col-sm-8">Content</th>										
 									</tr>
 								</thead>
 								<tbody>
 								</tbody>
-							</table>
-							<div class="pagination">
-								<a id="msgBackward" class="btn btn-default"
-									role="button" href="#"></span>«</a> 
-								<a id="msgForward"	class="btn btn-default" role="button" href="#"></span>»</a>
-							</div>
+							</table>							
 						</div>
 						<div role="tabpanel" class="tab-pane fade" id="settings">
 							<div class="block">
@@ -182,12 +183,12 @@
 								</div>
 							</div>
 						</div>
-						
-						
-						
-						
-						<div role="tabpanel" class="tab-pane fade" id="comments">													
-								<g:render template="/board/comment_list"/>						
+
+
+
+
+						<div role="tabpanel" class="tab-pane fade" id="comments">
+							<g:render template="/board/comment_list" />
 						</div>
 
 
@@ -196,44 +197,43 @@
 
 
 
-			</div>
+					</div>
 
 
 
 
-			<div class="block-action">
-				<button type="submit" class="btn btn-primary">	
-					<span class="glyphicon glyphicon-save"></span>
-					<g:message code="default.button.save.label" default="Save" />										
-				</button>
-				<button type="submit" class="btn btn-default" name="_action_remove"
-					onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-					formnovalidate>
-					<span class="glyphicon glyphicon-trash"></span>
-					<g:message code="default.button.delete.label" default="Delete" />
-				</button>
-				<g:link action="chart" params='[id:"${boardInstance?.id}"]'>
-					<button type="button" class="btn btn-default">
-						<span class="glyphicon glyphicon-stats"></span> Chart
-					</button>
-				</g:link>
-				<div class="btn-group">
-					<button type="button" class="btn btn-default dropdown-toggle"
-						data-toggle="dropdown">
-						<span class="glyphicon glyphicon-hdd"></span> Template <span
-							class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li><g:link action="editTemplate"
-								params='[id:"${boardInstance?.id}"]'>Apply Template</g:link></li>
-						<li><g:link action="saveAsTemplate"
-								params='[id:"${boardInstance?.id}"]'>Save as Template</g:link></li>
-					</ul>
-				</div>
+					<div class="block-action">
+						<button type="submit" class="btn btn-primary">
+							<span class="glyphicon glyphicon-save"></span>
+							<g:message code="default.button.save.label" default="Save" />
+						</button>
+						<button type="submit" class="btn btn-default"
+							name="_action_remove"
+							onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+							formnovalidate>
+							<span class="glyphicon glyphicon-trash"></span>
+							<g:message code="default.button.delete.label" default="Delete" />
+						</button>
+						<g:link action="chart" params='[id:"${boardInstance?.id}"]'>
+							<button type="button" class="btn btn-default">
+								<span class="glyphicon glyphicon-stats"></span> Chart
+							</button>
+						</g:link>
+						<div class="btn-group">
+							<button type="button" class="btn btn-default dropdown-toggle"
+								data-toggle="dropdown">
+								<span class="glyphicon glyphicon-hdd"></span> Template <span
+									class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li><g:link action="editTemplate"
+										params='[id:"${boardInstance?.id}"]'>Apply Template</g:link></li>
+								<li><g:link action="saveAsTemplate"
+										params='[id:"${boardInstance?.id}"]'>Save as Template</g:link></li>
+							</ul>
+						</div>
 
-			</div>
-
-
+					</div>
 		</g:form>
 
 
@@ -259,98 +259,65 @@
         </g:each>
 
      	// Select tab by name
-        $('#myTab a[href="#channels"]').tab('show')        					   	   		
+        $('#myTab a[href="#channels"]').tab('show');
+                     
+        $('#tab-messages').DataTable( {
+ 				"responsive": true,
+        		"autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "lengthChange": false,
+                "searching": false,
+                "rowId": 'id',                                    
+                "columns": [
+                    {data: 'type'},
+                    {data: 'result_time'},
+                    {data: 'content'}
+                ],
+                "ajax": {
+                    "url": '${createLink(controller:'message', action:'listData')}',
+                    "data": function (d) {
+                    	d.origin="${boardInstance.origin}"
+                     }                        
+                },
+                "columnDefs": [
+                    // https://datatables.net/reference/option/columns.render
+                    // Type
+            		{ "targets": 0 , "render":
+            			function ( data, type, row , meta) {
+            				 var cellType;
+			        		 if (row.type == "ERROR"){
+			        			return "<td><span class=\"text-danger\"/>" + row.type + "</span></td>";  
+				          	 } else {
+				          		return "<td>" + row.type + "</td>";
+					      	 }				          			            				             			            			                    		
+                		}
+            		},
+            		// Result Time
+            		{ "targets": 1 , "render":
+            			function ( data, type, row, meta ) {
+            				return "<td>" + getDateString(new Date(row.result_time)) + "</td>";	
+                		}
+            		},
 
-		$("#msgBackward").bind("click", msgBackward);
-		$("#msgForward").bind("click", msgForward);
+            		// Content
+            		{ "targets": 2, "render":
+            			function ( data, type, row, meta ) {
+            				return "<td>" + row.content + "</td>" ;
+            			
+                		}
+            		}
 
-		function setPager(){
-			if (rowsTotal < max){
-				$("#msgForward").addClass("disabled")
-				$("#msgBackward").addClass("disabled")
-			} else {
-				// Backward 
-				if (step > 0){
-					$("#msgBackward").removeClass("disabled")
-				} else {
-					$("#msgBackward").addClass("disabled")
-				}
-				// Forward 
-				if ((step + 1)*max >= rowsTotal ){
-					$("#msgForward").addClass("disabled")
-				} else {
-					$("#msgForward").removeClass("disabled")
-				}				
-			}
-		}
-
-		function msgForward(){
-			step++;					
-			fetchMsg(max,step*max);
-			setPager()						
-		}
-
-		function msgBackward(){
-			step--;				
-			fetchMsg(max, step*max);
-			setPager()						
-		}
-
-
-		function fetchMsg(max, offset) {	
-			$.ajax(
-			        {
-			          url: '${createLink(controller: 'message', action: 'getMessagesByOrigin')}',          
-			          dataType: "json",
-			          cache: false,            
-			          data: 'origin=${boardInstance.origin}&max='+max+'&offset='+ offset,  
-			          timeout: 5000, 
-			          success: function(data){ 
-			        	  $("#messages tbody tr").remove()	
-			        	  rowsTotal = data.count;
-			        	  $('#msgBadge').text(rowsTotal)			        	 		        	  			        	 
-			        	  $.each(data.messages, function(key, val) {
-			        		  var cellType;
-				        	  if (val.type == "ERROR"){
-				        		  cellType = "danger";  
-					          } else {
-					        	  cellType = "info";
-						      }				   
-
-				        	       	  		        					        	     
-			        		  $("#messages tbody").append(			        				  
-			        					"<tr id=\"row"  + val.id + "\">" +
-			        					"<td class=\"" + cellType + "\">" + val.type + "</td>" + 			        					   							        		  			        								        					
-			        					"<td>" + new Date(val.result_time).toLocaleString()+ "</td>" +			        					
-			        					"<td>" + val.content + "</td>" +
-			        					"<td><a id=\"row\" rowId=\"" + val.id + "\" class=\"btn btn-xs btn-default msgDelete\" role=\"button\">Delete <span class=\"glyphicon glyphicon-remove\"></span></a></td>" +		
-			        					"</tr>");								
-			              });			        	  
-			      		  $(".msgDelete").click(function() {
-				      		var id = $(this).attr("rowId")				      		
-			      			console.log("click:" + id);			      			
-			      			$.ajax({
-			      				url: '${createLink(controller: 'message', action: 'deleteMessage')}',          
-						          dataType: "json",
-						          cache: false,            
-						          data: "id="+id,  
-						          timeout: 5000, 
-					      	});				 
-			      			$('#row' + id).remove();
-			      			$('#msgBadge').text(--rowsTotal)
-			      		});
-			      		setPager();
-				     }
-			        });
-		}
-		
-		fetchMsg(10,0);
-		
+        		],
+        		"initComplete": function () {
+        			$('#msgBadge').text(this.api().page.info().recordsTotal);
+        		}
+        });
         
-
          	 
 });
-    
+
+		 	
 </script>
 
 </body>
