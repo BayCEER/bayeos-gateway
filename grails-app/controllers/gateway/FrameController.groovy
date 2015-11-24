@@ -11,28 +11,10 @@ class FrameController {
 		
 	}
 	
-	
-	def saveFlat() {				
-		String sender = "IP:" + request.getRemoteAddr()				
-		if (params.containsKey("sender")){			
-			sender = params.get("sender")			
-		}	
-		log.info("Received a package from ${sender}")
-		def ret = false
-		if (params.containsKey("bayeosframe")){
-			ret = frameService.saveFlatFrames(sender,new Date(),[params.bayeosframe])
-		} else {
-			ret = frameService.saveFlatFrames(sender,new Date(),params.get("bayeosframes[]"))
-		}
-		if (ret){
-			logAndRender(200,'Frames saved.')
-		} else {
-			logAndRender(500,'Failed to save frames.')
-		}	
-	
-	}
-
-	def saveMatrix() {				
+	/*
+	 *  @since 1.9.21
+	 */
+	def save() {
 		String sender = "IP:" + request.getRemoteAddr()
 		if (params.containsKey("sender")){
 			sender = params.get("sender")
@@ -40,16 +22,29 @@ class FrameController {
 		log.info("Received a package from ${sender}")
 		def ret = false
 		if (params.containsKey("bayeosframe")){
-			ret = frameService.saveMatrixFrames(sender,new Date(),[params.bayeosframe])
+			ret = frameService.saveFlatFrames(sender,[params.bayeosframe])
 		} else {
-			ret = frameService.saveMatrixFrames(sender,new Date(),params.get("bayeosframes[]"))
+			ret = frameService.saveFlatFrames(sender,params.get("bayeosframes[]"))
 		}
 		if (ret){
 			logAndRender(200,'Frames saved.')
 		} else {
 			logAndRender(500,'Failed to save frames.')
 		}
-	
+	}
+			
+	/*
+	 *@deprecated 
+	 */
+	def saveFlat() {					
+		redirect(action: "save", params: params)
+	}
+
+	/*
+	 * @deprecated 
+	 */
+	def saveMatrix() {				
+		redirect(action: "save", params: params)
 	}
 
 
