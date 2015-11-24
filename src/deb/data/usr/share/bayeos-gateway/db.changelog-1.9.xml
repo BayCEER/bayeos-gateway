@@ -730,5 +730,21 @@ $BODY$
       <sql>ALTER TABLE message ALTER COLUMN content TYPE text;</sql>
   </changeSet>
   
+  <changeSet id="131" author="oa">
+  	<comment>Dropped matrix storage</comment>
+  	 <sql>ALTER TABLE board DROP COLUMN frame_storage;</sql>  	 
+  </changeSet>
+  
+  <changeSet id="132" author="oa">
+  	<comment>Frame import redesign</comment>  	
+  	<sql>DROP TRIGGER trg_chk_observation ON observation;</sql>
+  	<sql>DROP FUNCTION _chk_observation();</sql>
+  </changeSet>
+  
+  <changeSet id="133" author="oa">
+    <comment>Remove file_format table</comment>  
+  	<sql>DROP TABLE file_format;</sql>
+  </changeSet>
+  
      
 </databaseChangeLog>
