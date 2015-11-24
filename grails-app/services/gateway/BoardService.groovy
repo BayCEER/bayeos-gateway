@@ -1,8 +1,5 @@
 package gateway
 
-import frame.parser.FrameHandler;
-import frame.parser.FrameParser
-import frame.parser.ParserException;
 import groovy.sql.Sql
 
 import java.awt.GraphicsConfiguration.DefaultBufferCapabilities;
@@ -24,9 +21,6 @@ import org.postgresql.PGConnection
 import org.postgresql.copy.CopyManager
 import org.postgresql.core.BaseConnection
 
-import de.unibayreuth.bayceer.parser.simpleformat.CSVParser
-import de.unibayreuth.bayceer.parser.simpleformat.Column
-import de.unibayreuth.bayceer.parser.simpleformat.SimpleFormat
 import org.springframework.transaction.annotation.Transactional
 
 
@@ -110,82 +104,6 @@ class BoardService  {
 		db.close()
 		return result
 	}
-	
-	
-	
-	
-	def int createBoardByFileFormat(String origin, FileFormat format){
-		SimpleFormat sf = JAXB.unmarshal(new StringReader(format.getXml()), SimpleFormat.class)		
-		def db = new Sql(dataSource)		
-		def seq = db.firstRow("select nextval('board_id_seq') as id;")		 			
-		db.execute """
-			insert into board (id, origin, frame_storage) 
-			values (${seq.id},${origin},true); 
-		"""				
-		for(int i=1;i<sf.getColumns().size();i++){
-			Column col = sf.getColumns().get(i)
-			db.execute "insert into channel (board_id,nr,label) values (${seq.id},${col.num},${col.name}); "			
-		}																																												
-		db.execute 'CREATE TABLE _board_data_' + seq.id + ' (id bigserial, result_time timestamp with time zone);'
-		db.execute 'CREATE INDEX  idx_board_data_' + seq.id + ' ON _board_data_' + seq.id + ' (result_time);'
-		for(int i=1;i<sf.getColumns().size();i++){
-			db.execute 'ALTER TABLE _board_data_' + seq.id + ' add column c' + i + ' real;'				
-		}			
-		db.close()			
-		return seq.id					
-	}
-	
-	def int copyZippedData(Integer id, CSVParser parser, File file){		
-		int ret = 0								
-		ZipFile zf = new ZipFile(file)		
-		for(ZipEntry entry : Collections.list( zf.entries() ) ){			
-			InputStream inStream = zf.getInputStream( entry )
-			ret = ret + copyData(id, parser, inStream);							
-		}		
-		return ret
-	}
-	
-	def int copyData(Integer id, CSVParser parser, InputStream source){
-					
-		def db = new Sql(dataSource)
-		List cha = db.rows('select nr from channel where board_id = :id order by nr',[id:id])				 
-				
-		def copy = "COPY _board_data_${id} (result_time," + cha.collect{"c${it[0]}"}.join(",") +  ") FROM STDIN WITH CSV"
-		int rows = 0		
-		int batchSize = 1000;						
-		try {									
-			Connection con = dataSource.getConnection()
-			CopyManager copyManager = ((PGConnection)con.unwrap(PGConnection.class)).getCopyAPI()			
-			StringBuffer b = new StringBuffer(10000)						
-			Scanner scanner = new Scanner(source)						
-			while(scanner.hasNext()){													
-				b.append(parser.parse(scanner.nextLine())).append("\n")				
-				if (rows%batchSize==0){
-					copyManager.copyIn(copy,new StringReader(b.toString()));
-					b.setLength(0)					
-				}
-				rows++;
-			}
-			
-			
-			if (b.size()>0)	copyManager.copyIn(copy,new StringReader(b.toString()))			
-			db.eachRow('select id, nr from channel where board_id = ? order by nr',[id]){ row ->				
-				Timestamp ts = new Timestamp(parser.getColumnLastDate(row.nr).getTime())				
-				db.executeUpdate("update channel set last_result_time = ? where id = ? and (last_result_time < ? or last_result_time is null)",[ts,row.id,ts])
-			}
-			Timestamp bm = new Timestamp(parser.getLastDate().getTime())
-			db.executeUpdate("update board set last_result_time = ? where id = ? and (last_result_time < ? or last_result_time is null)",[bm,id,bm])			
-			db.close()
-			return rows;
-			
-		} catch (Exception e){
-			log.error(e.getMessage())
-			rows = 0						
-		}	
-		
-		return rows
-	}
-
 
 	
 }
