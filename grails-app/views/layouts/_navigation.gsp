@@ -60,10 +60,7 @@
 									<g:link controller="deleteJob" action="edit"> Delete</g:link>
 								</li>
 							</ul></li>
-						<li ${controllerName.equals('fileUpload') ? 'class="active"' : ''}>
-							<g:link controller="fileUpload" action="upload">
-							<span class="glyphicon glyphicon-upload"></span> Upload</g:link>
-						</li>
+						
 						<li ${controllerName.equals('file') ? 'class="active"' : ''}>
 							<g:link controller="file" action="show" params="[file:'/var/log/tomcat6/gateway.log', title:'Gateway Log']"><span class="glyphicon glyphicon-file"></span>
 								Log</g:link>
