@@ -21,8 +21,7 @@ class Board extends CheckDevice {
 	Short lastRssi
 	Date lastResultTime
 	
-	Boolean frameStorage = false
-    BoardGroup boardGroup
+	BoardGroup boardGroup
 	
 	static hasMany = [comments: Comment]
 	
@@ -43,14 +42,6 @@ class Board extends CheckDevice {
 		origin(sqlType:"text", index: 'board_origin_idx')		
 		comments cascade: "all"	
 	}
-	
-	def beforeDelete(){
-		def db = new Sql(dataSource)
-		if (frameStorage){					
-			db.execute("DROP TABLE IF EXISTS _board_data_" + id + ";")		
-		}
-		db.execute("DELETE FROM channel where board_id = ?",[id])
-		db.close()						
-	}				
+			
 	
 }
