@@ -56,12 +56,12 @@ grails.gorm.default.mapping = {
 
 
 log4j = {
-	appenders {
-		console name: 'stdout'
-	}
-	root {
-		info 'stdout'
-	}
+	
+	// Set level for all application artifacts
+	info "grails.app"	
+	info "grails.app.services"
+	info "bayeos"
+	
 }
 
 environments {
