@@ -11,6 +11,7 @@ grails.project.source.level = 1.7
 //   run: [maxMemory:1024, minMemory:64, debug:false, maxPerm:256]
 //]
 
+grails.enable.native2ascii = false
 
 grails.war.resources = { stagingDir ->
 	// Servlet JAR conflicts with Tomcat's version. See: http://jira.grails.org/browse/GRAILS-9483
@@ -39,8 +40,7 @@ grails.project.dependency.resolution = {
 
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
-		compile 'de.unibayreuth.bayceer.bayeos:bayeos-file-parser:1.0.0'		
-		compile 'de.unibayreuth.bayceer.bayeos:bayeos-frame-api:2.0.3'
+		compile 'de.unibayreuth.bayceer.bayeos:bayeos-frame:1.0.0'
 		compile 'de.unibayreuth.bayceer.bayeos:bayeos-xmlrpc:1.9.5'
 		compile 'de.unibayreuth.bayceer.bayeos:bayeos-password-file:1.0.0'		
 		test 	'org.codehaus.groovy.modules.http-builder:http-builder:0.6'
