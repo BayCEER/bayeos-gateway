@@ -197,19 +197,10 @@ class BoardController {
 				return
 			}
 
-			def sql
-			if (board.frameStorage) {
-				sql = "select result_time, " + chaNr.collect{
-					"real_value(c${it[0]},${it[3]})"
-				}.join(",") + " from _board_data_${board.id} where result_time >= '${startDate.format('yyyy-MM-dd HH:mm:ss',timeZone)}' and result_time <= '${endDate.format('yyyy-MM-dd HH:mm:ss',timeZone)}' order by result_time, id"
-			} else {
-				sql = "select * from crosstab('select result_time, c.nr, real_value(o.result_value,c.spline_id) from all_observation o, channel c where " +
+			def sql = "select * from crosstab('select result_time, c.nr, real_value(o.result_value,c.spline_id) from all_observation o, channel c where " +
 				"o.channel_id = c.id and c.board_id = ${board.id} and o.result_time >= ''${startDate.format('yyyy-MM-dd HH:mm:ss',timeZone)}'' and o.result_time <= ''${endDate.format('yyyy-MM-dd HH:mm:ss', timeZone)}'' order by o.result_time, c.nr, o.id', 'SELECT nr FROM channel where board_id = ${board.id} ORDER BY 1')" +
-				" as ct(result_time timestamp with time zone ,"	+ chaNr.collect{
-					"c${it[0]} text"
-				}.join(", ") + ");"
-			}
-			
+				" as ct(result_time timestamp with time zone ,"	+ chaNr.collect{"c${it[0]} text"}.join(", ") + ");"
+						
 			
 			withFormat {
 				// default format
