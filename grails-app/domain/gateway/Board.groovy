@@ -42,7 +42,10 @@ class Board extends CheckDevice {
 		comments cascade: "all"	
 	}
 	
-		
-			
+	def beforeDelete(){
+		def db = new Sql(dataSource)		
+		db.execute("DELETE FROM channel where board_id = ?",[id])
+		db.close()						
+	}				
 	
 }
