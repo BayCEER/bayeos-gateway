@@ -30,6 +30,7 @@ class BoardController {
 	]
 
 
+	
 	def listData() {
 		def search = "%%"
 		if (params['search[value]']){
@@ -38,7 +39,9 @@ class BoardController {
 
 		def max = params.int('length',10)
 		def offset = params.int('start',0)
+
 		def recordsTotal = Board.count()
+				
 		def res = [draw: params["draw"], recordsTotal: recordsTotal]
 
 		// Ordering

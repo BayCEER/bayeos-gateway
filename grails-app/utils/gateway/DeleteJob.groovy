@@ -37,9 +37,7 @@ class DeleteJob implements Runnable {
 				dt = config.maxStatInterval.toString()
 				log.info("Deleting statistics older than ${dt}.")
 				db.execute("delete from export_job_stat where start_time < now() - ?::interval",[dt])
-				
-				// Achtung: Matrix Boards Daten in _board_data Tabellen werden nicht gelöscht.
-				
+											
 				
 			} catch (SQLException e){
 				log.error(e)

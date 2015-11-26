@@ -21,13 +21,13 @@ class NagiosService {
 	}
 
 	NagiosMessage msgGroup(String name) {
-		log.info("Query status of group: $name")
+		log.info("Query status of group: ${name}")
 		def db = new Sql(dataSource)
-		if (db.rows("select true from board_group where name like '$name'").empty ){
+		if (db.rows("select true from board_group where name like ?",[name]).empty ){
 			db.close();
-			return new NagiosMessage(status:3,text:"Group $name not found");
+			return new NagiosMessage(status:3,text:"Group ${name} not found");
 		} else {
-			List channels = db.rows("select * from nagios_status where group_name like '$name' order by board_origin, channel_nr")
+			List channels = db.rows("select * from nagios_status where group_name like ? order by board_origin, channel_nr",[name])
 			db.close()
 			NagiosMessage m = getNagiosMsg(channels)
 			return m;
@@ -39,7 +39,7 @@ class NagiosService {
 		def db = new Sql(dataSource)
 		if (db.rows("select true from board where id=?",[id]).empty){
 			db.close();
-			return new NagiosMessage(status:3,text:"Board with id:$id not found");
+			return new NagiosMessage(status:3,text:"Board with id:${id} not found");
 		} else {
 			List channels = db.rows("select * from nagios_status where board_id=? order by channel_nr",[id]);
 			db.close()
@@ -50,11 +50,11 @@ class NagiosService {
 
 
 	NagiosMessage msgChannel(Integer id) {
-		log.info("Query status of channel: $id")
+		log.info("Query status of channel: ${id}")
 		def db = new Sql(dataSource)
 		if (db.rows("select true from channel where id=?",[id]).empty){
 			db.close();
-			return new NagiosMessage(status:3,text:"Channel with id:$id not found");
+			return new NagiosMessage(status:3,text:"Channel with id:${id} not found");
 		} else {
 			List channels = db.rows('select * from nagios_status where channel_id=?',[id])
 			db.close()

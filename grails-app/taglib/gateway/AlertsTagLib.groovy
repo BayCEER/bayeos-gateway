@@ -11,5 +11,6 @@ class AlertsTagLib {
 		out << '<p>' << body() << '</p>'
 		out << '</div>'
 	}
+		
 
 }

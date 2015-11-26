@@ -34,14 +34,15 @@ class Board extends CheckDevice {
 		lastRssi(editable:false, nullable:true)
 		lastResultTime(editable:false,nullable:true)
 		checkDelay(nullable:true, min:0)
-		boardGroup(nullable:true)
-		frameStorage(nullable:false)		
+		boardGroup(nullable:true)				
     }
 	
 	static mapping = {
 		origin(sqlType:"text", index: 'board_origin_idx')		
 		comments cascade: "all"	
 	}
+	
+		
 			
 	
 }

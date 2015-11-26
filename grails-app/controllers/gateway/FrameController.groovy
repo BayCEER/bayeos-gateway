@@ -11,10 +11,8 @@ class FrameController {
 		
 	}
 	
-	/*
-	 *  @since 1.9.21
-	 */
-	def save() {
+	
+	def saveFlat() {
 		String sender = "IP:" + request.getRemoteAddr()
 		if (params.containsKey("sender")){
 			sender = params.get("sender")
@@ -22,9 +20,9 @@ class FrameController {
 		log.info("Received a package from ${sender}")
 		def ret = false
 		if (params.containsKey("bayeosframe")){
-			ret = frameService.saveFlatFrames(sender,[params.bayeosframe])
+			ret = frameService.saveFrames(sender,[params.bayeosframe])
 		} else {
-			ret = frameService.saveFlatFrames(sender,params.get("bayeosframes[]"))
+			ret = frameService.saveFrames(sender,params.get("bayeosframes[]"))
 		}
 		if (ret){
 			logAndRender(200,'Frames saved.')
@@ -33,22 +31,6 @@ class FrameController {
 		}
 	}
 			
-	/*
-	 *@deprecated 
-	 */
-	def saveFlat() {					
-		redirect(action: "save", params: params)
-	}
-
-	/*
-	 * @deprecated 
-	 */
-	def saveMatrix() {				
-		redirect(action: "save", params: params)
-	}
-
-
-
 	private logAndRender(status, text) {
 		if (status == 200) {
 			log.debug(text)

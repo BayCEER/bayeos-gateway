@@ -26,7 +26,7 @@
                     <g:each in="${result}" status="i" var="res">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">                        
                             <td><g:link action="edit" id="${res.id}">${res.name}</g:link></td>
-                            <td><g:link controller="board" action="list" params="[group: res.name]">${res.board_count}</g:link></td>
+                            <td>${res.board_count}</td>
                             <td><g:formatDate date="${res.lrt}" format="dd.MM.yyyy HH:mm:ss z"/></td> 
                          	<td><nagios:statusMsg returnCode="${res.status}"/></td>
                          	<td class="link">

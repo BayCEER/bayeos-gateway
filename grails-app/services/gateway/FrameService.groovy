@@ -35,7 +35,7 @@ class FrameService {
 	}
 
 
-	private Integer findOrSaveBoard(String origin, Boolean frameStorage){
+	private Integer findOrSaveBoard(String origin){
 		log.debug("findOrSaveBoard:${origin}")
 		def db = new Sql(dataSource)
 		try {
@@ -43,7 +43,7 @@ class FrameService {
 			if (b==null) {
 				log.info("Creating new board:${origin}")							
 				def seq = db.firstRow("select nextval('board_id_seq') as id;")
-				db.execute """ insert into board (id, origin, frame_storage) values (${seq.id},${origin},${frameStorage});"""				
+				db.execute """ insert into board (id, origin) values (${seq.id},${origin});"""				
 				return seq.id
 			} else {
 				return b.id
@@ -214,6 +214,7 @@ class FrameService {
 				long r = cin.endCopy()
 			}			
 			updateLrt(boardRecords)
+			log.info("${dataFrames} observations imported")
 			return true
 
 
