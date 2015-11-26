@@ -47,7 +47,7 @@
 								<td><g:link controller="board" action="edit" id="${bs.id}">${bs.name}</g:link></td>
 								<td><xbee:rssiChart rssi="${bs.last_rssi}"/></td>
 								<td><g:formatDate date="${bs.last_result_time}"	format="dd.MM.yyyy HH:mm:ss Z" /></td>
-								<td><nagios:statusMsg/></td>
+								<td><nagios:statusMsg returnCode="${bs.status}"/></td>
 								<td>
 								<g:link	data-toggle="tooltip" title="Removes board from group." onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" 
 								action="removeBoard" id="${bs.id}"  class="btn btn-xs btn-default">

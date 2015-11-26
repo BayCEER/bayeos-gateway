@@ -350,6 +350,7 @@ class BoardController {
 			def boardInstance = Board.get(params.id)
 			if (boardInstance) {
 				try {
+					
 					boardInstance.delete(flush: true)
 					flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'board.label', default: 'Board'), params.id])}"
 					redirect(action: "list")
