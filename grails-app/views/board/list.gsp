@@ -10,6 +10,7 @@
         <table id="table" class="table table-hover nowrap">
         <thead>        	                        
                 <tr>
+                   <th class="min-tablet-l">Group</th>
                    <th class="min-tablet-l">Origin</th>
                    <th>Name</th>
                    <th class="min-tablet-l">Rssi</th>
@@ -27,31 +28,43 @@
        
         <script type="text/javascript" language="javascript" class="init">
  		$(document).ready(function(){
- 			$('#table').DataTable( {
+ 			var dt = $('#table').DataTable( {
  				"responsive": true,
         		"autoWidth": false,
                 "processing": true,
                 "serverSide": true,
                 "lengthChange": false,
                 "columns": [
+					{data: 'group_name'},
                     {data: 'origin'},
                     {data: 'name'},
                     {data: 'last_rssi'},
                     {data: 'last_result_time'},
-                    {data: 'status'}
+                    {data: 'status'}                    
                 ],
                 "ajax": {
                     "url": '${createLink(action:'listData')}'
                 },
                 "columnDefs": [
+                    // Group Name
+                   	{ "targets": 0 , render:
+                   		function ( data, type, row ) {   
+                   		if (row.group_name != null){
+                   			return '<a href="${createLink(controller:'boardGroup', action:'edit')}/' + row.group_id +'">' + row.group_name + '</>' ;
+                        }  else {
+							return "";
+                        }       			                		
+            		}
+                    },
+					                                                       
                     // Origin
-            		{ "targets": 0 , "render":
+            		{ "targets": 1 , "render":
             			function ( data, type, row ) {            			
                     		return '<a href="${createLink(action:'edit')}/' + row.id +'">' + row.origin + '</>' ;
                 		}
             		},
             		// Name
-            		{ "targets": 1 , "render":
+            		{ "targets": 2 , "render":
             			function ( data, type, row ) {
             			    if (row.name != null) {
             			            return '<a href="${createLink(action:'edit')}/' + row.id + '">' + row.name + '</>' ;
@@ -62,7 +75,7 @@
             		},
 
             		// Rssi
-            		{ "targets": 2, "render":
+            		{ "targets": 3, "render":
             			function ( data, type, row ) {
             			    if (row.last_rssi != null) {
             			    	return '<img src="${resource(dir:'images')}/level_' + rssiLevel(row.last_rssi) + '.gif"/>';             			        
@@ -72,14 +85,14 @@
                 		}
             		},
             		// LRT
-            		{"targets": 3, "render":
+            		{"targets": 4, "render":
             			function ( data, type, row ) {
             			 	return getDateString(new Date(row.last_result_time));
                 		}
 
             		},
             		// Status
-            		{ "targets": 4,"render":
+            		{ "targets": 5,"render":
             		    function ( data, type, row ) {
             			   if (row.status != null) {
             			        return '<span class="label label-' + statusClass(row.status) + '">' + statusText(row.status) + '</span>';
@@ -89,7 +102,7 @@
                 		}
             		},
             		// Controls
-            		{ "targets": 5,"render":
+            		{ "targets": 6,"render":
             		    function ( data, type, row ) {
             		        var ret = '<td class="link">';
             		        ret += '<a class="btn btn-xs btn-default" href="${createLink(action:'edit')}/' + row.id + '"><span class="glyphicon glyphicon-edit"></span> Edit</a>';
@@ -103,6 +116,8 @@
 
         		]
             } );
+
+            
 		});
     
 	</script>
