@@ -239,8 +239,9 @@ class FrameService {
 									sb.append(id).append(",").append(dateFormatter.format(timeStamp)).append(",").append(value).append("\n");
 									byte[] b = sb.toString().getBytes("UTF-8")
 									cin.writeToCopy(b,0,b.length)
+									dataFrames++;
 								}
-								dataFrames++;
+								
 							}
 							bc.lrt = timeStamp
 							bc.lrssi = rssi
