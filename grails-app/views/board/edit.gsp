@@ -32,15 +32,19 @@
 				</div>
 
 				<div class="row">
-					<div class="col-sm-4">
+					<div class="col-sm-3">
 						<f:field bean="boardInstance" property="name" />
 					</div>
-					<div class="col-sm-4">
+					<div class="col-sm-3">
 						<f:field bean="boardInstance" property="boardGroup" />
 					</div>
-					<div class="col-sm-4">
+					<div class="col-sm-3">
 						<f:field bean="boardInstance" property="samplingInterval"
 							label="Sampling Interval [sec]" />
+					</div>
+					<div class="col-sm-3">
+						<f:field bean="boardInstance" property="denyNewChannels"
+							label="Deny New Channels" />
 					</div>
 				</div>
 

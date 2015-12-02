@@ -21,6 +21,9 @@ class Board extends CheckDevice {
 	Short lastRssi
 	Date lastResultTime
 	
+	// Deny new channels  
+	Boolean denyNewChannels = false
+	
 	BoardGroup boardGroup
 	
 	static hasMany = [comments: Comment]
@@ -34,7 +37,8 @@ class Board extends CheckDevice {
 		lastRssi(editable:false, nullable:true)
 		lastResultTime(editable:false,nullable:true)
 		checkDelay(nullable:true, min:0)
-		boardGroup(nullable:true)				
+		boardGroup(nullable:true)
+		denyNewChannels(nullable:false)				
     }
 	
 	static mapping = {

@@ -24,8 +24,6 @@ class Channel extends CheckDevice {
 	
 	Integer lastCount
 		
-	Integer statusComplete
-	String statusCompleteMsg
 	
 	Integer statusValid
 	String statusValidMsg
@@ -49,13 +47,7 @@ class Channel extends CheckDevice {
 		dbExcludeAutoExport(defaultValue:false)
 		lastResultTime(nullable:true, editable:false)	
 		lastResultValue(nullable:true, editable:false)
-		lastCount(nullable:true, editable:false)
-
-		// Values populated by functions
-		statusComplete(editable:false,nullable:true)
-		statusCompleteMsg(editable:false,nullable:true)
-		
-		// Values populated by trigger
+		lastCount(nullable:true, editable:false)			
 		statusValid(editable:false,nullable:true)
 		statusValidMsg(editable:false,nullable:true)
     }

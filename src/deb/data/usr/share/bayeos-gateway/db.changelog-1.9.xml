@@ -746,5 +746,39 @@ $BODY$
   	<sql>DROP TABLE file_format;</sql>
   </changeSet>
   
+  <changeSet id="134" author="oa">
+    <comment>Remove function chk_nrpe</comment>  
+  	<sql>DROP FUNCTION check_nrpe();</sql>
+  </changeSet>
+  
+  <changeSet id="135" author="oa">
+    <comment>Remove function chk_obs_valid</comment>  
+  	<sql>DROP FUNCTION check_obs_valid(real, bigint);</sql>
+  </changeSet>
+  
+  <changeSet id="136" author="oa">
+    <comment>Remove function insert_observation</comment>
+  	<sql>DROP FUNCTION insert_observation(text, timestamp with time zone, integer, integer[], double precision[]);</sql>
+  </changeSet>
+  
+  <changeSet id="137" author="oa">
+  	<sql>
+  	ALTER TABLE board DROP COLUMN status_complete;
+	ALTER TABLE board DROP COLUMN status_complete_msg;
+	ALTER TABLE board DROP COLUMN status_valid_msg;
+	ALTER TABLE channel DROP COLUMN status_complete;
+	ALTER TABLE channel DROP COLUMN status_complete_msg;
+  	</sql>  	
+  </changeSet>
+  
+  <changeSet id="138" author="oa">
+  <sql>
+  	ALTER TABLE board add column deny_new_channels boolean not null default false;
+  </sql>
+  </changeSet>
+  
+  
+  
+    
      
 </databaseChangeLog>
