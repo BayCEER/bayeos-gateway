@@ -124,7 +124,7 @@ class FrameService {
 								def status_valid_msg = null
 	
 								// Calc Validation 
-								if (cha.critical_max !=null && ob.result_value > cha.critical_max){
+								if (cha.critical_max !=null && obs.result_value > cha.critical_max){
 									status_valid = 2; status_valid_msg = "Value ${obs.result_value} above ${cha.critical_max}."
 								} else if (cha.warning_max != null && obs.result_value > cha.warning_max){
 									status_valid = 1; status_valid_msg = "Value ${obs.result_value} above ${cha.warning_max}."
