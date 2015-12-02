@@ -152,8 +152,8 @@ class FrameService {
 									} else {
 										lastCount = s.sum
 									}				
-								}																							
-								db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ?",[obs.result_value, obs.result_time,status_valid,status_valid_msg, lastCount, cha.id])									
+								}																														
+								db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ?",[obs.result_value, obs.result_time,status_valid,status_valid_msg.toString(), lastCount, cha.id])																	
 							}
 							
 							def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [boardRecord.id])						
