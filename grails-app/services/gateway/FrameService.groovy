@@ -83,7 +83,11 @@ class FrameService {
 
 	private void parseFrames(FrameParser parser, String sender, String[] frames) {
 		if (frames == null)	return
-			log.info("Parsing ${frames.length} frames from: ${sender}")
+		log.info("Parsing ${frames.length} frames from: ${sender}")
+		
+		if (log.isDebugEnabled()){
+			log.debug(frames)
+		} 
 		for(String f:frames) {
 			try {
 				if (!Base64.isBase64(f)) {
@@ -116,10 +120,12 @@ class FrameService {
 							if(channels.containsValue((int)cha.id)){
 								log.debug("Update meta information for channel ${cha.id}")
 								//	Get values 
-								def obs = db.firstRow("""select real_value(coalesce(a.result_value,b.result_value),?) result_value, coalesce(a.result_time,b.result_time) result_time from
-								(select * from observation where channel_id = ? order by result_time desc limit 1) a full outer join
-								(select * from observation_exp where channel_id = ? order by result_time desc limit 1) b on (a.id = b.id);""",[cha.spline_id, cha.id, cha.id])
-	
+								
+								def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from
+								(select * from (select * from observation  where channel_id = ? order by result_time desc limit 1) a
+								union select * from (select * from observation_exp where channel_id = ? order by result_time desc limit 1) b)
+								c order by result_time desc limit 1;""",[cha.spline_id, cha.id, cha.id])
+																								
 								def status_valid = null
 								def status_valid_msg = null
 	
@@ -225,7 +231,7 @@ class FrameService {
 						}
 
 						void onDataFrame(String origin, Date timeStamp, Hashtable<Integer,Float> values, Integer rssi) {
-							log.debug("On dataFrame:${values} for board:${origin}")
+							log.debug("On dataFrame: Origin:${origin} Date:${timeStamp} Values:${values} Rssi:${rssi}")
 							startCopy()
 							BoardRecord bc = boardRecords[origin]
 							assert(bc!=null)
