@@ -6,21 +6,20 @@
 <title><g:message code="default.edit.label" args="[entityName]" /></title>
 </head>
 <body>
-	<div class="container">
-		<g:hasErrors bean="${boardInstance}">
-			<bootstrap:alert class="alert-danger">
-				<ul>
-					<g:eachError bean="${boardInstance}" var="error">
-						<li
-							<g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message
-								error="${error}" /></li>
-					</g:eachError>
-				</ul>
-			</bootstrap:alert>
-		</g:hasErrors>
+	<g:hasErrors bean="${boardInstance}">
+		<bootstrap:alert class="alert-danger">
+			<ul>
+				<g:eachError bean="${boardInstance}" var="error">
+					<li
+						<g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message
+							error="${error}" /></li>
+				</g:eachError>
+			</ul>
+		</bootstrap:alert>
+	</g:hasErrors>
 
 
-
+	<div class="row">
 
 		<g:form class="form" role="form" action="save"
 			id="${boardInstance?.id}">
@@ -65,12 +64,10 @@
 						</a></li>
 						<li role="presentation"><a href="#comments"
 							aria-controls="comments" role="tab" data-toggle="tab">Comments
-								<span class="badge" id="comBadge">
-									${boardInstance.comments.size()}
+								<span class="badge" id="comBadge"> ${boardInstance.comments.size()}
 							</span>
 						</a></li>
 					</ul>
-
 					<!-- Tab panes -->
 					<div class="tab-content">
 						<div role="tabpanel" class="tab-pane fade in" id="channels">
@@ -104,7 +101,6 @@
 												<g:formatDate date="${c?.last_result_time}"
 													format="dd.MM.yyyy HH:mm:ss Z" />
 											</nagios:statusCell>
-
 											<td>
 												<div class="make-switch switch-mini" id="nsw${c.id}">
 													<g:checkBox type="checkbox" name="${c.id}"
@@ -127,9 +123,7 @@
 									</g:each>
 								</tbody>
 							</table>
-
 						</div>
-
 						<div role="tabpanel" class="tab-pane fade" id="messages">
 
 							<table id="tab-messages" class="table table-condensed col-sm-12">
@@ -137,12 +131,12 @@
 									<tr>
 										<th class="col-sm-1">Type</th>
 										<th class="col-sm-3">Time</th>
-										<th class="col-sm-8">Content</th>										
+										<th class="col-sm-8">Content</th>
 									</tr>
 								</thead>
 								<tbody>
 								</tbody>
-							</table>							
+							</table>
 						</div>
 						<div role="tabpanel" class="tab-pane fade" id="settings">
 							<div class="block">
@@ -187,61 +181,48 @@
 								</div>
 							</div>
 						</div>
-
-
-
-
 						<div role="tabpanel" class="tab-pane fade" id="comments">
 							<g:render template="/board/comment_list" />
 						</div>
+					</div>
+				</div>
 
-
-
-
-
-
-
+				<div class="block-action">
+					<button type="submit" class="btn btn-primary">
+						<span class="glyphicon glyphicon-save"></span>
+						<g:message code="default.button.save.label" default="Save" />
+					</button>
+					<button type="submit" class="btn btn-default" name="_action_remove"
+						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+						formnovalidate>
+						<span class="glyphicon glyphicon-trash"></span>
+						<g:message code="default.button.delete.label" default="Delete" />
+					</button>
+					<g:link action="chart" params='[id:"${boardInstance?.id}"]'>
+						<button type="button" class="btn btn-default">
+							<span class="glyphicon glyphicon-stats"></span> Chart
+						</button>
+					</g:link>
+					<div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle"
+							data-toggle="dropdown">
+							<span class="glyphicon glyphicon-hdd"></span> Template <span
+								class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li><g:link action="editTemplate"
+									params='[id:"${boardInstance?.id}"]'>Apply Template</g:link></li>
+							<li><g:link action="saveAsTemplate"
+									params='[id:"${boardInstance?.id}"]'>Save as Template</g:link></li>
+						</ul>
 					</div>
 
-
-
-
-					<div class="block-action">
-						<button type="submit" class="btn btn-primary">
-							<span class="glyphicon glyphicon-save"></span>
-							<g:message code="default.button.save.label" default="Save" />
-						</button>
-						<button type="submit" class="btn btn-default"
-							name="_action_remove"
-							onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-							formnovalidate>
-							<span class="glyphicon glyphicon-trash"></span>
-							<g:message code="default.button.delete.label" default="Delete" />
-						</button>
-						<g:link action="chart" params='[id:"${boardInstance?.id}"]'>
-							<button type="button" class="btn btn-default">
-								<span class="glyphicon glyphicon-stats"></span> Chart
-							</button>
-						</g:link>
-						<div class="btn-group">
-							<button type="button" class="btn btn-default dropdown-toggle"
-								data-toggle="dropdown">
-								<span class="glyphicon glyphicon-hdd"></span> Template <span
-									class="caret"></span>
-							</button>
-							<ul class="dropdown-menu">
-								<li><g:link action="editTemplate"
-										params='[id:"${boardInstance?.id}"]'>Apply Template</g:link></li>
-								<li><g:link action="saveAsTemplate"
-										params='[id:"${boardInstance?.id}"]'>Save as Template</g:link></li>
-							</ul>
-						</div>
-
-					</div>
+				</div>
+			</div>
 		</g:form>
 
-
 	</div>
+
 
 	<script type="text/javascript">
 
