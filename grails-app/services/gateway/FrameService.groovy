@@ -25,7 +25,7 @@ class FrameService {
 
 	def dataSource
 
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+01")
+	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 
 	class BoardRecord {
 		Integer id
@@ -102,7 +102,7 @@ class FrameService {
 	}
 
 
- private void updateMetaInfo(BoardRecord boardRecord){
+	private void updateMetaInfo(BoardRecord boardRecord){
 		def db = new Sql(dataSource)
 		try {
 
@@ -180,7 +180,8 @@ class FrameService {
 
 	}
 
-
+ 	
+	
 	def saveFrames(String sender, String[] frames) {
 		if ((frames == null) || (sender == null)) return
 			Connection con = null
