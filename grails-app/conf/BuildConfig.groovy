@@ -40,7 +40,7 @@ grails.project.dependency.resolution = {
 
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
-		compile 'de.unibayreuth.bayceer.bayeos:bayeos-frame:1.0.0'
+		compile 'de.unibayreuth.bayceer.bayeos:bayeos-frame:1.1.0'
 		compile 'de.unibayreuth.bayceer.bayeos:bayeos-xmlrpc:1.9.5'
 		compile 'de.unibayreuth.bayceer.bayeos:bayeos-password-file:1.0.0'		
 		test 	'org.codehaus.groovy.modules.http-builder:http-builder:0.6'

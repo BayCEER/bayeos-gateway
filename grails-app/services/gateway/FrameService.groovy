@@ -16,6 +16,7 @@ import org.postgresql.copy.CopyManager
 import org.postgresql.copy.CopyIn
 import bayeos.frame.FrameParser
 import bayeos.frame.DefaultFrameHandler
+import bayeos.frame.FrameHandler;
 import bayeos.frame.FrameParserException
 import gateway.FrameService.BoardRecord;
 import gateway.time.ThisMonth;
@@ -24,8 +25,8 @@ import gateway.time.ThisMonth;
 class FrameService {
 
 	def dataSource
-
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+	
+	static transactional = false
 
 	class BoardRecord {
 		Integer id
@@ -104,6 +105,7 @@ class FrameService {
 
 	private void updateMetaInfo(BoardRecord boardRecord){
 		def db = new Sql(dataSource)
+		
 		try {
 
 			def channels = boardRecord.channels
@@ -184,11 +186,11 @@ class FrameService {
 	
 	def saveFrames(String sender, String[] frames) {
 		if ((frames == null) || (sender == null)) return
-			Connection con = null
+		Connection con = null
 		CopyIn cin = null
 		def boardRecords = [:]
 		def dataFrames = 0
-
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 		try {
 			con = dataSource.getConnection()
 
@@ -242,9 +244,10 @@ class FrameService {
 								Float value  = item.getValue()
 								Integer id = bc.channels[nr]
 								if (id != null){
-									StringBuilder sb = new StringBuilder(80);
+									StringBuffer sb = new StringBuffer(200);
 									sb.append(id).append(",").append(dateFormatter.format(timeStamp)).append(",").append(value).append("\n");
-									byte[] b = sb.toString().getBytes("UTF-8")
+									byte[] b = sb.toString().getBytes("UTF-8")		
+									sb = null;							
 									cin.writeToCopy(b,0,b.length)
 									dataFrames++;
 								}
@@ -266,7 +269,7 @@ class FrameService {
 						}
 
 						void onError(String origin, Date timeStamp, String message) {
-							//log.debug("Insert error:${message}")
+							log.debug("Insert error:${message}")
 							endCopy()
 							try {
 								new Message(content:message,origin:origin,resultTime:timeStamp,type:"ERROR").save()
@@ -279,8 +282,8 @@ class FrameService {
 
 
 			FrameParser p = new FrameParser(flatHandler)
-			parseFrames(p,sender,frames)
-
+			parseFrames(p,sender,frames)			
+			
 			if (cin != null && cin.isActive()){
 				long r = cin.endCopy()
 			}
