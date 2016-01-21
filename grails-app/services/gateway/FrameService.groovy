@@ -213,7 +213,7 @@ class FrameService {
 								Integer nr  = item.getKey()
 								Float value  = item.getValue()
 								Integer id = bc.channels[nr]
-								if (id != null){
+								if (id != null && !value.isNaN()){
 									StringBuffer sb = new StringBuffer(200);
 									sb.append(id).append(",").append(dateFormatter.format(timeStamp)).append(",").append(value).append("\n");
 									byte[] b = sb.toString().getBytes("UTF-8")
