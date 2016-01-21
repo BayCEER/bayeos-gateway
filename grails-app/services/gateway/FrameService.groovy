@@ -70,7 +70,7 @@ class FrameService {
 
 	private void parseFrames(FrameParser parser, String sender, String[] frames) {
 		if (frames == null)	return
-		log.info("Parsing ${frames.length} frames from: ${sender}")
+			log.info("Parsing ${frames.length} frames from: ${sender}")
 		for(String f:frames) {
 			try {
 				if (!Base64.isBase64(f)) {
@@ -87,8 +87,8 @@ class FrameService {
 
 	private void updateMetaInfo(Sql db, BoardRecord boardRecord) throws SQLException {
 
-			def channels = boardRecord.channels
-			db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
+		def channels = boardRecord.channels
+		db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
 												coalesce(check_delay,0) as check_delay,
 												c.spline_id,
 											    coalesce(c.critical_max, b.critical_max) as critical_max, 
@@ -97,14 +97,16 @@ class FrameService {
 												coalesce(c.warning_min, b.warning_min) as warning_min 												 											
 										FROM channel c, board b WHERE b.id = c.board_id and b.id = ?""",[boardRecord.id]){ cha ->
 
-						if(channels.containsValue((int)cha.id)){
-							log.debug("Update meta information for channel ${cha.id}")
-							//	Get values
+					if(channels.containsValue((int)cha.id)){
+						log.debug("Update meta information for channel ${cha.id}")
 
-							def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from
+						//	Get values
+						def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from
 								(select * from (select * from observation  where channel_id = ? order by result_time desc limit 1) a
 								union select * from (select * from observation_exp where channel_id = ? order by result_time desc limit 1) b)
 								c order by result_time desc limit 1;""",[cha.spline_id, cha.id, cha.id])
+
+						if (obs!=null){
 
 							def status_valid = null
 							def status_valid_msg = null
@@ -150,16 +152,17 @@ class FrameService {
 						}
 
 					}
+				}
 	}
 
 
 
 	def saveFrames(String sender, String[] frames) {
 		if ((frames == null) || (sender == null)) return
-		Connection con = null
+			Connection con = null
 		CopyIn cin = null
 		def boardRecords = [:]
-		def dataFrames = 0		
+		def dataFrames = 0
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 		try {
 			con = dataSource.getConnection()
@@ -226,13 +229,13 @@ class FrameService {
 							bc.lrt = timeStamp
 							bc.lrssi = rssi
 						}
-						
-						
-						void insertMessage(String origin, Date date, String message, String type){							
-							endCopy()							
-							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[message,origin,date.toTimestamp(),type]);
+
+
+						void insertMessage(String origin, Date date, String message, String type){
+							endCopy()
+							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[message, origin, date.toTimestamp(), type]);
 							log.debug("Message saved")
-							
+
 						}
 
 						void onMessage(String origin, Date date, String message) {
@@ -243,7 +246,7 @@ class FrameService {
 						void onError(String origin, Date date, String message) {
 							log.debug("On error:${message}")
 							insertMessage(origin,date,message,"ERROR");
-							
+
 						}
 					}
 
@@ -268,7 +271,7 @@ class FrameService {
 			log.error(e.getMessage())
 			return false
 		} finally {
-			try {				
+			try {
 				con.close()
 			} catch (SQLException e){
 				log.error(e.getMessage())
