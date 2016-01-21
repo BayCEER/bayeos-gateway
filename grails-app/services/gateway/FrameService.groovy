@@ -25,7 +25,7 @@ import gateway.time.ThisMonth;
 class FrameService {
 
 	def dataSource
-	
+
 	static transactional = false
 
 	class BoardRecord {
@@ -36,59 +36,41 @@ class FrameService {
 	}
 
 
-	private Integer findOrSaveBoard(String origin){
+	private Integer findOrSaveBoard(Sql db, String origin) throws SQLException {
 		log.debug("findOrSaveBoard:${origin}")
-		def db = new Sql(dataSource)
-		try {
-			def b = db.firstRow("select id from board where origin like ?;",[origin])
-			if (b==null) {
-				log.info("Creating new board:${origin}")
-				def seq = db.firstRow("select nextval('board_id_seq') as id;")
-				db.execute """ insert into board (id, origin) values (${seq.id},${origin});"""
-				return seq.id
-			} else {
-				return b.id
-			}
-		} catch (SQLException e){
-			log.error(e.getMessage())
-		} finally {
-			db.close()
+		def b = db.firstRow("select id from board where origin like ?;",[origin])
+		if (b==null) {
+			log.info("Creating new board:${origin}")
+			def seq = db.firstRow("select nextval('board_id_seq') as id;")
+			db.execute """ insert into board (id, origin) values (${seq.id},${origin});"""
+			return seq.id
+		} else {
+			return b.id
 		}
 	}
 
-	private Integer findOrSaveChannel(Integer boardId, Integer channelNr){
-		log.debug("findOrSaveChannel: Board id:${boardId} , Channel nr:${channelNr}")
-		def db = new Sql(dataSource)
-		try {											
-			def c = db.firstRow("select id from channel c where board_id = ? and nr = ?;",[boardId, channelNr])
-			if (c==null){				
-				def b = db.firstRow("select deny_new_channels from board where id=?",[boardId])
-				if (b.deny_new_channels == false){
-					log.info("Creating new channel:${channelNr} for board:${boardId}")
-					def seq = db.firstRow("select nextval('channel_id_seq') as id;")
-					db.execute 	"""insert into channel (id, board_id, nr) values (${seq.id},${boardId},${channelNr});"""
-					return seq.id					
-				} else {
-					log.info("Deny new channel:${channelNr} for board:${boardId}")
-					return null
-				}
-			} else {				 
-				return c.id
+	private Integer findOrSaveChannel(Sql db, Integer boardId, Integer channelNr) throws SQLException {
+		log.debug("findOrSaveChannel: Board id:${boardId},Channel nr:${channelNr}")
+		def c = db.firstRow("select id from channel c where board_id = ? and nr = ?;",[boardId, channelNr])
+		if (c==null){
+			def b = db.firstRow("select deny_new_channels from board where id=?",[boardId])
+			if (b.deny_new_channels == false){
+				log.info("Creating new channel:${channelNr} for board:${boardId}")
+				def seq = db.firstRow("select nextval('channel_id_seq') as id;")
+				db.execute 	"""insert into channel (id, board_id, nr) values (${seq.id},${boardId},${channelNr});"""
+				return seq.id
+			} else {
+				log.info("Deny new channel:${channelNr} for board:${boardId}")
+				return null
 			}
-		} catch (SQLException e){
-			log.error(e.getMessage())
-		} finally {
-			db.close()
+		} else {
+			return c.id
 		}
 	}
 
 	private void parseFrames(FrameParser parser, String sender, String[] frames) {
 		if (frames == null)	return
 		log.info("Parsing ${frames.length} frames from: ${sender}")
-		
-		if (log.isDebugEnabled()){
-			log.debug(frames)
-		} 
 		for(String f:frames) {
 			try {
 				if (!Base64.isBase64(f)) {
@@ -103,13 +85,9 @@ class FrameService {
 	}
 
 
-	private void updateMetaInfo(BoardRecord boardRecord){
-		def db = new Sql(dataSource)
-		
-		try {
+	private void updateMetaInfo(Sql db, BoardRecord boardRecord) throws SQLException {
 
 			def channels = boardRecord.channels
-			
 			db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
 												coalesce(check_delay,0) as check_delay,
 												c.spline_id,
@@ -118,82 +96,74 @@ class FrameService {
 												coalesce(c.warning_max, b.warning_max) as warning_max, 
 												coalesce(c.warning_min, b.warning_min) as warning_min 												 											
 										FROM channel c, board b WHERE b.id = c.board_id and b.id = ?""",[boardRecord.id]){ cha ->
-																																
-							if(channels.containsValue((int)cha.id)){
-								log.debug("Update meta information for channel ${cha.id}")
-								//	Get values 
-								
-								def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from
+
+						if(channels.containsValue((int)cha.id)){
+							log.debug("Update meta information for channel ${cha.id}")
+							//	Get values
+
+							def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from
 								(select * from (select * from observation  where channel_id = ? order by result_time desc limit 1) a
 								union select * from (select * from observation_exp where channel_id = ? order by result_time desc limit 1) b)
 								c order by result_time desc limit 1;""",[cha.spline_id, cha.id, cha.id])
-																								
-								def status_valid = null
-								def status_valid_msg = null
-	
-								// Calc Validation 
-								if (cha.critical_max !=null && obs.result_value > cha.critical_max){
-									status_valid = 2; status_valid_msg = "Value ${obs.result_value} above ${cha.critical_max}."
-								} else if (cha.warning_max != null && obs.result_value > cha.warning_max){
-									status_valid = 1; status_valid_msg = "Value ${obs.result_value} above ${cha.warning_max}."
-								} else if (cha.critical_min != null && obs.result_value < cha.critical_min){
-									status_valid = 2; status_valid_msg = "Value ${obs.result_value} below ${cha.critical_min}."
-								} else if (cha.warning_min != null && obs.result_value < cha.warning_min){
-									status_valid = 1; status_valid_msg = "Value ${obs.result_value} below ${cha.warning_min}."
-								} else {
-									status_valid = 0; status_valid_msg = 'Value Ok';
-								}
-								
-								// Calc counts 
-								def lastCount = 0								
-								if (cha.sampling_interval != null){									
-									def s = db.firstRow("""select (a.n + b.n) as sum from 
+
+							def status_valid = null
+							def status_valid_msg = null
+
+							// Calc Validation
+							if (cha.critical_max !=null && obs.result_value > cha.critical_max){
+								status_valid = 2; status_valid_msg = "Value ${obs.result_value} above ${cha.critical_max}."
+							} else if (cha.warning_max != null && obs.result_value > cha.warning_max){
+								status_valid = 1; status_valid_msg = "Value ${obs.result_value} above ${cha.warning_max}."
+							} else if (cha.critical_min != null && obs.result_value < cha.critical_min){
+								status_valid = 2; status_valid_msg = "Value ${obs.result_value} below ${cha.critical_min}."
+							} else if (cha.warning_min != null && obs.result_value < cha.warning_min){
+								status_valid = 1; status_valid_msg = "Value ${obs.result_value} below ${cha.warning_min}."
+							} else {
+								status_valid = 0; status_valid_msg = 'Value Ok';
+							}
+
+							// Calc counts
+							def lastCount = 0
+							if (cha.sampling_interval != null){
+								def s = db.firstRow("""select (a.n + b.n) as sum from 
 												(select count(*) as n from observation where channel_id = :channel_id and result_time between
 												(now() - ( (10*:sampling_interval+:check_delay) || ' seconds')::interval) and
 												(now() - (:check_delay || ' seconds')::interval)) a, 								    
 												(select count(*) as n from observation_exp where channel_id = :channel_id and result_time between
 												(now() - ( (10*:sampling_interval+:check_delay) || ' seconds')::interval) and
 												(now() - (:check_delay || ' seconds')::interval)) b""", ['channel_id':cha.id, 'sampling_interval':cha.sampling_interval,'check_delay':cha.check_delay])
-									lastCount = s.sum		
-									if (cha.check_delay == 0){
-										lastCount = s.sum + 1
-									} else {
-										lastCount = s.sum
-									}				
-								}																														
-								db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ?",[obs.result_value, obs.result_time,status_valid,status_valid_msg.toString(), lastCount, cha.id])																	
+								lastCount = s.sum
+								if (cha.check_delay == 0){
+									lastCount = s.sum + 1
+								} else {
+									lastCount = s.sum
+								}
 							}
-							
-							def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [boardRecord.id])						
-							if (b.lrt == boardRecord.lrt){
-								db.executeUpdate("update board set last_result_time = ?,status_valid = ?,last_rssi = ? where id = ?",[b.lrt,b.status,boardRecord.lrssi, boardRecord.id])
-							} else {
-								db.executeUpdate("update board set last_result_time = ?,status_valid = ? where id = ?",[b.lrt,b.status,boardRecord.id])
-							}													
-												
+							db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ?",[obs.result_value, obs.result_time, status_valid, status_valid_msg.toString(), lastCount, cha.id])
+						}
+
+						def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [boardRecord.id])
+						if (b.lrt == boardRecord.lrt){
+							db.executeUpdate("update board set last_result_time = ?,status_valid = ?,last_rssi = ? where id = ?",[b.lrt, b.status, boardRecord.lrssi, boardRecord.id])
+						} else {
+							db.executeUpdate("update board set last_result_time = ?,status_valid = ? where id = ?",[b.lrt, b.status, boardRecord.id])
+						}
+
 					}
-
-
-		} catch (SQLException e){
-			log.error(e.getMessage())
-		} finally {
-			db.close()
-		}
-
 	}
 
- 	
-	
+
+
 	def saveFrames(String sender, String[] frames) {
 		if ((frames == null) || (sender == null)) return
 		Connection con = null
 		CopyIn cin = null
 		def boardRecords = [:]
-		def dataFrames = 0
+		def dataFrames = 0		
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 		try {
 			con = dataSource.getConnection()
-
+			Sql db = new Sql(con)
 			DefaultFrameHandler flatHandler = new DefaultFrameHandler(sender){
 
 						private void startCopy(){
@@ -218,7 +188,7 @@ class FrameService {
 							endCopy()
 							BoardRecord bc = boardRecords[origin]
 							if (bc == null){
-								boardRecords[origin] = new BoardRecord(id:FrameService.this.findOrSaveBoard(origin))
+								boardRecords[origin] = new BoardRecord(id:FrameService.this.findOrSaveBoard(db, origin))
 							}
 						}
 
@@ -229,7 +199,7 @@ class FrameService {
 							assert(bc!=null)
 							channels.removeAll(bc.channels.keySet())
 							for (Integer nr:channels){
-								bc.channels[nr] = FrameService.this.findOrSaveChannel(bc.id,nr)
+								bc.channels[nr] = FrameService.this.findOrSaveChannel(db, bc.id,nr)
 							}
 						}
 
@@ -246,51 +216,48 @@ class FrameService {
 								if (id != null){
 									StringBuffer sb = new StringBuffer(200);
 									sb.append(id).append(",").append(dateFormatter.format(timeStamp)).append(",").append(value).append("\n");
-									byte[] b = sb.toString().getBytes("UTF-8")		
-									sb = null;							
+									byte[] b = sb.toString().getBytes("UTF-8")
+									sb = null;
 									cin.writeToCopy(b,0,b.length)
 									dataFrames++;
 								}
-								
+
 							}
 							bc.lrt = timeStamp
 							bc.lrssi = rssi
 						}
-
-						void onMessage(String origin, Date timeStamp, String message) {
-							log.debug("Insert message:${message}")
-							endCopy()
-							try {
-								new Message(content:message,origin:origin,resultTime:timeStamp,type:"INFO").save()
-								log.debug("Info message saved")
-							} catch (SQLException e) {
-								log.error(e)
-							}
+						
+						
+						void insertMessage(String origin, Date date, String message, String type){							
+							endCopy()							
+							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[message,origin,date.toTimestamp(),type]);
+							log.debug("Message saved")
+							
 						}
 
-						void onError(String origin, Date timeStamp, String message) {
-							log.debug("Insert error:${message}")
-							endCopy()
-							try {
-								new Message(content:message,origin:origin,resultTime:timeStamp,type:"ERROR").save()
-								log.debug("Error message saved")
-							} catch (SQLException e) {
-								log.error(e)
-							}
+						void onMessage(String origin, Date date, String message) {
+							log.debug("On message:${message}")
+							insertMessage(origin,date,message,"INFO");
+						}
+
+						void onError(String origin, Date date, String message) {
+							log.debug("On error:${message}")
+							insertMessage(origin,date,message,"ERROR");
+							
 						}
 					}
 
 
 			FrameParser p = new FrameParser(flatHandler)
-			parseFrames(p,sender,frames)			
-			
+			parseFrames(p,sender,frames)
+
 			if (cin != null && cin.isActive()){
 				long r = cin.endCopy()
 			}
 
 			// Update channel and board meta data
 			boardRecords.each{ bc ->
-				updateMetaInfo(bc.value)
+				updateMetaInfo(db, bc.value)
 			}
 
 			log.info("${dataFrames} observations imported")
@@ -301,7 +268,7 @@ class FrameService {
 			log.error(e.getMessage())
 			return false
 		} finally {
-			try {
+			try {				
 				con.close()
 			} catch (SQLException e){
 				log.error(e.getMessage())
