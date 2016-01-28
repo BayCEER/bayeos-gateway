@@ -4,7 +4,8 @@ import static org.junit.Assert.*
 import org.junit.*
 import org.apache.commons.codec.binary.Base64
 
-import bayeos.frame.StringFrame;
+import bayeos.frame.StringFrame
+import bayeos.frame.FrameConstants;
 import bayeos.frame.FrameConstants.NumberType;
 import bayeos.frame.data.*;
 import bayeos.frame.wrapped.*;
@@ -53,7 +54,7 @@ class FrameServiceTests {
 	
 	@Test
 	void testMessageFrame() {
-		StringFrame msg = new StringFrame("This is a test message")		
+		StringFrame msg = new StringFrame(FrameConstants.Message, "This is a test message")		
 		frameService.saveFrames("testMessageFrame",new String(Base64.encodeBase64String(msg.getBytes())));
 		Board b = Board.findByOrigin("testMessageFrame")		
 		Message m = Message.findByOrigin(b.getOrigin())
