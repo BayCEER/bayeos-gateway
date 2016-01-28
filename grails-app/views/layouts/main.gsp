@@ -37,7 +37,7 @@
 		<g:render template="/layouts/navigation" />
 		<div class="container">
 		<g:if test="${flash.message}">
-			<div class="container">
+			<div class="row">
 				<bootstrap:alert class="alert-${flash.level ?: 'info'}">${flash.message}</bootstrap:alert>
 			</div>
 		</g:if>
