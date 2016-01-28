@@ -778,6 +778,55 @@ $BODY$
   </changeSet>
   
   
+  <changeSet id="139" author="oa">
+  	<comment>Redesign of status views</comment>
+  	<sql>
+  	<![CDATA[
+  	drop view nagios_status;
+drop view group_status;
+drop view board_status;
+drop view channel_status;
+
+CREATE OR REPLACE VIEW channel_check AS 
+ SELECT a.board_id, a.id, a.status_valid, a.status_valid_msg, a.exclude_from_nagios, 
+        CASE
+            WHEN a.last_count IS NULL THEN NULL::integer
+            WHEN a.last_count > 8 THEN 0
+            WHEN a.last_count = 0 THEN 2
+            ELSE 1
+        END AS status_complete, 
+        CASE
+            WHEN a.last_count IS NULL THEN NULL::text
+            ELSE (a.last_count * 10) || '% completeness'::text
+        END AS status_complete_msg
+   FROM ( SELECT c.board_id, c.id, c.status_valid, c.status_valid_msg, c.last_result_time, c.last_result_value, get_channel_count(c.last_count, c.last_result_time, cd.sampling_interval, cd.check_delay) AS last_count, c.exclude_from_nagios
+           FROM channel c, check_device cd
+          WHERE c.id = cd.channel_id) a;
+
+create or replace view board_check as
+select b.*, a.status_complete, a.status_valid, greatest(a.status_complete,a.status_valid) as status from
+(select b.id, max(chk.status_complete) status_complete, max(chk.status_valid) status_valid from board b, channel_check chk , channel c 
+where b.id = c.board_id and chk.id = c.id and not chk.exclude_from_nagios and not b.exclude_from_nagios group by b.id) a
+right join (select id, board_group_id, exclude_from_nagios from board) b on b.id = a.id 
+
+create or replace view group_check as
+select g.*, a.status_complete, a.status_valid, greatest(a.status_complete,a.status_valid) status from
+(select board_group_id, max(status_complete) status_complete, max(status_valid) status_valid from board_check where not exclude_from_nagios group by board_group_id) a
+right join (select id, name from board_group) g on g.id = a.board_group_id 
+
+create or replace view nagios_status as
+SELECT board_group.id AS group_id, board_group.name AS group_name, b.id AS board_id, b.origin AS board_origin, c.id AS channel_id, c.nr AS channel_nr, c.label AS channel_label, chk.status_complete, chk.status_complete_msg, chk.status_valid, chk.status_valid_msg
+   FROM board b
+   LEFT JOIN board_group ON board_group.id = b.board_group_id, channel c, channel_check chk
+  WHERE b.id = c.board_id AND chk.id = c.id AND (chk.status_complete > 0 OR chk.status_valid > 0) AND NOT (b.exclude_from_nagios OR c.exclude_from_nagios)
+  ORDER BY board_group.name, b.origin, c.nr;
+  	 ]]> 
+  	</sql>
+  	
+  	
+  </changeSet>
+  
+  
   
     
      

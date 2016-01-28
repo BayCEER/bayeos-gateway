@@ -115,7 +115,7 @@
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-frame</artifactId>
-			<version>1.1.0</version>
+			<version>1.1.1</version>
 			<scope>compile</scope>
 		</dependency>
 

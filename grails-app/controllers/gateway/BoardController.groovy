@@ -19,6 +19,7 @@ class BoardController {
 		'criticalMin',
 		'warningMin',
 		'warningMax']
+	
 	def chaProps = chkProps + [
 		'nr',
 		'label',
@@ -66,8 +67,10 @@ class BoardController {
 			// No search string
 			res['recordsFiltered'] = recordsTotal
 			def db = new Sql(dataSource)
-			def sql = "SELECT group_id,group_name,id,origin,name,last_rssi, extract(epoch from date_trunc('milliseconds',last_result_time)) * 1000 as last_result_time, greatest(status_valid, status_complete) as status FROM board_status " +
-				" order by " + sort.join(",") + " LIMIT ? OFFSET ?"
+			def sql = """SELECT bg.id as group_id, bg.name as group_name, b.id, b.origin, b.name, b.last_rssi, 
+						extract(epoch from date_trunc('milliseconds',b.last_result_time)) * 1000 as last_result_time,
+						chk.status FROM board b left join board_group bg on b.board_group_id = bg.id, board_check chk where b.id = chk.id""" +
+						" order by " + sort.join(",") + " LIMIT ? OFFSET ?"
 			res['data'] = db.rows(sql,[max, offset])
 
 			db.close()
@@ -75,15 +78,16 @@ class BoardController {
 		} else {
 			// Search String
 			def db = new Sql(dataSource)
-			def commentsFound = db.firstRow("SELECT count(*) from board_status where (group_name ilike ? or origin ilike ? or name ilike ?)", [search, search,search])[0]
+			def commentsFound = db.firstRow("SELECT count(*) from board b left join board_group bg on b.board_group_id = bg.id  where (bg.name ilike ? or b.origin ilike ? or b.name ilike ?)", [search, search,search])[0]
 			res['recordsFiltered'] = commentsFound
 			if (commentsFound == 0) {
 				res['data'] = []
 			} else {
 				// Filter with max and offset
-				def sql = "SELECT group_id, group_name, id, origin, name, last_rssi, extract(epoch from date_trunc('milliseconds',last_result_time)) * 1000 as last_result_time," +
-						"greatest(status_valid, status_complete) as status FROM board_status " +
-						"where (group_name ilike ? or origin ilike ? or name ilike ?) order by " + sort.join(",") + " LIMIT ? OFFSET ?"
+					def sql = """SELECT bg.id as group_id, bg.name as group_name, b.id, b.origin, b.name, b.last_rssi,
+						extract(epoch from date_trunc('milliseconds',b.last_result_time)) * 1000 as last_result_time,
+						chk.status FROM board b left join board_group bg on b.board_group_id = bg.id, board_check chk where b.id = chk.id and (bg.name ilike ? or b.origin ilike ? or b.name ilike ?)""" +
+						" order by " + sort.join(",") + " LIMIT ? OFFSET ?"
 				res['data'] = db.rows(sql,[search, search, search, max, offset])
 
 			}

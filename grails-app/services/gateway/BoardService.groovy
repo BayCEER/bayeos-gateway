@@ -70,37 +70,37 @@ class BoardService  {
 	
 	def getChannelStati(Board board) {
 		def db = new Sql(dataSource)
-		def channelStati = db.rows("""SELECT c.id, c.nr, c.label, unit.abbrevation as unit, c.status_valid, c.status_valid_msg, 
-				s.status_complete, s.status_complete_msg, c.last_result_time, c.last_result_value, not c.exclude_from_nagios as nagiosOn  
-				FROM channel_status s, channel c LEFT JOIN unit on unit.id = c.unit_id where c.board_id = ? and s.id = c.id  order by c.nr""", board.id)
+		def channelStati = db.rows("""SELECT c.id, c.nr, c.label, unit.abbrevation as unit, chk.status_valid, chk.status_valid_msg, 
+				chk.status_complete, chk.status_complete_msg, c.last_result_time, c.last_result_value, not c.exclude_from_nagios as nagiosOn  
+				FROM channel_check chk, channel c LEFT JOIN unit on unit.id = c.unit_id where c.board_id = ? and chk.id = c.id  order by c.nr""", board.id)
 		db.close()
 		return channelStati
 	}
 	
 	def getBoardStatus(Board board) {
 		 def db = new Sql(dataSource)
-		 def boardStatus = db.firstRow("SELECT status_valid, status_complete, last_result_time FROM board_status where id = ?", board.id)
+		 def boardStatus = db.firstRow("SELECT chk.status_valid, chk.status_complete, b.last_result_time FROM board b, board_check chk where b.id = chk.id and b.id = ?", board.id)
 		 db.close()
 		 return boardStatus
 	}
 	
 	
 	def findBoardsByGroup(Long groupId, Integer max, Integer offset) {
-		def db = new Sql(dataSource)
-		def result = db.rows("""SELECT bs.group_id, bs.group_name, bs.id, bs.origin, bs.name, bs.last_rssi, bs.last_result_time,
-				greatest(bs.status_valid,bs.status_complete) as nagiosStatus, ns.exc_cha as nagiosChannelOff, not b.exclude_from_nagios as nagiosOn
-				FROM board b, board_status bs, (SELECT board_id, count(*) as total, sum(exclude_from_nagios::int)::int as exc_cha FROM channel GROUP BY board_id) as ns
-				where b.id = bs.id and bs.id = ns.board_id and group_id = ?  order by bs.group_name, bs.origin LIMIT ? OFFSET ?""",[groupId, max, offset])
+		def db = new Sql(dataSource)						
+		def result = db.rows("""SELECT bg.id as group_id, bg.name as group_name, b.id, b.origin, b.name, b.last_rssi, b.last_result_time,
+				chk.status as nagiosStatus, ns.exc_cha as nagiosChannelOff, not b.exclude_from_nagios as nagiosOn
+				FROM board b left join board_group bg on bg.id = b.board_group_id, board_check chk, (SELECT board_id, count(*) as total, sum(exclude_from_nagios::int)::int as exc_cha FROM channel GROUP BY board_id) as ns
+				where b.id = chk.id and b.id = ns.board_id and bg.id = ? order by bg.name, b.origin LIMIT ? OFFSET ?""",[groupId, max, offset])
 		db.close()
 		return result			   
 	}
 	
 	def findAllBoards(Integer max, Integer offset) {
 		def db = new Sql(dataSource)
-		def result = db.rows("""SELECT bs.group_id, bs.group_name, bs.id, bs.origin, bs.name, bs.last_rssi, bs.last_result_time,
-                greatest(bs.status_valid, bs.status_complete) as nagiosStatus, ns.exc_cha as nagiosChannelOff, not b.exclude_from_nagios as nagiosOn
-				FROM board b, board_status bs, (SELECT board_id, count(*) as total, sum(exclude_from_nagios::int)::int as exc_cha FROM channel GROUP BY board_id) as ns
-				where b.id = bs.id and bs.id = ns.board_id order by bs.group_name, bs.origin LIMIT ? OFFSET ?""",[max, offset])
+		def result = db.rows("""SELECT bg.id as group_id, bg.name as group_name, b.id, b.origin, b.name, b.last_rssi, b.last_result_time,
+                chk.status as nagiosStatus, ns.exc_cha as nagiosChannelOff, not b.exclude_from_nagios as nagiosOn
+				FROM board b left join board_group bg on bg.id = b.board_group_id, board_check chk, (SELECT board_id, count(*) as total, sum(exclude_from_nagios::int)::int as exc_cha FROM channel GROUP BY board_id) as ns
+				where b.id = chk.id and b.id = ns.board_id order by bg.name, b.origin LIMIT ? OFFSET ?""",[max, offset])
 		db.close()
 		return result
 	}

@@ -9,7 +9,7 @@ public class ChannelService {
 	
 	def getChannelStatus(Channel c) {
 		def db = new Sql(dataSource)
-		def channelStatus = db.firstRow("SELECT status_valid, status_valid_msg, status_complete, status_complete_msg, last_result_time FROM channel_status where id = ?", c.id)
+		def channelStatus = db.firstRow("SELECT ck.status_valid, ck.status_valid_msg, ck.status_complete, ck.status_complete_msg, c.last_result_time FROM channel_check ck, channel c where c.id = chk.id and id = ?", c.id)
 		db.close()
 		return channelStatus
 		

@@ -17,7 +17,10 @@ class BoardGroupController {
 		def db = new Sql(dataSource)
 		def max = Math.min(params.max?.toInteger()?:10,100)
 		def offset = params.offset?.toInteger()?:0
-		def result = db.rows("SELECT * FROM group_status order by name LIMIT ? OFFSET ? ",[max, offset])
+		def result = db.rows("""
+					select bg.id, bg.name, bs.lrt, bs.board_count, chk.status from board_group bg,  
+					(select board_group_id, max(last_result_time) as lrt, count(id) as board_count from board group by board_group_id) bs,
+					group_check chk where bg.id = bs.board_group_id and chk.id = bg.id order by bg.name LIMIT ? OFFSET ?""", [max, offset])
 		db.close()
 		[result: result, total: BoardGroup.count()]
 	}
@@ -52,7 +55,7 @@ class BoardGroupController {
 		}
 		
 		def db = new Sql(dataSource)
-		def rows = db.rows("SELECT id,origin,name,last_rssi, last_result_time, greatest(status_valid, status_complete) as status FROM board_status where group_id = ? order by 2 ",[boardGroupInstance.id])
+		def rows = db.rows("SELECT b.id,b.origin,b.name,b.last_rssi, b.last_result_time, chk.status FROM board b, board_check chk where b.id = chk.id and b.board_group_id = ? order by 2 ",[boardGroupInstance.id])
 		db.close()
 
 		
