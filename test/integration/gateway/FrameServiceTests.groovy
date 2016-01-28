@@ -4,7 +4,7 @@ import static org.junit.Assert.*
 import org.junit.*
 import org.apache.commons.codec.binary.Base64
 
-import bayeos.frame.MsgFrame;
+import bayeos.frame.StringFrame;
 import bayeos.frame.FrameConstants.NumberType;
 import bayeos.frame.data.*;
 import bayeos.frame.wrapped.*;
@@ -53,13 +53,14 @@ class FrameServiceTests {
 	
 	@Test
 	void testMessageFrame() {
-		MsgFrame msg = new MsgFrame("This is a test message")		
+		StringFrame msg = new StringFrame("This is a test message")		
 		frameService.saveFrames("testMessageFrame",new String(Base64.encodeBase64String(msg.getBytes())));
 		Board b = Board.findByOrigin("testMessageFrame")		
 		Message m = Message.findByOrigin(b.getOrigin())
 		assert "This is a test message" == m.getContent()		
 		b.delete(flush:true);
 		m.delete(flush:true);
+		
 				
 	}
 	
@@ -80,21 +81,6 @@ class FrameServiceTests {
 		
 		b.delete(flush:true);
 		
-	}
-	
-	
-//	@Test
-//	void testPosts() {
-//		HTTPClient cli = new HTTPClient("http://localhost:8080/bayeos-gateway/gateway/Frame/saveFlat", "root", "bayeos")		
-//		MillisecondTimestampFrame f = new MillisecondTimestampFrame(new Date(1453197399820), new IndexFrame(NumberType.Float32,3.5F,2.5F,7.19F,80.0F).getBytes())
-//		StringBuffer b = new StringBuffer(1000)
-//		String frame = "bayeosframes[]=" + new String(Base64.encodeBase64String(f.getBytes()))
-//		for (i in 1..1000){
-//			b.append("&")
-//			b.append(frame)	
-//		}
-//		cli.post("TEST",b.toString())
-//	}
-		
+	}	
 
 }
