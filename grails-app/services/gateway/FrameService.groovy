@@ -163,7 +163,8 @@ class FrameService {
 		CopyIn cin = null
 		def boardRecords = [:]
 		def dataFrames = 0
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+00")
+		dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC")); 
 		try {
 			con = dataSource.getConnection()
 			Sql db = new Sql(con)
