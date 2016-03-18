@@ -431,7 +431,7 @@ class BoardController {
 
 
 		def findByOrigin() {
-			def board = Board.findByOriginIlikeAndFrameStorage(params.origin + "%", true)
+			def board = Board.findByOriginIlike(params.origin + "%")
 			if (board) render(board as JSON)
 		}
 
