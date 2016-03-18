@@ -826,8 +826,15 @@ SELECT board_group.id AS group_id, board_group.name AS group_name, b.id AS board
   	
   </changeSet>
   
-  
-  
-    
+  <changeSet id="140" author="oa">
+  <comment>View channel path</comment>
+  <sql>
+  CREATE OR REPLACE VIEW channel_path AS 
+ SELECT board.id AS board_id, board.name AS board_name, channel.id AS channel_id, channel.label AS channel_label, (COALESCE(board.name, board.origin) || '/'::text) || COALESCE(channel.label, channel.nr::text) AS path
+   FROM channel, board
+  WHERE board.id = channel.board_id;
+  </sql>
+  </changeSet>
+      
      
 </databaseChangeLog>

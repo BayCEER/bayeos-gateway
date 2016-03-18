@@ -113,6 +113,7 @@ grails.plugins.springsecurity.basic.realmName = "Login Please:"
 
 grails.plugins.springsecurity.filterChain.chainMap = [
 	'/nagios/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
+	'/grafana/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
 	'/frame/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
 	'/board/**': 'JOINED_FILTERS,-exceptionTranslationFilter',	
 	'/message/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
