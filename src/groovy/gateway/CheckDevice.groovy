@@ -10,6 +10,8 @@ abstract class CheckDevice {
 	Float warningMin	
 	// Completeness Check
 	Integer samplingInterval	
+	// Check Delay
+	Integer checkDelay
 	// Disable Alerts   
 	Boolean excludeFromNagios = false	
 	// Import valid records only 
@@ -22,7 +24,8 @@ abstract class CheckDevice {
 		warningMax(nullable:true)
 		warningMin(nullable:true)
 		criticalMin(nullable:true)
-		samplingInterval(nullable:true, min:0)				
+		samplingInterval(nullable:true, min:0)	
+		checkDelay(nullable:true, min:0)			
     }
 	
 	static mapping = {

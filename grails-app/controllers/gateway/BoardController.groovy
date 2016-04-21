@@ -18,7 +18,8 @@ class BoardController {
 		'criticalMax',
 		'criticalMin',
 		'warningMin',
-		'warningMax']
+		'warningMax',
+		'checkDelay']
 	
 	def chaProps = chkProps + [
 		'nr',

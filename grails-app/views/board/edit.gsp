@@ -128,10 +128,11 @@
 
 							<table id="tab-messages" class="table table-condensed col-sm-12">
 								<thead>
-									<tr>
-										<th class="col-sm-1">Type</th>
+									<tr>										
 										<th class="col-sm-3">Time</th>
-										<th class="col-sm-8">Content</th>
+										<th class="col-sm-1">Type</th>
+										<th class="col-sm-6">Content</th>
+										<th class="col-sm-2"></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -225,7 +226,6 @@
 
 
 	<script type="text/javascript">
-
 		var rowsTotal = 0;
 		var max = 10;		
 		var step = 0
@@ -245,18 +245,19 @@
 
      	// Select tab by name
         $('#myTab a[href="#channels"]').tab('show');
-                     
-        $('#tab-messages').DataTable( {
+
+        var messages = $('#tab-messages').DataTable( {
  				"responsive": true,
         		"autoWidth": false,
                 "processing": true,
                 "serverSide": true,
                 "lengthChange": false,
                 "searching": false,
-                "rowId": 'id',                                    
+                "rowId": 'id',          
+                "order": [[0,'desc']],                          
                 "columns": [
-                    {data: 'type'},
-                    {data: 'result_time'},
+					{data: 'result_time'},
+                    {data: 'type'},                    
                     {data: 'content'}
                 ],
                 "ajax": {
@@ -266,39 +267,56 @@
                      }                        
                 },
                 "columnDefs": [
-                    // https://datatables.net/reference/option/columns.render
-                    // Type
-            		{ "targets": 0 , "render":
-            			function ( data, type, row , meta) {
-            				 var cellType;
-			        		 if (row.type == "ERROR"){
-			        			return "<td><span class=\"text-danger\"/>" + row.type + "</span></td>";  
-				          	 } else {
-				          		return "<td>" + row.type + "</td>";
-					      	 }				          			            				             			            			                    		
-                		}
-            		},
+                    // https://datatables.net/reference/option/columns.render                                		
             		// Result Time
-            		{ "targets": 1 , "render":
+            		{ "targets": 0 , "render":
             			function ( data, type, row, meta ) {
             				return "<td>" + getDateString(new Date(row.result_time)) + "</td>";	
                 		}
             		},
-
+            		// Type
+            		{ "targets": 1 , "render":
+            			function ( data, type, row , meta) {
+				          	return "<td>" + row.type + "</td>";					      				          			            				             			            			                    		
+                		}
+            		},
             		// Content
             		{ "targets": 2, "render":
             			function ( data, type, row, meta ) {
             				return "<td>" + row.content + "</td>" ;
             			
                 		}
-            		}
+            		},
 
+            		{ "targets": 3, "render":
+            			function ( data, type, row, meta ) {            			 
+             		        var ret = '<td class="link">';
+             		        ret += '<a class="btn btn-xs btn-default deleteMsg"><span class="glyphicon glyphicon-remove"></span> Delete</a>';
+             		        return ret += '</td>';
+                 		}
+            		}
+            		
         		],
-        		"initComplete": function () {
-        			$('#msgBadge').text(this.api().page.info().recordsTotal);
+        		"initComplete": function (settings, json) {
+        			$('#msgBadge').text(this.api().page.info().recordsTotal);      			
         		}
         });
-        
+
+        $('#tab-messages tbody').on('click','.deleteMsg', function () {
+        	if (confirm("Are you sure ?")) {            
+            var id = $(this).parent().parent().attr('id');
+            $.ajax({
+				 url: '${createLink(controller:'message', action: 'delete')}',          
+		         data: "id="+id,
+		         dataType: "json",
+		         success: function(data){
+		        	 messages.row(id).remove().draw(false);
+			     }		               			 			 				 
+		 	});
+        	}
+            	 	      
+        } );
+          
          	 
 });
 

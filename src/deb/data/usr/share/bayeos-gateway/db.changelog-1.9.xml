@@ -835,6 +835,19 @@ SELECT board_group.id AS group_id, board_group.name AS group_name, b.id AS board
   WHERE board.id = channel.board_id;
   </sql>
   </changeSet>
-      
+  
+  
+  <changeSet id="141" author="oa">
+  	<comment>Add check_delay attribute to board_template, channel_template and channel</comment>
+  	<sql>
+  	alter table board_template add column check_delay integer;
+  	alter table channel_template add column check_delay integer;
+  	alter table channel add column check_delay integer;
+  	CREATE OR REPLACE VIEW check_device AS 
+ 		SELECT b.id AS board_id, b.origin AS board_origin, COALESCE(b.check_delay,c.check_delay,0) AS check_delay, c.id AS channel_id, c.nr AS channel_nr, COALESCE(c.critical_max, b.critical_max) AS critical_max, COALESCE(c.critical_min, b.critical_min) AS critical_min, COALESCE(c.warning_max, b.warning_max) AS warning_max, COALESCE(c.warning_min, b.warning_min) AS warning_min, COALESCE(c.sampling_interval, b.sampling_interval) AS sampling_interval, c.filter_critical_values OR b.filter_critical_values AS filter_critical_values, c.exclude_from_nagios OR b.exclude_from_nagios AS exclude_from_nagios
+    FROM board b, channel c
+    WHERE b.id = c.board_id;  	
+  	</sql>
+  </changeSet>
      
 </databaseChangeLog>

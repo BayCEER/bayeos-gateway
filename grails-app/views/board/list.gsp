@@ -9,10 +9,10 @@
 		<div class="col-xs-12">
         <table id="table" class="table table-hover nowrap">
         <thead>        	                        
-                <tr>
+                <tr>                   
+                   <th>Origin</th>
                    <th class="min-tablet-l">Group</th>
-                   <th class="min-tablet-l">Origin</th>
-                   <th>Name</th>
+                   <th class="min-tablet-l">Name</th>
                    <th class="min-tablet-l">Rssi</th>
                    <th>Last Result Time</th>
                    <th>Status</th>
@@ -34,9 +34,9 @@
                 "processing": true,
                 "serverSide": true,
                 "lengthChange": false,
-                "columns": [
-					{data: 'group_name'},
+                "columns": [					
                     {data: 'origin'},
+                    {data: 'group_name'},
                     {data: 'name'},
                     {data: 'last_rssi'},
                     {data: 'last_result_time'},
@@ -46,8 +46,15 @@
                     "url": '${createLink(action:'listData')}'
                 },
                 "columnDefs": [
+					//Origin
+					{ "targets": 0 , "render":
+					function ( data, type, row ) {            			
+						return '<a href="${createLink(action:'edit')}/' + row.id +'">' + row.origin + '</>' ;
+					}
+					},
+                               
                     // Group Name
-                   	{ "targets": 0 , render:
+                   	{ "targets": 1 , render:
                    		function ( data, type, row ) {   
                    		if (row.group_name != null){
                    			return '<a href="${createLink(controller:'boardGroup', action:'edit')}/' + row.group_id +'">' + row.group_name + '</>' ;
@@ -57,13 +64,7 @@
             		}
                     },
 					                                                       
-                    // Origin
-            		{ "targets": 1 , "render":
-            			function ( data, type, row ) {            			
-                    		return '<a href="${createLink(action:'edit')}/' + row.id +'">' + row.origin + '</>' ;
-                		}
-            		},
-            		// Name
+                    // Name
             		{ "targets": 2 , "render":
             			function ( data, type, row ) {
             			    if (row.name != null) {

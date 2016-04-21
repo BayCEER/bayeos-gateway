@@ -21,7 +21,7 @@ class Message {
 	
 	static mapping = {
 		version false				
-		origin(sqlType:"text", index: 'message_origin_idx')					
+		origin(sqlType:"text", index: 'message_origin_idx')		
 	 }
 		
 

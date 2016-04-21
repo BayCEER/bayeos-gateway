@@ -1,6 +1,5 @@
 <%@ page import="gateway.User" %>
 <%@ page import="gateway.Role" %>
-<!doctype html>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -8,8 +7,7 @@
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	</head>
 	<body>
-		<div class="container">	
-				<div class="btn-group">
+   			    <div class="btn-group">
 					<g:link action="list" class="btn btn-sm btn-default">
 						<span class="glyphicon glyphicon-list"></span> <g:message code="default.button.list.label" args="[entityName]"/>						
 					</g:link>
@@ -31,10 +29,8 @@
 				</g:hasErrors>
 				
 				
-				
-					<g:form class="form" action="edit" id="${userInstance?.id}" >
-						<g:hiddenField name="version" value="${userInstance?.version}" />
-						
+				<g:form class="form" action="edit" id="${userInstance?.id}" >
+						<g:hiddenField name="version" value="${userInstance?.version}" />						
 							<f:field bean="userInstance" property="username"/>						  	
 						  	<div class="form-group ${userInstance.errors?.hasFieldErrors('password')} ? 'has-error' : ''}">						  								  		
 						  		<label class="control-label" for="${password}">
@@ -42,23 +38,12 @@
 						  		</label>						  		
 						  		<g:passwordField name="password" class="form-control" value="${userInstance.password}"/>						  								  								  							  	
 						  	</div>
-						  	
-						  	
-						  	<f:field bean="userInstance" property="accountExpired"/>						  
-						  	<f:field bean="userInstance" property="accountLocked"/>
-						  	
-						  	<f:field bean="userInstance" property="enabled"/>
-						  	<f:field bean="userInstance" property="passwordExpired"/>
-						  	
-						  	
-						  	
-						  	
-						  										  		
+      						<f:field bean="userInstance" property="accountExpired"/><f:field bean="userInstance" property="accountLocked"/>						  	
+						  	<f:field bean="userInstance" property="enabled"/><f:field bean="userInstance" property="passwordExpired"/>
 						  	<div class="form-group">
 						  	<label class="control-label">Roles:</label>										  								  		
 						  		<g:select class="form-control" name="roles" from="${Role.list(sort:"authority", order:"asc")}" optionKey="id" optionValue="name" multiple="true" value="${userInstance.getAuthorities()*.id}"/>						  		
-						  	</div>													  				  							  						
-							
+						  	</div>													  				  							  													
 							<div class="form-group">
 								<button type="submit" class="btn btn-primary">
 									<span class="glyphicon glyphicon-ok"></span> <g:message code="default.button.ok.label" default="Ok" />
@@ -67,8 +52,7 @@
 									<span class="glyphicon glyphicon-trash"></span> <g:message code="default.button.delete.label" default="Delete" />
 								</button>
 							</div>						
-					</g:form>		
-					<span class="help-block"><g:message code="default.form.asterisk-hint"/>(<span style="color: #f00;">*</span>)</span>					
-		</div>
+				</g:form>					
+				<span class="help-block"><g:message code="default.form.asterisk-hint"/>(<span style="color: #f00;">*</span>)</span>					
 	</body>
 </html>

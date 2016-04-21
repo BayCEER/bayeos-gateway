@@ -44,4 +44,3 @@
 			</g:each>
 		</tbody>
 	</table>
- 

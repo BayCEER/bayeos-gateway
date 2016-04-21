@@ -69,19 +69,7 @@ class FrameService {
 	}
 
 	private void parseFrames(FrameParser parser, String sender, String[] frames) {
-		if (frames == null)	return
-			log.info("Parsing ${frames.length} frames from: ${sender}")
-		for(String f:frames) {
-			try {
-				if (!Base64.isBase64(f)) {
-					log.warn("Invalid base64 character in frame:${f}")
-				} else {
-					parser.parse(Base64.decodeBase64(f))
-				}
-			} catch (FrameParserException e){
-				log.error("FrameParserError: frame:${f}")
-			}
-		}
+		
 	}
 
 
@@ -89,7 +77,7 @@ class FrameService {
 
 		def channels = boardRecord.channels
 		db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
-												coalesce(check_delay,0) as check_delay,
+												coalesce(b.check_delay,c.check_delay,0) as check_delay,
 												c.spline_id,
 											    coalesce(c.critical_max, b.critical_max) as critical_max, 
 												coalesce(c.critical_min, b.critical_min) as critical_min, 
@@ -169,7 +157,6 @@ class FrameService {
 			con = dataSource.getConnection()
 			Sql db = new Sql(con)
 			DefaultFrameHandler flatHandler = new DefaultFrameHandler(sender){
-
 						private void startCopy(){
 							if (cin == null){
 								log.debug("startCopy")
@@ -252,7 +239,23 @@ class FrameService {
 					}
 
 
-			FrameParser p = new FrameParser(flatHandler)
+			FrameParser p = new FrameParser(flatHandler)		
+			log.info("Parsing ${frames.length} frames from: ${sender}")
+			for(String f:frames) {
+				try {
+					if (!Base64.isBase64(f)) {
+						log.warn("Invalid base64 character in frame:${f}")
+					} else {
+						p.parse(Base64.decodeBase64(f))
+					}
+				} catch (FrameParserException e){
+					log.error("FrameParserError: frame:${f}")
+				} 
+		}
+			
+			
+			
+			
 			parseFrames(p,sender,frames)
 
 			if (cin != null && cin.isActive()){

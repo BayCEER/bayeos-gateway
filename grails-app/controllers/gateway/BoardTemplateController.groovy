@@ -13,7 +13,8 @@ class BoardTemplateController {
 
 	def list() {		
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[boardTemplateInstance: BoardTemplate.list(params), total: BoardTemplate.count()]
+		
+		[boardTemplateInstance: BoardTemplate.listOrderByName(params), total: BoardTemplate.count()]
 	}
 	
 	def upload() {
@@ -154,6 +155,10 @@ class BoardTemplateController {
 			if (board['@warningMin']){
 				template.warningMin = Float.valueOf(board['@warningMin'])
 			}
+			if (board['@checkDelay']){
+				template.checkDelay = Integer.valueOf(board['@checkDelay'])
+			}
+			
 
 
 
@@ -182,6 +187,11 @@ class BoardTemplateController {
 				if (ch['@samplingInterval']){
 					cht.samplingInterval = Integer.valueOf(ch['@samplingInterval'])
 				}
+				
+				if (ch['@checkDelay']){
+					cht.checkDelay = Integer.valueOf(ch['@checkDelay'])
+				}
+				
 
 				if (ch.unit) {
 					String u = ch.unit[0]['@name']
@@ -229,11 +239,11 @@ class BoardTemplateController {
 		xml.board(name:board.name,description:board.description,revision:board.revision,
 		dataSheet:board.dataSheet, criticalMax:board.criticalMax,criticalMin:board.criticalMin,
 		warningMax:board.warningMax,warningMin:board.warningMin,
-		samplingInterval:board.samplingInterval){
+		samplingInterval:board.samplingInterval,checkDelay:board.checkDelay){
 
 			board.channelTemplates.each { item ->
 				channel(nr:item.nr, label:item.label, phenomena:item.phenomena,aggrInterval:item.aggrInterval, aggrFunction:item.aggrFunction,
-				criticalMax:item.criticalMax,criticalMin:item.criticalMin,warningMax:item.warningMax,warningMin:item.warningMin,samplingInterval:item.samplingInterval ){
+				criticalMax:item.criticalMax,criticalMin:item.criticalMin,warningMax:item.warningMax,warningMin:item.warningMin,samplingInterval:item.samplingInterval,checkDelay:item.checkDelay){
 					if (item.unit){
 						unit(name:item.unit.name)
 					}

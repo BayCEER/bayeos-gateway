@@ -20,6 +20,7 @@ class User {
 	static mapping = {		
 		table "users"		
 		password column: '`password`'
+		sort "username"
 	}
 
 	Set<Role> getAuthorities() {

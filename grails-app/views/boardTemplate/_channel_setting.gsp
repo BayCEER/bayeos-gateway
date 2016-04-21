@@ -23,6 +23,9 @@
 				<div class="row">
 					<div class="col-sm-6">
 						<f:field bean="${channel}" property="samplingInterval" />
+					</div>
+					<div class="col-sm-6">
+						<f:field bean="${channel}" property="checkDelay" label="Check Delay [sec]"/>
 					</div>					
 				</div>				
 </div>

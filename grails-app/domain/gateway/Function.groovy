@@ -7,7 +7,7 @@ class Function {
    
     
     static mapping = {              
-       
+       sort "name"
     }
     
     static constraint = {

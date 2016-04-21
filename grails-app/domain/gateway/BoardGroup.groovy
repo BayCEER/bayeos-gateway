@@ -12,6 +12,8 @@ public class BoardGroup {
 		return name;
 	}
 	
-	
+	static mapping  = {
+		sort "name"
+	}
 
 }

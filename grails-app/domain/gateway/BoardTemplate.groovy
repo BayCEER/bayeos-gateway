@@ -24,11 +24,12 @@ class BoardTemplate extends CheckDevice {
     }
 					
 	
-	static mapping  ={
+	static mapping  = {
 		channelTemplates sort:"nr"
 		revision(sqlType:"text")
 		description(sqlType:"text")
-		dataSheet(sqlType:"text")			
+		dataSheet(sqlType:"text")	
+		sort "name"		
 	}
 	    
 	

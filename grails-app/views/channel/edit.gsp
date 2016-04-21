@@ -85,12 +85,17 @@
 					</div>					
 				</div>
 				<div class="row">
-				<div class="col-sm-6">
+				 <div class="col-sm-6">
 					<f:field property="samplingInterval"/>
-					</div>
-				<div class="col-sm-6">
+				 </div>
+				 <div class="col-sm-6">
+					<f:field property="checkDelay" label="Check Delay [sec]:"/>
+				 </div>										
+				</div>
+				<div class="row">				
+				 <div class="col-sm-6">
 					<f:field property="excludeFromNagios"/>
-					</div>										
+				 </div>										
 				</div>
 			</div>
 

@@ -28,7 +28,7 @@ class BoardService  {
 	
 	
 	def dataSource 	
-	def chkProps = ['samplingInterval','criticalMax','criticalMin','warningMin','warningMax']	
+	def chkProps = ['samplingInterval','criticalMax','criticalMin','warningMin','warningMax','checkDelay']	
 	def chaProps = chkProps + ['nr','label','phenomena','unit','spline','aggrInterval','aggrFunction']
 		
 		

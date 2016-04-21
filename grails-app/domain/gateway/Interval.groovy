@@ -13,6 +13,8 @@ class Interval {
     
     static mapping = {        
         version false
+		sort "name"
+		
     }
 	
 	

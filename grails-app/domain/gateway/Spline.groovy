@@ -9,6 +9,7 @@ class Spline {
     static mapping = {       
        name sqlType:"text"       
 	   knotePoints sort: "x"
+	   sort "name"
     }
 	
 	static constraints = {

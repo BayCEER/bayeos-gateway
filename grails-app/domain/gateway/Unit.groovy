@@ -15,4 +15,8 @@ class Unit {
     String toString(){
         return name;
     }
+	
+	static mapping = {
+		sort "name"
+	}
 }

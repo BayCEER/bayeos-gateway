@@ -12,7 +12,7 @@ class UnitController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [unitInstanceList: Unit.list(params), unitInstanceTotal: Unit.count()]
+        [unitInstanceList: Unit.listOrderByName(params), unitInstanceTotal: Unit.count()]
     }
 
     def create() {
