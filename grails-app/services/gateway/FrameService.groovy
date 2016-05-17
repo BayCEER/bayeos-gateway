@@ -49,7 +49,7 @@ class FrameService {
 		}
 	}
 
-	private Integer findOrSaveChannel(Sql db, Integer boardId, Integer channelNr) throws SQLException {
+	private Integer findOrSaveChannel(Sql db, Integer boardId, String channelNr) throws SQLException {
 		log.debug("findOrSaveChannel: Board id:${boardId},Channel nr:${channelNr}")
 		def c = db.firstRow("select id from channel c where board_id = ? and nr = ?;",[boardId, channelNr])
 		if (c==null){
@@ -68,16 +68,12 @@ class FrameService {
 		}
 	}
 
-	private void parseFrames(FrameParser parser, String sender, String[] frames) {
-		
-	}
-
-
+	
 	private void updateMetaInfo(Sql db, BoardRecord boardRecord) throws SQLException {
 
 		def channels = boardRecord.channels
 		db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
-												coalesce(b.check_delay,c.check_delay,0) as check_delay,
+												coalesce(c.check_delay,b.check_delay,0) as check_delay,
 												c.spline_id,
 											    coalesce(c.critical_max, b.critical_max) as critical_max, 
 												coalesce(c.critical_min, b.critical_min) as critical_min, 
@@ -157,6 +153,7 @@ class FrameService {
 			con = dataSource.getConnection()
 			Sql db = new Sql(con)
 			DefaultFrameHandler flatHandler = new DefaultFrameHandler(sender){
+					
 						private void startCopy(){
 							if (cin == null){
 								log.debug("startCopy")
@@ -165,7 +162,7 @@ class FrameService {
 							}
 						}
 
-						private void endCopy(){
+					    private void endCopy(){
 							if (cin != null){
 								log.debug("endCopy")
 								long r = cin.endCopy()
@@ -173,9 +170,8 @@ class FrameService {
 							}
 						}
 
-
-						void onNewOrigin(String origin) {
-							log.debug("On new board:${origin}")
+						void newOrigin(String origin) {
+							log.debug("New board:${origin}")
 							endCopy()
 							BoardRecord bc = boardRecords[origin]
 							if (bc == null){
@@ -183,25 +179,25 @@ class FrameService {
 							}
 						}
 
-						void onNewChannels(String origin, SortedSet<Integer> channels) {
-							log.debug("On new channels:${channels} for board:${origin}")
+						void newChannels(String origin, List<String> channels) {
+							log.debug("New channels:${channels} for board:${origin}")
 							endCopy()
 							BoardRecord bc = boardRecords[origin]
 							assert(bc!=null)
 							channels.removeAll(bc.channels.keySet())
-							for (Integer nr:channels){
+							for (String nr:channels){
 								bc.channels[nr] = FrameService.this.findOrSaveChannel(db, bc.id,nr)
 							}
 						}
 
-						void onDataFrame(String origin, Date timeStamp, Hashtable<Integer,Float> values, Integer rssi) {
-							log.debug("On dataFrame: Origin:${origin} Date:${timeStamp} Values:${values} Rssi:${rssi}")
+						void dataFrame(String origin, Date timeStamp, Hashtable<String,Float> values, Integer rssi) {
+							log.debug("DataFrame: Origin:${origin} Date:${timeStamp} Values:${values} Rssi:${rssi}")
 							startCopy()
 							BoardRecord bc = boardRecords[origin]
 							assert(bc!=null)
 
-							for (Map.Entry<Integer, Float> item : values.entrySet()) {
-								Integer nr  = item.getKey()
+							for (Map.Entry<String, Float> item : values.entrySet()) {
+								String nr  = item.getKey()
 								Float value  = item.getValue()
 								Integer id = bc.channels[nr]
 								if (id != null && !value.isNaN()){
@@ -226,13 +222,13 @@ class FrameService {
 
 						}
 
-						void onMessage(String origin, Date date, String message) {
-							log.debug("On message:${message}")
+						void message(String origin, Date date, String message) {
+							log.debug("Message:${message}")
 							insertMessage(origin,date,message,"INFO");
 						}
 
-						void onError(String origin, Date date, String message) {
-							log.debug("On error:${message}")
+						void error(String origin, Date date, String message) {
+							log.debug("Error:${message}")
 							insertMessage(origin,date,message,"ERROR");
 
 						}
@@ -249,15 +245,10 @@ class FrameService {
 						p.parse(Base64.decodeBase64(f))
 					}
 				} catch (FrameParserException e){
-					log.error("FrameParserError: frame:${f}")
+					log.error("Failed to parse frame:${f}")
 				} 
-		}
-			
-			
-			
-			
-			parseFrames(p,sender,frames)
-
+			}
+					
 			if (cin != null && cin.isActive()){
 				long r = cin.endCopy()
 			}

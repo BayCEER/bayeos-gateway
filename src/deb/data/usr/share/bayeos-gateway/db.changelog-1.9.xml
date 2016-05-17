@@ -849,5 +849,134 @@ SELECT board_group.id AS group_id, board_group.name AS group_name, b.id AS board
     WHERE b.id = c.board_id;  	
   	</sql>
   </changeSet>
+  
+  
+  
+  
+  <changeSet id="142" author="oa">
+  	<comment>Change channel.NR and channelTemplate.NR to String</comment>
+  	<sql>
+  	<![CDATA[
+  	alter table channel alter column nr type text;
+alter table channel add constraint channel_board_nr_unique unique(board_id, nr);
+
+create or replace function get_channel_count(_id bigint) returns integer as
+$BODY$
+declare
+ ret int;
+begin
+select into ret get_channel_count(c.last_count, c.last_result_time, COALESCE(c.sampling_interval, b.sampling_interval), COALESCE(c.check_delay, b.check_delay, 0)) 
+  from channel c join board b on c.board_id = b.id where c.id = _id; 
+return ret;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE;
+
+
+create or replace function get_completeness_msg(_count int) returns text as 
+$BODY$
+declare
+ msg text;
+begin
+ if (_count is null) then
+	msg = null;
+  else
+	msg = (_count * 10) || '% completeness'::text;
+  end if;  
+ return msg;
+ end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE;
+ 
+
+create or replace function get_completeness_status(_count int) returns integer as
+$BODY$
+declare
+ ret int;
+begin
+  if (_count is null) then
+	ret = null;	
+  elsif (_count > 8) then
+	ret = 0;
+  elsif (_count = 0) then
+	ret = 2;
+  else
+	ret = 1;
+  end if;
+  return ret;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE;
+
+create or replace view channel_check as 
+select channel.id as id, channel.board_id, greatest(channel.status_valid, get_completeness_status(get_channel_count(channel.id))) as status, channel.status_valid, channel.status_valid_msg,
+get_completeness_msg(get_channel_count(channel.id)) as status_complete_msg, get_completeness_status(get_channel_count(channel.id)) as status_complete, channel.exclude_from_nagios
+  from channel;
+
+create or replace view board_check as 
+select board_id as id, board.board_group_id, max(status) as status from channel_check, board where channel_check.board_id = board.id and channel_check.exclude_from_nagios = false group by channel_check.board_id, board.board_group_id;
+
+create or replace view group_check as 
+select board_group.id , max(board_check.status) as status from board_check right join board_group on (board_group.id = board_check.board_group_id) group by board_group.id;
+
+create or replace view channel_path as 
+ select board.id as board_id, board.name as board_name, channel.id as channel_id, channel.label as channel_label, (coalesce(board.name, board.origin) || '/'::text) || coalesce(channel.label, channel.nr::text) as path
+   from channel, board
+  where board.id = channel.board_id;
+
+create or replace view nagios_status as 
+ select board_group.id as group_id, board_group.name as group_name, b.id as board_id, b.origin as board_origin, c.id as channel_id, c.nr as channel_nr, c.label as channel_label, chk.status_complete, chk.status_complete_msg, chk.status_valid, chk.status_valid_msg
+   from board b
+   left join board_group on board_group.id = b.board_group_id, channel c, channel_check chk
+  where b.id = c.board_id and chk.id = c.id and (chk.status_complete > 0 or chk.status_valid > 0) and not (b.exclude_from_nagios or c.exclude_from_nagios)
+  order by board_group.name, b.origin, c.nr;
+
+create or replace view channel_detail as 
+select c.id, c.db_series_id, c.spline_id, f.name as f_name, i.name as i_name, coalesce(c.filter_critical_values,b.filter_critical_values) as filter_critical_values
+   from board b 
+   join channel c on (c.board_id = b.id)   
+   left join function f on f.id = c.aggr_function_id
+   left join "interval" i on i.id = c.aggr_interval_id;
+
+
+create or replace function get_order_number(text)
+  returns text as
+$body$declare
+    out text;
+    temp text;
+    i int;
+begin
+    
+    out:='';
+    temp:='';   
+    i:=1;
+    while i<=length($1) loop
+      if substr($1,i,1)~'[0-9]' then
+        temp:=temp||substr($1,i,1);
+      else
+        if temp>'' then
+          out:=out||to_char(temp::int,'0999999');
+          temp:='';
+        end if;
+        out:=out||substr($1,i,1);
+          end if;
+      i:=i+1;
+    end loop;
+    if temp>'' then
+     out:=out||to_char(temp::int,'0999999');
+    end if;
+    
+    return out;
+
+end;$body$ language plpgsql volatile cost 100; 
+
+
+alter table channel_template alter column nr type text;
+alter table channel_template add constraint channel_template_board_nr_unique unique(board_id, nr);
+  	 ]]> 
+  	 </sql>
+  	
+</changeSet>
+  	
      
 </databaseChangeLog>

@@ -29,10 +29,10 @@
       </tr>  
       <g:each in="${channels}" var="channel">
       <tr>
-        <td class="cell${channel.nr}"><input type="checkbox" checked="checked" name="${channel.nr}" id="chk${channel.nr}"/><label for="chk${channel.nr}">Nr. ${channel.nr}</label></td>                
-        <td id="cv${channel.nr}" />
-        <td>${channel?.label} [${channel?.unit?.abbrevation}]</td>
-        <td id="ct${channel.nr}"/>
+        <td class="cell${channel.id}"><input type="checkbox" checked="checked" name="${channel.id}" id="${channel.id}"/><label for="chk${channel.id}">${channel.nr}</label></td>                
+        <td id="cv${channel.id}"/>
+        <td>${channel?.label} [${channel?.unit}]</td>
+        <td id="ct${channel.id}"/>
       </tr>
       </g:each>       
     </table>
@@ -51,7 +51,7 @@
    
      
  <script type="text/javascript">
-    var channels = ${channelList};
+    var channels = ${channels.id};
     var colors = [];     
     var series = [];
                
@@ -86,7 +86,7 @@
 		 // Plot series according to choices 
         var points = [];                          
         $(".block").find("input:checked").each(function () {
-          var key = $(this).attr("name");
+          var key = $(this).attr("id");
           points.push({data:series[key], color:colors[parseInt(key)]});            
         }); 
         var plot = $.plot($("#chart"),points,options);     
@@ -112,9 +112,9 @@
 	          success: function(data){    
 	            lastRowId = data.lastRowId;  	        
 	            $.each(data.observations, function(key, val) {              
-	              $('#cv' + val.ch).html(val.value);                       
-	              $('#ct' + val.ch).html(getDateString(new Date(val.millis)));
-	              var s = series[val.ch];
+	              $('#cv' + val.cid).html(val.value);                       
+	              $('#ct' + val.cid).html(getDateString(new Date(val.millis)));
+	              var s = series[val.cid];
 	              s.push([val.millis,val.value]);              
 	            });
 	            drawChart();                                          	            

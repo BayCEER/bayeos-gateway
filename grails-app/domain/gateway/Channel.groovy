@@ -2,9 +2,9 @@ package gateway
 
 import java.util.Date;
 
-class Channel extends CheckDevice {
+class Channel extends CheckDevice implements Comparable<Channel>{
 	
-	Integer nr
+	String nr
 	String label
 	String phenomena
 	
@@ -32,7 +32,7 @@ class Channel extends CheckDevice {
 				
 
     static constraints = {
-		nr(min:0)
+		nr(nullable:false)
 		label(nullable:true)
 		phenomena(nullable:true)
 		unit(nullable:true)
@@ -51,4 +51,15 @@ class Channel extends CheckDevice {
 		statusValid(editable:false,nullable:true)
 		statusValidMsg(editable:false,nullable:true)
     }
-}
+
+
+
+	@Override
+	public int compareTo(Channel o) {
+		if (nr.isInteger() && o.nr.isInteger()){
+			return Integer.valueOf(nr).compareTo(Integer.valueOf(o.nr))
+		} else {
+			return nr.compareTo(o.nr)
+		}
+		
+	}}

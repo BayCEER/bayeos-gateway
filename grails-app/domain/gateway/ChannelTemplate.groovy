@@ -4,7 +4,7 @@ import java.util.List;
 
 class ChannelTemplate extends CheckDevice implements Comparable<ChannelTemplate>{
 	
-	Integer nr
+	String nr
 	String label
 	String phenomena
 	Unit unit
@@ -19,7 +19,7 @@ class ChannelTemplate extends CheckDevice implements Comparable<ChannelTemplate>
 	static belongsTo = [boardTemplate: BoardTemplate]
 	
     static constraints = {
-		nr(min:0)
+		nr(nullable:false)
 		label(blank:false)
 		phenomena(nullable:true)
 		unit(nullable:true)
@@ -46,7 +46,12 @@ class ChannelTemplate extends CheckDevice implements Comparable<ChannelTemplate>
 
 	@Override
 	public int compareTo(ChannelTemplate o) {
-		return nr.compareTo(o.nr)
+		if (nr.isInteger() && o.nr.isInteger()){
+			return Integer.valueOf(nr).compareTo(Integer.valueOf(o.nr))
+		} else {
+			return nr.compareTo(o.nr)
+		}		
+
 	}
 
 

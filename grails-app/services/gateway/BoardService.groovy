@@ -72,38 +72,31 @@ class BoardService  {
 		def db = new Sql(dataSource)
 		def channelStati = db.rows("""SELECT c.id, c.nr, c.label, unit.abbrevation as unit, chk.status_valid, chk.status_valid_msg, 
 				chk.status_complete, chk.status_complete_msg, c.last_result_time, c.last_result_value, not c.exclude_from_nagios as nagiosOn  
-				FROM channel_check chk, channel c LEFT JOIN unit on unit.id = c.unit_id where c.board_id = ? and chk.id = c.id  order by c.nr""", board.id)
+				FROM channel_check chk, channel c LEFT JOIN unit on unit.id = c.unit_id where c.board_id = ? and chk.id = c.id  order by get_order_number(c.nr)""", board.id)
 		db.close()
 		return channelStati
 	}
 	
-	def getBoardStatus(Board board) {
-		 def db = new Sql(dataSource)
-		 def boardStatus = db.firstRow("SELECT chk.status_valid, chk.status_complete, b.last_result_time FROM board b, board_check chk where b.id = chk.id and b.id = ?", board.id)
-		 db.close()
-		 return boardStatus
-	}
-	
-	
-	def findBoardsByGroup(Long groupId, Integer max, Integer offset) {
-		def db = new Sql(dataSource)						
-		def result = db.rows("""SELECT bg.id as group_id, bg.name as group_name, b.id, b.origin, b.name, b.last_rssi, b.last_result_time,
-				chk.status as nagiosStatus, ns.exc_cha as nagiosChannelOff, not b.exclude_from_nagios as nagiosOn
-				FROM board b left join board_group bg on bg.id = b.board_group_id, board_check chk, (SELECT board_id, count(*) as total, sum(exclude_from_nagios::int)::int as exc_cha FROM channel GROUP BY board_id) as ns
-				where b.id = chk.id and b.id = ns.board_id and bg.id = ? order by bg.name, b.origin LIMIT ? OFFSET ?""",[groupId, max, offset])
-		db.close()
-		return result			   
-	}
-	
-	def findAllBoards(Integer max, Integer offset) {
+	def findBoards(String search, def sort) {
 		def db = new Sql(dataSource)
-		def result = db.rows("""SELECT bg.id as group_id, bg.name as group_name, b.id, b.origin, b.name, b.last_rssi, b.last_result_time,
-                chk.status as nagiosStatus, ns.exc_cha as nagiosChannelOff, not b.exclude_from_nagios as nagiosOn
-				FROM board b left join board_group bg on bg.id = b.board_group_id, board_check chk, (SELECT board_id, count(*) as total, sum(exclude_from_nagios::int)::int as exc_cha FROM channel GROUP BY board_id) as ns
-				where b.id = chk.id and b.id = ns.board_id order by bg.name, b.origin LIMIT ? OFFSET ?""",[max, offset])
+		def sql = """SELECT bg.id as group_id, bg.name as group_name, b.id, b.origin, b.name, b.last_rssi,
+						extract(epoch from date_trunc('milliseconds',b.last_result_time)) * 1000 as last_result_time, board_check.status
+						FROM board b left outer join board_group bg on (b.board_group_id = bg.id) join board_check on (b.id = board_check.id)"""
+		if (search){
+			sql = sql + " where bg.name ilike :s or b.origin ilike :s or b.name ilike :s"
+		} 										 
+		sql = sql + " order by " + sort.join(",")
+		def rows	
+		if (search) {
+			rows = db.rows(sql,s:search)
+		} else {
+			rows = db.rows(sql)
+		}
+		
 		db.close()
-		return result
+		return rows
 	}
+	
 
 	
 }

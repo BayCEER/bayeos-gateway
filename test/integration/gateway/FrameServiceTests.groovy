@@ -14,6 +14,11 @@ import gateway.Board
 import groovy.sql.Sql
 
 
+/*
+ * Run this tests with:
+ * 
+ */
+
 
 class FrameServiceTests {
 	static transactional = false
@@ -42,11 +47,10 @@ class FrameServiceTests {
 			frames[i] = new String(Base64.encodeBase64String(f.getBytes()))
 		}
 		frameService.saveFrames("testSaveFlat",frames)		
-		Board b = Board.findByOrigin("testSaveFlat")
-		
+		Board b = Board.findByOrigin("testSaveFlat")		
 		Sql db = new Sql(dataSource)		
 		def row = db.firstRow("select count(*) from observation, board, channel where observation.channel_id = channel.id and channel.board_id = board.id and board.id = ?",[b.id])
-		assert 40000 == row[0]
+		assertEquals(40000,row[0])
 		db.close()		
 		b.delete(flush:true);						
     }
@@ -54,34 +58,54 @@ class FrameServiceTests {
 	
 	@Test
 	void testMessageFrame() {
-		StringFrame msg = new StringFrame(FrameConstants.Message, "This is a test message")		
+		String mv = "This is a test message";
+		StringFrame msg = new StringFrame(FrameConstants.Message,mv)		
 		frameService.saveFrames("testMessageFrame",new String(Base64.encodeBase64String(msg.getBytes())));
 		Board b = Board.findByOrigin("testMessageFrame")		
 		Message m = Message.findByOrigin(b.getOrigin())
-		assert "This is a test message" == m.getContent()		
+		assertEquals(mv,m.getContent());		
 		b.delete(flush:true);
-		m.delete(flush:true);
-		
-				
+		m.delete(flush:true);				
 	}
 	
 	@Test
-	void testNaN() {
-		
+	void testNaN() {		
 		Date now = new Date()		
 		MillisecondTimestampFrame frame = new MillisecondTimestampFrame(now, new DataFrame(NumberType.Float32, Float.NaN,1.0F).getBytes())
 		frameService.saveFrames("testNaN",new String(Base64.encodeBase64String(frame.getBytes())))
-		Board b = Board.findByOrigin("testNaN")
-				
-		def data = observationService.findByIdAndRowId(b.id.toInteger(),null)		
-		
-		assert 1 == data.size()		
-		assert 2 == data[0]['channel_nr']
-		assert now.getTime() == data[0]['result_time'].getTime()
-		assert 1.0F == data[0]['result_value']
-		
+		Board b = Board.findByOrigin("testNaN")				
+		def data = observationService.findByIdAndRowId(b.id.toInteger(),null)				
+		assertEquals(1,data.size())		
+		assertEquals("2",data[0]['channel_nr'])
+		assertEquals(now.getTime(),data[0]['result_time'].getTime())
+		assertEquals(1.0f,data[0]['result_value'],0.1)				
 		b.delete(flush:true);
 		
 	}	
+	
+	@Test 
+	void labeledFrames() {
+		Date now = new Date()		
+		LabeledFrame f = new LabeledFrame(NumberType.UInt8,"{'c1':1.0,'c11':11.0,'c3':3.0}")		
+		MillisecondTimestampFrame frame = new MillisecondTimestampFrame(now,f.getBytes())		
+		frameService.saveFrames("labeledFrames",new String(Base64.encodeBase64String(frame.getBytes())))
+		Board b = Board.findByOrigin("labeledFrames")
+		def data = observationService.findByIdAndRowId(b.id.toInteger(),null)		
+		
+		assertEquals("c1",data[0]['channel_nr'])
+		assertEquals(1.0f,data[0]['result_value'],0.1)
+		assertEquals(now.getTime(),data[0]['result_time'].getTime())
+		
+		assertEquals("c11",data[1]['channel_nr'])
+		assertEquals(11f,data[1]['result_value'],0.1)
+		assertEquals(now.getTime(),data[1]['result_time'].getTime())
+		
+		assertEquals("c3",data[2]['channel_nr'])
+		assertEquals(3f,data[2]['result_value'],0.1)
+		assertEquals(now.getTime(),data[2]['result_time'].getTime())
+				
+		b.delete(flush:true)
+				
+	}
 
 }

@@ -18,9 +18,11 @@ class BoardGroupController {
 		def max = Math.min(params.max?.toInteger()?:10,100)
 		def offset = params.offset?.toInteger()?:0
 		def result = db.rows("""
-					select id, name, lrt, count as board_count, status from group_check left outer join 
-					(select board_group_id as group_id, max(last_result_time) as lrt, count(id) as count from board group by board_group_id) bs 
-					on (group_check.id = bs.group_id) order by name LIMIT ? OFFSET ?""", [max, offset])
+					select board_group.id, board_group.name, bg.lrt, bg.count as board_count, group_check.status 
+					from (select board_group_id as id, max(last_result_time) as lrt, count(id) as count from board group by board_group_id) bg
+					right outer join board_group on (board_group.id = bg.id) 
+					join group_check on (board_group.id = group_check.id)
+					order by name LIMIT ? OFFSET ?""", [max, offset])
 		db.close()
 		[result: result, total: BoardGroup.count()]
 	}

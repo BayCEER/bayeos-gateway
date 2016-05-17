@@ -134,11 +134,9 @@ class ExportJob implements Runnable  {
 	private def syncChannels(Long boardId, Integer dbFolderId){
 		try {
 			
-			db.eachRow("""select c.id, c.label, u.db_unit_id,
-			CASE WHEN c.aggr_interval_id is not null THEN extract(EPOCH from i.name::interval)::int ELSE d.sampling_interval END
-			from check_device d, channel c LEFT JOIN unit u on u.id = c.unit_id LEFT JOIN interval i on i.id = c.aggr_interval_id
-			where c.board_id = ? and c.db_series_id is null and d.channel_id = c.id
-			and c.label is not null and (c.db_exclude_auto_export is null or c.db_exclude_auto_export is false) order by c.nr asc""",[boardId]){ it ->																										
+			db.eachRow("""select c.id, c.label, u.db_unit_id, CASE WHEN c.aggr_interval_id is not null THEN extract(EPOCH from i.name::interval)::int ELSE COALESCE(b.sampling_interval,c.sampling_interval) END as sampling_interval
+					from channel c JOIN board b on (b.id = c.board_id) LEFT JOIN unit u on u.id = c.unit_id LEFT JOIN interval i on (i.id = c.aggr_interval_id)
+					where c.board_id = ? and c.db_series_id is null and c.label is not null and (c.db_exclude_auto_export is null or c.db_exclude_auto_export is false) order by c.nr asc""",[boardId]){ it ->																										
 				log.info("Syncing channel: ${it.label}")
 				Integer id = (om.newNode(dbFolderId, it.label, ObjektArt.MESSUNG_MASSENDATEN)).getId()
 				cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id,ObjektArt.MESSUNG_MASSENDATEN.toString(),[it.label,"Automated created by Gateway",it.sampling_interval,null,null,1,2] as Object[])
