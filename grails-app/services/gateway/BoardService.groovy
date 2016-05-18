@@ -38,16 +38,17 @@ class BoardService  {
 		chkProps.each{ p ->
 			template.setProperty(p, board.getProperty(p));
 		}
-		template.save();
+		template.save(flush:true);
 				
 		def channels = Channel.findAllByBoard(board)
 		channels.each{ cha ->
-			ChannelTemplate cht = new ChannelTemplate()			
+			ChannelTemplate cht = new ChannelTemplate()	
+					
 			chaProps.each{ p ->
 				cht.setProperty(p, cha.getProperty(p))
 			}
 			cht.setBoardTemplate(template);
-			cht.save();			
+			cht.save(flush:true);			
 		}										
 		return template
 	}

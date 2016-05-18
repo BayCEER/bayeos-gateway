@@ -44,12 +44,19 @@ class GrafanaController {
 		def toDate = new java.sql.Timestamp(DatatypeConverter.parseDateTime(to).getTimeInMillis())
 		try {
 			db = new Sql(dataSource)
-			def ret = [] 				
-			db.eachRow("""select real_value(o.result_value,c.spline_id) as result_value, extract(epoch from date_trunc('milliseconds',o.result_time)) * 1000 as result_time
-				from all_observation o, channel_path cp, channel c
-				where o.channel_id = c.id and c.id = cp.channel_id and cp.path = ? and o.result_time between ? and ? order by 2 asc""",[path,fromDate,toDate]){ row ->				
-				ret << [row.result_value,row.result_time]
-			}			
+			def ret = [] 							
+			db.eachRow("""select s.* from (
+				with ch as (select channel_id as id, spline_id from channel_path join channel on (channel.id = channel_path.channel_id) where path = :path) ,
+					obs as (select real_value(o.result_value,ch.spline_id) as result_value, extract(epoch from date_trunc('milliseconds',o.result_time)) * 1000 as result_time from
+					observation o, ch where o.channel_id = ch.id and result_time between :from and :to),
+					exp as (select real_value(o.result_value,ch.spline_id) as result_value, extract(epoch from date_trunc('milliseconds',o.result_time)) * 1000 as result_time from
+					observation_exp o, ch where o.channel_id = ch.id and result_time between :from and :to)
+				select * from exp
+				union all
+				select * from obs
+				) s order by 2 asc;""",path:path,from:fromDate,to:toDate){ r ->
+				ret << [r.result_value,r.result_time]
+			}		
 			return ret
 		} catch (Exception e) {
 			log.error(e.getMessage())

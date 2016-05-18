@@ -19,8 +19,8 @@ class ChannelTemplate extends CheckDevice implements Comparable<ChannelTemplate>
 	static belongsTo = [boardTemplate: BoardTemplate]
 	
     static constraints = {
-		nr(nullable:false)
-		label(blank:false)
+		nr(nullable:false)		
+		label(nullable:false)
 		phenomena(nullable:true)
 		unit(nullable:true)
 		spline(nullable:true)

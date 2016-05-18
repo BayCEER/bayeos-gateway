@@ -853,15 +853,30 @@ SELECT board_group.id AS group_id, board_group.name AS group_name, b.id AS board
   
   
   
-  <changeSet id="142" author="oa">
-  	<comment>Change channel.NR and channelTemplate.NR to String</comment>
+<changeSet id="142" author="oa">
   	<sql>
-  	<![CDATA[
-  	alter table channel alter column nr type text;
-alter table channel add constraint channel_board_nr_unique unique(board_id, nr);
+		drop view if exists channel_detail;
+		drop view if exists group_check;
+		drop view if exists board_check;
+		drop view if exists nagios_status;
+		drop view if exists channel_check;
+		drop view if exists channel_path;
+		drop view if exists check_device;
+	</sql>
+</changeSet>
 
+<changeSet id="143" author="oa">
+<sql>
+	alter table channel alter column nr type text;
+	alter table channel add constraint channel_board_nr_unique unique(board_id, nr);
+</sql>
+</changeSet>
+	
+		
+<changeSet id="144" author="oa">
+<createProcedure>
 create or replace function get_channel_count(_id bigint) returns integer as
-$BODY$
+$body$
 declare
  ret int;
 begin
@@ -869,52 +884,68 @@ select into ret get_channel_count(c.last_count, c.last_result_time, COALESCE(c.s
   from channel c join board b on c.board_id = b.id where c.id = _id; 
 return ret;
 end;
-$BODY$
-  LANGUAGE plpgsql VOLATILE;
+$body$
+LANGUAGE plpgsql VOLATILE;
+</createProcedure>
+</changeSet>
 
 
+
+<changeSet id="145" author="oa">
+<createProcedure>
 create or replace function get_completeness_msg(_count int) returns text as 
-$BODY$
+$body$
 declare
  msg text;
 begin
  if (_count is null) then
-	msg = null;
+   msg = null;
   else
-	msg = (_count * 10) || '% completeness'::text;
+   msg = (_count * 10) || '% completeness'::text;
   end if;  
  return msg;
  end;
-$BODY$
+$body$
   LANGUAGE plpgsql VOLATILE;
+</createProcedure>
+</changeSet>
+  
  
-
+<changeSet id="146" author="oa">
+<createProcedure>
 create or replace function get_completeness_status(_count int) returns integer as
-$BODY$
+$body$
 declare
  ret int;
 begin
   if (_count is null) then
-	ret = null;	
+   ret = null;
   elsif (_count > 8) then
-	ret = 0;
+   ret = 0;
   elsif (_count = 0) then
-	ret = 2;
+   ret = 2;
   else
-	ret = 1;
+   ret = 1;
   end if;
   return ret;
 end;
-$BODY$
+$body$
   LANGUAGE plpgsql VOLATILE;
+</createProcedure>
+</changeSet>
 
+<changeSet id="147" author="oa" runOnChange="true">
+<sql>
 create or replace view channel_check as 
 select channel.id as id, channel.board_id, greatest(channel.status_valid, get_completeness_status(get_channel_count(channel.id))) as status, channel.status_valid, channel.status_valid_msg,
 get_completeness_msg(get_channel_count(channel.id)) as status_complete_msg, get_completeness_status(get_channel_count(channel.id)) as status_complete, channel.exclude_from_nagios
   from channel;
 
 create or replace view board_check as 
-select board_id as id, board.board_group_id, max(status) as status from channel_check, board where channel_check.board_id = board.id and channel_check.exclude_from_nagios = false group by channel_check.board_id, board.board_group_id;
+select b.id, b.board_group_id, a.status as status from
+(select bo.id, max(chk.status_complete) as status from channel_check chk join board bo on (bo.id = chk.board_id) 
+where chk.exclude_from_nagios = false and bo.exclude_from_nagios = false group by bo.id) a
+right join (select id, board_group_id, exclude_from_nagios from board) b on b.id = a.id order by 1;
 
 create or replace view group_check as 
 select board_group.id , max(board_check.status) as status from board_check right join board_group on (board_group.id = board_check.board_group_id) group by board_group.id;
@@ -937,16 +968,21 @@ select c.id, c.db_series_id, c.spline_id, f.name as f_name, i.name as i_name, co
    join channel c on (c.board_id = b.id)   
    left join function f on f.id = c.aggr_function_id
    left join "interval" i on i.id = c.aggr_interval_id;
+</sql>
+</changeSet>
 
 
+<changeSet id="148" author="oa">
+<createProcedure>
+<![CDATA[
 create or replace function get_order_number(text)
   returns text as
-$body$declare
+$body$
+declare
     out text;
     temp text;
     i int;
-begin
-    
+begin    
     out:='';
     temp:='';   
     i:=1;
@@ -964,18 +1000,20 @@ begin
     end loop;
     if temp>'' then
      out:=out||to_char(temp::int,'0999999');
-    end if;
-    
+    end if;    
     return out;
+end;
+$body$
+language plpgsql volatile cost 100; 
+ ]]> 
+</createProcedure>
+</changeSet>
 
-end;$body$ language plpgsql volatile cost 100; 
-
-
+<changeSet id="149" author="oa">
+<sql>
 alter table channel_template alter column nr type text;
-alter table channel_template add constraint channel_template_board_nr_unique unique(board_id, nr);
-  	 ]]> 
-  	 </sql>
-  	
+alter table channel_template add constraint channel_template_board_nr_unique unique(board_template_id, nr);
+</sql>
 </changeSet>
   	
      

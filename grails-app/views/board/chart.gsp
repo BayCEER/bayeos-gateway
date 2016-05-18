@@ -6,6 +6,8 @@
   <body> 
   <script src="${resource(dir:'javascripts',file:'jquery.flot.min.js')}" type="text/javascript"></script>
   <script src="${resource(dir:'javascripts',file:'jquery.flot.time.min.js')}" type="text/javascript"></script>
+  <link rel="stylesheet" href="${resource(dir:'stylesheets',file:'font-awesome.min.css')}">
+  
  
 
   
@@ -16,6 +18,11 @@
   <div class="row">       
    <div class="block">
     <div class="block-header">Data of Board: ${boardInstance.origin}</div>
+     <div class="pull-right hidden" id="spinner">
+    	<i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+    </div>
+    
+    
     <div class="btn-group btn-group-default" role="group" aria-label="Selection">
     <button class="btn" id="allChannels" aria-label="Select All" data-toggle="tooltip" title="Select all channels"><span class="glyphicon glyphicon-ok"></span></button>    
     <button class="btn" id="noChannel" aria-label="Select None" data-toggle="tooltip" title="Delselect all channels"><span class="glyphicon glyphicon-remove"></span></button>
@@ -44,11 +51,6 @@
   		</div>
    </div>
         
-     
-  
-   
-  
-   
      
  <script type="text/javascript">
     var channels = ${channels.id};
@@ -90,7 +92,7 @@
           points.push({data:series[key], color:colors[parseInt(key)]});            
         }); 
         var plot = $.plot($("#chart"),points,options);     
-		
+        $("#spinner").addClass("hidden")
 	}
 
 
@@ -101,7 +103,8 @@
 	 	 		$("#timeOutWarning").removeClass("hidden") 	 		
 	 	 		return;
 	 	}
-	         
+
+ 		$("#spinner").removeClass("hidden")
 	    $.ajax(
 	        {
 	          url: '${createLink(controller: 'board', action: 'chartData')}',          

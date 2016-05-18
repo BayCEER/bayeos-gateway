@@ -31,7 +31,6 @@ class BoardController {
 		'aggrFunction'
 	]
 
-
 	
 	def listData() {
 		def search		
