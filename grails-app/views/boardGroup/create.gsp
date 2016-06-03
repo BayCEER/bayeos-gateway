@@ -24,6 +24,7 @@
                                    
             <g:form class="form" role="form" action="create" >
             	<f:field bean="boardGroupInstance" property="name"/>
+            	<f:field bean="boardGroupInstance" property="dbFolderId" />
              	
              	<div class="form-group">
 							<button type="submit" class="btn btn-primary">

@@ -96,8 +96,9 @@ class ExportJob implements Runnable  {
 		}
 		}
 	}
-
-
+	
+	
+	
 	private def syncUnits(Integer dbHomeUnitId) {
 		try {
 			db.eachRow("SELECT id, name from unit where db_unit_id is null"){ it ->
@@ -112,16 +113,22 @@ class ExportJob implements Runnable  {
 
 	private def syncBoards(Integer dbHomeFolderId) {
 		try {
-			db.eachRow("SELECT id, name, db_folder_id from board where board.db_auto_export and name is not null order by id"){ it ->						
-				log.info("Syncing board: ${it.name}")
-				Integer fId = it.db_folder_id
-				if (fId == null && dbHomeFolderId != null){
-					fId = om.newNode(dbHomeFolderId, it.name, ObjektArt.MESSUNG_ORDNER).getId()
-					db.executeUpdate("update board set db_folder_id = ? where id = ?",fId,it.id)
-					log.info("Updated folder id for board: ${it.name}")
-				} else if (fId == null && dbHomeFolderId == null){
-					log.info("Failed to sync board: ${it.name} due to missing gateway home folder")
-				}			
+						
+			db.eachRow("""SELECT b.id, b.name, b.db_folder_id as board_folder_id, bg.db_folder_id as group_folder_id 
+				from board b left outer join board_group bg on (b.board_group_id = bg.id) where b.db_auto_export and b.name is not null order by b.id"""){ it ->						
+				log.info("Syncing board: ${it.name}")				
+				Integer fId = it.board_folder_id
+				if (fId == null){
+					Integer pId = it.group_folder_id ?: dbHomeFolderId					
+					if (pId != null){
+						fId = om.newNode(pId, it.name, ObjektArt.MESSUNG_ORDNER).getId()
+						db.executeUpdate("update board set db_folder_id = ? where id = ?",fId,it.id)
+						log.info("Updated folder id for board: ${it.name}")
+					} else {
+						log.info("Failed to sync board: ${it.name} due to missing home folder")
+						return
+					}					
+				}												
 				if (fId!=null){
 					syncChannels(it.id, fId)
 				}

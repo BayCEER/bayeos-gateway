@@ -16,6 +16,10 @@
 					<div class="col-sm-6">
 						<f:field bean="${boardGroupInstance}" property="name" />
 					</div>
+					<div class="col-sm-6">
+						<f:field bean="${boardGroupInstance}" property="dbFolderId" />
+					</div>
+					
 				</div>
 			</div>
 

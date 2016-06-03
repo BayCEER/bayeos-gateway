@@ -4,8 +4,11 @@ public class BoardGroup {
 	
 	String name
 	
+	Integer dbFolderId 
+	
 	static constraints = {
-		name (unique:true, nullable:false, blank:false)		
+		name (unique:true, nullable:false, blank:false)
+		dbFolderId(nullable:true, min:0)
 	}
 	
 	String toString(){

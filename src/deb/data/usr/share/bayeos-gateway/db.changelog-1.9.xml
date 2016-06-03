@@ -1015,6 +1015,49 @@ alter table channel_template alter column nr type text;
 alter table channel_template add constraint channel_template_board_nr_unique unique(board_template_id, nr);
 </sql>
 </changeSet>
+
+<changeSet id="150" author="oa">
+<createProcedure>
+<![CDATA[
+CREATE OR REPLACE FUNCTION get_channel_count(
+    _counts integer,
+    _lrt timestamp with time zone,
+    _sampling_interval integer,
+    _check_delay integer)
+  RETURNS integer AS
+$BODY$
+		DECLARE
+			c int;
+			id interval;			
+		BEGIN
+			if _sampling_interval is null then
+				return null;
+			end if;
+			
+			id:= _check_delay * interval '1 second';			
+			if (_lrt < now()-id) then		
+			   c:= ceil(_counts - extract(EPOCH from now()-id-_lrt)/_sampling_interval);
+			else 
+			   c:= _counts;
+			end if;
+			if (c < 0) THEN 
+				c:= 0;
+			end if;
+			return c;
+		END; 
+		$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+   ]]> 
+</createProcedure>
+</changeSet>
+
+<changeSet id="151" author="oa">
+<sql>
+  ALTER TABLE board_group
+   ADD COLUMN db_folder_id integer;  
+</sql>
+</changeSet>
   	
      
 </databaseChangeLog>
