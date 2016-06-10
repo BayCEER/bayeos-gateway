@@ -1058,6 +1058,22 @@ $BODY$
    ADD COLUMN db_folder_id integer;  
 </sql>
 </changeSet>
+
+<changeSet id="152" author="oa">
+<comment>Bugfix: Wrong status selection in view board_check</comment>
+<sql>
+CREATE OR REPLACE VIEW board_check AS 
+ SELECT b.id, b.board_group_id, a.status
+   FROM ( SELECT bo.id, max(chk.status) AS status
+           FROM channel_check chk
+      JOIN board bo ON bo.id = chk.board_id
+     WHERE chk.exclude_from_nagios = false AND bo.exclude_from_nagios = false
+     GROUP BY bo.id) a
+   RIGHT JOIN ( SELECT board.id, board.board_group_id, board.exclude_from_nagios
+           FROM board) b ON b.id = a.id
+  ORDER BY b.id;
+</sql>
+</changeSet>
   	
      
 </databaseChangeLog>
