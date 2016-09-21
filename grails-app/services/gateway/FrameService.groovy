@@ -245,7 +245,7 @@ class FrameService {
 						p.parse(Base64.decodeBase64(f))
 					}
 				} catch (FrameParserException e){
-					log.error("Failed to parse frame:${f}")
+					log.warn("Failed to parse frame:${f} Error:${e.getMessage()}")
 				} 
 			}
 					

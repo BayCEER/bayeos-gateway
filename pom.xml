@@ -5,7 +5,7 @@
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
 	<packaging>grails-app</packaging>
-	<version>1.9.33</version>	
+	<version>1.9.34</version>	
 	<name>bayeos-gateway</name>
 	<description>bayeos-gateway</description>
 	
@@ -109,15 +109,13 @@
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-xmlrpc</artifactId>
-			<version>1.9.5</version>
-			<scope>compile</scope>
+			<version>1.9.9</version>
 		</dependency>
 
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-frame</artifactId>
-			<version>1.2.0</version>
-			<scope>compile</scope>
+			<version>1.3.0</version>
 		</dependency>
 
 		<dependency>
