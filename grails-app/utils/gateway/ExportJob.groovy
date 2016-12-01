@@ -7,6 +7,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.Vector
 import java.lang.Byte
+import java.net.InetAddress
 
 import org.apache.xmlrpc.XmlRpcException
 
@@ -21,14 +22,15 @@ class ExportJob implements Runnable  {
 	
 	private ObjektNodeModel om = null	
 	private ExportJobConfig config
-	
+		
 	def db
-	def dataSource
-	
+	def dataSource	
+	def sender 
 
-	public ExportJob(dataSource,ExportJobConfig config){
+	public ExportJob(sender,dataSource,config){
 		this.dataSource = dataSource
 		this.config = config
+		this.sender	= sender		
 	}
 
 	@Override
@@ -114,14 +116,16 @@ class ExportJob implements Runnable  {
 	private def syncBoards(Integer dbHomeFolderId) {
 		try {
 						
-			db.eachRow("""SELECT b.id, b.name, b.db_folder_id as board_folder_id, bg.db_folder_id as group_folder_id 
+			db.eachRow("""SELECT b.id, b.name, b.origin, b.db_folder_id as board_folder_id, bg.db_folder_id as group_folder_id 
 				from board b left outer join board_group bg on (b.board_group_id = bg.id) where b.db_auto_export and b.name is not null order by b.id"""){ it ->						
 				log.info("Syncing board: ${it.name}")				
 				Integer fId = it.board_folder_id
 				if (fId == null){
 					Integer pId = it.group_folder_id ?: dbHomeFolderId					
 					if (pId != null){
-						fId = om.newNode(pId, it.name, ObjektArt.MESSUNG_ORDNER).getId()
+						fId = om.newNode(pId, it.name, ObjektArt.MESSUNG_ORDNER).getId()	
+						def desc = "Created by BayEOS-Gateway (${sender}), Board (${it.origin})"						 											
+						cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",fId,ObjektArt.MESSUNG_ORDNER.toString(),[it.name,desc.toString(),null,null,null,null,2] as Object[])					
 						db.executeUpdate("update board set db_folder_id = ? where id = ?",fId,it.id)
 						log.info("Updated folder id for board: ${it.name}")
 					} else {

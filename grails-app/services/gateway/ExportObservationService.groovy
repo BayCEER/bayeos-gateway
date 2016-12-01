@@ -5,18 +5,24 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import gateway.ExportJob
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+
 
 
 class ExportObservationService {
 
-	def dataSource
+	def dataSource	
+	def grailsLinkGenerator
+		
 	private Thread t
-	
-	
+		
 	Boolean start() {
 		log.info("Starting export service")
-		if (!started()) {
-			Runnable task = new ExportJob(dataSource, ExportJobConfig.first())
+		if (!started()) {				
+			def url = grailsLinkGenerator.getServerBaseURL() 
+			def context = ServletContextHolder.getServletContext().getContextPath()
+			Runnable task = new ExportJob(url, dataSource, ExportJobConfig.first())
 			t = new Thread(task)
 			t.start()
 		}

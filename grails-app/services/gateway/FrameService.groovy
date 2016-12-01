@@ -1,5 +1,6 @@
 package gateway
 
+import java.lang.invoke.SwitchPoint;
 import java.sql.Array
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -8,17 +9,15 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat;
 import java.util.Date
 import java.util.Hashtable
+import java.util.List;
 import java.util.Map
 import groovy.sql.Sql
 import org.apache.commons.codec.binary.Base64
 import org.postgresql.PGConnection
 import org.postgresql.copy.CopyManager
 import org.postgresql.copy.CopyIn
-import bayeos.frame.FrameParser
-import bayeos.frame.DefaultFrameHandler
-import bayeos.frame.FrameHandler;
 import bayeos.frame.FrameParserException
-import gateway.FrameService.BoardRecord;
+import bayeos.frame.Parser;
 import gateway.time.ThisMonth;
 
 
@@ -28,12 +27,109 @@ class FrameService {
 
 	static transactional = false
 
-	class BoardRecord {
+	class Board {
 		Integer id
 		Date lrt
 		def channels = [:] 	// nr, id
 		Integer lrssi
 	}
+ 
+	def saveFrames(String sender, String[] frames) {
+		if ((frames == null) || (sender == null)) return
+		
+		Connection con = null
+		CopyIn cin = null
+		
+		def boards = [:]
+						
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+00")
+		dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+				
+		try {
+			con = dataSource.getConnection()
+			Sql db = new Sql(con)
+			log.info("Parsing ${frames.length} frames from: ${sender}")
+			long obsCount = 0
+			for(String f:frames) {
+				try {
+					def res = Parser.parseBase64(f,new Date(),sender,0)
+					
+					// Parser sends ts as nano secs
+					Date ts = new Date((long)(res['ts']/(1000*1000)))					
+
+					// Check if board exists
+					Board b = boards[res['origin']]					 				
+					if (b == null) {							
+						b = new Board(id:findOrSaveBoard(db,res['origin']), lrt:ts,lrssi:res['rssi'], channels:[:])
+						boards[res['origin']] = b			
+					} else {						
+						b.lrt = ts
+						b.lrssi = res['rssi']
+					}
+					
+					switch (res['type']) {						
+						case "DataFrame":
+							res['data'].each { key, value ->								
+								if (!b.channels.containsKey(key)){									
+									// log.info("Board:" + b.channels.toMapString())																		
+									b.channels[key] = findOrSaveChannel(db,b.id,key)
+								}
+							}							
+							// Insert channel values from data using copy 
+							CopyManager cm = ((PGConnection)con.unwrap(PGConnection.class)).getCopyAPI()
+							cin = cm.copyIn("COPY observation (channel_id,result_time,result_value) FROM STDIN WITH CSV")							
+							res['data'].each { key, value ->	
+								Float fvalue = (Float)value
+								if (!fvalue.isNaN()){
+									StringBuffer sb = new StringBuffer(200)
+									sb.append(b.channels[key])
+									sb.append(",").append(dateFormatter.format(ts))
+									sb.append(",").append(fvalue).append("\n")
+									byte[] pl = sb.toString().getBytes("UTF-8")
+									cin.writeToCopy(pl,0,pl.length)
+									sb = null
+									obsCount++
+								}										
+							}
+							long r = cin.endCopy()							
+							break
+						case "Message":							
+							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(),"INFO"])
+							log.debug("Message saved")
+							break
+						case "ErrorMessage":
+							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(),"ERROR"])
+							log.debug("ErrorMessage saved")
+							break
+						default:
+							break
+					}														
+				} catch (FrameParserException e){
+					log.warn("Failed to parse frame:${f} Error:${e.getMessage()}")
+				}
+			}
+					
+			// Update channel and board meta data
+			boards.each{ board ->
+				updateMetaInfo(db, board.value)
+			}
+				
+			log.info("${obsCount} observations imported")
+			return true
+
+
+		} catch (SQLException e){
+			log.error(e.getMessage())
+			return false
+		} finally {
+			try {
+				con.close()
+			} catch (SQLException e){
+				log.error(e.getMessage())
+			}
+		}
+	}
+
 
 
 	private Integer findOrSaveBoard(Sql db, String origin) throws SQLException {
@@ -69,9 +165,9 @@ class FrameService {
 	}
 
 	
-	private void updateMetaInfo(Sql db, BoardRecord boardRecord) throws SQLException {
+	private void updateMetaInfo(Sql db, Board board) throws SQLException {
 
-		def channels = boardRecord.channels
+		def channels = board.channels
 		db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
 												coalesce(c.check_delay,b.check_delay,0) as check_delay,
 												c.spline_id,
@@ -79,11 +175,10 @@ class FrameService {
 												coalesce(c.critical_min, b.critical_min) as critical_min, 
 												coalesce(c.warning_max, b.warning_max) as warning_max, 
 												coalesce(c.warning_min, b.warning_min) as warning_min 												 											
-										FROM channel c, board b WHERE b.id = c.board_id and b.id = ?""",[boardRecord.id]){ cha ->
+										FROM channel c, board b WHERE b.id = c.board_id and b.id = ?""",[board.id]){ cha ->
 
 					if(channels.containsValue((int)cha.id)){
 						log.debug("Update meta information for channel ${cha.id}")
-
 						//	Get values
 						def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from
 								(select * from (select * from observation  where channel_id = ? order by result_time desc limit 1) a
@@ -128,150 +223,18 @@ class FrameService {
 							db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ?",[obs.result_value, obs.result_time, status_valid, status_valid_msg.toString(), lastCount, cha.id])
 						}
 
-						def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [boardRecord.id])
-						if (b.lrt == boardRecord.lrt){
-							db.executeUpdate("update board set last_result_time = ?,status_valid = ?,last_rssi = ? where id = ?",[b.lrt, b.status, boardRecord.lrssi, boardRecord.id])
+						def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [board.id])
+						if (b.lrt == board.lrt){
+							db.executeUpdate("update board set last_result_time = ?,status_valid = ?,last_rssi = ? where id = ?",[b.lrt, b.status, board.lrssi, board.id])
 						} else {
-							db.executeUpdate("update board set last_result_time = ?,status_valid = ? where id = ?",[b.lrt, b.status, boardRecord.id])
+							db.executeUpdate("update board set last_result_time = ?,status_valid = ? where id = ?",[b.lrt, b.status, board.id])
 						}
 
 					}
 				}
 	}
+	
 
 
-
-	def saveFrames(String sender, String[] frames) {
-		if ((frames == null) || (sender == null)) return
-			Connection con = null
-		CopyIn cin = null
-		def boardRecords = [:]
-		def dataFrames = 0
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+00")
-		dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC")); 
-		try {
-			con = dataSource.getConnection()
-			Sql db = new Sql(con)
-			DefaultFrameHandler flatHandler = new DefaultFrameHandler(sender){
-					
-						private void startCopy(){
-							if (cin == null){
-								log.debug("startCopy")
-								CopyManager cm = ((PGConnection)con.unwrap(PGConnection.class)).getCopyAPI()
-								cin = cm.copyIn("COPY observation (channel_id,result_time,result_value) FROM STDIN WITH CSV")
-							}
-						}
-
-					    private void endCopy(){
-							if (cin != null){
-								log.debug("endCopy")
-								long r = cin.endCopy()
-								cin = null
-							}
-						}
-
-						void newOrigin(String origin) {
-							log.debug("New board:${origin}")
-							endCopy()
-							BoardRecord bc = boardRecords[origin]
-							if (bc == null){
-								boardRecords[origin] = new BoardRecord(id:FrameService.this.findOrSaveBoard(db, origin))
-							}
-						}
-
-						void newChannels(String origin, List<String> channels) {
-							log.debug("New channels:${channels} for board:${origin}")
-							endCopy()
-							BoardRecord bc = boardRecords[origin]
-							assert(bc!=null)
-							channels.removeAll(bc.channels.keySet())
-							for (String nr:channels){
-								bc.channels[nr] = FrameService.this.findOrSaveChannel(db, bc.id,nr)
-							}
-						}
-
-						void dataFrame(String origin, Date timeStamp, Hashtable<String,Float> values, Integer rssi) {
-							log.debug("DataFrame: Origin:${origin} Date:${timeStamp} Values:${values} Rssi:${rssi}")
-							startCopy()
-							BoardRecord bc = boardRecords[origin]
-							assert(bc!=null)
-
-							for (Map.Entry<String, Float> item : values.entrySet()) {
-								String nr  = item.getKey()
-								Float value  = item.getValue()
-								Integer id = bc.channels[nr]
-								if (id != null && !value.isNaN()){
-									StringBuffer sb = new StringBuffer(200);
-									sb.append(id).append(",").append(dateFormatter.format(timeStamp)).append(",").append(value).append("\n");
-									byte[] b = sb.toString().getBytes("UTF-8")
-									sb = null;
-									cin.writeToCopy(b,0,b.length)
-									dataFrames++;
-								}
-
-							}
-							bc.lrt = timeStamp
-							bc.lrssi = rssi
-						}
-
-
-						void insertMessage(String origin, Date date, String message, String type){
-							endCopy()
-							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[message, origin, date.toTimestamp(), type]);
-							log.debug("Message saved")
-
-						}
-
-						void message(String origin, Date date, String message) {
-							log.debug("Message:${message}")
-							insertMessage(origin,date,message,"INFO");
-						}
-
-						void error(String origin, Date date, String message) {
-							log.debug("Error:${message}")
-							insertMessage(origin,date,message,"ERROR");
-
-						}
-					}
-
-
-			FrameParser p = new FrameParser(flatHandler)		
-			log.info("Parsing ${frames.length} frames from: ${sender}")
-			for(String f:frames) {
-				try {
-					if (!Base64.isBase64(f)) {
-						log.warn("Invalid base64 character in frame:${f}")
-					} else {
-						p.parse(Base64.decodeBase64(f))
-					}
-				} catch (FrameParserException e){
-					log.warn("Failed to parse frame:${f} Error:${e.getMessage()}")
-				} 
-			}
-					
-			if (cin != null && cin.isActive()){
-				long r = cin.endCopy()
-			}
-
-			// Update channel and board meta data
-			boardRecords.each{ bc ->
-				updateMetaInfo(db, bc.value)
-			}
-
-			log.info("${dataFrames} observations imported")
-			return true
-
-
-		} catch (SQLException e){
-			log.error(e.getMessage())
-			return false
-		} finally {
-			try {
-				con.close()
-			} catch (SQLException e){
-				log.error(e.getMessage())
-			}
-		}
-	}
-
+	
 }
