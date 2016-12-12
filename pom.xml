@@ -104,7 +104,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<docker.hostname>132.180.112.244</docker.hostname>
+				<docker.hostname>docker</docker.hostname>
 				<docker.host>https://${docker.hostname}:2376</docker.host>
 				<db.url>jdbc:postgresql://db/xbee</db.url>
 			</properties>
