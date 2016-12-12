@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title>All Users</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th><a class="sorted" sd:pagination-sort="userName"	th:text="#{user.name}">Username</a></th>					
+					<th><a class="sorted" sd:pagination-sort="role"
+						th:text="#{user.role}">Role</a></th>
+					<th><a class="sorted" sd:pagination-sort="locked"
+						th:text="#{user.locked}">Locked</a></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="u : ${users}">
+					<td><a th:href="@{/users/{id}(id=${u.id})}" th:text="${u.userName}">User A</a></td>
+					<td th:text="${u.role}">Role</td>
+					<td><div th:include="boolean::yesno (${u.locked})"></div></td>					
+					<td>
+						<div class="pull-right">
+							<form class="form-inline" th:action="@{'/users/' + ${u.id}}"
+								th:method="delete">
+								<input type="submit" th:value="#{action.delete}" class="btn btn-xs btn-default" value="Delete" th:onclick="#{dialog.confirm}" />
+							</form>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="row">
+			<div class="col-sm-6">
+				<div sd:pagination-summary="">info</div>
+			</div>
+			<div class="col-sm-6">
+				<nav class="pull-right">
+					<ul class="pagination" sd:pagination="full">
+						<!-- Pagination created by SpringDataDialect, this content is just for mockup -->
+						<li class="disabled"><a href="#" aria-label="Previous"><span
+								aria-hidden="true">&laquo;</span></a></li>
+						<li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

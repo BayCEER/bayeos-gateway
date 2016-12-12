@@ -1,0 +1,16 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head>	
+</head>
+<div th:fragment="onoff(value)">
+<div th:switch="${value}">
+  	<span th:case="true" th:text="#{state.on}">On</span>
+  	<span th:case="false" th:text="#{state.off}">Off</span>
+</div>
+</div>
+<div th:fragment="yesno(value)">
+<div th:switch="${value}">
+  	<span th:case="true" th:text="#{state.yes}">Yes</span>
+  	<span th:case="false" th:text="#{state.no}">No</span>
+</div>
+</div>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{user.edit}">Edit user</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<form method="post" action="#" th:action="@{/users/save}" th:object="${user}">
+		 	<input type="hidden" th:field="*{id}"/>
+			<div class="form-group">
+				<label th:text="#{user.name} + ':'" for="userName">Name:</label> 
+				<input type="text" class="form-control" id="userName" placeholder="Name" th:field="*{userName}"/>
+			</div>
+			<div class="form-group">
+				<label th:text="#{user.password} + ':'" for="password">Password:</label>
+				<input type="password" class="form-control" id="password" placeholder="Password" th:field="*{password}"/>
+			</div>
+			<div class="form-group">
+				<label th:text="#{user.role} + ':'" for="role">Role:</label>
+				<ul class="list-inline">
+					<li th:each="ro : ${allRoles}">
+						<input type="radio" th:field="*{role}" th:value="${ro}" />
+						<label th:for="${#ids.prev('role')}" th:text="${ro}">Rolle A</label></li>
+				</ul>
+			</div>
+			
+			<div class="checkbox">
+				<label>
+					 <input th:text="#{user.locked}" type="checkbox" th:field="*{locked}" th:value="${user.locked}"/>
+				</label>								
+			</div>
+			
+			<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+	</div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"  xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
+<head>
+	<title>Edit Board</title>        
+</head>
+<body>
+<div layout:fragment="content">	   
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Channel</th>
+				<th>Last Value</th>
+				<th>Label [Unit]</th>
+				<th>Last Result Time</th>
+				<th>Nagios</th>
+				<th></th>				
+			</tr>			
+		</thead>
+		<tbody>			
+            <tr th:each="cha : ${board.channels}">
+          		<td><a href="editChannel.html" th:href="@{'/channels/' + ${cha.id}}" th:text="${cha.nr}">Nr</a></td>
+          		<td th:text="${cha.lastResultValue}"></td>            		      
+          		<td th:text="${cha.unit} ? ${cha.unit.name}"></td>
+          		<td th:text="${{cha.lastResultTime}}"></td>
+          		<td></td>
+          		<td></td>
+            </tr>
+		</tbody>			
+	</table>			
+</div>
+</body>
+</html>

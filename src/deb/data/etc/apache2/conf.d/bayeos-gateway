@@ -1,4 +1,0 @@
-JkMount /manager/* ajp13_worker
-JkMount /gateway/* ajp13_worker
-JkMountCopy ALL
-  
