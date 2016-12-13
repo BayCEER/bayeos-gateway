@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"  xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
 <head>
 	<title th:text="#{board.list}">Board list</title>        
@@ -116,11 +116,15 @@
                      }
                     },
                     { searchable: false, sortable: false,
-                      render: function ( data, type, row ) {                      	                         	    
+                      render: function ( data, type, row ) {
+                      var msg = /*[[ #{status.ok} ]]*/                      	                         	    
                     	    var ret = '<td class="link">';
-            		        ret += '<a class="btn btn-xs btn-default" href="./boards/' + row.id + '"><span class="glyphicon glyphicon-edit"></span> Edit</a>';
-            		        ret += '<a class="btn btn-xs btn-default" href="./charts/' + row.id + '"><span class="glyphicon glyphicon-stats"></span> Chart</a>';
-            		        ret += '<a class="btn btn-xs btn-default" href="./boards/delete/' + row.id + '" onclick="return confirm(\'Are you sure?\');"><span class="glyphicon glyphicon-remove"></span> Remove</a>';
+                    	    var edit = /*[[ #{action.edit} ]]*/
+                    	    var chart = /*[[ #{action.chart} ]]*/
+                    	    var del = /*[[ #{action.delete} ]]*/
+            		        ret += '<a class="btn btn-xs btn-default" href="./boards/' + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + edit + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default" href="./charts/' + row.id + '"><span class="glyphicon glyphicon-stats"></span> ' + chart + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default" href="./boards/delete/' + row.id + '" onclick="return confirm(\'Are you sure?\');"><span class="glyphicon glyphicon-remove"></span> ' + del + '</a>';
             			    return ret += '</td>';
                 		}	
                     }

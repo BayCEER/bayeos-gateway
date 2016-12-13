@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<!--  Add Button   -->
+<a th:fragment="add(href)" class="btn btn-xs btn-default" th:href="${href}"> <span
+		class="glyphicon glyphicon-plus"></span> <span
+		th:text="#{action.create}"></span>
+</a>
+
+<!--  Delete Button   -->
+<form th:fragment="delete(href)" class="form-inline" th:action="${href}" th:method="delete">
+		<button type="submit" class="btn btn-xs btn-default" value="Delete"
+			th:onclick="#{dialog.confirm}">
+			<span class="glyphicon glyphicon-remove"></span> <span
+				th:text="#{action.delete}"></span>
+		</button>
+</form>
+
+<!--  Pagination row below table  -->
+<div th:fragment="pagination" class="row">
+	<div class="col-sm-6">
+		<div sd:pagination-summary="">info</div>
+	</div>
+	<div class="col-sm-6">
+		<nav class="pull-right">
+			<ul class="pagination" sd:pagination="full">
+			</ul>
+		</nav>
+	</div>
+</div>
+
+
+</html>

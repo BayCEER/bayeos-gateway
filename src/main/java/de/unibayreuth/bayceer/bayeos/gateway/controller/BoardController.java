@@ -14,7 +14,6 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 
 
 @Controller
-
 public class BoardController {
 		
 	@Autowired

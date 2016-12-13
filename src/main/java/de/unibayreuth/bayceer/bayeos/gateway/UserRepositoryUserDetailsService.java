@@ -42,14 +42,15 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userName)
-            throws UsernameNotFoundException {
-    	
+            throws UsernameNotFoundException {    	
         User user = userRepository.findByUserName(userName);        
         if(user == null) {
             throw new UsernameNotFoundException("Could not find user " + userName);
-        }
+        } 
         return new CustomUserDetails(user);
     }
+    
+    
 
     private final static class CustomUserDetails extends User implements UserDetails {
 

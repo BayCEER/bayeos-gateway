@@ -46,13 +46,31 @@
 							<li th:if="${currentUser.isAdmin()}"  class="dropdown"><a class="dropdown-toggle" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="#"><span
 									class="glyphicon glyphicon-wrench"></span> <span th:text="#{nav.admin}">Administration</span><span class="caret"></span></a>
 								<ul class="dropdown-menu">
-									<li th:classappend="${controllerName == 'BoardTemplate'}? 'active'"><a th:text="#{nav.boardTemplate}" th:href="@{/templates}"><span class="glyphicon glyphicon-hdd"></span> <span th:text="nav.boardTemplate">Board Templates</span></a></li>
-									<li th:classappend="${controllerName == 'User'}? 'active'"><a th:href="@{/users}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{nav.users}">Users</span></a></li>
-									<li class="divider" role="separator"></li>									
-									<li th:classappend="${controllerName == 'Function'}? 'active'"><a th:href="@{/functions}" th:text="#{nav.functions}">Functions</a></li>
-									<li th:classappend="${controllerName == 'Interval'}? 'active'"><a th:href="@{/intervals}" th:text="#{nav.intervals}">Intervals</a></li>
+									<li th:classappend="${controllerName == 'BoardTemplate'}? 'active'">
+										<a th:href="@{/templates}">
+											<span class="glyphicon glyphicon-hdd"></span> <span th:text="#{nav.boardTemplate}">Board Templates</span>
+										</a>
+									</li>
+									<li th:classappend="${controllerName == 'User'}? 'active'">
+										<a th:href="@{/users}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{nav.users}">Users</span></a></li>
 									<li class="divider" role="separator"></li>
-									<li th:classappend="${controllerName == 'Spline'}? 'active'"><a th:href="@{/splines}"><span class="glyphicon glyphicon-resize-horizontal"></span> <span th:text="#{nav.splines}">Splines</span></a></li>
+																		
+									<li th:classappend="${controllerName == 'Function'}? 'active'">
+										<a th:href="@{/functions}">
+											<span class="glyphicon glyphicon-resize-vertical"></span> <span th:text="#{nav.functions}">Functions</span>
+										</a>
+									  </li>
+									  
+									<li th:classappend="${controllerName == 'Interval'}? 'active'">
+										<a th:href="@{/intervals}">
+										<span class="glyphicon glyphicon-resize-horizontal"></span> <span th:text="#{nav.intervals}">Intervals</span>
+										</a>
+									</li>
+										
+									<li class="divider" role="separator"></li>
+									<li th:classappend="${controllerName == 'Spline'}? 'active'">
+										<a th:href="@{/splines}">
+										<span class="glyphicon glyphicon-share-alt"></span> <span th:text="#{nav.splines}">Splines</span></a></li>
 									<li th:classappend="${controllerName == 'Unit'}? 'active'"><a th:href="@{/units}"><span class="glyphicon glyphicon-tag"></span> <span th:text="#{nav.units}">Units</span></a></li>
 								</ul>
 							</li>													

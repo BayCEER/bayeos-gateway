@@ -5,31 +5,49 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name="users")
 public class User extends UniqueEntity {
 	
-	@Column(name="username")	
+	@Column(name="username")
+	@NotEmpty
+	
 	private String userName;
 
-	@NotEmpty(message = "Password is required.")	
+	@Column(name="password")
 	private String password;
-
+	
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	
 	
 	@Column(name="account_locked")
 	private Boolean locked = false;
 	
-	public User() {
-
+	@Transient
+	private String newPassword;
+	
+	
+	public String getNewPassword() {
+		return newPassword;
 	}
 
-	
 
+	public void setNewPassword(String password) {
+		this.newPassword = password;
+	}
+
+
+
+	public User(){
+		
+	}
+	
+	
+	
 	public Boolean getLocked() {
 		return locked;
 	}
@@ -80,15 +98,6 @@ public class User extends UniqueEntity {
 	public void setRole(Role role) {
 		this.role = role;
 	}
-	
-	
-//	@PrePersist
-//	public void hashPassword(){
-//		MessageDigestPasswordEncoder pwe = new ShaPasswordEncoder();
-//		pwe.setEncodeHashAsBase64(true);		
-//		this.password = pwe.encodePassword(this.password,null );
-//	}
-	
 	
 	
 }
