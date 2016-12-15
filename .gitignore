@@ -1,5 +1,9 @@
-/target/
-/.mvn/
-/.settings/
+# Eclipse
 .project
 .classpath
+.settings/
+
+# Maven
+target/
+.mvn/
+
