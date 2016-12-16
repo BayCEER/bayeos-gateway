@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.splines}">All functions</title>
+</head>
+<body>
+	<div layout:fragment="content">
+			<h3 th:text="#{nav.splines}">Splines</h3>			
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+						<th><a class="sorted" sd:pagination-sort="name"
+							th:text="#{a.name}">Name</a></th>
+						<th>
+							<div class="pull-right">
+								<div th:replace="table::add(@{'/splines/create'})">
+							</div>				
+					</div>
+						</th>
+					</tr>					
+			
+				</thead>
+				<tbody>
+					<tr th:each="i : ${splines}">
+						<td><a th:href="@{/splines/{id}(id=${i.id})}"
+							th:text="${i.name}">Name A</a></td>
+						<td>
+							<div class="pull-right">																				
+								<div th:replace="table::edit(@{'/splines/' + ${i.id}})"></div>
+								<div th:replace="table::delete(@{'/splines/delete/' + ${i.id}})"></div>
+							</div>  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

@@ -5,7 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
-class ExportJobStat extends UniqueEntity {	
+public class ExportJobStat extends UniqueEntity {	
 	
 	@Column(name="start_time")
 	Date startTime;

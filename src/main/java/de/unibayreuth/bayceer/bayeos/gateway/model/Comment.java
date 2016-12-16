@@ -7,7 +7,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-class Comment extends UniqueEntity {	
+public class Comment extends UniqueEntity {	
 	
 	@ManyToOne
 	@JoinColumn(name="user_id",nullable=false)

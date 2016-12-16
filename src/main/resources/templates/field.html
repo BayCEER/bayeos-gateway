@@ -6,6 +6,8 @@
 <body>
 
 
+
+
 <div th:fragment="text(prop,label)" th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
 				<label th:text="${label}+ ':'" class="control-label">Text:</label> 
 				<input type="text" class="form-control" th:field="*{__${prop}__}"/>

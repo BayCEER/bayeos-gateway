@@ -4,7 +4,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Column;
 
 @MappedSuperclass
-abstract class CheckDevice extends UniqueEntity {	
+public abstract class CheckDevice extends UniqueEntity {	
 	// Validation Check
 	@Column(name="critical_max")
 	Float criticalMax;

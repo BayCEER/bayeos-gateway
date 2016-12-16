@@ -31,6 +31,7 @@ class DeleteJob implements Runnable {
 			try {
 				log.info("DeleteJob running")
 				def db = new Sql(dataSource)
+				
 				try {
 					log.info("Deleting observations older than ${retention}.")
 					db.execute("delete from observation where insert_time < now() - ?::interval",[retention])

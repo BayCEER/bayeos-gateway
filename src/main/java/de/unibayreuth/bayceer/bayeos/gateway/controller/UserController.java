@@ -66,7 +66,7 @@ public class UserController {
 	}
 	
 		
-	@RequestMapping(value="/users/{id}", method=RequestMethod.DELETE)
+	@RequestMapping(value="/users/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect) {
 		repo.delete(id);
 		redirect.addFlashAttribute("globalMessage", "User removed successfully");

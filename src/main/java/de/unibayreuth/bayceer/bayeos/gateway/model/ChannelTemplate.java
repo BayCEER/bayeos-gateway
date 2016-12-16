@@ -6,7 +6,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-class ChannelTemplate extends CheckDevice {
+public class ChannelTemplate extends CheckDevice {
 	
 	String nr;
 	String label;

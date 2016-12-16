@@ -4,15 +4,17 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 @Entity
-class Spline extends UniqueEntity { 
+public class Spline extends UniqueEntity { 
 	
 	
     String name;
     
 	@OneToMany(mappedBy="spline")
-	List<KnotPoint> knotePoints;
+	@OrderBy("x ASC")
+	List<KnotPoint> knotPoints;
 
 	public String getName() {
 		return name;
@@ -22,12 +24,12 @@ class Spline extends UniqueEntity {
 		this.name = name;
 	}
 
-	public List<KnotPoint> getKnotePoints() {
-		return knotePoints;
+	public List<KnotPoint> getKnotPoints() {
+		return knotPoints;
 	}
 
-	public void setKnotePoints(List<KnotPoint> knotePoints) {
-		this.knotePoints = knotePoints;
+	public void setKnotPoints(List<KnotPoint> knotPoints) {
+		this.knotPoints = knotPoints;
 	}
 	         
    

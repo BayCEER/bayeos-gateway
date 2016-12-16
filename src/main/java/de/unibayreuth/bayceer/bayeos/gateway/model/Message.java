@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
-class Message extends UniqueEntity {
+public class Message extends UniqueEntity {
 	
 
 	String origin;		

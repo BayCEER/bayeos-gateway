@@ -10,7 +10,7 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @MappedSuperclass
-abstract class UniqueEntity {
+public abstract class UniqueEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	
 	@JsonView(DataTablesOutput.View.class)

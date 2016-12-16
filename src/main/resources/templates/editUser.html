@@ -3,10 +3,11 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="main">
 <head>
-<title th:text="#{user.edit}">Edit user</title>
+<title th:text="#{e.user}">User</title>
 </head>
 <body>
 	<div layout:fragment="content">
+		<h3 th:text="#{e.user}">Edit user</h3>
 		<form method="post" action="#" th:action="@{/users/save}" th:object="${user}">
 		 	<input type="hidden" th:field="*{id}"/>						
 			<div th:replace="field::text('userName',#{user.name})"></div>			

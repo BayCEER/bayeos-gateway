@@ -5,19 +5,24 @@
 </head>
 
 <!--  Add Button   -->
-<a th:fragment="add(href)" class="btn btn-xs btn-default" th:href="${href}"> <span
+<a th:fragment="add(href)" class="btn btn-default btn-sm" th:href="${href}"> <span
 		class="glyphicon glyphicon-plus"></span> <span
 		th:text="#{action.create}"></span>
 </a>
 
+
+<!--  Edit Button   -->
+<a th:fragment="edit(href)" class="btn btn-default btn-sm" th:href="${href}"> <span
+		class="glyphicon glyphicon-edit"></span> <span
+		th:text="#{action.edit}"></span>
+</a>
+
 <!--  Delete Button   -->
-<form th:fragment="delete(href)" class="form-inline" th:action="${href}" th:method="delete">
-		<button type="submit" class="btn btn-xs btn-default" value="Delete"
-			th:onclick="#{dialog.confirm}">
-			<span class="glyphicon glyphicon-remove"></span> <span
-				th:text="#{action.delete}"></span>
-		</button>
-</form>
+<a th:fragment="delete(href)" class="btn btn-default btn-sm" th:href="${href}"> <span
+		class="glyphicon glyphicon-remove"></span> <span
+		th:text="#{action.delete}" th:onclick="#{dialog.confirm}"></span>
+</a>
+
 
 <!--  Pagination row below table  -->
 <div th:fragment="pagination" class="row">

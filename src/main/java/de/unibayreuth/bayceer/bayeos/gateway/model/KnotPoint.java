@@ -5,7 +5,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-class KnotPoint  extends UniqueEntity {   
+public class KnotPoint  extends UniqueEntity {   
 	
 	
     Float x;

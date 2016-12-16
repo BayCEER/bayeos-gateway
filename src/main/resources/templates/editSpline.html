@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.spline}">Spline</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.spline}">Spline</h3>
+		<form method="post" action="#" th:action="@{/splines/save}" th:object="${spline}">
+		 	<input type="hidden" th:field="*{id}"/>		 						
+			<div th:replace="field::text('name',#{a.name})"></div>				
+			<div class="form-group">
+				<label th:text="#{nav.knotPoints} + ':'">Knot Points:</label>
+				
+				<div class="btn-group pull-right btn-sm">
+					<div th:replace="table::add(@{'/knotepoint/create/' + ${spline.id}})"></div>
+				</div>
+				
+				<table class="table table-striped" >
+				<thead>	
+					<tr>
+						
+					
+					</tr>			
+				</thead>
+				<tbody>
+					<tr th:each="k : ${spline.knotPoints}">
+						<td><a th:href="@{/knotPoints/{id}(id=${k.id})}"
+							th:text="${k.x} + ';' + ${k.y}"></a></td>
+						<td>
+							<div class="pull-right">																				
+								<div th:replace="table::edit(@{'/knotPoints/' + ${k.id}})"></div>
+								<div th:replace="table::delete(@{'/knotPoints/delete/' + ${k.id}})"></div>
+							</div>  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+			</div>		
+					
+					
+			<button th:text="#{action.submit}" type="submit" class="btn btn-default">Submit</button>
+		</form>
+	</div>
+</body>
+</html>

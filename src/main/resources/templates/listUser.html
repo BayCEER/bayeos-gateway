@@ -3,20 +3,23 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="main">
 <head>
-<title>All Users</title>
+<title th:text="#{nav.users}">All Users</title>
 </head>
 <body>
 	<div layout:fragment="content">	
-		<div class="btn-group">
-			<div th:replace="table::add(@{'/users/create'})"></div>									
-		</div> 	
+		<h3 th:text="#{nav.users}">Users</h3>
+		 	
 		<table class="table table-striped">
 			<thead>
 				<tr>
 					<th><a class="sorted" sd:pagination-sort="userName"	th:text="#{user.name}">Username</a></th>					
 					<th><a class="sorted" sd:pagination-sort="role"	th:text="#{user.role}">Role</a></th>
 					<th><a class="sorted" sd:pagination-sort="locked" th:text="#{user.locked}">Locked</a></th>
-					<th></th>
+					<th>
+						<div class="btn-group pull-right">
+							<div th:replace="table::add(@{'/users/create'})"></div>									
+						</div>
+					</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -26,16 +29,14 @@
 					<td><div th:include="boolean::yesno (${u.locked})"></div></td>					
 					<td>
 						<div class="pull-right">
-							<div th:replace="table::delete(@{'/users/' + ${u.id}})"></div>	
+							<div th:replace="table::edit(@{'/users/' + ${u.id}})"></div>													
+							<div th:replace="table::delete(@{'/users/delete/' + ${u.id}})"></div>							
 						</div>
 					</td>
 				</tr>
 			</tbody>
 		</table>				
-		<div th:replace="table::pagination">
-		</div>
-
-		
+		<div th:replace="table::pagination"></div>
 	</div>
 </body>
 </html>
