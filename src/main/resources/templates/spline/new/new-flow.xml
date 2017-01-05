@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+		
+	<var name="spline" class="de.unibayreuth.bayceer.bayeos.gateway.model.Spline"/>	
+	
+    <view-state id="name" model="spline" view="/spline/new/name">
+		<binder>            	
+            	<binding property="name"></binding>            
+        </binder>                
+        <transition on="next" to="knotpoints">
+		</transition>		        
+    </view-state>
+    
+    <view-state id="knotpoints" model="spline" view="/spline/new/knotpoints">
+    	<transition on="addPoint" to="knotpoint">
+		</transition>		
+		<transition on="removePoint" to="spline">
+			<evaluate expression="spline.removeKnotPoint(flowScope.point)"/>
+		</transition>
+		
+		<transition on="submit" to="created">
+    	   	<evaluate expression="splineRepository.save(spline)"/>
+    	</transition>
+    	<transition on="back" to="name"/>
+    	
+    </view-state>
+    
+    <view-state id="knotpoint" model="point" view="/spline/new/knotpoint">    	   
+    	<on-entry>
+    		<set name="flowScope.point" value="new de.unibayreuth.bayceer.bayeos.gateway.model.KnotPoint()"></set>
+    	</on-entry>    
+    	<transition on="submit" to="knotpoints">
+    		<evaluate expression="spline.addKnotPoint(flowScope.point)"></evaluate>
+    	</transition>
+    	
+    	<transition on="back" to="knotpoints"/>
+    </view-state>
+        
+    <end-state id="created" view="externalRedirect:contextRelative:/splines">
+    	<output name="globalMessage" value="'Spline created.'" />
+    </end-state>
+    
+    <end-state id="canceled" view="externalRedirect:contextRelative:/splines"/>
+    
+    <global-transitions>
+			<transition on="cancel" to="canceled" />			
+	</global-transitions>
+
+</flow>
