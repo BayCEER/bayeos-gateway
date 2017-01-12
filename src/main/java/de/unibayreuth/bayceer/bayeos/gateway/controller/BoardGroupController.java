@@ -34,7 +34,7 @@ public class BoardGroupController extends AbstractCRUDController {
 	@RequestMapping(value="/groups/create",method=RequestMethod.GET)
 	public String create(Model model){
 		model.addAttribute("group",new BoardGroup());
-		return "editBoardGroup";
+		return "createBoardGroup";
 	}
 	
 	@RequestMapping(value="/groups/save", method=RequestMethod.POST)

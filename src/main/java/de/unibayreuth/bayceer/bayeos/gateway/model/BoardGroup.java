@@ -1,11 +1,14 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
-import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -14,6 +17,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Entity
 public class BoardGroup extends UniqueEntity{
 	String name;
+		
+	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.ALL)
+	public List<Board> boards;
 
 	@Column(name="db_folder_id")
 	Integer dbFolderId;
@@ -35,13 +41,50 @@ public class BoardGroup extends UniqueEntity{
 		this.dbFolderId = dbFolderId;
 	}
 	
-	@Formula("(select count(*) from board where board.board_group_id = id)")
-	public Integer boardCount;
+	// @Formula("(select count(*) from board where board.board_group_id = id)")	
+	@Transient
+	public Integer getBoardCount(){
+		return boards.size();
+	};
 	
-	@Formula("(select max(board.last_result_time) from board where board.board_group_id = id)")
-	public Date lastResultTime;
+	
+	// @Formula("(select max(board.last_result_time) from board where board.board_group_id = id)")
+	@Transient
+	public Date getLastResultTime(){
+		Date d = null;
+		if (boards != null){
+			for(Board b:boards){
+				if (d == null){
+					d = b.getLastResultTime();
+				} else {					
+					if (b.getLastResultTime().after(d)){
+						d = b.getLastResultTime();
+					}					
+				}				
+			}
+		}
+		return d;		
+	};
 
-	@Formula("(select get_group_status(id))")
-	public Integer groupStatus;
+	// @Formula("(select get_group_status(id))")	
+	@Transient
+	public Integer getGroupStatus(){
+		Integer ret = null;		
+		if (boards != null){
+			for(Board b:boards){
+				if (ret == null) {
+					ret = b.getStatus();
+				} else {
+					if (b.getStatus() > ret){
+						ret = b.getStatus();
+					}	
+				}				
+			}
+		}
+		return ret;
+	};
+	
+	
+	
 	
 }
