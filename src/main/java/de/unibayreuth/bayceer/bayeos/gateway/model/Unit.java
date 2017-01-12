@@ -13,7 +13,21 @@ public class Unit extends UniqueEntity  {
 
 	@Column(name="db_unit_id")
 	private Integer dbUnitId;
+	
+	
 
+	public Unit() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Unit(String id){
+		if (id != null && !id.equals("")){			
+			this.id = Long.valueOf(id);						
+		}
+	}
+
+	
 	public String getName() {
 		return name;
 	}
@@ -36,6 +50,11 @@ public class Unit extends UniqueEntity  {
 
 	public void setDbUnitId(Integer dbUnitId) {
 		this.dbUnitId = dbUnitId;
+	}
+	
+	@Override
+	public String toString() {
+		return this.name;
 	}
 
 	

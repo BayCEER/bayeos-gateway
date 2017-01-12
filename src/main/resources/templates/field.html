@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,16 +8,30 @@
 
 
 
-<div th:fragment="text(prop,label)" th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
-				<label th:text="${label}+ ':'" class="control-label">Text:</label> 
-				<input type="text" class="form-control" th:field="*{__${prop}__}"/>
+<div th:fragment="text(prop,label,required)"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
+				<label th:text="${label} + (${required} ? '*':'') + ':'" class="control-label">Text:</label> 
+				<input type="text" class="form-control" th:field="*{__${prop}__}" th:required="${required}"/>
+				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
+</div>
+
+<div th:fragment="number(prop,label,required)"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
+				<label th:text="${label} + (${required} ? '*':'') + ':'" class="control-label">Text:</label> 
+				<input type="number" class="form-control" th:field="*{__${prop}__}" th:required="${required}"/>
+				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
+</div>
+
+<div th:fragment="url(prop,label,required)"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
+				<label th:text="${label} + (${required} ? '*':'') + ':'" class="control-label">Text:</label> 
+				<input type="url" class="form-control" th:field="*{__${prop}__}" th:required="${required}"/>
 				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
 </div>
 
 
-<div th:fragment="password(prop,label)" class="form-group">
-				<label th:text="${label} + ':'">Password:</label>
-				<input type="password" class="form-control" th:field="*{__${prop}__}"/>
+
+
+<div th:fragment="password(prop,label,required)" class="form-group">
+				<label th:text="${label} + (${required} ? '*':'') + ':'">Password:</label>
+				<input type="password" class="form-control"  th:required="${required}"  th:field="*{__${prop}__}"/>
 </div>
 
 <div th:fragment="checkbox(prop,label)" class="checkbox">
@@ -34,9 +48,26 @@
 						<input type="radio"  th:field="*{__${prop}__}" th:value="${r}" />
 						<label th:text="${r}">Property</label></li>
 				</ul>
-
 </div>
 			
+
+<div th:fragment="select(prop,label,option,required)" class="form-group">
+		<label th:text="${label} + ':'">Select:</label>
+		<select class="form-control" th:field="*{__${prop}__}">
+				<option th:value="NULL" th:unless="${required}"></option>
+				<option th:each="o : ${option}" th:text="${o}" th:value="${o.id}"></option>													
+		</select>		
+</div>
+
+
+<div th:fragment="status(code)">
+<div th:switch="${code}">
+  	<span th:case="0" class="label label-success" th:text="#{status.ok}">Ok</span>
+  	<span th:case="1" class="label label-warning" th:text="#{status.warning}">Warning</span>
+  	<span th:case="2" class="label label-danger" th:text="#{status.critical}">Critical</span>
+  	<span th:case="*"></span>  										
+</div>
+</div>
 
 </body>
 </html>

@@ -47,8 +47,8 @@
 									class="glyphicon glyphicon-wrench"></span> <span th:text="#{nav.admin}">Administration</span><span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									<li th:classappend="${controllerName == 'BoardTemplate'}? 'active'">
-										<a th:href="@{/templates}">
-											<span class="glyphicon glyphicon-hdd"></span> <span th:text="#{nav.boardTemplate}">Board Templates</span>
+										<a th:href="@{/boardTemplates}">
+											<span class="glyphicon glyphicon-hdd"></span> <span th:text="#{nav.boardTemplates}">Board Templates</span>
 										</a>
 									</li>
 									<li th:classappend="${controllerName == 'User'}? 'active'">

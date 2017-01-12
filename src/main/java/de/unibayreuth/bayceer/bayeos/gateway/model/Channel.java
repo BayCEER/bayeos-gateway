@@ -21,6 +21,9 @@ public class Channel extends CheckDevice {
 	@Column(name="last_result_value")
 	private Float lastResultValue;
 
+	
+	@Column(name="spline_id")
+	private Integer splineId;
 
 	@Column(name="db_series_id")
 	private Integer dbSeriesId;
@@ -36,6 +39,9 @@ public class Channel extends CheckDevice {
 	@JoinColumn(name="unit_id", nullable = true)
 	private Unit unit;
 
+	
+	
+	
 	public Channel() {
 	}
 

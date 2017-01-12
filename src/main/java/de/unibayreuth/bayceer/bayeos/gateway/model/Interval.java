@@ -13,8 +13,11 @@ public class Interval extends UniqueEntity {
 	@NotEmpty
     String name	;
 	
-	public Interval(String name) {
-		this.name = name;
+	
+	public Interval(String id) {
+		if (id != null && !id.equals("")){			
+			this.id = Long.valueOf(id);						
+		}
 	}
     
     public Interval() {
@@ -36,5 +39,9 @@ public class Interval extends UniqueEntity {
 		return epoch;
 	}
 	
+	@Override
+	public String toString() {
+		return name;
+	}
     	
 }

@@ -10,17 +10,22 @@
 		th:text="#{action.create}"></span>
 </a>
 
-
 <!--  Edit Button   -->
-<a th:fragment="edit(href)" class="btn btn-default btn-sm" th:href="${href}"> <span
+<a th:fragment="edit(href,locked)" th:unless="${locked}" class="btn btn-default btn-sm" th:href="${href}"> <span
 		class="glyphicon glyphicon-edit"></span> <span
 		th:text="#{action.edit}"></span>
 </a>
 
 <!--  Delete Button   -->
-<a th:fragment="delete(href)" class="btn btn-default btn-sm" th:href="${href}"> <span
+<a th:fragment="delete(href,locked)" th:unless="${locked}" class="btn btn-default btn-sm" th:href="${href}" th:onclick="#{dialog.confirm}"> <span
 		class="glyphicon glyphicon-remove"></span> <span
-		th:text="#{action.delete}" th:onclick="#{dialog.confirm}"></span>
+		th:text="#{action.delete}"></span>
+</a>
+
+<!--  Export Button   -->
+<a th:fragment="export(href)" class="btn btn-default btn-sm" th:href="${href}"> <span
+		class="glyphicon glyphicon-save"></span> <span
+		th:text="#{action.export}"></span>
 </a>
 
 

@@ -1,41 +1,62 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ChannelTemplate extends CheckDevice {
+public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTemplate>{
+	
+	
+	private static final long serialVersionUID = -2463673550735591743L;
 	
 	String nr;
 	String label;
-	String phenomena;
+	String phenomena;	
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="unit_id", nullable = true)
-	Unit unit;
+	@ManyToOne()
+	@JoinColumn(name="unit_id")
+	Unit unit = new Unit();
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="spline_id", nullable = true)
-	Spline spline;	
+	@ManyToOne()
+	@JoinColumn(name="spline_id")
+	Spline spline = new Spline();
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="aggr_interval_id", nullable = false)
-	Interval aggrInterval;
+	@ManyToOne()
+	@JoinColumn(name="aggr_interval_id")
+	Interval aggrInterval = new Interval();
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="aggr_function_id", nullable = false)
-	Function aggrFunction;			
+	
+	@ManyToOne()
+	@JoinColumn(name="aggr_function_id")
+	Function aggrFunction = new Function();			
 		
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne()
 	@JoinColumn(name="board_template_id", nullable = false)
 	BoardTemplate boardTemplate;
+	
+
+	
+	public ChannelTemplate(String nr, String label, String phenomena, 
+			Unit unit, Spline spline, Interval aggrInterval, Function aggrFunction) {
+		super();
+		this.nr = nr;
+		this.label = label;
+		this.phenomena = phenomena;
+		this.unit = unit;
+		this.spline = spline;		
+		this.aggrInterval = aggrInterval;
+		this.aggrFunction = aggrFunction;
+	}
+	
+	public ChannelTemplate() {
+		super();		
+	}
 
 	public String getNr() {
 		return nr;
 	}
-
+		
 	public void setNr(String nr) {
 		this.nr = nr;
 	}
@@ -95,5 +116,26 @@ public class ChannelTemplate extends CheckDevice {
 	public void setBoardTemplate(BoardTemplate boardTemplate) {
 		this.boardTemplate = boardTemplate;
 	}
+
+	private boolean isNr(String s){
+		return s != null && s.matches("[0-9]+");
+	}
 	
+	@Override
+	public int compareTo(ChannelTemplate o) {		
+		if (isNr(nr)  && isNr(o.nr)){
+			return Integer.valueOf(nr).compareTo(Integer.valueOf(o.nr));
+		} else {
+			return nr.compareTo(o.nr);
+		}		
+	}
+	
+	@Override
+	public String toString() {		
+		StringBuffer f = new StringBuffer();
+		f.append("Nr:").append(nr).append(",Label:").append(label).append(",Phenomena:").append(phenomena).append(",Unit:").append(unit).append(",Spline:").append(spline).append(",Interval:").append(aggrInterval);
+		f.append(",Function:").append(aggrFunction);
+		return f.toString();			
+	}
+		
 }

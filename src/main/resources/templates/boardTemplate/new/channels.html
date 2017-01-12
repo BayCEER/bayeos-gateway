@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+	<title th:text="#{e.boardTemplate}">Board Template</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h2 th:text="#{e.boardTemplate}">Board Template</h2>
+		<form method="post" th:object="${boardTemplate}" th:action="${flowExecutionUrl}">			
+			<div id="channels" class="block">
+		 		<div class="block-header" th:text="#{e.channels}">Channels</div>	
+		 		<table class="table table-striped">
+		 			<thead>
+		 				<tr>
+		 					<th>
+		 						<span th:text="#{chaTemplate.nr}">Number</span>
+							</th>
+							<th>
+		 						<span th:text="#{chaTemplate.label}">Label</span>
+							</th>
+							<th>
+		 						<span th:text="#{chaTemplate.phenomena}">Phenomena</span>
+							</th>
+							<th>
+							<div class="pull-right">
+								<div th:replace="table::add(${flowExecutionUrl}+'&amp;_eventId=add')"></div>				
+							</div>
+							</th>
+		 				</tr>
+		 			</thead>
+		 			<tbody>
+		 				<tr th:each="t : ${boardTemplate.templates}">
+						<td><a th:href="${flowExecutionUrl}+'&amp;_eventId=edit' + '&amp;index=' + ${tStat.index}"	th:text="${t.nr}">Nr</a>
+						</td>					
+						<td th:text="${t.label}">Label</td>
+						<td th:text="${t.phenomena}">Phenomena</td>
+						<td>
+							<div class="pull-right">
+								<div th:replace="table::delete(${flowExecutionUrl}+'&amp;_eventId=remove&amp;index=' + ${tStat.index} ,false)"></div>																									
+							</div>  								  								  								
+						</td>
+					</tr>
+		 			</tbody>		 			
+		 			
+		 		</table>	 		
+		 	</div>	
+			
+					
+			
+			<div class="form-group block-action">
+				<a th:href="${flowExecutionUrl}+'&amp;_eventId=cancel'"  th:text="#{action.cancel}" class="btn btn-default">Cancel</a>
+				<a th:href="${flowExecutionUrl}+'&amp;_eventId=back'" th:text="#{action.back}" class="btn btn-default">Back</a>
+				<button th:text="#{action.save}" type="submit" name ="_eventId_submit" value="submit" class="btn btn-default">Save</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>
+
+  

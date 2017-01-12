@@ -29,8 +29,8 @@
 					<td><div th:include="boolean::yesno (${u.locked})"></div></td>					
 					<td>
 						<div class="pull-right">
-							<div th:replace="table::edit(@{'/users/' + ${u.id}})"></div>													
-							<div th:replace="table::delete(@{'/users/delete/' + ${u.id}})"></div>							
+							<div th:replace="table::edit(@{'/users/' + ${u.id}},false)"></div>													
+							<div th:replace="table::delete(@{'/users/delete/' + ${u.id}},false)"></div>							
 						</div>
 					</td>
 				</tr>

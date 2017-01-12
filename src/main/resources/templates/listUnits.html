@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.units}">All units</title>
+</head>
+<body>
+	<div layout:fragment="content">
+			<h3 th:text="#{nav.units}">Units</h3>			
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+						<th><a class="sorted" sd:pagination-sort="name"
+							th:text="#{a.name}">Name</a>
+						</th>
+						<th><a class="sorted" sd:pagination-sort="abbrevation"
+							th:text="#{a.abbrevation}">Abbrevation</a>
+						</th>
+						<th><a class="sorted" sd:pagination-sort="dbUnitId"
+							th:text="#{a.dbId}">Server ID</a>
+						</th>						
+						<th>
+							<div class="pull-right">
+								<div th:replace="table::add(@{'/units/create'})">
+								</div>				
+							</div>
+						</th>
+					</tr>					
+			
+				</thead>
+				<tbody>
+					<tr th:each="u : ${units}">
+						<td><a th:href="@{/units/{id}(id=${u.id})}"
+							th:text="${u.name}">Name A</a>
+						</td>					
+						<td th:text="${u.abbrevation}">Abbrevation A</td>
+						<td th:text="${u.dbUnitId}">Server ID</td>
+						<td>
+							<div class="pull-right">																				
+								<div th:replace="table::edit(@{'/units/' + ${u.id}},false)"></div>
+								<div th:replace="table::delete(@{'/units/delete/' + ${u.id}},false)"></div>
+							</div>  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

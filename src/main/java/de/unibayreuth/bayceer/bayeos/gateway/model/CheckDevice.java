@@ -1,7 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class CheckDevice extends UniqueEntity {	

@@ -43,7 +43,7 @@ public class User extends UniqueEntity {
 
 
 	public User(){
-		
+		this.role = Role.USER;
 	}
 	
 	

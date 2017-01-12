@@ -1,5 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +16,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 
 
 @Controller
-public class BoardController {
+public class BoardController extends AbstractCRUDController {
 		
 	@Autowired
 	BoardRepository repo;
@@ -34,9 +36,9 @@ public class BoardController {
 	
 	
 	@RequestMapping(path="/boards/{id}", method=RequestMethod.DELETE)
-    public String delete(@PathVariable Long id , RedirectAttributes redirect) {
+    public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
         repo.delete(id);
-        redirect.addFlashAttribute("globalMessage", "Board removed successfully");
+        redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
         return "redirect:/boards";
     }
 		

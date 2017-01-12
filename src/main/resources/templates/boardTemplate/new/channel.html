@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+	<title th:text="#{e.boardTemplate}">Board Template</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h2 th:text="#{e.boardTemplate}">Board Template</h2>
+		<form method="post"  action="#" th:object="${channelTemplate}" th:action="${flowExecutionUrl}">
+						
+			<div class="block">
+				<div th:text="#{a.properties}" class="block-header">Main</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div th:replace="field::text('nr',#{chaTemplate.nr},true)"></div>
+					</div>
+					<div class="col-sm-6">
+						<div th:replace="field::text('label',#{chaTemplate.label},false)"></div>
+					</div>				
+				</div>				
+				<div class="row">
+					<div class="col-sm-6">
+						<div th:replace="field::text('phenomena',#{chaTemplate.phenomena},false)"></div>
+					</div>
+					<div class="col-sm-6">
+						<div th:replace="field::select('unit.id',#{e.unit},${units},false)"></div>
+					</div>								
+				</div>
+				
+				<div class="row">
+						<div class="col-sm-4">
+							<div th:replace="field::select('aggrInterval.id',#{e.interval},${intervals},false)"></div>							
+						</div>
+						<div class="col-sm-4">
+							<div th:replace="field::select('aggrFunction.id',#{e.function},${functions},false)"></div>							
+						</div>
+						<div class="col-sm-4">
+							<div th:replace="field::select('spline.id',#{e.spline},${splines},false)"></div>							
+						</div>
+				</div>
+			</div>
+			
+			
+			<div id="defaults" th:replace="block::channelSettings(#{chk.header})"></div>
+				
+			<div class="form-group block-action">
+				<a th:href="${flowExecutionUrl}+'&amp;_eventId=cancel'"  th:text="#{action.cancel}" class="btn btn-default">Cancel</a>
+				<a th:href="${flowExecutionUrl}+'&amp;_eventId=back'" th:text="#{action.back}" class="btn btn-default">Back</a>				
+				<button type="submit" name ="_eventId_submit"  th:text="#{action.save}" class="btn btn-default">Save</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>
+
+  

@@ -40,7 +40,7 @@ public class Board extends CheckDevice {
 	List<Channel> channels;
 	
 	@JsonView(DataTablesOutput.View.class)	
-	@Formula("(select max(GREATEST(channel.status_valid, get_completeness_status(get_channel_count(channel.id)))) from channel where channel.board_id = id and not channel.exclude_from_nagios)")
+	@Formula("(select get_board_status(id))")
 	Integer channelStatus;
 	
 	@ManyToOne	

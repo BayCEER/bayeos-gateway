@@ -27,8 +27,8 @@
 							th:text="${i.name}">Name A</a></td>
 						<td>
 							<div class="pull-right">																				
-								<div th:replace="table::edit(@{'/intervals/' + ${i.id}})"></div>
-								<div th:replace="table::delete(@{'/intervals/delete/' + ${i.id}})"></div>
+								<div th:replace="table::edit(@{'/intervals/' + ${i.id}},false)"></div>
+								<div th:replace="table::delete(@{'/intervals/delete/' + ${i.id}},false)"></div>
 							</div>  								  								  								
 						</td>
 					</tr>

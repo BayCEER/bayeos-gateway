@@ -7,10 +7,8 @@
 </head>
 <body>
 	<div layout:fragment="content">
-	
-		<h3 th:text="#{e.spline}">Spline</h3>
-	
-		<form id="sp" method="post" th:object="${spline}">
+		<h2 th:text="#{e.spline}">Spline</h2>	
+		<form method="post" th:object="${spline}" th:action="${flowExecutionUrl}">
 			<div class="form-group">			
 			<label th:text="#{nav.knotPoints} + ':'" class="control-label">Knot Points:</label>							
 			<div class="btn-group pull-right btn-sm">
@@ -20,11 +18,11 @@
 				<thead>									
 				</thead>
 				<tbody>
-					<tr th:each="k : ${spline.knotPoints}">
-						<td><span th:text="|(${k.x};${k.y})|"></span></td>
+					<tr th:each="point : ${spline.knotPoints}">
+						<td><a th:href="${flowExecutionUrl}+'&amp;_eventId=editPoint' + '&amp;index=' + ${pointStat.index} " th:text="|(${point.x};${point.y})|"></a></td>
 						<td>
 							<div class="pull-right">								
-								<div th:replace="table::delete(${flowExecutionUrl}+'&amp;_eventId=removePoint',false)"></div>																																			
+								<div th:replace="table::delete(${flowExecutionUrl}+'&amp;_eventId=removePoint' + '&amp;index=' + ${pointStat.index} ,false)"></div>																																			
 							</div>  								  								  								
 						</td>
 					</tr>

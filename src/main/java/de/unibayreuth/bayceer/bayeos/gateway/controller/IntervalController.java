@@ -1,11 +1,12 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
+import java.util.Locale;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +20,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Interval;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.IntervalRepository;
 
 @Controller
-public class IntervalController {
+public class IntervalController extends AbstractCRUDController {
 	
 	
 	@Autowired
@@ -32,12 +33,12 @@ public class IntervalController {
 	}
 	
 	@RequestMapping(value="/intervals/save", method=RequestMethod.POST)
-	public String save(@Valid Interval interval, BindingResult bindingResult, RedirectAttributes redirect){
+	public String save(@Valid Interval interval, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
 			return "editInterval";
 		}				
 		repo.save(interval);
-		redirect.addFlashAttribute("globalMessage", "Interval saved.");
+		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/intervals";
 	}
 	
@@ -57,9 +58,9 @@ public class IntervalController {
 	}
 	
 	@RequestMapping(value="/intervals/delete/{id}", method=RequestMethod.GET)
-	public String delete(@PathVariable Long id , RedirectAttributes redirect) {
+	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
 		repo.delete(id);
-		redirect.addFlashAttribute("globalMessage", "Interval removed successfully");
+		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/intervals";
 	}
 	

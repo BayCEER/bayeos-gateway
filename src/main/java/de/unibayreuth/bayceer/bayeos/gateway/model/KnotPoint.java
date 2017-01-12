@@ -7,13 +7,28 @@ import javax.persistence.ManyToOne;
 @Entity
 public class KnotPoint  extends UniqueEntity {   
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2336185331669319124L;
+	
 	
     Float x;
     Float y;   
     
 	@ManyToOne
 	@JoinColumn(name="spline_id",nullable=false)
-	Spline spline;
+	private Spline spline;	
+	
+	public KnotPoint() {
+		
+	}
+	
+	public KnotPoint(Float x, Float y){
+		this.x = x;
+		this.y = y;
+		
+	}
 
 	public Float getX() {
 		return x;

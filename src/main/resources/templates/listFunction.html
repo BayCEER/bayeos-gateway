@@ -27,8 +27,8 @@
 							th:text="${f.name}">Name A</a></td>
 						<td>
 							<div class="pull-right">																				
-								<div th:replace="table::edit(@{'/functions/' + ${f.id}})"></div>
-								<div th:replace="table::delete(@{'/functions/delete/' + ${f.id}})"></div>
+								<div th:replace="table::edit(@{'/functions/' + ${f.id}},false)"></div>
+								<div th:replace="table::delete(@{'/functions/delete/' + ${f.id}},false)"></div>
 							</div>  								  								  								
 						</td>
 					</tr>

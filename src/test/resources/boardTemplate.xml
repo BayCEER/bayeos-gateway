@@ -1,0 +1,24 @@
+<board name='BayEOS Wetterstation' description='Einfache Wetterstation mit LE Board' revision='2.0' samplingInterval='15'>
+  <channel nr='1' label='CPU Time' phenomena='Time' aggrInterval='10 min' aggrFunction='avg'>
+    <unit name='Milliseconds' />
+  </channel>
+  <channel nr='2' label='Battery Voltage' phenomena='Voltage' aggrInterval='10 min' aggrFunction='avg' criticalMin='2.1' warningMin='2.4'>
+    <unit name='Volts' />
+  </channel>
+  <channel nr='3' label='Air Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg'>
+    <unit name='Celsius' />
+  </channel>
+  <channel nr='4' label='Air Humidity' phenomena='Humidity' aggrInterval='10 min' aggrFunction='avg'>
+    <unit name='Percent' />
+  </channel>
+  <channel nr='5' label='Precipitation' phenomena='Precipitation' aggrInterval='10 min' aggrFunction='max'>
+    <unit name='Millimeter' />
+    <spline name='Niederschlag Kippwaage'>
+      <knotePoint x='0.0' y='0.0' />
+      <knotePoint x='1.0' y='0.33' />
+    </spline>
+  </channel>
+  <channel nr='21' label='Soil Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg'>
+    <unit name='Celsius' />
+  </channel>
+</board>

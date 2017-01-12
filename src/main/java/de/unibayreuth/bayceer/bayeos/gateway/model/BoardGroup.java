@@ -1,8 +1,11 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
+import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -32,7 +35,13 @@ public class BoardGroup extends UniqueEntity{
 		this.dbFolderId = dbFolderId;
 	}
 	
-	// @Formula("(select max(GREATEST(channel.status_valid, get_completeness_status(get_channel_count(channel.id)))) from channel where channel.board_id = id and not channel.exclude_from_nagios)")
-	// Integer boardStatus
+	@Formula("(select count(*) from board where board.board_group_id = id)")
+	public Integer boardCount;
+	
+	@Formula("(select max(board.last_result_time) from board where board.board_group_id = id)")
+	public Date lastResultTime;
+
+	@Formula("(select get_group_status(id))")
+	public Integer groupStatus;
 	
 }

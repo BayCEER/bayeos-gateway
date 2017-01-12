@@ -1,5 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
+import java.util.Locale;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Function;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.FunctionRepository;
 
 @Controller
-public class FunctionController {
+public class FunctionController extends AbstractCRUDController{
 	
 	
 	@Autowired
@@ -30,12 +32,12 @@ public class FunctionController {
 	}
 	
 	@RequestMapping(value="/functions/save", method=RequestMethod.POST)
-	public String save(@Valid Function function, BindingResult bindingResult, RedirectAttributes redirect){
+	public String save(@Valid Function function, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
 			return "editFunction";
 		}				
 		repo.save(function);
-		redirect.addFlashAttribute("globalMessage", "Function saved.");
+		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/functions";
 	}
 	
@@ -53,9 +55,9 @@ public class FunctionController {
 	}
 	
 	@RequestMapping(value="/functions/delete/{id}", method=RequestMethod.GET)
-	public String delete(@PathVariable Long id , RedirectAttributes redirect) {
+	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
 		repo.delete(id);
-		redirect.addFlashAttribute("globalMessage", "Function removed successfully");
+		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/functions";
 	}
 	
