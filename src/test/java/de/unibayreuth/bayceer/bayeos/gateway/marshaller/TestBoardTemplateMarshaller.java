@@ -36,8 +36,7 @@ public class TestBoardTemplateMarshaller {
 		d.setRevision("2.0");
 		d.setSamplingInterval(15);
 		
-		ChannelTemplate c = new ChannelTemplate("1","CPU Time","Time",null,null,new Interval("10 min"),new Function("avg"));
-		
+		ChannelTemplate c = new ChannelTemplate("1","CPU Time","Time",null,null,new Interval("10 min"),new Function("avg"));		
 		d.addTemplate(c);
 		
 		String xml = BoardTemplateMarshaller.marshal(d);
@@ -52,8 +51,6 @@ public class TestBoardTemplateMarshaller {
 		assertEquals("10 min",ct.getAggrInterval().getName());
 		assertEquals("avg",ct.getAggrFunction().getName());
 				
-		
-		
 	}
 	
 

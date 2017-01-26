@@ -26,7 +26,7 @@
 				<tr th:each="u : ${users}">
 					<td><a th:href="@{/users/{id}(id=${u.id})}" th:text="${u.userName}">User A</a></td>
 					<td th:text="${u.role}">Role</td>
-					<td><div th:include="boolean::yesno (${u.locked})"></div></td>					
+					<td><div th:include="field::yesno (${u.locked})"></div></td>					
 					<td>
 						<div class="pull-right">
 							<div th:replace="table::edit(@{'/users/' + ${u.id}},false)"></div>													

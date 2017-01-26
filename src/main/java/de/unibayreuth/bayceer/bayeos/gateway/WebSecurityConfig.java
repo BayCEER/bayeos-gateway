@@ -23,15 +23,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		 
-				
-	     
+	protected void configure(HttpSecurity http) throws Exception {		 
 		 http.csrf().disable();
 		 http.authorizeRequests()
              .antMatchers("/resources/**").permitAll()
              .antMatchers("/Frame/saveFrame").hasAnyRole("ADMIN","USER","IMPORT")
-             .antMatchers("/admin/**").hasRole("ADMIN")             
+             .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**","/splines/**","/units/**","/knotpoints/**").hasRole("ADMIN")             
              .anyRequest().authenticated()             
              .and()
              .addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -42,8 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
          .httpBasic()
           	.and()
          .logout()                                    
-            .permitAll();
-		 
+            .permitAll();		 
 	}
 	
 	

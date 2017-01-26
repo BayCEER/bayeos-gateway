@@ -31,34 +31,30 @@
 				<table class="table table-striped" >
 				<thead>
 					<tr>
-						<th>
-							<a class="sorted" th:text="#{board.origin}">Origin</a>							
-						</th>
-						<th>
-							<a class="sorted" th:text="#{board.name}">Name</a>							
-						</th>
-						<th>
-							<a class="sorted" th:text="#{board.rssi}">RSSI</a>							
-						</th>
-						<th>
-							<a class="sorted" th:text="#{board.lrt}">Last Result Time</a>							
-						</th>
-						<th>
-							<a class="sorted" th:text="#{board.status}">Status</a>							
-						</th>												
+						<th class="min-tablet-1" th:text="#{board.origin}">Origin</th>						
+						<th class="min-tablet-1" th:text="#{board.name}">Name</th>
+						<th th:text="#{board.rssi}">RSSI</th>
+						<th th:text="#{board.lrt}">Last Result Time</th>
+						<th th:text="#{board.status}">Status</th>												
 						<th>
 							<div class="pull-right">
-								<div th:replace="table::add(@{'/groups/addBoard/' + ${group.id}})"></div>								
+								<div th:replace="table::add(@{'/groups/selectBoards/' + ${group.id}})"></div>								
 							</div>				
 						</th>
 					</tr>					
-			
 				</thead>
 				<tbody>
 					<tr th:each="i : ${group.boards}">
-						<th><a th:href="@{'/boards/' + ${i.id}}" th:text="${i.origin}"></a></th>						
-						<th th:text="${i.name}">Name</th>							
-						
+						<td><a th:href="@{'/boards/' + ${i.id}}" th:text="${i.origin}"></a></td>						
+						<td th:text="${i.name}">Name</td>													
+						<td>
+							<div th:replace="field :: rssi(${i.rssi}}">RSSI</div>
+						</td>
+						<td th:text="${{i.lastResultTime}}">2001</td>
+						<td>
+							<div th:replace="field::status(${i.status})"></div>
+						</td>
+
 						<td class="pull-right">		
 							<div th:replace="table::edit(@{'/boards/' + ${i.id}},false)"></div>
 							<div th:replace="table::delete(@{'/groups/removeBoard/' + ${i.id}},false)"></div>														  								  								  							

@@ -8,7 +8,7 @@
 <body>
 	<div layout:fragment="content">
 		<h3 th:text="#{e.spline}">Spline</h3>
-		<form id="sp" method="post" th:object="${spline}" th:action="${flowExecutionUrl}">
+		<form id="sp" method="post" th:object="${sp}" th:action="${flowExecutionUrl}">
 			<div class="form-group">		 				 						
 				<div th:replace="field::text('name',#{a.name},true)"></div>																	
 			</div>						

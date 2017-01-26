@@ -30,16 +30,13 @@ public class Spline extends UniqueEntity implements Serializable {
 	Boolean locked;
 			
 	
-	public Spline() {
-		// TODO Auto-generated constructor stub
+	public Spline() {		
 	}
 	
-	public Spline(String id){
-		if (id != null && !id.equals("")){			
-			this.id = Long.valueOf(id);						
-		}
+	public Spline(String name){
+		this.name = name;
 	}
-	
+		
 	public Boolean getLocked() {
 		return locked;
 	}
@@ -86,6 +83,5 @@ public class Spline extends UniqueEntity implements Serializable {
 	public String toString() {
 		return this.name;
 	}
-   
     
 }

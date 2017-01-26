@@ -15,6 +15,15 @@ import com.fasterxml.jackson.annotation.JsonView;
 public abstract class UniqueEntity implements Serializable  {
 
 	private static final long serialVersionUID = 2082710865576938551L;
+	
+	
+	public UniqueEntity() {
+	
+	}
+	
+	public UniqueEntity(Long id) {
+		this.id = id;
+	}
 
 	
 	@Id

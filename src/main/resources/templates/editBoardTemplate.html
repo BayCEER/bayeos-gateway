@@ -8,7 +8,7 @@
 <body>
 	<div layout:fragment="content">
 		<h3 th:text="#{e.boardTemplate}">Edit board template</h3>
-		<form method="post" action="#" th:action="@{/boardTemplate/save}" th:object="${boardTemplate}">
+		<form method="post" action="#" th:action="@{/boardTemplates/save}" th:object="${boardTemplate}">
 		 	<input type="hidden" th:field="*{id}"/>			
 		 				
 		 	<div id="props" class="block">

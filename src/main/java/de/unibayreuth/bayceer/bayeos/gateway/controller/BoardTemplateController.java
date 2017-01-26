@@ -3,6 +3,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.Locale;
 
 import javax.validation.Valid;
@@ -37,11 +38,12 @@ public class BoardTemplateController extends AbstractCRUDController {
 	@Autowired
 	BoardTemplateRepository repo;
 	
+	
 	@Autowired
-	BoardTemplateService boardService;
+	BoardTemplateService serviceBoardTemplate;
 					
 		
-	@RequestMapping(value="/boardTemplate/save", method=RequestMethod.POST)
+	@RequestMapping(value="/boardTemplates/save", method=RequestMethod.POST)
 	public String save(@Valid BoardTemplate template, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
 			return "editBoardTemplate";
@@ -62,7 +64,7 @@ public class BoardTemplateController extends AbstractCRUDController {
 	public String edit(@PathVariable Long id, Model model){	
 		BoardTemplate s = repo.findOne(id);
 		if (s!=null && s.getTemplates()!=null){
-			s.getTemplates().sort(null);
+			Collections.sort(s.getTemplates());			
 		}
 		model.addAttribute("boardTemplate",s);
 		return "editBoardTemplate";		
@@ -75,17 +77,17 @@ public class BoardTemplateController extends AbstractCRUDController {
 		return "redirect:/boardTemplates";
 	}
 	
-	@RequestMapping(value="/boardTemplate/upload", method=RequestMethod.GET)
+	@RequestMapping(value="/boardTemplates/upload", method=RequestMethod.GET)
 	public String upload(){
 		return "uploadBoardTemplate";
 	}
 	
-	@RequestMapping(value="/boardTemplate/upload", method=RequestMethod.POST)
+	@RequestMapping(value="/boardTemplates/upload", method=RequestMethod.POST)
 	public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirect) {
 			try {
 				
 				BoardTemplate t = BoardTemplateMarshaller.unmarshal(file.getInputStream());
-				boardService.save(t);
+				serviceBoardTemplate.save(t);
 				
 			} catch (IOException e) {
 				log.error(e.getMessage());
@@ -106,8 +108,21 @@ public class BoardTemplateController extends AbstractCRUDController {
 		
 	}
 	
+	@RequestMapping(value="/boardTemplates/create/{id}", method=RequestMethod.GET)
+	public String create(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {		
+		BoardTemplate t = serviceBoardTemplate.saveAsTemplate(id);	
+		redirect.addFlashAttribute("globalMessage", getActionMsg("creaeted", locale));
+		return "redirect:/boardTemplates/" + t.getId();
+	}
 	
-		
+	
+	
+	
+	
+	
+	
+	
+
 			
 	
 }

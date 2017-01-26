@@ -52,3 +52,27 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
+ALTER TABLE board_comment DROP CONSTRAINT fk877c3e0628a1f209;
+ALTER TABLE board_comment
+  ADD CONSTRAINT fk_board_comment_board FOREIGN KEY (board_comments_id)
+      REFERENCES board (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE;
+
+ALTER TABLE board_comment DROP CONSTRAINT fk877c3e062f2e4b90;
+ALTER TABLE board_comment
+  ADD CONSTRAINT fk_board_comment_comment FOREIGN KEY (comment_id)
+      REFERENCES comment (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;      
+
+ALTER TABLE board_comment
+  ADD CONSTRAINT board_comment_pkey PRIMARY KEY(comment_id);
+
+     
+ALTER TABLE comment DROP CONSTRAINT fk38a5ee5fd0b68b64;
+
+ALTER TABLE comment
+  ADD CONSTRAINT fk_comment_users FOREIGN KEY (user_id)
+      REFERENCES users (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE;
+
+

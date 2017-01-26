@@ -20,13 +20,21 @@ public abstract class CheckDevice extends UniqueEntity {
 	// Check Delay
 	@Column(name="check_delay")
 	Integer checkDelay;
-	// Disable Alerts   
-	@Column(name="exclude_from_nagios")
+	// Disable Alerts   	
+	@Column(name="exclude_from_nagios")	
 	Boolean excludeFromNagios = false;	
+
 	// Import valid records only
 	@Column(name="filter_critical_values")
 	Boolean filterCriticalValues = false;
 	
+		
+	public Boolean getNagios() {
+		return !excludeFromNagios;
+	}
+	public void setNagios(Boolean nagios) {
+		this.excludeFromNagios = !nagios;
+	}
 	public Float getCriticalMax() {
 		return criticalMax;
 	}
@@ -67,7 +75,7 @@ public abstract class CheckDevice extends UniqueEntity {
 		return excludeFromNagios;
 	}
 	public void setExcludeFromNagios(Boolean excludeFromNagios) {
-		this.excludeFromNagios = excludeFromNagios;
+		this.excludeFromNagios = excludeFromNagios;		
 	}
 	public Boolean getFilterCriticalValues() {
 		return filterCriticalValues;
@@ -75,10 +83,5 @@ public abstract class CheckDevice extends UniqueEntity {
 	public void setFilterCriticalValues(Boolean filterCriticalValues) {
 		this.filterCriticalValues = filterCriticalValues;
 	}
-	
-	
-			
-   
-	
-	
+				 
 }

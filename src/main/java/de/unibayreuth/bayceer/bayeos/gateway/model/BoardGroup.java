@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class BoardGroup extends UniqueEntity{
 	String name;
 		
-	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.PERSIST)
 	public List<Board> boards;
 
 	@Column(name="db_folder_id")
@@ -84,6 +84,11 @@ public class BoardGroup extends UniqueEntity{
 		return ret;
 	};
 	
+	
+	@Override
+	public String toString() {
+		return this.name;
+	}
 	
 	
 	

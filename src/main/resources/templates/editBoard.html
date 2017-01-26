@@ -1,32 +1,161 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"  xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
 <head>
-	<title>Edit Board</title>        
+<title th:text="#{e.board}">Board</title>
 </head>
 <body>
-<div layout:fragment="content">	   
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th>Channel</th>
-				<th>Last Value</th>
-				<th>Label [Unit]</th>
-				<th>Last Result Time</th>
-				<th>Nagios</th>
-				<th></th>				
-			</tr>			
-		</thead>
-		<tbody>			
-            <tr th:each="cha : ${board.channels}">
-          		<td><a href="editChannel.html" th:href="@{'/channels/' + ${cha.id}}" th:text="${cha.nr}">Nr</a></td>
-          		<td th:text="${cha.lastResultValue}"></td>            		      
-          		<td th:text="${cha.unit} ? ${cha.unit.name}"></td>
-          		<td th:text="${{cha.lastResultTime}}"></td>
-          		<td></td>
-          		<td></td>
-            </tr>
-		</tbody>			
-	</table>			
-</div>
+	<div layout:fragment="content">
+		<form id="board" method="post" action="#" th:action="@{/boards/save}" th:object="${board}">
+			<input type="hidden" name="id" th:field="*{id}" />
+			<input type="hidden" name="origin" th:field="*{origin}" />
+		
+			<div id="props" class="block">
+				<div class="block-header" th:text="'ORIGIN:' + *{origin}"></div>
+				<div class="row">
+					<div class="col-sm-4">
+						<div th:replace="field::text('name',#{board.name},false)"></div>
+					</div>
+					<div class="col-sm-4">
+						<div th:replace="field::select('boardGroup',#{e.boardGroup},${groups},false)"></div>
+					</div>
+					<div class="col-sm-4">			
+							<div th:replace="field::checkbox('nagios',#{chkDev.nagios})"></div>
+							<div th:replace="field::checkbox('denyNewChannels',#{board.denyNewChannels})"></div>	
+							<div th:replace="field::checkbox('dbAutoExport',#{board.autoExport})"></div>																	
+					</div>					
+				</div>
+				
+			<div role="tabpanel">
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs" role="tablist" id="myTab">
+					<li role="presentation">
+						<a href="#channels" aria-controls="channels" role="tab" data-toggle="tab" th:text="#{e.channels}">Channels</a>
+					</li>
+					<li role="presentation">
+						<a href="#settings"	aria-controls="settings" role="tab" data-toggle="tab" th:text="#{a.properties}">Settings</a>
+					</li>					
+					<li role="presentation">						
+						<a th:href="@{'/messages/__${board.id}__'}"><span th:text="#{e.messages}"></span> <span class="badge" id="msgBadge" th:text="${board.messageCount}">0</span></a>						
+					</li>
+					<li role="presentation">
+						<a th:href="@{'/comments/__${board.id}__'}"><span th:text="#{e.comments}"></span> <span class="badge" id="comBadge" th:text="${board.commentCount}">0</span></a>
+					</li>				
+					
+				</ul>
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div role="tabpanel" class="tab-pane fade in" id="channels">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th th:text="#{e.channel}">Channel</th>
+									<th th:text="#{channel.lastResultValue}">Last Value</th>
+									<th th:text="#{channel.phenomena} + '[' + #{e.unit} +  ']'">Label [Unit]</th>
+									<th th:text="#{channel.lastResultTime}">Last Result Time</th>
+									<th>Nagios</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="cha, stat : *{channels}">
+									<td><a href="editChannel.html" th:href="@{'/channels/' + ${cha.id}}" th:text="${cha.nr}">Nr</a></td>									
+									<td th:text="${cha.lastResultValue}" th:class="(${cha.statusValid}) ? (${'td-' + cha.statusValid.toString().toLowerCase()}):''"></td>									
+									<td th:text="${cha.getQuantity()}"></td>
+									<td th:text="${{cha.lastResultTime}}" th:class="(${cha.statusComplete}) ? (${'td-' + cha.statusComplete.toString().toLowerCase()}):''"></td>
+									<td>																		
+										<input th:name="|nsw${cha.id}|" type="checkbox" th:checked="${cha.nagios}" th:id="${cha.id}" data-size="mini"></input>										
+									</td>										 
+									<td>
+										
+										<div th:replace="table::edit(@{'/channels/' + ${cha.id}},false)"></div>
+										<div th:replace="table::delete(@{'/channels/delete/' + ${cha.id}},false)"></div>																																				
+										  														
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>							
+			 <div role="tabpanel" class="tab-pane fade" id="settings">
+							<div th:replace="block::channelSettings(Checks)"></div>
+							<div class="block">
+								<div class="block-header">Exports</div>
+								<div class="row">
+									<div class="col-sm-6">
+										<div th:replace="field::number('dbFolderId',#{a.dbId},false)"></div>
+									</div>
+									<div class="col-sm-6">
+																				
+									</div>
+								</div>
+							</div>
+						</div>					
+				</div>
+			</div>
+			
+			<div class="block-action">
+				<button type="submit" class="btn btn-primary">
+					<span class="glyphicon glyphicon-save"></span> <span
+						th:text="#{action.save}"></span>
+				</button>
+				
+				<a class="btn btn-default" th:href="@{/boards/delete/} + ${board.id}" th:onclick="#{dialog.confirm}"> <span
+					class="glyphicon glyphicon-remove"></span> <span
+					th:text="#{action.delete}"></span>
+				</a>
+				
+				<a class="btn btn-default" th:href="@{/boards/chart/} + ${board.id}">
+					 <span class="glyphicon glyphicon-stats"></span> <span th:text="#{action.chart}"></span>
+				</a>		
+				
+				<div class="btn-group">
+					<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+						<span class="glyphicon glyphicon-hdd"> </span>
+						<span th:text="#{e.template}"></span>
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li>
+							<a th:href="@{/boards/selectTemplate/} + ${board.id}" th:text="#{action.apply}">Apply</a>
+						</li>
+						<li>
+							<a th:href="@{/boards/saveAsTemplate/} + ${board.id}" th:text="#{action.saveAs} + ' ' + #{e.template}">Save as</a>
+						</li>
+					</ul>
+				</div>		
+				
+				
+			</div>
+			
+			</div>
+
+			
+		</form>
+		
+	<script th:inline="javascript">
+	  /*<![CDATA[*/
+	   	$('#myTab a[href="#channels"]').tab('show');	
+	   	 $(document).ready(function(){		
+			$("input[name^='nsw']").bootstrapToggle();		
+			$("input[name^='nsw']").change(function() {
+				$.ajax({
+				 url: [[@{/channels/toggleNagios}]] + '/' + $(this).prop('id') ,          
+		         type: "POST",	                  
+		         data: "enabled="+ $(this).prop('checked')		               			 			 				 
+		 		})															
+		 	});
+		 });					
+		 	
+	   	
+	   	 
+	 	//TODO Implement Live Data
+	  /*]]>*/ 
+	</script>
+
+
+	</div>
+	
+	
 </body>
 </html>

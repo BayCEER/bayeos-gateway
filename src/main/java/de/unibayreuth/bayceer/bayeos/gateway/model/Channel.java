@@ -4,27 +4,40 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Formula;
+
+
 @Entity 
-public class Channel extends CheckDevice {
+public class Channel extends CheckDevice implements Comparable<Channel>{
 
 	private String nr;
 	private String label;
 	private String phenomena;
-
-	@Column(name="last_result_time")
+	
+	
+	@Column(name="status_valid",insertable=false,updatable=false)	
+	@Enumerated(EnumType.ORDINAL)
+	private NagiosStatus statusValid;
+		
+	@Column(name="status_valid_msg",insertable=false,updatable=false)
+	private String statusValidMsg;
+		
+	@Formula("(select get_channel_count(id))")
+	private Integer channelCounts;		
+	
+	@Column(name="last_result_time",insertable=false,updatable=false)	
 	private Date lastResultTime;
 
-	@Column(name="last_result_value")
+	@Column(name="last_result_value",insertable=false,updatable=false)
 	private Float lastResultValue;
-
 	
-	@Column(name="spline_id")
-	private Integer splineId;
-
+	
 	@Column(name="db_series_id")
 	private Integer dbSeriesId;
 
@@ -38,10 +51,20 @@ public class Channel extends CheckDevice {
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="unit_id", nullable = true)
 	private Unit unit;
-
 	
+	@ManyToOne()
+	@JoinColumn(name="spline_id")
+	Spline spline = new Spline();
 	
+	@ManyToOne()
+	@JoinColumn(name="aggr_interval_id")
+	Interval aggrInterval = new Interval();	
 	
+	@ManyToOne()
+	@JoinColumn(name="aggr_function_id")
+	Function aggrFunction = new Function();	
+		
+			
 	public Channel() {
 	}
 
@@ -121,6 +144,116 @@ public class Channel extends CheckDevice {
 	public void setUnit(Unit unit) {
 		this.unit = unit;
 	}
+	
+	private boolean isNr(String s){
+		return s != null && s.matches("[0-9]+");
+	}
+	
+	
+	public String getStatusValidMsg() {
+		return statusValidMsg;
+	}
 
+	public void setStatusValidMsg(String statusValidMsg) {
+		this.statusValidMsg = statusValidMsg;
+	}
+	
+	public NagiosStatus getStatusValid() {
+		return statusValid;
+	}
+
+	public void setStatusValid(NagiosStatus statusValid) {
+		this.statusValid = statusValid;
+	}
+
+	
+	@Override
+	public int compareTo(Channel o) {
+		if (isNr(nr)  && isNr(o.nr)){
+			return Integer.valueOf(nr).compareTo(Integer.valueOf(o.nr));
+		} else {
+			return nr.compareTo(o.nr);
+		}	
+	}
+	
+	public NagiosStatus getStatus(){	
+		NagiosStatus com = getStatusComplete();
+		NagiosStatus valid = getStatusValid();
+	
+		if (com == null || valid == null){
+			return null;
+		} else {			
+			if (com.compareTo(valid) > 0){
+				return com;
+			} else {
+				return valid;
+			}			
+		}
+	}
+	
+	public String getQuantity(){		
+		if (unit != null){
+			return phenomena + "[" + getUnit().getName() + "]";
+		} else {
+			return phenomena;
+		}
+	}
+
+	
+	public NagiosStatus getStatusComplete() {
+		if (channelCounts == null) {
+			return null;
+		}  else if (channelCounts > 8) {
+			return NagiosStatus.ok;
+		}  else if (channelCounts == 0) {
+			return NagiosStatus.critical;
+		}  else {
+			return NagiosStatus.warn;
+		}		   			
+	}
+
+	public Integer getChannelCounts() {
+		return channelCounts;
+	}
+
+	public void setChannelCounts(Integer channelCounts) {
+		this.channelCounts = channelCounts;
+	}
+	
+	public Interval getAggrInterval() {
+		return aggrInterval;
+	}
+
+	public void setAggrInterval(Interval aggrInterval) {
+		this.aggrInterval = aggrInterval;
+	}
+
+	public Function getAggrFunction() {
+		return aggrFunction;
+	}
+
+	public void setAggrFunction(Function aggrFunction) {
+		this.aggrFunction = aggrFunction;
+	}
+
+	public Spline getSpline() {
+		return spline;
+	}
+
+	public void setSpline(Spline spline) {
+		this.spline = spline;
+	}
+	
+	public void setAutoExport(Boolean value){
+		this.dbExcludeAutoExport = !value;
+	}
+	
+	public Boolean getAutoExport(){
+		return !this.dbExcludeAutoExport;
+	}
+
+	
+	
+	
 	
 }

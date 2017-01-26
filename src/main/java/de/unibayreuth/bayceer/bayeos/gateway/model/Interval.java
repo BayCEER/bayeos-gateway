@@ -11,18 +11,17 @@ public class Interval extends UniqueEntity {
 	
 	@Column(name="name")
 	@NotEmpty
-    String name	;
+    String name;
 	
-	
-	public Interval(String id) {
-		if (id != null && !id.equals("")){			
-			this.id = Long.valueOf(id);						
-		}
+	public Interval() {
+			
+	}
+		
+	public Interval(String name) {
+		this.name = name;
 	}
     
-    public Interval() {
-	
-	}
+   
 
 	public String getName() {
 		return name;

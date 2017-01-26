@@ -25,19 +25,19 @@
 						<div th:replace="field::text('phenomena',#{chaTemplate.phenomena},false)"></div>
 					</div>
 					<div class="col-sm-6">
-						<div th:replace="field::select('unit.id',#{e.unit},${units},false)"></div>
+						<div th:replace="field::select('unit',#{e.unit},${units},false)"></div>
 					</div>								
 				</div>
 				
 				<div class="row">
 						<div class="col-sm-4">
-							<div th:replace="field::select('aggrInterval.id',#{e.interval},${intervals},false)"></div>							
+							<div th:replace="field::select('aggrInterval',#{e.interval},${intervals},false)"></div>							
 						</div>
 						<div class="col-sm-4">
-							<div th:replace="field::select('aggrFunction.id',#{e.function},${functions},false)"></div>							
+							<div th:replace="field::select('aggrFunction',#{e.function},${functions},false)"></div>							
 						</div>
 						<div class="col-sm-4">
-							<div th:replace="field::select('spline.id',#{e.spline},${splines},false)"></div>							
+							<div th:replace="field::select('spline',#{e.spline},${splines},false)"></div>							
 						</div>
 				</div>
 			</div>

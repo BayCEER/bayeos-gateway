@@ -8,9 +8,14 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate;
 public interface BoardTemplateService {
 	
 	@Transactional
-	public void save(BoardTemplate s);
+	public BoardTemplate save(BoardTemplate s);
 	
 	@Transactional
 	public void persist(BoardTemplate s);
-
+	
+	@Transactional
+	public BoardTemplate saveAsTemplate(Long boardId);
+	
+	@Transactional
+	public void applyTemplate(Long boardId, Long templateId);
 }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.comment}">Comment</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.comment}">Edit comment</h3>
+		<form method="post" action="#" th:action="@{/comments/save}" th:object="${comment}">
+		 	<input type="hidden" th:field="*{id}"/>
+		 	<input type="hidden" th:value="${board}" name="board"/>
+		 	<textarea rows="3" class="form-control" th:field="*{content}"></textarea>
+			
+			<div class="block-action">
+		 		<button th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
+		 	</div>		 	 																		
+			
+		</form>
+		
+	</div>
+</body>
+</html>

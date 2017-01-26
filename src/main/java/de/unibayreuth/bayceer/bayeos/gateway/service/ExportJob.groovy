@@ -18,6 +18,7 @@ import org.apache.log4j.Logger
 import org.apache.xmlrpc.XmlRpcException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 import de.unibayreuth.bayceer.bayeos.client.Client
@@ -25,6 +26,7 @@ import de.unibayreuth.bayceer.bayeos.objekt.ObjektArt
 import de.unibayreuth.bayceer.bayeos.objekt.ObjektNodeModel
 
 @Component
+@Profile("default")
 class ExportJob implements Runnable  {
 
     

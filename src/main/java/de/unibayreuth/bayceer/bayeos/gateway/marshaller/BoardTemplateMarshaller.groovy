@@ -49,10 +49,10 @@ class BoardTemplateMarshaller {
 			template.samplingInterval = Integer.valueOf(n['@samplingInterval'])
 		}
 		if (n['@aggrInterval']){
-			template.aggrInterval = new Interval(n['@aggrInterval'])
+			template.aggrInterval = new Interval(name:n['@aggrInterval'])
 		}
 		if (n['@aggrFunction']){
-			template.aggrFunction = new Function(n['@aggrFunction'])
+			template.aggrFunction = new Function(name:n['@aggrFunction'])			 
 		}
 		if (n['@criticalMax']){
 			template.criticalMax = Float.valueOf(n['@criticalMax'])
@@ -72,10 +72,10 @@ class BoardTemplateMarshaller {
 		n.channel.each { ch ->			
 			def cht = new ChannelTemplate(nr:Integer.valueOf(ch['@nr']),label:ch['@label'],phenomena:ch['@phenomena'])
 			if (ch['@aggrInterval']){
-				cht.aggrInterval = new Interval(ch['@aggrInterval'])
+				cht.aggrInterval = new Interval(ch['@aggrInterval'])				 
 			}
 			if (ch['@aggrFunction']){
-				cht.aggrFunction = new Function(ch['@aggrFunction'])
+				cht.aggrFunction = new Function(ch['@aggrFunction'])				 
 			}
 			if (ch['@criticalMax']){
 				cht.criticalMax = Float.valueOf(ch['@criticalMax'])
@@ -107,7 +107,7 @@ class BoardTemplateMarshaller {
 					}					
 				cht.setSpline(spline)
 			}
-			template.addChannelTemplate(cht)
+			template.addTemplate(cht)
 		}
 		return template
 	}

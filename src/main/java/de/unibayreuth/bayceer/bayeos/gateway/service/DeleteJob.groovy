@@ -1,16 +1,20 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import groovy.sql.Sql
 import java.sql.SQLException
+
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
+import groovy.sql.Sql
+
 @Component
+@Profile("default")
 class DeleteJob implements Runnable {
 
 	@Autowired

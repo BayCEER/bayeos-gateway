@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.messages}">Messages</title>
+</head>
+<body>
+	<div layout:fragment="content">
+	
+	  	<h3 th:text="#{e.messages}">Messages</h3>	  
+		
+		<table class="table table-condensed table-striped col-sm-12">
+			<thead>
+				<tr>
+					<th class="col-sm-3">
+						<a class="sorted" sd:pagination-sort="insertTime" th:text="#{msg.time}">Time</a>
+					</th>					
+					<th class="col-sm-1">
+						<a class="sorted" sd:pagination-sort="type" th:text="#{msg.type}">Time</a>
+					</th>					
+					<th class="col-sm-6">
+						<a class="sorted" sd:pagination-sort="content" th:text="#{msg.content}">Content</a>
+					</th>
+					<th class="col-sm-2"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="msg : *{messages}">
+					<td th:text="${{msg.insertTime}}" class="col-sm-3">Time</td>
+					<td th:text="${msg.type}" class="col-sm-1">Type</td>
+					<td th:text="${msg.content}" class="col-sm-6">Content</td>
+					<td class="col-sm-2">
+						<div
+							th:replace="table::delete(@{'/messages/delete/' + ${msg.id}},false)">
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>	
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

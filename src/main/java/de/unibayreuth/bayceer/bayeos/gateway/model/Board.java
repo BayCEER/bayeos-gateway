@@ -1,14 +1,18 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
@@ -17,8 +21,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 public class Board extends CheckDevice {
-		
-	
+			
 	@JsonView(DataTablesOutput.View.class)
 	String origin;
 	
@@ -26,18 +29,28 @@ public class Board extends CheckDevice {
 	String name;
 	
 	@JsonView(DataTablesOutput.View.class)
+	/* Column is managed by import routines */
+	@Column(insertable=false,updatable=false)
 	Short  lastRssi;
 	
-	@JsonView(DataTablesOutput.View.class)
+	@JsonView(DataTablesOutput.View.class)	
+	/* Column is managed by import routines !! */
+	@Column(insertable=false,updatable=false)
 	Date lastResultTime;
 	
 	Integer dbFolderId;
 	Boolean dbAutoExport = false;
 	Boolean denyNewChannels = false;
 	
-		
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy="board", cascade=CascadeType.REMOVE)
 	List<Channel> channels;
+		
+	@Formula("(select count(*) from board_comment where board_comment.board_comments_id = id)")
+	Integer commentCount;
+	
+	@Formula("(select count(*) from message where message.origin = origin)")
+	Integer messageCount;
 	
 	@JsonView(DataTablesOutput.View.class)	
 	@Formula("(select get_board_status(id))")
@@ -122,13 +135,7 @@ public class Board extends CheckDevice {
 		this.denyNewChannels = denyNewChannels;
 	}
 
-	public List<Channel> getChannels() {
-		return channels;
-	}
-
-	public void setChannels(List<Channel> channels) {
-		this.channels = channels;
-	}
+	
 
 	public Integer getChannelStatus() {
 		return channelStatus;
@@ -145,4 +152,50 @@ public class Board extends CheckDevice {
 	public void setBoardGroup(BoardGroup boardGroup) {
 		this.boardGroup = boardGroup;
 	}
+
+	public Integer getCommentCount() {
+		return commentCount;
+	}
+
+	
+	public Integer getMessageCount() {
+		return messageCount;
+	}
+
+	public void setMessageCount(Integer messageCount) {
+		this.messageCount = messageCount;
+	}
+	
+
+	public Channel findOrCreateChannel(String nr) {				
+		for(Channel c:channels){
+			if (c.getNr().equals(nr)){
+				return c;
+			}
+		}		
+		Channel c = new Channel(this,nr);
+		channels.add(c);		
+		return c;
+	}
+
+	public List<Channel> getChannels() {
+		return channels;
+	}
+	
+	public List<Long> getChannelIds(){
+		List<Long> ret = new ArrayList<>();		
+		for(Channel c:channels){
+			ret.add(c.getId());
+		}
+		return ret;
+	}
+
+	public void setChannels(List<Channel> channels) {
+		this.channels = channels;
+	}
+		
+	
+	 
+
+	
 }

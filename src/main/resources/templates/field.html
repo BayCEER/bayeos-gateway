@@ -5,7 +5,18 @@
 </head>
 <body>
 
-
+<div th:fragment="onoff(value)">
+<div th:switch="${value}">
+  	<span th:case="true" th:text="#{state.on}">On</span>
+  	<span th:case="false" th:text="#{state.off}">Off</span>
+</div>
+</div>
+<div th:fragment="yesno(value)">
+<div th:switch="${value}">
+  	<span th:case="true" th:text="#{state.yes}">Yes</span>
+  	<span th:case="false" th:text="#{state.no}">No</span>
+</div>
+</div>
 
 
 <div th:fragment="text(prop,label,required)"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
@@ -27,18 +38,24 @@
 </div>
 
 
-
+<div th:fragment="switch(prop,label)" class="make-switch switch-small">
+		<label th:text="${label} + ':'" class="control-label">Text:</label>
+    	<input type="checkbox" th:field="*{__${prop}__}"/>    	
+</div>
 
 <div th:fragment="password(prop,label,required)" class="form-group">
 				<label th:text="${label} + (${required} ? '*':'') + ':'">Password:</label>
 				<input type="password" class="form-control"  th:required="${required}"  th:field="*{__${prop}__}"/>
 </div>
 
-<div th:fragment="checkbox(prop,label)" class="checkbox">
-				<label>
-					 <input th:text="${label}" type="checkbox" th:field="*{__${prop}__}"/>
-				</label>
+<div th:fragment="checkbox(prop,label)" class="form-group">
+	<input type="checkbox" th:field="*{__${prop}__}"/>
+	<label th:for="${#ids.prev('__${prop}__')}" th:text="${label}">Label</label>				
 </div>
+
+
+		
+
 
 
 <div th:fragment="radio(prop,label,enum)" class="form-group">
@@ -73,9 +90,9 @@
 <div th:fragment="rssi(value)">
 <div th:switch="${value}">
   	<img th:case="value &lt; -85" th:src="@{/resources/img/level_1.gif}"/>
-  	<img th:case="value &ge; -85 and value &lt -75" th:src="@{/resources/img/level_2.gif}"/>
-  	<img th:case="value &ge; -75 and value &lt -65"  th:src="@{/resources/img/level_3.gif}"/>
-  	<img th:case="value &ge; -65 and value &lt -45"  th:src="@{/resources/img/level_4.gif}"/>
+  	<img th:case="value &ge; -85 and value &lt; -75" th:src="@{/resources/img/level_2.gif}"/>
+  	<img th:case="value &ge; -75 and value &lt; -65"  th:src="@{/resources/img/level_3.gif}"/>
+  	<img th:case="value &ge; -65 and value &lt; -45"  th:src="@{/resources/img/level_4.gif}"/>
   	<img th:case="value &ge; -45" th:src="@{/resources/img/level_5.gif}"/>   	
   	<span th:case="*"></span>  										
 </div>

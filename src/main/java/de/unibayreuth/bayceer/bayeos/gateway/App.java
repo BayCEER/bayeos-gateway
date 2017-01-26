@@ -22,8 +22,5 @@ public class App {
 		resourceBundleMessageSource.setDefaultEncoding("UTF-8");
 		return resourceBundleMessageSource;
 	}
-	
-	
-	
-	
+		
 }

@@ -11,18 +11,10 @@
 			<table class="table table-striped" >
 				<thead>
 					<tr>
-						<th>
-							<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a>
-						</th>						
-						<th>
-							<a class="sorted" sd:pagination-sort="boardCount" th:text="#{nav.boards}"></a>
-						</th>
-						<th>
-							<a class="sorted" sd:pagination-sort="lastResultTime" th:text="#{board.lrt}"></a>
-						</th>
-						<th>
-							<a class="sorted" sd:pagination-sort="boardStatus" th:text="#{board.status}"></a>
-						</th>
+						<th><a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a></th>												
+						<th th:text="#{nav.boards}"></th>
+						<th th:text="#{board.lrt}"></th>
+						<th th:text="#{board.status}"></th>
 						<th>
 							<div class="pull-right">
 								<div th:replace="table::add(@{'/groups/create'})"></div>					
@@ -38,11 +30,9 @@
 						</td>
 						<td th:text="${i.boardCount}">2</td>
 						<td th:text="${{i.lastResultTime}}">2017-01-01 12:00:00</td>
-						<!-- <td th:text="${i.groupStatus}">OK</td> -->
 						<td>
 							<div th:replace="field::status(${i.groupStatus})">OK</div>
-						</td>
-							
+						</td>							
 						<td class="pull-right">		
 							<div th:replace="table::edit(@{'/groups/' + ${i.id}},false)"></div>
 							<div th:replace="table::delete(@{'/groups/delete/' + ${i.id}},false)"></div>														  								  								  								

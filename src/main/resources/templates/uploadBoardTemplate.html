@@ -8,7 +8,7 @@
 <body>
 	<div layout:fragment="content">
 		<h3 th:text="#{action.upload}">Upload</h3>
-		<form method="post" action="#" th:action="@{/boardTemplate/upload}" role="form" enctype="multipart/form-data">
+		<form method="post" action="#" th:action="@{/boardTemplates/upload}" role="form" enctype="multipart/form-data">
 		 	<div class="form-group">		 	
 				<label for="file" th:text="#{e.file} + ':'">File:</label>
 				<input type="file" id="file" name="file" accept="application/xml"/>							

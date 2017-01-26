@@ -20,16 +20,16 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 	
 	@ManyToOne()
 	@JoinColumn(name="spline_id")
-	Spline spline = new Spline();
+	Spline spline;
 	
 	@ManyToOne()
 	@JoinColumn(name="aggr_interval_id")
-	Interval aggrInterval = new Interval();
+	Interval aggrInterval;
 	
 	
 	@ManyToOne()
 	@JoinColumn(name="aggr_function_id")
-	Function aggrFunction = new Function();			
+	Function aggrFunction;			
 		
 	@ManyToOne()
 	@JoinColumn(name="board_template_id", nullable = false)

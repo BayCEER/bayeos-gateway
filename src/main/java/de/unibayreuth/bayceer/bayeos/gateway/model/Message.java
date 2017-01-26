@@ -5,18 +5,33 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Entity
 public class Message extends UniqueEntity {
 	
-
+	@JsonView(DataTablesOutput.View.class)
 	String origin;		
+	
+	@JsonView(DataTablesOutput.View.class)
 	String type;
+	
+	
+	@JsonView(DataTablesOutput.View.class)
 	String content;
+	
+	@JsonView(DataTablesOutput.View.class)
 	@Column(name="result_time")
 	Date resultTime;
 	
 	@Column(name="insert_time")
 	Date insertTime = new Date();
+	
+	public Message() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	public Message(String value){
 		// Hotfix 1.9.12: replace all null chars with space
@@ -62,8 +77,5 @@ public class Message extends UniqueEntity {
 	public void setInsertTime(Date insertTime) {
 		this.insertTime = insertTime;
 	}
-	
-	
-
     
 }

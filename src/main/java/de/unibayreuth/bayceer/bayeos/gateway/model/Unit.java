@@ -15,18 +15,12 @@ public class Unit extends UniqueEntity  {
 	private Integer dbUnitId;
 	
 	
-
 	public Unit() {
-		super();
-		// TODO Auto-generated constructor stub
 	}
 	
-	public Unit(String id){
-		if (id != null && !id.equals("")){			
-			this.id = Long.valueOf(id);						
-		}
+	public Unit(String name){
+		this.name = name;
 	}
-
 	
 	public String getName() {
 		return name;

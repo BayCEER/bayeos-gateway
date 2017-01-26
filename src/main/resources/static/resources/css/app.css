@@ -66,7 +66,6 @@ body > .container {
 
 
 
-
 .form-signin {
     margin: 0 auto;
     max-width: 330px;
@@ -98,3 +97,44 @@ body > .container {
     border-top-right-radius: 0;
     margin-bottom: 10px;
 }
+
+.td-ok {
+	background-color: rgb(223, 240, 216);
+}
+
+.td-warn {
+	background-color: rgb(252, 248, 227);
+}
+
+.td-critical {
+	background-color: rgb(242, 222, 222);
+}
+
+.td-unknown {
+	background-color: rgb(224, 224, 224);
+}
+
+.label-ok {
+	background-color: rgb(57, 132, 57);
+}
+
+.label-warn {
+	background-color: rgb(213, 133, 18);
+}
+
+.label-critical {
+	background-color: rgb(217, 83, 79);
+}
+
+.label-unknown {
+	background-color: rgb(224, 224, 224);
+}
+
+
+
+
+
+
+
+
+

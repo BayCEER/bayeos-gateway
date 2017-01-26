@@ -81,7 +81,7 @@
 									<dataSet>
 										<data>
 											<src>${project.build.directory}/deb/data</src>
-											<type>directory</type>
+											<type>directory</type>											
 										</data>
 										<data>
 											<src>${project.build.directory}/${project.build.finalName}.jar</src>
@@ -306,8 +306,22 @@
 			<resource>
 				<directory>src/deb</directory>
 				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.jar</exclude>
+					<exclude>**/*.sql</exclude>
+				</excludes>
 				<targetPath>${project.build.directory}/deb</targetPath>				
 			</resource>
+			<resource>
+				<directory>src/deb</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*.jar</include>
+					<include>**/*.sql</include>
+				</includes>
+				<targetPath>${project.build.directory}/deb</targetPath>				
+			</resource>
+			
 		</resources>
 		<plugins>
 
@@ -406,15 +420,15 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-		</dependency>
+		</dependency>		
 		
-		<!-- This breaks web flow scope !! --> 
+		<!-- This breaks web flow scope !! 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-		</dependency>		
-		 
-		
+			<scope>test</scope>
+		</dependency>				 
+		 -->
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
