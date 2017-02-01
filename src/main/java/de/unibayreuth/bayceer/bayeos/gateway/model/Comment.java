@@ -2,7 +2,6 @@ package de.unibayreuth.bayceer.bayeos.gateway.model;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

@@ -30,7 +30,7 @@ class DeleteJob implements Runnable {
 
 	@Override
 	public void run() {
-
+		Thread.sleep(1000*waitSecs);
 		while(true){
 			try {
 				log.info("DeleteJob running")

@@ -193,9 +193,9 @@ public class Channel extends CheckDevice implements Comparable<Channel>{
 	
 	public String getQuantity(){		
 		if (unit != null){
-			return phenomena + "[" + getUnit().getName() + "]";
+			return label + "[" + getUnit().getName() + "]";
 		} else {
-			return phenomena;
+			return label;
 		}
 	}
 

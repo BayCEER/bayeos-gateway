@@ -101,7 +101,8 @@
                      	}
                     },                    
                     {data: 'channelStatus', searchable: false,
-                     render: function(data,type,row){                                          
+                     render: function(data,type,row){
+                     	if (row.channelStatus != null){                                          
                     		if (row.channelStatus == 0){                    	                    			 	
                     			return '<span class="label label-success">' + [[ #{status.ok} ]] + '</span>';
                     		} else if (row.channelStatus == 1) {                    			
@@ -109,11 +110,13 @@
                     		} else if (row.channelStatus == 2) {                    			
                     			return '<span class="label label-critical">' + [[ #{status.critical} ]] + '</span>';
                     		}
+                    	} else {
+                    			return "";                    			
+                     	}
                      }
                     },
                     { searchable: false, sortable: false,
-                      render: function ( data, type, row ) {
-                      var msg = /*[[ #{status.ok} ]]*/                      	                         	    
+                      render: function ( data, type, row ) {                                           	                         	    
                     	    var ret = '<td class="link">';
                     	    var edit = /*[[ #{action.edit} ]]*/
                     	    var chart = /*[[ #{action.chart} ]]*/

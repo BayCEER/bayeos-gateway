@@ -6,12 +6,12 @@ chmod +x *.sh
 su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
 
 chmod +x /var/lib/bayeos-gateway/bayeos-gateway.jar
-ln -s /var/lib/bayeos-gateway/bayeos-gateway.jar /etc/init.d/bayeos-gateway
+ln -sf /var/lib/bayeos-gateway/bayeos-gateway.jar /etc/init.d/bayeos-gateway
 update-rc.d bayeos-gateway defaults
 service bayeos-gateway start  
 
 # Apache integration 
 a2enmod proxy proxy_http ssl
-a2enconf bayeos-gateway.conf bayeos-gateway-ssl.conf
+a2enconf bayeos-gateway.conf
 service apache2 restart
 

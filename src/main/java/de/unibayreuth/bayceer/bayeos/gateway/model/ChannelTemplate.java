@@ -16,7 +16,7 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 	
 	@ManyToOne()
 	@JoinColumn(name="unit_id")
-	Unit unit = new Unit();
+	Unit unit;
 	
 	@ManyToOne()
 	@JoinColumn(name="spline_id")

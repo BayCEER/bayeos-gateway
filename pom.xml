@@ -38,7 +38,7 @@
 		<db.user>xbee</db.user>
 		<db.password>0b64debf8fae4239a7ca845f39878a3d</db.password>
 
-		<server.port>9001</server.port>
+		<server.port>5533</server.port>
 		<server.contextPath>/gateway</server.contextPath>
 
 		<log.level>INFO</log.level>
@@ -196,14 +196,10 @@
 										</tags>
 									</build>
 									<run>
-										<labels>
-
-										</labels>
 										<wait>
 											<log>PostgreSQL init process complete; ready for start up.</log>
 											<time>60000</time>
 										</wait>
-
 										<log>
 											<prefix>DB:</prefix>
 											<color>blue</color>
@@ -213,12 +209,11 @@
 
 								<image>
 									<alias>bayeos-gateway</alias>
-
 									<name>bayceer/bayeos-gateway:${project.version}</name>
 									<build>
 										<from>java:7</from>
 										<env>
-
+											<EXPORT_HOST>bayeos-server</EXPORT_HOST>
 										</env>
 										<assembly>
 											<descriptorRef>artifact</descriptorRef>
@@ -232,10 +227,10 @@
 										</tags>
 									</build>
 									<run>
-
+																										
 										<labels>
 											<environment>development</environment>
-											<version>${project.version}</version>
+											<version>${project.version}</version>											
 										</labels>
 										<ports>
 											<port>${server.port}:${server.port}</port>
@@ -246,6 +241,7 @@
 											</http>
 											<time>60000</time>
 										</wait>
+										
 										<links>
 											<link>db:db</link>
 										</links>
@@ -407,28 +403,31 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>			
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency> 
+		
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-		</dependency>		
+		</dependency>
 		
-		<!-- This breaks web flow scope !! 
+		<!-- This breaks web flow --> 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>test</scope>
 		</dependency>				 
-		 -->
+		 
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -463,12 +462,6 @@
 				 <version>2.4.4.RELEASE</version>
 		</dependency>
 
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jetty</artifactId>
-			<scope>provided</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

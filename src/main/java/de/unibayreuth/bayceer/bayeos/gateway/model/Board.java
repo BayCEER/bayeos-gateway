@@ -9,10 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PreRemove;
 
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;

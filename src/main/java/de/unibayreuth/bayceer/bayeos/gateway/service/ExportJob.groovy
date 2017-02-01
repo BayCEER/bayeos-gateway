@@ -39,7 +39,7 @@ class ExportJob implements Runnable  {
 	@Value('${EXPORT_HOST:localhost}')
 	private String expHost	
 	
-	@Value('${EXPORT_PORT:9002}')
+	@Value('${EXPORT_PORT:5532}')
 	private String expPort
 		
 	@Value('${EXPORT_CONTEXT:/XMLServlet}')
@@ -77,6 +77,7 @@ class ExportJob implements Runnable  {
 						
 	@Override
 	public void run() {
+		Thread.sleep(1000*expWaitSecs);
 		while(true) {
 			try {
 			log.info("ExportJob running")

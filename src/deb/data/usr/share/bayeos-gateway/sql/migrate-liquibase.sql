@@ -19,7 +19,7 @@ BEGIN
 	);
 	ALTER TABLE schema_version OWNER TO xbee;
 	ALTER TABLE ONLY schema_version ADD CONSTRAINT schema_version_pk PRIMARY KEY (installed_rank);
-	INSERT INTO schema_version VALUES (1, '1.99', 'xbee', 'SQL', 'V1.99__xbee.sql', -459484018, 'xbee', now(), 1667, true);
+	INSERT INTO schema_version VALUES (1, '1.99', 'xbee', 'SQL', 'V1.99__xbee.sql', -596518527, 'xbee', now(), 1667, true);
 	CREATE INDEX schema_version_s_idx ON schema_version USING btree (success);
 	DROP TABLE IF EXISTS databasechangelog;
 	DROP TABLE IF EXISTS databasechangeloglock;
