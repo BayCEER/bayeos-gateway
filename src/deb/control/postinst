@@ -3,8 +3,12 @@ set -e
 
 cd /usr/share/bayeos-gateway
 chmod +x *.sh
+
+# PostgreSQL
+service postgresql start 
 su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
 
+# Gateway 
 chmod +x /var/lib/bayeos-gateway/bayeos-gateway.jar
 ln -sf /var/lib/bayeos-gateway/bayeos-gateway.jar /etc/init.d/bayeos-gateway
 update-rc.d bayeos-gateway defaults

@@ -22,5 +22,14 @@ public class App {
 		resourceBundleMessageSource.setDefaultEncoding("UTF-8");
 		return resourceBundleMessageSource;
 	}
+	
+//	@Bean
+//	public Filter logFilter() {
+//	    CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+//	    filter.setIncludeQueryString(true);
+//	    filter.setIncludePayload(true);
+//	    filter.setMaxPayloadLength(5120);
+//	    return filter;
+//	}
 		
 }
