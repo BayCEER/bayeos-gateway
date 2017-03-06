@@ -5,6 +5,7 @@ package de.unibayreuth.bayceer.bayeos.gateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.RoleHierarchyVoter;
@@ -22,27 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {		 
-		 http.csrf().disable();
-		 http.authorizeRequests()
-             .antMatchers("/resources/**").permitAll()
-             .antMatchers("/Frame/saveFrame").hasAnyRole("ADMIN","USER","IMPORT")
-             .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**","/splines/**","/units/**","/knotpoints/**").hasRole("ADMIN")             
-             .anyRequest().authenticated()             
-             .and()
-             .addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)
-          .formLogin()
-             .loginPage("/login")
-             .permitAll()             
-             .and()
-         .httpBasic()
-          	.and()
-         .logout()                                    
-            .permitAll();		 
-	}
-	
-	
 	
 	@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth, UserDetailsService userDetailsService) throws Exception {
@@ -50,6 +30,40 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		pwe.setEncodeHashAsBase64(true);		
         auth.userDetailsService(userDetailsService).passwordEncoder(pwe);              
     }
+	
+	
+	
+	@Configuration 
+	@Order(1)
+	public static class HttpBasicConfig extends WebSecurityConfigurerAdapter {
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			 http.csrf().disable();
+			 http.authorizeRequests()
+			 .antMatchers("/frame/*").hasAnyRole("ADMIN","USER","IMPORT").and().httpBasic();	             
+		}		
+	}
+		
+	
+	@Configuration 
+	@Order(2)
+	public static class FormConfig extends WebSecurityConfigurerAdapter {
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			 http.csrf().disable();
+			 http.authorizeRequests()
+	             .antMatchers("/resources/**").permitAll()
+	             .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**","/splines/**","/units/**","/knotpoints/**").hasRole("ADMIN")             
+	             .anyRequest().authenticated()             
+	             .and()
+	             .addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)
+	          .formLogin().loginPage("/login").permitAll()             
+	             .and()
+	         .logout().permitAll();
+		}
+		
+	}
+	
 	
 	@Bean
     public RoleHierarchy roleHierarchy() {
