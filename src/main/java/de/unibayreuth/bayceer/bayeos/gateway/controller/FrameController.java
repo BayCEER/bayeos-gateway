@@ -25,7 +25,7 @@ public class FrameController {
 	
 	private Logger log = Logger.getLogger(FrameController.class);
 
-	@RequestMapping(path = "/Frame/saveFlat", method = RequestMethod.POST, headers = "Content-Type=application/x-www-form-urlencoded")
+	@RequestMapping(path = "/frame/saveFlat", method = RequestMethod.POST, headers = "Content-Type=application/x-www-form-urlencoded")
 	@ResponseBody
 	public ResponseEntity saveFlat(@RequestParam MultiValueMap<String,String> params, HttpServletRequest request) {			
 			String sender = "IP:" + request.getRemoteAddr();
