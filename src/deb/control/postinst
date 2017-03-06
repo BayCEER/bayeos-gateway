@@ -15,7 +15,7 @@ update-rc.d bayeos-gateway defaults
 service bayeos-gateway start  
 
 # Apache integration 
-a2enmod proxy proxy_http ssl
+a2enmod proxy proxy_http
 a2enconf bayeos-gateway.conf
 service apache2 restart
 
