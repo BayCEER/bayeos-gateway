@@ -39,8 +39,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			 http.csrf().disable();
-			 http.authorizeRequests()
-			 .antMatchers("/frame/*").hasAnyRole("ADMIN","USER","IMPORT").and().httpBasic();	             
+			 http.antMatcher("/frame/**").authorizeRequests()
+			 .anyRequest().hasAnyRole("ADMIN","USER","IMPORT").and().httpBasic();
 		}		
 	}
 		
@@ -50,16 +50,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public static class FormConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			 http.csrf().disable();
+			 http.csrf().disable();	 
 			 http.authorizeRequests()
-	             .antMatchers("/resources/**").permitAll()
-	             .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**","/splines/**","/units/**","/knotpoints/**").hasRole("ADMIN")             
-	             .anyRequest().authenticated()             
-	             .and()
-	             .addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)
-	          .formLogin().loginPage("/login").permitAll()             
-	             .and()
-	         .logout().permitAll();
+			 .antMatchers("/resources/**").permitAll()
+			 .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**","/splines/**","/units/**","/knotpoints/**").hasRole("ADMIN")             
+			 .anyRequest().authenticated()
+			 .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)
+			 .formLogin().loginPage("/login").permitAll().and().logout().permitAll();
 		}
 		
 	}
