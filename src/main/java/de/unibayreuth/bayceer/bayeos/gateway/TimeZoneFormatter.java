@@ -16,9 +16,11 @@ public class TimeZoneFormatter implements Formatter<Date> {
 	private TimeZone tz = TimeZone.getDefault();	
 	
 	public void setTimeZone(){
-		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-		String id  = (String) requestAttributes.getAttribute("tz", RequestAttributes.SCOPE_SESSION);
-		tz = TimeZone.getTimeZone(id);
+		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();		
+		Object ra = requestAttributes.getAttribute("tz", RequestAttributes.SCOPE_SESSION);
+		if (ra != null){			
+			tz = TimeZone.getTimeZone((String)ra);
+		}
 	}	
 	
 	public Date parse(String text, Locale locale) throws ParseException {
