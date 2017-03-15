@@ -76,7 +76,7 @@ public class CommentController extends AbstractCRUDController {
 		com.setUser(repoUser.findByUserName(principal.getName()));		
 		repo.save(com);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
-		return "redirect:/comments/" + id;
+		return "redirect:/boards/" + id + "?tab=comments";
 	}
 	
 	

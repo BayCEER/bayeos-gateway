@@ -37,10 +37,14 @@
 						<a href="#settings"	aria-controls="settings" role="tab" data-toggle="tab" th:text="#{a.properties}">Settings</a>
 					</li>					
 					<li role="presentation">						
-						<a th:href="@{'/messages/__${board.id}__'}"><span th:text="#{e.messages}"></span> <span class="badge" id="msgBadge" th:text="${board.messageCount}">0</span></a>						
+						<a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">
+							<span th:text="#{e.messages}"></span> <span class="badge" id="msgBadge" th:text="${board.messageCount}">0</span>
+						</a>			
 					</li>
-					<li role="presentation">
-						<a th:href="@{'/comments/__${board.id}__'}"><span th:text="#{e.comments}"></span> <span class="badge" id="comBadge" th:text="${board.commentCount}">0</span></a>
+					<li role="presentation">					
+						<a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">
+						   <span th:text="#{e.comments}"></span> <span class="badge" id="comBadge" th:text="${board.commentCount}">0</span>
+						</a>
 					</li>				
 					
 				</ul>
@@ -53,9 +57,9 @@
 									<th th:text="#{e.channel}">Channel</th>
 									<th th:text="#{channel.lastResultValue}">Last Value</th>
 									<th th:text="#{channel.label} + '[' + #{e.unit} +  ']'">Label [Unit]</th>
-									<th th:text="#{channel.lastResultTime}">Last Result Time</th>
-									<th>Nagios</th>
-									<th></th>
+									<th class="hidden-xs hidden-sm" th:text="#{channel.lastResultTime}">Last Result Time</th>
+									<th class="hidden-xs hidden-sm">Nagios</th>
+									<th class="hidden-xs hidden-sm"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -63,12 +67,11 @@
 									<td><a href="editChannel.html" th:href="@{'/channels/' + ${cha.id}}" th:text="${cha.nr}">Nr</a></td>									
 									<td th:text="${cha.lastResultValue}" th:class="(${cha.statusValid}) ? (${'td-' + cha.statusValid.toString().toLowerCase()}):''"></td>									
 									<td th:text="${cha.getQuantity()}"></td>
-									<td th:text="${{cha.lastResultTime}}" th:class="(${cha.statusComplete}) ? (${'td-' + cha.statusComplete.toString().toLowerCase()}):''"></td>
-									<td>																		
+									<td th:text="${{cha.lastResultTime}}" class="hidden-xs hidden-sm" th:classappend="(${cha.statusComplete}) ? (${'td-' + cha.statusComplete.toString().toLowerCase()}):''"></td>
+									<td class="hidden-xs hidden-sm">																		
 										<input th:name="|nsw${cha.id}|" type="checkbox" th:checked="${cha.nagios}" th:id="${cha.id}" data-size="mini"></input>										
 									</td>										 
-									<td>
-										
+									<td class="hidden-xs hidden-sm">										
 										<div th:replace="table::edit(@{'/channels/' + ${cha.id}},false)"></div>
 										<div th:replace="table::delete(@{'/channels/delete/' + ${cha.id}},false)"></div>																																				
 										  														
@@ -77,7 +80,7 @@
 							</tbody>
 						</table>
 					</div>							
-			 <div role="tabpanel" class="tab-pane fade" id="settings">
+			 		<div role="tabpanel" class="tab-pane fade" id="settings">
 							<div th:replace="block::channelSettings(Checks)"></div>
 							<div class="block">
 								<div class="block-header">Exports</div>
@@ -89,10 +92,47 @@
 																				
 									</div>
 								</div>
-							</div>
-						</div>					
-				</div>
-			</div>
+							</div>						
+					</div>
+					<div role="tabpanel" class="tab-pane fade in" id="messages">
+						<table id="tableMessages" class="table table-hover nowrap col-sm-12">
+						<thead>
+						<tr>
+						<th th:text="#{msg.resultTime}">Time</th>
+						<th th:text="#{msg.type}">Type</th>
+						<th th:text="#{msg.content}">Content</th>					
+						</tr>
+						</thead>
+						<tbody>
+						</tbody>
+						</table>				
+					</div>
+					
+					<div role="tabpanel" class="tab-pane fade in" id="comments">
+					<div class="block-action">
+					
+					<a class="btn btn-default" th:href="@{'/comments/create/__${board.id}__'}"> <span
+						class="glyphicon glyphicon-plus"></span> <span th:text="#{action.create}"></span>
+					</a>											
+						<table id="tableComments" class="table table-hover nowrap col-sm-12">
+						<thead>
+						<tr>
+						<th th:text="#{com.insertTime}">Time</th>
+						<th th:text="#{com.user}">User</th>
+						<th th:text="#{com.content}">Content</th>					
+						</tr>
+						</thead>
+						<tbody>
+						</tbody>
+						</table>				
+					</div>
+										
+					</div>
+					</div>
+					</div>
+										
+			
+			
 			
 			<div class="block-action">
 				<button type="submit" class="btn btn-primary">
@@ -133,9 +173,31 @@
 			
 		</form>
 		
-	<script th:inline="javascript">
-	  /*<![CDATA[*/
-	   	$('#myTab a[href="#channels"]').tab('show');	
+	<script th:inline="javascript" language="javascript" class="init">
+	     
+	    // Default: channels 			   
+	   	var tab = [[ ${tab} ]];
+	   	
+	   	var comCount = 0;
+	   	
+	   	$('#myTab a[aria-controls="' + tab + '"]').tab('show');
+	   	
+	   	var language = {
+ 					"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
+ 					"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ , 					
+ 					"info": /*[[#{datatable.info}]]*/, 
+ 					"infoEmpty": /*[[#{datatable.infoEmpty}]]*/,
+ 					"infoFiltered": /*[[#{datatable.infoFiltered}]]*/,
+ 					"loadingRecords": /*[[#{datatable.loadingRecords}]]*/,
+ 					"search": /*[[#{datatable.search}]]*/,
+ 					"paginate" : {
+ 						"first" : /*[[#{datatable.first}]]*/,
+ 						"last" : /*[[#{datatable.last}]]*/,
+ 						"next" : /*[[#{datatable.next}]]*/,
+ 						"previous" : /*[[#{datatable.previous}]]*/,
+ 					}
+ 		 };
+	   	
 	   	 $(document).ready(function(){		
 			$("input[name^='nsw']").bootstrapToggle();		
 			$("input[name^='nsw']").change(function() {
@@ -145,14 +207,128 @@
 		         data: "enabled="+ $(this).prop('checked')		               			 			 				 
 		 		})															
 		 	});
+		 
+		 // Table messages 
+		 $('#tableMessages').DataTable( {
+		 	"language": language,
+ 		    "info": false,
+ 		    "searching": false,
+		 	"responsive": true,
+		 	"autoWidth": false,
+		 	"processing": true,
+		  	"serverSide": true,
+		  	"lengthChange": false,
+		   	"columns": [					
+                    {data: 'resultTime', width: "10%",
+                     render: function(data,type,row) {                     
+                     		if (row.resultTime != null){
+                    			var date = new Date(row.resultTime); 
+                    			return date.toLocaleDateString() + " " + date.toLocaleTimeString();                    			
+                    		} else {
+                    			return '';
+                    		}
+                     } 
+                    },
+                    {data: 'type', width: "10%",
+                     render: function(data,type,row) {
+                    	 return row.type;
+                     } 
+                    },
+                    {data: 'content',
+                     render: function(data,type,row) {
+                    	 return row.content;
+                     } 
+                    }],
+             "order": [[ 0, "desc" ]],      
+             "ajax": {
+                	'contentType': 'application/json',
+                	'url': [[ @{/rest/messages} + '/' + ${board.id} ]],
+                	'type': 'POST',
+                    'data': function(d) {                    		
+                            return JSON.stringify(d);
+                    }
+                },
+               "initComplete": function(settings, json) {               		
+               		$('#msgBadge').text(this.api().page.info().recordsFiltered);   
+               } 
+             });
+             
+             
+         // Table comments 
+		 var comments = $('#tableComments').DataTable( {
+		 	"language": language,
+ 		    "info": false,
+ 		    "rowId": 'id',    
+ 		    "searching": false,
+		 	"responsive": true,
+		 	"autoWidth": false,
+		 	"processing": true,
+		  	"serverSide": true,
+		  	"lengthChange": false,
+		   	"columns": [					
+                    {data: 'insertTime', width: "10%",
+                     render: function(data,type,row) {                     
+                     		if (row.insertTime != null){
+                    			var date = new Date(row.insertTime); 
+                    			return date.toLocaleDateString() + " " + date.toLocaleTimeString();                    			
+                    		} else {
+                    			return '';
+                    		}
+                     } 
+                    },
+                    {data: 'user.userName', width: "10%",
+                     render: function(data,type,row) {
+                    	 return row.user.userName;
+                     } 
+                    },
+                    {data: 'content',
+                     render: function(data,type,row) {
+                    	 return row.content;
+                     } 
+                    }, {
+                     searchable: false, sortable: false,
+                     render: function ( data, type, row ) {
+                        	var ret = '<td class="link">';
+                    	    var del = /*[[ #{action.delete} ]]*/;
+                    	    var confirm =  [[ #{dialog.confirm} ]];
+            		        ret += '<a class="btn btn-xs btn-default deleteComment"><span class="glyphicon glyphicon-remove"></span> ' + del + '</a>';
+            			    return ret += '</td>';
+                     }
+                    }],
+             "order": [[ 0, "desc" ]],  
+             "ajax": {
+                	'contentType': 'application/json',
+                	'url': [[ @{/rest/comments} + '/' + ${board.id} ]],
+                	'type': 'POST',
+                    'data': function(d) {
+                            return JSON.stringify(d);
+                    }
+                },
+               "initComplete": function(settings, json) {
+               		comCount = this.api().page.info().recordsFiltered             		
+               		$('#comBadge').text(comCount);   
+               } 
+             });
+             
+           $('#comments tbody').on('click','.deleteComment', function () {
+        	if (confirm( [[#{msg.confirm}]] )) {            
+           		 var id = $(this).parent().parent().attr('id');
+            	$.ajax({
+				 url: [[ @{/rest/comments/delete} ]] + '/' + id,          
+		         success: function(){		        	 		        	 
+		        	 comments.row(id).remove().draw(true);	
+		        	 $('#comBadge').text(--comCount);
+			     }		               			 			 				 
+		 	});
+        	}
+            	 	      
+        } );
+              
+               
+             
+  
 		 });					
-		 	
-	   	
-	   	 
-	 	//TODO Implement Live Data
-	  /*]]>*/ 
 	</script>
-
 
 	</div>
 	
