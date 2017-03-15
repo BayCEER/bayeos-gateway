@@ -118,12 +118,13 @@
                     { searchable: false, sortable: false,
                       render: function ( data, type, row ) {                                           	                         	    
                     	    var ret = '<td class="link">';
-                    	    var edit = /*[[ #{action.edit} ]]*/
-                    	    var chart = /*[[ #{action.chart} ]]*/
-                    	    var del = /*[[ #{action.delete} ]]*/
+                    	    var edit = /*[[ #{action.edit} ]]*/;
+                    	    var chart = /*[[ #{action.chart} ]]*/;
+                    	    var del = /*[[ #{action.delete} ]]*/;
+                    	    var confirm =  [[ #{dialog.confirm} ]];
             		        ret += '<a class="btn btn-xs btn-default" href="./boards/' + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + edit + '</a>';
             		        ret += '<a class="btn btn-xs btn-default" href="./boards/chart/' + row.id + '"><span class="glyphicon glyphicon-stats"></span> ' + chart + '</a>';
-            		        ret += '<a class="btn btn-xs btn-default" href="./boards/delete/' + row.id + '" onclick="return confirm(\'Are you sure?\');"><span class="glyphicon glyphicon-remove"></span> ' + del + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default" href="./boards/delete/' + row.id + '" onclick="' + confirm + '"><span class="glyphicon glyphicon-remove"></span> ' + del + '</a>';
             			    return ret += '</td>';
                 		}	
                     }                                                            
