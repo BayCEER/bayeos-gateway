@@ -56,13 +56,14 @@ public class BoardController extends AbstractCRUDController {
 	
 	
 	@RequestMapping(path="/boards/{id}", method = RequestMethod.GET)
-	public String edit(@PathVariable Long id, Model model){	
+	public String edit(@PathVariable Long id, Model model, @RequestParam(defaultValue="channels") String tab){	
 		Board b = repo.findOne(id);
 		if (b!=null && b.getChannels()!=null){
 			Collections.sort(b.getChannels());
 		}
 		model.addAttribute("board", b);
 		model.addAttribute("groups",repoGroup.findAll());
+		model.addAttribute("tab",tab);
 		return "editBoard";
 	}
 	
