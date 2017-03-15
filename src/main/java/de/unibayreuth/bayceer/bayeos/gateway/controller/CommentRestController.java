@@ -28,7 +28,7 @@ public class CommentRestController {
 	
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(path ="/rest/comments/{id}", method = RequestMethod.POST)
-	public DataTablesOutput<Comment> findComments(@Valid @RequestBody DataTablesInput input, @PathVariable Long id) {		
+	public DataTablesOutput<Comment> findComments(@Valid @RequestBody DataTablesInput input, @PathVariable final Long id) {		
 		Specification<Comment> spec = new Specification<Comment>() {
 			@Override
 			public Predicate toPredicate(Root<Comment> root, CriteriaQuery<?> query, CriteriaBuilder cb) {

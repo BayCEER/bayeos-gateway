@@ -34,7 +34,7 @@ public class MessageRestController {
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(path = "/rest/messages/{id}", method = RequestMethod.POST)
 	public DataTablesOutput<Message> findMessages(@Valid @RequestBody DataTablesInput input, @PathVariable Long id) {
-		Board b = repoBoard.findOne(id);
+		final Board b = repoBoard.findOne(id);
 		Specification<Message> spec = new Specification<Message>() {
 			@Override
 			public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
