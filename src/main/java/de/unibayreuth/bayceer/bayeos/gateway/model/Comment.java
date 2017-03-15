@@ -9,6 +9,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Entity
 public class Comment extends UniqueEntity {
 	
@@ -18,12 +22,16 @@ public class Comment extends UniqueEntity {
 
 	@ManyToOne
 	@JoinColumn(name="user_id",nullable=false)
+	@JsonView(DataTablesOutput.View.class)
 	User user;
 	
 	
 	@OrderBy("insertTime DESC")
 	@Column(name="insert_time")	
+	@JsonView(DataTablesOutput.View.class)
 	Date insertTime = new Date();
+	
+	@JsonView(DataTablesOutput.View.class)
 	String content;
 	
 	
@@ -36,6 +44,10 @@ public class Comment extends UniqueEntity {
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	public String getAuthor(){
+		return user.getUserName();
 	}
 	
 	public String getContent() {

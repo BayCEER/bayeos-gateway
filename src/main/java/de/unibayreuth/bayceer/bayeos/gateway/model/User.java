@@ -8,11 +8,15 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @Table(name="users")
 public class User extends UniqueEntity {
 	
+	@JsonView(DataTablesOutput.View.class)
 	@Column(name="username")
 	@NotEmpty
 	
