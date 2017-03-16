@@ -5,7 +5,7 @@
 
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.0.4-SNAPSHOT</version>
+	<version>2.0.5-SNAPSHOT</version>
 
 
 	<licenses>
@@ -60,7 +60,7 @@
 		<profile>
 			<id>prod</id>
 			<properties>
-				<db.url>jdbc:postgresql://localhost/xbee</db.url>
+				<db.url>jdbc:postgresql://db/xbee</db.url>
 				<skipTests>true</skipTests>
 			</properties>
 			<build>
@@ -402,18 +402,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-        	<exclusion>
-            	<groupId>org.springframework.boot</groupId>
-            	<artifactId>spring-boot-starter-tomcat</artifactId>
-        	</exclusion>
-    		</exclusions>			
+			<artifactId>spring-boot-starter-web</artifactId>			        				
 		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jetty</artifactId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -427,11 +421,13 @@
 		</dependency>
 		
 		<!-- This breaks web flow --> 
+		<!--  
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
-		</dependency>				 
+		</dependency>
+		 -->				 
 		 
 		
 		<dependency>
