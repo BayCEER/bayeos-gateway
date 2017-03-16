@@ -15,7 +15,7 @@
 	</on-start>
     
     
-    <view-state id="props" model="boardTemplate" view="/boardTemplate/new/props">
+    <view-state id="props" model="boardTemplate" view="newBoardTemplate/props">
 		<binder>            	
             <binding property="name"></binding>
            	<binding property="description"></binding>
@@ -26,7 +26,7 @@
 		</transition>		        
     </view-state>
     
-    <view-state id="defaults" model="boardTemplate" view="/boardTemplate/new/defaults">
+    <view-state id="defaults" model="boardTemplate" view="newBoardTemplate/defaults">
     	<binder>            	
             <binding property="criticalMin"></binding>
            	<binding property="criticalMax"></binding>
@@ -43,7 +43,7 @@
     
     
     
-    <view-state id="channels" model="boardTemplate" view="/boardTemplate/new/channels">
+    <view-state id="channels" model="boardTemplate" view="newBoardTemplate/channels">
     	<transition on="add" to="addTemplate">
     		<evaluate result="flowScope.channelTemplate" expression="new de.unibayreuth.bayceer.bayeos.gateway.model.ChannelTemplate()"></evaluate>     		
 		</transition>
@@ -59,12 +59,12 @@
     	<transition on="back" to="defaults"/>
     </view-state>
     
-     <view-state id="editTemplate" model="channelTemplate" view="/boardTemplate/new/channel">
+     <view-state id="editTemplate" model="channelTemplate" view="newBoardTemplate/channel">
      	<transition on="back" to="channels"/>   
     	<transition on="submit" to="channels"/>  	  
     </view-state>
     
-    <view-state id="addTemplate" model="channelTemplate" view="/boardTemplate/new/channel">
+    <view-state id="addTemplate" model="channelTemplate" view="newBoardTemplate/channel">
     	<transition on="submit" to="channels">
     		<evaluate expression="boardTemplate.addTemplate(flowScope.channelTemplate)"></evaluate>
     	</transition>    	

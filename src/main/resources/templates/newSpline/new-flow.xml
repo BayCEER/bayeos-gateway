@@ -6,14 +6,14 @@
 		
 	<var name="sp" class="de.unibayreuth.bayceer.bayeos.gateway.model.Spline"/>	
 	
-    <view-state id="name" model="sp" view="/spline/new/name">
+    <view-state id="name" model="sp" view="newSpline/name">
 		<binder>            	
             <binding property="name"></binding>            
         </binder>                
         <transition on="next" to="knotpoints"/>        			        
     </view-state>
     
-    <view-state id="knotpoints" model="sp" view="/spline/new/knotpoints">
+    <view-state id="knotpoints" model="sp" view="newSpline/knotpoints">
     	<transition on="addPoint" to="addKnotpoint">
     		<set name="flowScope.point" value="new de.unibayreuth.bayceer.bayeos.gateway.model.KnotPoint()"></set>
 		</transition>		
@@ -29,12 +29,12 @@
     	<transition on="back" to="name"/>    		    	
     </view-state>    
                 
-    <view-state id="editKnotpoint" model="point" view="/spline/new/knotpoint">    	   
+    <view-state id="editKnotpoint" model="point" view="newSpline/knotpoint">    	   
     	<transition on="back" to="knotpoints"/>   
     	<transition on="submit" to="knotpoints"/>  	  
     </view-state>
     
-    <view-state id="addKnotpoint" model="point" view="/spline/new/knotpoint">    	   
+    <view-state id="addKnotpoint" model="point" view="newSpline/knotpoint">    	   
     	<transition on="submit" to="knotpoints">
     		<evaluate expression="sp.addKnotPoint(flowScope.point)"></evaluate>
     	</transition>
