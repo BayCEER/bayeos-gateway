@@ -27,13 +27,15 @@ public class FrameController {
 
 	@RequestMapping(path = "/frame/saveFlat", method = RequestMethod.POST, headers = "Content-Type=application/x-www-form-urlencoded")
 	@ResponseBody
-	public ResponseEntity saveFlat(@RequestParam MultiValueMap<String,String> params, HttpServletRequest request) {			
-			String sender = "IP:" + request.getRemoteAddr();
-			
-			log.info("Received a message from " + sender);
+	public ResponseEntity saveFlat(@RequestParam MultiValueMap<String,String> params, HttpServletRequest request) {	
+		
+			String sender;			
 			if (params.containsKey("sender")){
 				sender = params.get("sender").get(0);
+			} else {
+				sender = "IP:" + request.getRemoteAddr();
 			}
+			log.info("Received a request from: " + sender);
 			
 			List<String> frames = params.get("bayeosframes[]");
 			if (params.containsKey("bayeosframe")){
