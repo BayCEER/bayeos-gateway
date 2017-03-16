@@ -12,8 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableJpaRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class)
-public class App {
-	
+public class App {	
 
 	@Value("${project.version}")
 	String version;
@@ -30,8 +29,7 @@ public class App {
 		
 		Properties p = new Properties();
 		p.putIfAbsent("project.version", version);		
-		resourceBundleMessageSource.setCommonMessages(p);
-		
+		resourceBundleMessageSource.setCommonMessages(p);		
 		return resourceBundleMessageSource;
 	}
 	
