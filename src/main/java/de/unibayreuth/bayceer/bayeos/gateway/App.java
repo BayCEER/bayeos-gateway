@@ -28,18 +28,9 @@ public class App {
 		resourceBundleMessageSource.setDefaultEncoding("UTF-8");		
 		
 		Properties p = new Properties();
-		p.putIfAbsent("project.version", version);		
+		p.setProperty("project.version", version);				
 		resourceBundleMessageSource.setCommonMessages(p);		
 		return resourceBundleMessageSource;
 	}
-	
-//	@Bean
-//	public Filter logFilter() {
-//	    CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
-//	    filter.setIncludeQueryString(true);
-//	    filter.setIncludePayload(true);
-//	    filter.setMaxPayloadLength(5120);
-//	    return filter;
-//	}
 		
 }
