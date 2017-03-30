@@ -19,7 +19,7 @@ public class BoardGroup extends UniqueEntity{
 	String name;
 		
 	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.PERSIST)
-	public List<Board> boards;
+	List<Board> boards;
 
 	@Column(name="db_folder_id")
 	Integer dbFolderId;

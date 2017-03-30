@@ -18,7 +18,7 @@
 		 						<span th:text="#{chaTemplate.nr}">Number</span>
 							</th>
 							<th>
-		 						<span th:text="#{chaTemplate.label}">Label</span>
+		 						<span th:text="#{chaTemplate.name}">Name</span>
 							</th>
 							<th>
 		 						<span th:text="#{chaTemplate.phenomena}">Phenomena</span>
@@ -34,7 +34,7 @@
 		 				<tr th:each="t : ${boardTemplate.templates}">
 						<td><a th:href="${flowExecutionUrl}+'&amp;_eventId=edit' + '&amp;index=' + ${tStat.index}"	th:text="${t.nr}">Nr</a>
 						</td>					
-						<td th:text="${t.label}">Label</td>
+						<td th:text="${t.name}">Name</td>
 						<td th:text="${t.phenomena}">Phenomena</td>
 						<td>
 							<div class="pull-right">

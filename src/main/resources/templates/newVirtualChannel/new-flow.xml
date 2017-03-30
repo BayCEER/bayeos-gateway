@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+	
+	
+		
+	
+	<var name="vc" class="de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannelWebFlow"/>
+	
+	<input name="boardId" type="long" required="true"/>
+	 	  
+	<on-start>	
+	     <evaluate result="flowScope.channelFunctions" expression="channelFunctionRepository.findAll()"></evaluate>	     
+	</on-start>
+        
+    <view-state id="nr" model="vc" view="newVirtualChannel/nr">		
+    	<binder>            	
+            <binding property="nr"></binding>            
+        </binder> 
+        <transition on="next" to="func">
+        </transition>         				       
+    </view-state>
+    
+    <view-state id="func" model="vc" view="newVirtualChannel/function">
+    	<binder>            	
+            <binding property="index"></binding>
+         </binder>
+    	<transition on="back" to="nr">
+    	</transition>    	
+        <transition on="next" to="binding">
+        	<evaluate expression="vc.init(channelFunctions[vc.index])"/>        				
+        </transition>
+        
+    </view-state>
+               
+    <view-state id="binding" model="vc" view="newVirtualChannel/binding">    						
+		<transition on="submit" to="created">
+			<evaluate expression="virtualChannelWebFlowService.create(boardId,vc,channelFunctions[vc.index])"></evaluate>		    	   	
+    	</transition>    	
+    	<transition on="back" to="func"/>
+    </view-state>
+    
+            
+    <end-state id="created" view="externalRedirect:contextRelative:/boards/#{boardId}?tab=virtualChannels">
+    	<output name="globalMessage" value="'Virtual channel created.'" />    	
+    </end-state>
+    
+    <end-state id="canceled" view="externalRedirect:contextRelative:/boards/#{boardId}?tab=virtualChannels">    	
+    </end-state>
+    
+    <global-transitions>
+			<transition on="cancel" to="canceled" />			
+	</global-transitions>
+
+</flow>

@@ -1,50 +1,50 @@
 <board name='MCP Template ÖBG' revision='1.0' samplingInterval='30'>
-  <channel nr='1' label='CPU Time' phenomena='Time' aggrInterval='10 min' aggrFunction='max'>
+  <channel nr='1' name='CPU Time' phenomena='Time' aggrInterval='10 min' aggrFunction='max'>
     <unit name='Millisekunden' />
   </channel>
-  <channel nr='2' label='Battery Voltage' phenomena='Voltage' aggrInterval='10 min' aggrFunction='avg' criticalMin='2.4' warningMin='2.5'>
+  <channel nr='2' name='Battery Voltage' phenomena='Voltage' aggrInterval='10 min' aggrFunction='avg' criticalMin='2.4' warningMin='2.5'>
     <unit name='Volts' />
     <spline name='1:1000'>
       <knotePoint x='0.0' y='0.0' />
       <knotePoint x='1000.0' y='1.0' />
     </spline>
   </channel>
-  <channel nr='3' label='SHT21-Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg' criticalMax='60.0' criticalMin='-50.0'>
+  <channel nr='3' name='SHT21-Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg' criticalMax='60.0' criticalMin='-50.0'>
     <unit name='Celsius' />
     <spline name='1:100'>
       <knotePoint x='0.0' y='0.0' />
       <knotePoint x='100.0' y='1.0' />
     </spline>
   </channel>
-  <channel nr='4' label='SHT21-Humidity' phenomena='Humidity' aggrInterval='10 min' aggrFunction='avg' criticalMax='150.0' criticalMin='0.0'>
+  <channel nr='4' name='SHT21-Humidity' phenomena='Humidity' aggrInterval='10 min' aggrFunction='avg' criticalMax='150.0' criticalMin='0.0'>
     <unit name='Percentage' />
     <spline name='1:100'>
       <knotePoint x='0.0' y='0.0' />
       <knotePoint x='100.0' y='1.0' />
     </spline>
   </channel>
-  <channel nr='5' label='Photodiode' phenomena='Light' aggrInterval='10 min' aggrFunction='avg'>
+  <channel nr='5' name='Photodiode' phenomena='Light' aggrInterval='10 min' aggrFunction='avg'>
     <unit name='Millivolts' />
     <spline name='1:100'>
       <knotePoint x='0.0' y='0.0' />
       <knotePoint x='100.0' y='1.0' />
     </spline>
   </channel>
-  <channel nr='6' label='Windspeed (avg)' phenomena='Wind' aggrInterval='10 min' aggrFunction='avg'>
+  <channel nr='6' name='Windspeed (avg)' phenomena='Wind' aggrInterval='10 min' aggrFunction='avg'>
     <unit name='meter per second' />
     <spline name='1:100'>
       <knotePoint x='0.0' y='0.0' />
       <knotePoint x='100.0' y='1.0' />
     </spline>
   </channel>
-  <channel nr='7' label='MLX90614 Ambient Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg'>
+  <channel nr='7' name='MLX90614 Ambient Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg'>
     <unit name='Celsius' />
     <spline name='1:100'>
       <knotePoint x='0.0' y='0.0' />
       <knotePoint x='100.0' y='1.0' />
     </spline>
   </channel>
-  <channel nr='8' label='MLX90614 Object Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg'>
+  <channel nr='8' name='MLX90614 Object Temperature' phenomena='Temperature' aggrInterval='10 min' aggrFunction='avg'>
     <unit name='Celsius' />
     <spline name='1:100'>
       <knotePoint x='0.0' y='0.0' />

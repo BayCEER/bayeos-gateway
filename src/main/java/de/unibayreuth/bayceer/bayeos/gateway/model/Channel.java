@@ -17,7 +17,7 @@ import org.hibernate.annotations.Formula;
 public class Channel extends CheckDevice implements Comparable<Channel>{
 
 	private String nr;
-	private String label;
+	private String name;
 	private String phenomena;
 	
 	
@@ -81,12 +81,12 @@ public class Channel extends CheckDevice implements Comparable<Channel>{
 		this.nr = nr;
 	}
 
-	public String getLabel() {
-		return label;
+	public String getName() {
+		return name;
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getPhenomena() {
@@ -193,9 +193,9 @@ public class Channel extends CheckDevice implements Comparable<Channel>{
 	
 	public String getQuantity(){		
 		if (unit != null){
-			return label + "[" + getUnit().getName() + "]";
+			return name + "[" + getUnit().getName() + "]";
 		} else {
-			return label;
+			return name;
 		}
 	}
 

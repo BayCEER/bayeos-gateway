@@ -7,7 +7,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -40,9 +39,11 @@ public class Board extends CheckDevice {
 	Boolean dbAutoExport = false;
 	Boolean denyNewChannels = false;
 	
-	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy="board", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)
 	List<Channel> channels;
+	
+	@OneToMany(mappedBy="board", cascade=CascadeType.ALL)
+	List<VirtualChannel> virtualChannels;
 		
 	@Formula("(select count(*) from board_comment where board_comment.board_comments_id = id)")
 	Integer commentCount;
@@ -180,6 +181,14 @@ public class Board extends CheckDevice {
 		return channels;
 	}
 	
+	public List<String> getChannelNrs() {
+		List<String> ret = new ArrayList();		
+		for(Channel c:channels){
+			ret.add(c.getNr());
+		}
+		return ret;
+	}
+	
 	public List<Long> getChannelIds(){
 		List<Long> ret = new ArrayList<>();		
 		for(Channel c:channels){
@@ -191,7 +200,27 @@ public class Board extends CheckDevice {
 	public void setChannels(List<Channel> channels) {
 		this.channels = channels;
 	}
-		
+
+	public List<VirtualChannel> getVirtualChannels() {
+		return virtualChannels;
+	}
+	
+	
+	public void setVirtualChannels(List<VirtualChannel> virtualChannels) {
+		this.virtualChannels = virtualChannels;
+	}
+	
+	
+	@Override
+	public String toString() {
+		StringBuffer b = new StringBuffer();
+		b.append("ID:").append(getId()).append(",ORIGIN:").append(getOrigin());
+		for(VirtualChannel vc:getVirtualChannels()){
+			b.append(",VC:{ID:").append(vc.getId()).append(",DEC:").append(vc.getDeclaration()).append("}\n");
+		}
+		return b.toString();
+	}
+	
 	
 	 
 

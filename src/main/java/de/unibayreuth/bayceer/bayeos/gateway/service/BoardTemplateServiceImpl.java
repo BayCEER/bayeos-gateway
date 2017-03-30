@@ -127,8 +127,8 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 		for(Channel c:b.getChannels()){			
 			ChannelTemplate ct = new ChannelTemplate();
 			BeanUtils.copyProperties(c, ct, new String[]{"id"});	
-			if (ct.getLabel() == null){
-				ct.setLabel("Channel " + ct.getNr());
+			if (ct.getName() == null){
+				ct.setName("Channel " + ct.getNr());
 			}
 			t.addTemplate(ct);
 		}		

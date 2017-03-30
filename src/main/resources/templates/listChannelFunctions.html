@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.channelFunctions}">All functions</title>
+</head>
+<body>
+	<div layout:fragment="content">
+			<h3 th:text="#{nav.channelFunctions}">Units</h3>			
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+						<th><a class="sorted" sd:pagination-sort="name"
+							th:text="#{a.name}">Name</a>
+						</th>										
+						<th>
+							<div class="pull-right">
+								<div th:replace="table::add(@{'/channelFunctions/create'})">
+								</div>				
+							</div>
+						</th>
+					</tr>					
+			
+				</thead>
+				<tbody>
+					<tr th:each="f : ${channelFunctions}">
+						<td><a th:href="@{/channelFunctions/{id}(id=${f.id})}"
+							th:text="${f.getFunctionHead()}">Name A</a>
+						</td>											
+						<td>
+							<div class="pull-right">																				
+								<div th:replace="table::edit(@{'/channelFunctions/' + ${f.id}},false)"></div>
+								<div th:replace="table::delete(@{'/channelFunctions/delete/' + ${f.id}},false)"></div>
+							</div>  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.virtualChannel}">Virtual Channel</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.virtualChannel}">Virtual Channel</h3>
+			<!-- <span th:text="${vc}"></span> -->
+			<form method="post" th:object="${vc}" th:action="${flowExecutionUrl}">				
+			
+			<div class="form-group">	
+			
+			<label th:text="|#{vc.binding}:|" class="control-label">Binding:</label>				
+				<table class="table table-condensed">
+				
+				<thead>
+					<tr>					
+						<th th:text="#{cfp.parameter}" class="col-xs-2">Parameter</th>
+						<th th:text="#{cfp.description}" class="col-xs-8">Description</th>
+						<th th:text="#{e.channel}" class="col-xs-2">Kanal</th>												
+					</tr>
+				</thead>				
+				<tbody>
+				 
+					<tr th:each="p,stat :${channelFunctions[__${vc.index}__].parameters}">
+						<td>											
+						   	<span th:text="${p.name}"></span>						   			
+						</td>
+						<td>							
+							<span th:text="${p.description}"></span>
+						</td>						
+						<td>																
+							<input type="text" class="form-control" required="required" th:field="*{channelNrs[__${stat.index}__]}"/>
+						</td>							
+					</tr>	
+				</tbody>		
+				</table>
+														
+			</div>						
+			<div class="form-group">
+				<a th:href="${flowExecutionUrl}+'&amp;_eventId=back'" th:text="#{action.back}" class="btn btn-default">Back</a>
+				<a th:text="#{action.cancel}" th:href="${flowExecutionUrl}+'&amp;_eventId=cancel'" class="btn btn-default">Cancel</a>
+			    <button th:text="#{action.save}" type="submit" name ="_eventId_submit" value="submit" class="btn btn-default">Save</button>		
+			</div>
+		</form>
+	</div>
+</body>
+</html>
+
+  

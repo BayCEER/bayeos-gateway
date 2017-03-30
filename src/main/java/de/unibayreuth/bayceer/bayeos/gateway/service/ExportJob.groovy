@@ -1,29 +1,19 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import groovy.sql.Sql
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.util.Vector
-
 import javax.annotation.PostConstruct
-import javax.servlet.ServletContext
 import javax.sql.DataSource
 
-import java.lang.Byte
-import java.net.InetAddress
-
 import org.apache.log4j.Logger
-import org.apache.xmlrpc.XmlRpcException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 import de.unibayreuth.bayceer.bayeos.client.Client
-import de.unibayreuth.bayceer.bayeos.objekt.ObjektArt
 import de.unibayreuth.bayceer.bayeos.objekt.ObjektNodeModel
+import groovy.sql.Sql
+import org.apache.xmlrpc.XmlRpcException
+import java.sql.SQLException
 
 @Component
 @Profile("default")
@@ -198,14 +188,14 @@ class ExportJob implements Runnable  {
 	private def syncChannels(Long boardId, Integer dbFolderId){
 		try {
 			
-			db.eachRow("""select c.id, c.label, u.db_unit_id, CASE WHEN c.aggr_interval_id is not null THEN extract(EPOCH from i.name::interval)::int ELSE COALESCE(b.sampling_interval,c.sampling_interval) END as sampling_interval
+			db.eachRow("""select c.id, c.name, u.db_unit_id, CASE WHEN c.aggr_interval_id is not null THEN extract(EPOCH from i.name::interval)::int ELSE COALESCE(b.sampling_interval,c.sampling_interval) END as sampling_interval
 					from channel c JOIN board b on (b.id = c.board_id) LEFT JOIN unit u on u.id = c.unit_id LEFT JOIN interval i on (i.id = c.aggr_interval_id)
-					where c.board_id = ? and c.db_series_id is null and c.label is not null and (c.db_exclude_auto_export is null or c.db_exclude_auto_export is false) order by c.nr asc""",[boardId]){ it ->																										
-				log.info("Syncing channel: ${it.label}")
-				Integer id = (om.newNode(dbFolderId, it.label, ObjektArt.MESSUNG_MASSENDATEN)).getId()
-				cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id,ObjektArt.MESSUNG_MASSENDATEN.toString(),[it.label,"Created by Gateway",it.sampling_interval,null,null,1,2] as Object[])
+					where c.board_id = ? and c.db_series_id is null and c.name is not null and (c.db_exclude_auto_export is null or c.db_exclude_auto_export is false) order by c.nr asc""",[boardId]){ it ->																										
+				log.info("Syncing channel: ${it.name}")
+				Integer id = (om.newNode(dbFolderId, it.name, ObjektArt.MESSUNG_MASSENDATEN)).getId()
+				cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id,ObjektArt.MESSUNG_MASSENDATEN.toString(),[it.name,"Created by Gateway",it.sampling_interval,null,null,1,2] as Object[])
 				db.executeUpdate("update channel set db_series_id = ? where id = ?",id,it.id)
-				log.info("Updated db series id for channel: ${it.label}")
+				log.info("Updated db series id for channel: ${it.name}")
 				if (it.db_unit_id != null){
 					om.setNodeReference(it.db_unit_id,id,ObjektArt.MESS_EINHEIT)
 				}

@@ -55,17 +55,25 @@
 																		
 									<li th:classappend="${controllerName == 'Function'}? 'active'">
 										<a th:href="@{/functions}">
-											<span class="glyphicon glyphicon-resize-vertical"></span> <span th:text="#{nav.functions}">Functions</span>
+											<span class="glyphicon glyphicon-resize-vertical"></span> <span th:text="#{nav.functions(#{nav.aggregate})}">Aggregation Functions</span>
 										</a>
-									  </li>
+									</li>
 									  
 									<li th:classappend="${controllerName == 'Interval'}? 'active'">
 										<a th:href="@{/intervals}">
-										<span class="glyphicon glyphicon-resize-horizontal"></span> <span th:text="#{nav.intervals}">Intervals</span>
+										<span class="glyphicon glyphicon-resize-horizontal"></span> <span th:text="#{nav.intervals(#{nav.aggregate})}">Aggregation Intervals</span>
 										</a>
 									</li>
-										
+									
 									<li class="divider" role="separator"></li>
+									
+									<li th:classappend="${controllerName == 'ChannelFunction'}? 'active'">
+										<a th:href="@{/channelFunctions}">										 
+										<span class="glyphicon glyphicon-subscript"></span> <span th:text="#{nav.channelFunctions}">Channel Functions</span>
+										</a>
+									</li>
+									
+									
 									<li th:classappend="${controllerName == 'Spline'}? 'active'">
 										<a th:href="@{/splines}">
 										<span class="glyphicon glyphicon-share-alt"></span> <span th:text="#{nav.splines}">Splines</span></a></li>

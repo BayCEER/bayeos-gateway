@@ -11,7 +11,7 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 	private static final long serialVersionUID = -2463673550735591743L;
 	
 	String nr;
-	String label;
+	String name;
 	String phenomena;	
 	
 	@ManyToOne()
@@ -37,11 +37,11 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 	
 
 	
-	public ChannelTemplate(String nr, String label, String phenomena, 
+	public ChannelTemplate(String nr, String name, String phenomena, 
 			Unit unit, Spline spline, Interval aggrInterval, Function aggrFunction) {
 		super();
 		this.nr = nr;
-		this.label = label;
+		this.name = name;
 		this.phenomena = phenomena;
 		this.unit = unit;
 		this.spline = spline;		
@@ -61,14 +61,7 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 		this.nr = nr;
 	}
 
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
+	
 	public String getPhenomena() {
 		return phenomena;
 	}
@@ -133,9 +126,17 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 	@Override
 	public String toString() {		
 		StringBuffer f = new StringBuffer();
-		f.append("Nr:").append(nr).append(",Label:").append(label).append(",Phenomena:").append(phenomena).append(",Unit:").append(unit).append(",Spline:").append(spline).append(",Interval:").append(aggrInterval);
+		f.append("Nr:").append(nr).append(",Name:").append(name).append(",Phenomena:").append(phenomena).append(",Unit:").append(unit).append(",Spline:").append(spline).append(",Interval:").append(aggrInterval);
 		f.append(",Function:").append(aggrFunction);
 		return f.toString();			
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 		
 }

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.virtualChannel}">Virtual Channel</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.virtualChannel}">Virtual Channel</h3>
+		<form method="post" th:object="${vc}" th:action="${flowExecutionUrl}">
+			<div class="form-group">
+				<label th:text="|#{e.channelFunction}:|" class="control-label">Select:</label>
+				<select class="form-control" id="index" name="index">
+					<option th:each="o, stat : ${channelFunctions}" th:text="${o}" th:value="${stat.index}" th:selected="${vc.index}"></option>													
+				</select>		 				 																			
+			</div>						
+			<div class="form-group">
+				<a th:href="${flowExecutionUrl}+'&amp;_eventId=back'" th:text="#{action.back}" class="btn btn-default">Back</a>
+				<a th:text="#{action.cancel}" th:href="${flowExecutionUrl}+'&amp;_eventId=cancel'" class="btn btn-default">Cancel</a>
+				<button type="submit" name ="_eventId_next" value="next" th:text="#{action.next}" class="btn btn-default">Next</button>							
+			</div>
+		</form>
+	</div>
+</body>
+</html>
+
+  

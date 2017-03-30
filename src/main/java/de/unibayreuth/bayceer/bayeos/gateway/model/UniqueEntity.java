@@ -29,7 +29,7 @@ public abstract class UniqueEntity implements Serializable  {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	
 	@JsonView(DataTablesOutput.View.class)
-	public Long id;
+	protected Long id;
 	
 	public Long getId() {
 		return id;

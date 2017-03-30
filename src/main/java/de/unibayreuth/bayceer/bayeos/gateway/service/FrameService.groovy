@@ -1,52 +1,64 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import java.sql.Array
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.sql.SQLException
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Hashtable
 import java.util.List
-import java.util.Map
+
+import javax.script.ScriptEngine
 import javax.sql.DataSource
-import groovy.sql.Sql
+
 import org.apache.log4j.Logger
 import org.postgresql.PGConnection
+import org.postgresql.copy.CopyIn
 import org.postgresql.copy.CopyManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.postgresql.copy.CopyIn
+import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
+import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository
+import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository
+import groovy.sql.Sql
 import bayeos.frame.FrameParserException
 import bayeos.frame.Parser
+
 
 @Service
 class FrameService {
 
 	@Autowired
 	DataSource dataSource
-	
+
+	@Autowired
+	ScriptEngine scriptEngine;
+
+	@Autowired
+	VirtualChannelRepository vcRepo;
+
+	@Autowired
+	BoardRepository boardRepo;
+
 	private Logger log = Logger.getLogger(FrameService.class)
-	
+
 	class Board {
 		Integer id
 		Date lrt
 		def channels = [:] 	// nr, id
+		def vchannels = [:] // channel_id, vc
 		Integer lrssi
 	}
- 
+
 	def saveFrames(String sender, List<String> frames) {
 		if ((frames == null) || (sender == null)) return
-		
-		Connection con = null
+
+			Connection con = null
 		CopyIn cin = null
-		
+
 		def boards = [:]
-						
+
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS+00")
 		dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-				
+
 		try {
 			con = dataSource.getConnection()
 			Sql db = new Sql(con)
@@ -55,32 +67,39 @@ class FrameService {
 			for(String f:frames) {
 				try {
 					def res = Parser.parseBase64(f,new Date(),sender,null)
-					
+
 					// Parser sends ts as nano secs
-					Date ts = new Date((long)(res['ts']/(1000*1000)))					
+					Date ts = new Date((long)(res['ts']/(1000*1000)))
 
 					// Check if board exists
-					Board b = boards[res['origin']]					 				
-					if (b == null) {							
-						b = new Board(id:findOrSaveBoard(db,res['origin']), lrt:ts,lrssi:res['rssi'], channels:[:])
-						boards[res['origin']] = b			
-					} else {						
+					Board b = boards[res['origin']]
+					if (b == null) {
+						def id = findOrSaveBoard(db,res['origin'])
+						b = new Board(id:id, lrt:ts,lrssi:res['rssi'], channels:[:], vchannels: boardRepo.findByOrigin(res['origin']).getVirtualChannels())
+						boards[res['origin']] = b
+					} else {
 						b.lrt = ts
 						b.lrssi = res['rssi']
 					}
-					
-					switch (res['type']) {						
+
+					switch (res['type']) {
 						case "DataFrame":
-							res['data'].each { key, value ->								
-								if (!b.channels.containsKey(key)){									
-									// log.info("Board:" + b.channels.toMapString())																		
+							res['data'].each { key, value ->
+								if (!b.channels.containsKey(key)){
+									// log.info("Board:" + b.channels.toMapString())
 									b.channels[key] = findOrSaveChannel(db,b.id,key)
 								}
-							}							
-							// Insert channel values from data using copy 
+							}
+
+						// Create virtual channels
+							for (VirtualChannel vc: b.vchannels){
+								b.channels[vc.getNr()] = findOrSaveChannel(db,b.id,vc.getNr())
+							}
+
+						// Write original values out using copy
 							CopyManager cm = ((PGConnection)con.unwrap(PGConnection.class)).getCopyAPI()
-							cin = cm.copyIn("COPY observation (channel_id,result_time,result_value) FROM STDIN WITH CSV")							
-							res['data'].each { key, value ->	
+							cin = cm.copyIn("COPY observation (channel_id,result_time,result_value) FROM STDIN WITH CSV")
+							res['data'].each { key, value ->
 								Float fvalue = (Float)value
 								if (!fvalue.isNaN()){
 									StringBuffer sb = new StringBuffer(200)
@@ -91,31 +110,52 @@ class FrameService {
 									cin.writeToCopy(pl,0,pl.length)
 									sb = null
 									obsCount++
-								}										
+								}
 							}
-							long r = cin.endCopy()							
+
+
+						// Write calculated values out
+							for (VirtualChannel vc: b.vchannels){
+								try {
+									def vcValue = vc.eval(scriptEngine, res['data'])
+									// println(vc.getDeclaration())
+									StringBuffer sb = new StringBuffer(200)
+									sb.append(b.channels[vc.getNr()])
+									sb.append(",").append(dateFormatter.format(ts))
+									sb.append(",").append(vcValue).append("\n")
+									byte[] pl = sb.toString().getBytes("UTF-8")
+									cin.writeToCopy(pl,0,pl.length)
+									sb = null
+									obsCount++
+								} catch (Exception e){
+									log.warn("Failed to calculate virtual channel value:${vc.nr}")
+									log.error(e.getMessage())
+								}
+							}
+
+							long r = cin.endCopy()
 							break
-						case "Message":							
-							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(),"INFO"])
+						case "Message":
+							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "INFO"])
 							log.debug("Message saved")
 							break
 						case "ErrorMessage":
-							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(),"ERROR"])
+							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "ERROR"])
 							log.debug("ErrorMessage saved")
 							break
 						default:
 							break
-					}														
+					}
 				} catch (FrameParserException e){
 					log.warn("Failed to parse frame:${f} Error:${e.getMessage()}")
 				}
 			}
-					
+
 			// Update channel and board meta data
 			boards.each{ board ->
 				updateMetaInfo(db, board.value)
 			}
-				
+
 			log.info("${obsCount} observations imported")
 			return true
 
@@ -131,6 +171,7 @@ class FrameService {
 			}
 		}
 	}
+
 
 
 
@@ -166,7 +207,7 @@ class FrameService {
 		}
 	}
 
-	
+
 	private void updateMetaInfo(Sql db, Board board) throws SQLException {
 
 		def channels = board.channels
@@ -235,8 +276,8 @@ class FrameService {
 					}
 				}
 	}
-	
 
 
-	
+
+
 }

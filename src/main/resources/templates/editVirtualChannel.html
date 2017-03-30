@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.virtualChannel}">Virtual Channel</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.virtualChannel}">Virtual Channel</h3>				
+		<form method="post" action="#" th:action="@{/virtualChannels/save}" th:object="${virtualChannel}">
+			<input type="hidden" th:field="*{id}"/>	
+			<input type="hidden" th:field="*{board.id}"/>			
+			<div th:replace="field::text('nr',#{vc.nr},true)"></div>
+			
+			<div class="form-group">
+				<label th:text="#{e.channelFunction} +':'" class="control-label">Channel Function:</label>				
+				<input type="number" class="hidden" th:id="channelFunction" th:name="channelFunction" th:value="*{channelFunction.id}"/>				
+				<input type="text" class="form-control" th:value="*{channelFunction.name}" disabled="disabled"/>							
+			</div>
+									
+			<div class="form-group">
+				<label th:text="#{vc.binding} +':'" class="control-label">Binding:</label>				
+				<table class="table table-condensed">
+				
+				<thead>
+					<tr>					
+						<th th:text="#{cfp.parameter}" class="col-xs-2">Parameter</th>
+						<th th:text="#{cfp.description}" class="col-xs-8">Description</th>
+						<th th:text="#{e.channel}" class="col-xs-2">Kanal</th>												
+					</tr>
+				</thead>				
+				<tbody>
+				 
+					<tr th:each="b,stat :*{channelBindings}">
+						<td>				
+							<input type="hidden" th:field="*{channelBindings[__${stat.index}__].id}"/>
+							<input type="hidden" th:field="*{channelBindings[__${stat.index}__].parameter.id}"/>							
+							<input type="hidden" th:field="*{channelBindings[__${stat.index}__].virtualchannel.id}"/>
+						   	<span th:text="${b.parameter.name}"></span>						   			
+						</td>
+						<td>
+							
+							<span th:text="${b.parameter.description}"></span>
+						</td>						
+						<td>
+							<input type="text" th:field="*{channelBindings[__${stat.index}__].nr}"/>
+						</td>							
+					</tr>
+				</tbody>				
+				</table>
+				
+			</div> 
+							
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary" th:text="#{action.save}">Save</button>
+				<a class="btn btn-default" th:href="@{/virtualChannels/delete/} + ${virtualChannel.id}" th:onclick="#{dialog.confirm}"> <span
+					class="glyphicon glyphicon-remove"></span> <span
+					th:text="#{action.delete}"></span>
+				</a>				
+			</div>	
+			
+			
+		</form>
+	</div>
+</body>
+</html>

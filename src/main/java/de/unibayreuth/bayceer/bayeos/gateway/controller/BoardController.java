@@ -22,6 +22,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardGroupRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardTemplateRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.CommentRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.BoardTemplateService;
 
 
@@ -47,6 +48,9 @@ public class BoardController extends AbstractCRUDController {
 	@Autowired
     private MessageSource msg;
 	
+	@Autowired
+	VirtualChannelRepository repoVirtualChannel;
+	
 		
 	@RequestMapping(value={"/","/boards"}, method=RequestMethod.GET)	
 	public String list() {
@@ -63,7 +67,7 @@ public class BoardController extends AbstractCRUDController {
 		}
 		model.addAttribute("board", b);
 		model.addAttribute("groups",repoGroup.findAll());
-		model.addAttribute("tab",tab);
+		model.addAttribute("tab",tab);		
 		return "editBoard";
 	}
 	
@@ -77,7 +81,8 @@ public class BoardController extends AbstractCRUDController {
 	
 	
 	
-	@RequestMapping(value="/boards/save", method=RequestMethod.POST)
+	
+	@RequestMapping(value="/boards", params={"save"}, method=RequestMethod.POST)
 	public String save(@Valid Board board, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
 			return "editBoard";
@@ -86,6 +91,8 @@ public class BoardController extends AbstractCRUDController {
 		redirect.addFlashAttribute("globalMessage",getActionMsg("saved", locale));
 		return "redirect:/boards";		
 	}
+	
+	
 	
 	
 	
@@ -123,6 +130,18 @@ public class BoardController extends AbstractCRUDController {
 		model.addAttribute("board",b);
 		return "chartBoard";
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 	
 	
 	

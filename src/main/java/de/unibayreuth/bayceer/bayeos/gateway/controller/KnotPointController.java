@@ -46,7 +46,7 @@ public class KnotPointController extends AbstractCRUDController{
 		}				
 		repo.save(point);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
-		return "redirect:/splines/" + point.getSpline().id;
+		return "redirect:/splines/" + point.getSpline().getId();
 	}
 		
 	
@@ -62,7 +62,7 @@ public class KnotPointController extends AbstractCRUDController{
 		KnotPoint k = repo.findOne(id);	
 		repo.delete(id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
-		return "redirect:/splines/" + k.getSpline().id;
+		return "redirect:/splines/" + k.getSpline().getId();
 	}
 	
 	

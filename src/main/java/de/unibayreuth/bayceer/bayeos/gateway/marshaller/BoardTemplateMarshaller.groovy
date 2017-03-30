@@ -23,7 +23,7 @@ class BoardTemplateMarshaller {
 		warningMax:board.warningMax,warningMin:board.warningMin,
 		samplingInterval:board.samplingInterval,checkDelay:board.checkDelay){
 			board.templates.each { item ->
-				channel(nr:item.nr, label:item.label, phenomena:item.phenomena,aggrInterval:item.aggrInterval, aggrFunction:item.aggrFunction,
+				channel(nr:item.nr, name:item.name, phenomena:item.phenomena,aggrInterval:item.aggrInterval, aggrFunction:item.aggrFunction,
 				criticalMax:item.criticalMax,criticalMin:item.criticalMin,warningMax:item.warningMax,warningMin:item.warningMin,samplingInterval:item.samplingInterval,checkDelay:item.checkDelay){
 					if (item.unit){
 						unit(name:item.unit.name)
@@ -70,7 +70,7 @@ class BoardTemplateMarshaller {
 			template.checkDelay = Integer.valueOf(n['@checkDelay'])
 		}	
 		n.channel.each { ch ->			
-			def cht = new ChannelTemplate(nr:Integer.valueOf(ch['@nr']),label:ch['@label'],phenomena:ch['@phenomena'])
+			def cht = new ChannelTemplate(nr:Integer.valueOf(ch['@nr']),name:ch['@name'],phenomena:ch['@phenomena'])
 			if (ch['@aggrInterval']){
 				cht.aggrInterval = new Interval(ch['@aggrInterval'])				 
 			}
