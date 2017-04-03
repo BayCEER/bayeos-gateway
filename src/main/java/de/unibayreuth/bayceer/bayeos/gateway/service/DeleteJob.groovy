@@ -38,7 +38,7 @@ class DeleteJob implements Runnable {
 					log.info("Deleting observations older than ${retention}.")
 					db.execute("delete from observation where insert_time < now() - ?::interval",[retention])
 
-					log.info("Deleting exorted observations older than ${retention}.")
+					log.info("Deleting exported observations older than ${retention}.")
 					db.execute("delete from observation_exp where insert_time < now() - ?::interval",[retention])
 
 					log.info("Deleting messages older than ${retention}.")
