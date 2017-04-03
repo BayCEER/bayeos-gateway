@@ -3,8 +3,6 @@ package de.unibayreuth.bayceer.bayeos.gateway.service
 import java.sql.Connection
 import java.sql.SQLException
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.List
 
 import javax.script.ScriptEngine
 import javax.sql.DataSource
@@ -15,12 +13,16 @@ import org.postgresql.copy.CopyIn
 import org.postgresql.copy.CopyManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+
+import bayeos.frame.FrameParserException
+import bayeos.frame.Parser
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository
 import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository
+import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEvent
+import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEventProducer
+import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEventType
 import groovy.sql.Sql
-import bayeos.frame.FrameParserException
-import bayeos.frame.Parser
 
 
 @Service
@@ -36,22 +38,26 @@ class FrameService {
 	VirtualChannelRepository vcRepo;
 
 	@Autowired
+	FrameEventProducer eventProducer;
+
+	@Autowired
 	BoardRepository boardRepo;
 
 	private Logger log = Logger.getLogger(FrameService.class)
 
 	class Board {
+		String origin
 		Integer id
 		Date lrt
 		def channels = [:] 	// nr, id
 		def vchannels = [:] // channel_id, vc
 		Integer lrssi
+		Long records = 0
 	}
 
 	def saveFrames(String sender, List<String> frames) {
 		if ((frames == null) || (sender == null)) return
-
-			Connection con = null
+		Connection con = null
 		CopyIn cin = null
 
 		def boards = [:]
@@ -63,7 +69,7 @@ class FrameService {
 			con = dataSource.getConnection()
 			Sql db = new Sql(con)
 			log.info("Parsing ${frames.size()} frames from: ${sender}")
-			long obsCount = 0
+			
 			for(String f:frames) {
 				try {
 					def res = Parser.parseBase64(f,new Date(),sender,null)
@@ -75,7 +81,7 @@ class FrameService {
 					Board b = boards[res['origin']]
 					if (b == null) {
 						def id = findOrSaveBoard(db,res['origin'])
-						b = new Board(id:id, lrt:ts,lrssi:res['rssi'], channels:[:], vchannels: boardRepo.findByOrigin(res['origin']).getVirtualChannels())
+						b = new Board(id:id, origin:res['origin'], lrt:ts,lrssi:res['rssi'], channels:[:], vchannels: boardRepo.findByOrigin(res['origin']).getVirtualChannels())
 						boards[res['origin']] = b
 					} else {
 						b.lrt = ts
@@ -87,13 +93,13 @@ class FrameService {
 							res['data'].each { key, value ->
 								if (!b.channels.containsKey(key)){
 									// log.info("Board:" + b.channels.toMapString())
-									b.channels[key] = findOrSaveChannel(db,b.id,key)
+									b.channels[key] = findOrSaveChannel(db,b,key)
 								}
 							}
 
 						// Create virtual channels
 							for (VirtualChannel vc: b.vchannels){
-								b.channels[vc.getNr()] = findOrSaveChannel(db,b.id,vc.getNr())
+								b.channels[vc.getNr()] = findOrSaveChannel(db,b,vc.getNr())
 							}
 
 						// Write original values out using copy
@@ -109,7 +115,7 @@ class FrameService {
 									byte[] pl = sb.toString().getBytes("UTF-8")
 									cin.writeToCopy(pl,0,pl.length)
 									sb = null
-									obsCount++
+									b.records++
 								}
 							}
 
@@ -126,7 +132,7 @@ class FrameService {
 									byte[] pl = sb.toString().getBytes("UTF-8")
 									cin.writeToCopy(pl,0,pl.length)
 									sb = null
-									obsCount++
+									b.records++
 								} catch (Exception e){
 									log.warn("Failed to calculate virtual channel value:${vc.nr}")
 									log.error(e.getMessage())
@@ -152,11 +158,14 @@ class FrameService {
 			}
 
 			// Update channel and board meta data
-			boards.each{ board ->
-				updateMetaInfo(db, board.value)
+			boards.each{ id, board ->
+				updateMetaInfo(db, board)
+				log.info("${board.records} observations for board ${board.origin} imported")
+				eventProducer.addFrameEvent(new FrameEvent(board.origin,FrameEventType.NEW_DATA))
 			}
 
-			log.info("${obsCount} observations imported")
+
+			
 			return true
 
 
@@ -182,24 +191,26 @@ class FrameService {
 			log.info("Creating new board:${origin}")
 			def seq = db.firstRow("select nextval('board_id_seq') as id;")
 			db.execute """ insert into board (id, origin) values (${seq.id},${origin});"""
+			eventProducer.addFrameEvent(new FrameEvent(origin, FrameEventType.NEW_BOARD))
 			return seq.id
 		} else {
 			return b.id
 		}
 	}
 
-	private Integer findOrSaveChannel(Sql db, Integer boardId, String channelNr) throws SQLException {
-		log.debug("findOrSaveChannel: Board id:${boardId},Channel nr:${channelNr}")
-		def c = db.firstRow("select id from channel c where board_id = ? and nr = ?;",[boardId, channelNr])
+	private Integer findOrSaveChannel(Sql db, Board board, String channelNr) throws SQLException {
+		log.debug("findOrSaveChannel: Board id:${board.id},Channel nr:${channelNr}")
+		def c = db.firstRow("select id from channel c where board_id = ? and nr = ?;",[board.id, channelNr])
 		if (c==null){
-			def b = db.firstRow("select deny_new_channels from board where id=?",[boardId])
+			def b = db.firstRow("select deny_new_channels from board where id=?",[board.id])
 			if (b.deny_new_channels == false){
-				log.info("Creating new channel:${channelNr} for board:${boardId}")
+				log.info("Creating new channel:${channelNr} for board:${board.id}")
 				def seq = db.firstRow("select nextval('channel_id_seq') as id;")
-				db.execute 	"""insert into channel (id, board_id, nr) values (${seq.id},${boardId},${channelNr});"""
+				db.execute 	"""insert into channel (id, board_id, nr) values (${seq.id},${board.id},${channelNr});"""
+				eventProducer.addFrameEvent(new FrameEvent(board.origin,FrameEventType.NEW_CHANNEL))
 				return seq.id
 			} else {
-				log.info("Deny new channel:${channelNr} for board:${boardId}")
+				log.info("Deny new channel:${channelNr} for board:${board.id}")
 				return null
 			}
 		} else {

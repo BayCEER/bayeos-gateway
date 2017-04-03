@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.events}">All Events</title>
+<script th:src="@{/resources/js/sockjs.min.js}"
+	src="../static/resources/js/sockjs.min.js"></script>
+<script th:src="@{/resources/js/stomp.min.js}"
+	src="../static/resources/js/stomp.min.js"></script>
+<script th:src="@{/resources/js/frameEvent.js}"
+	src="../static/resources/js/frameEvent.js"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{nav.events}">Events</h3>
+		<div class="form-group">
+			<label for="connect">WebSocket:</label>
+			<button id="connect" class="btn btn-default" type="submit">Connect</button>
+			<button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect</button>
+		</div>
+		
+		<div class="row">
+			<div class="col-md-12">
+				<table id="eventTable" class="table table-striped">
+					<thead>
+						<tr>
+							<th>Time</th>
+							<th>Origin</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody id="eventRows">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
