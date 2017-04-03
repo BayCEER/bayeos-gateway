@@ -73,7 +73,7 @@ public class CommentController extends AbstractCRUDController {
 	@RequestMapping(value="/comments/save", method=RequestMethod.POST)
 	public String save(@Valid Comment com, @ModelAttribute("board") Long id, RedirectAttributes redirect, Locale locale, Principal principal){		 
 		com.setBoard(repoBoard.findOne(id));
-		com.setUser(repoUser.findByUserName(principal.getName()));		
+		com.setUser(repoUser.findFirstByUserName(principal.getName()));		
 		repo.save(com);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
 		return "redirect:/boards/" + id + "?tab=comments";

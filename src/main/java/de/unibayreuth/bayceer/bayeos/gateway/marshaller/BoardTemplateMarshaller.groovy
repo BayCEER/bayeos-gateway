@@ -70,7 +70,7 @@ class BoardTemplateMarshaller {
 			template.checkDelay = Integer.valueOf(n['@checkDelay'])
 		}	
 		n.channel.each { ch ->			
-			def cht = new ChannelTemplate(nr:Integer.valueOf(ch['@nr']),name:ch['@name'],phenomena:ch['@phenomena'])
+			def cht = new ChannelTemplate(nr:Integer.valueOf(ch['@nr']),name:ch['@name']?:ch['@label'],phenomena:ch['@phenomena'])
 			if (ch['@aggrInterval']){
 				cht.aggrInterval = new Interval(ch['@aggrInterval'])				 
 			}

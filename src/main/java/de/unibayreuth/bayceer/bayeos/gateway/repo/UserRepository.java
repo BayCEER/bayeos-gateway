@@ -7,6 +7,6 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 public interface UserRepository extends PagingAndSortingRepository<User, Long>{
 
 
-	User findByUserName(String userName);	
+	User findFirstByUserName(String userName);	
 
 }

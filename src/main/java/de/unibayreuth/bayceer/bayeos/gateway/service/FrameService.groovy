@@ -143,10 +143,12 @@ class FrameService {
 							break
 						case "Message":
 							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "INFO"])
+							eventProducer.addFrameEvent(new FrameEvent(b.id,FrameEventType.NEW_MESSAGE))
 							log.debug("Message saved")
 							break
 						case "ErrorMessage":
 							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "ERROR"])
+							eventProducer.addFrameEvent(new FrameEvent(b.id,FrameEventType.NEW_MESSAGE))
 							log.debug("ErrorMessage saved")
 							break
 						default:
@@ -161,7 +163,7 @@ class FrameService {
 			boards.each{ id, board ->
 				updateMetaInfo(db, board)
 				log.info("${board.records} observations for board ${board.origin} imported")
-				eventProducer.addFrameEvent(new FrameEvent(board.origin,FrameEventType.NEW_DATA))
+				eventProducer.addFrameEvent(new FrameEvent(board.id,FrameEventType.NEW_DATA))
 			}
 
 
@@ -191,7 +193,7 @@ class FrameService {
 			log.info("Creating new board:${origin}")
 			def seq = db.firstRow("select nextval('board_id_seq') as id;")
 			db.execute """ insert into board (id, origin) values (${seq.id},${origin});"""
-			eventProducer.addFrameEvent(new FrameEvent(origin, FrameEventType.NEW_BOARD))
+			eventProducer.addFrameEvent(new FrameEvent(seq.id, FrameEventType.NEW_BOARD))
 			return seq.id
 		} else {
 			return b.id
@@ -207,7 +209,7 @@ class FrameService {
 				log.info("Creating new channel:${channelNr} for board:${board.id}")
 				def seq = db.firstRow("select nextval('channel_id_seq') as id;")
 				db.execute 	"""insert into channel (id, board_id, nr) values (${seq.id},${board.id},${channelNr});"""
-				eventProducer.addFrameEvent(new FrameEvent(board.origin,FrameEventType.NEW_CHANNEL))
+				eventProducer.addFrameEvent(new FrameEvent(board.id,FrameEventType.NEW_CHANNEL))
 				return seq.id
 			} else {
 				log.info("Deny new channel:${channelNr} for board:${board.id}")

@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class FrameEvent {
 	
-	String origin;
+	Long id;
 	Date time;
 	FrameEventType type;
 	
@@ -14,24 +14,18 @@ public class FrameEvent {
 	
 	
 	
-	public FrameEvent(String origin, Date time, FrameEventType type) {
+	public FrameEvent(Long id, Date time, FrameEventType type) {
 		super();
-		this.origin = origin;
+		this.id = id;	
 		this.time = time;
 		this.type = type;
 	}
 
 
-	public FrameEvent(String origin, FrameEventType type) {
-		this(origin,new java.util.Date(),type);
+	public FrameEvent(Long id, FrameEventType type) {
+		this(id,new java.util.Date(),type);
 	}
 	
-	public String getOrigin() {
-		return origin;
-	}
-	public void setOrigin(String origin) {
-		this.origin = origin;
-	}
 	public Date getTime() {
 		return time;
 	}
@@ -43,6 +37,18 @@ public class FrameEvent {
 	}
 	public void setType(FrameEventType type) {
 		this.type = type;
+	}
+
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }
 

@@ -6,6 +6,6 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Interval;
 
 public interface IntervalRepository extends PagingAndSortingRepository<Interval, Long>{
 	
-	Interval findByName(String name);
+	Interval findFirstByName(String name);
 
 }

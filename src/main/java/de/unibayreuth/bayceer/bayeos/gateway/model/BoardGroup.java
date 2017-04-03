@@ -89,6 +89,14 @@ public class BoardGroup extends UniqueEntity{
 	public String toString() {
 		return this.name;
 	}
+
+	public List<Board> getBoards() {
+		return boards;
+	}
+
+	public void setBoards(List<Board> boards) {
+		this.boards = boards;
+	}
 	
 	
 	

@@ -42,10 +42,10 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 	@Transactional
 	public BoardTemplate save(BoardTemplate s) {				
 		for(ChannelTemplate t: s.getTemplates()){
-						
+								
 			Function f = t.getAggrFunction();
 			if (f != null){											
-				Function ft = repoFunc.findByName(f.getName());				
+				Function ft = repoFunc.findFirstByName(f.getName());				
 				if (ft != null) {
 					t.setAggrFunction(ft);
 				} else {					
@@ -55,7 +55,7 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 			
 			Interval i = t.getAggrInterval();
 			if (i != null){											
-				Interval it = repoInt.findByName(i.getName());				
+				Interval it = repoInt.findFirstByName(i.getName());				
 				if (it != null) {
 					t.setAggrInterval(it);
 				} else {
@@ -64,7 +64,7 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 			}
 			Spline sp = t.getSpline();
 			if (sp != null){											
-				Spline st = repoSpline.findByName(sp.getName());				
+				Spline st = repoSpline.findFirstByName(sp.getName());				
 				if (st != null) {
 					t.setSpline(st);
 				} else {
@@ -73,7 +73,7 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 			}			
 			Unit u = t.getUnit();
 			if (u != null){											
-				Unit ut = repoUnit.findByName(u.getName());				
+				Unit ut = repoUnit.findFirstByName(u.getName());				
 				if (ut != null) {
 					t.setUnit(ut);
 				} else {

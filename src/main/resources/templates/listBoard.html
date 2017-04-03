@@ -1,7 +1,9 @@
 	<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"  xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
 <head>
-	<title th:text="#{board.list}">Board list</title>        
+	<title th:text="#{board.list}">Board list</title>      
+	<script th:src="@{/resources/js/sockjs.min.js}"	src="../static/resources/js/sockjs.min.js"></script>
+	<script th:src="@{/resources/js/stomp.min.js}"	src="../static/resources/js/stomp.min.js"></script>  
 </head>
 <body>
 <div layout:fragment="content">	
@@ -26,8 +28,10 @@
 	</div>
 
 	 <script type="text/javascript" class="init" th:inline="javascript">
- 		$(document).ready(function(){ 					
- 			var dt = $('#table').DataTable( { 				
+	 /*<![CDATA[*/
+ 		$(document).ready(function(){
+ 			
+ 			var boards = $('#table').DataTable( { 				
  				"language": {
  					"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
  					"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ , 					
@@ -45,7 +49,7 @@
  		        },
  				"responsive": true,
         		"autoWidth": false,
-                "processing": true,
+                "processing": false,
                 "serverSide": true,
                 "lengthChange": false,
                 "columns": [					
@@ -133,13 +137,45 @@
                 	'contentType': 'application/json',
                 	'url': /*[[ @{/rest/boards} ]]*/,
                 	'type': 'POST',
-                    'data': function(d) {
+                    'data': function(d) {                     		
                             return JSON.stringify(d);
                     }
-                } 
+                }                
  			} );
+ 			
+ 			
+ 			var stompClient = null;
+ 			var socket = new SockJS('/gateway/gs-guide-websocket');
+ 		    stompClient = Stomp.over(socket);
+ 		    
+ 		   	stompClient.connect({}, function (frame) {
+ 		        console.log('Connected: ' + frame);
+ 		        stompClient.subscribe('/topic/frameEvents', function (event) {
+ 		            handleFrameEvent(JSON.parse(event.body));
+ 		        });
+ 		    });
+ 		     		   	
+ 		   	function handleFrameEvent(e){ 		   		
+ 		   		if (e.type == 'NEW_DATA'){ 		   			
+ 					boards.ajax.reload( 							
+ 							function(d){ 																
+ 								for(var i = 0;i<d.data.length;i++){
+ 									var id = d.data[i].id; 									 									
+ 									if (id==e.id){
+ 										$(boards.rows(i).nodes()).addClass('info');
+ 										setTimeout(
+ 												function(a){
+ 													$(boards.rows(a).nodes()).removeClass('info');
+		        								},500,i);
+ 									}
+ 								}
+ 								
+ 							}
+ 							,false);
+ 		   		}
+ 		   	}
 		});
-    
+		/*]]>*/
 	</script>
 </div>
 </body>

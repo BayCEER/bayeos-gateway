@@ -117,7 +117,6 @@
 
 		<profile>
 			<id>test</id>
-
 			<properties>
 				<docker.hostname>docker</docker.hostname>
 				<docker.host>https://${docker.hostname}:2376</docker.host>

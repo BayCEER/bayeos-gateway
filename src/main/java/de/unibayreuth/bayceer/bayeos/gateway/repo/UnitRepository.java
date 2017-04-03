@@ -6,7 +6,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Unit;
 
 public interface UnitRepository extends PagingAndSortingRepository<Unit, Long>{
 	
-	Unit findByName(String name);
+	Unit findFirstByName(String name);
 
 }
 

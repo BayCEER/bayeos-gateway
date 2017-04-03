@@ -6,6 +6,6 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
 
 public interface SplineRepository extends PagingAndSortingRepository<Spline, Long> {
 		
-	Spline findByName(String name);
+	Spline findFirstByName(String name);
 	
 }

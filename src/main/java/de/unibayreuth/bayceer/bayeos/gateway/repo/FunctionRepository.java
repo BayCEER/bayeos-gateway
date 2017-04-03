@@ -6,6 +6,6 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Function;
 
 public interface FunctionRepository extends PagingAndSortingRepository<Function, Long>{
 			
-	Function findByName(String name);
+	Function findFirstByName(String name);
 }
 
