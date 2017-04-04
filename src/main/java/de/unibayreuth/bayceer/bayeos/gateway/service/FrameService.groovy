@@ -163,7 +163,7 @@ class FrameService {
 			boards.each{ id, board ->
 				updateMetaInfo(db, board)
 				log.info("${board.records} observations for board ${board.origin} imported")
-				eventProducer.addFrameEvent(new FrameEvent(board.id,FrameEventType.NEW_DATA))
+				eventProducer.addFrameEvent(new FrameEvent(board.id,FrameEventType.NEW_OBSERVATION))
 			}
 
 
