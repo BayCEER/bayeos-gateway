@@ -49,21 +49,25 @@ public class BoardRestController {
 	// See https://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html
 	@RequestMapping(path="/rest/boards/chartData", method = RequestMethod.GET)
 	public List<Observation> chartData(@RequestParam Long boardId, @RequestParam Long lastRowId){		
+	
 		if (lastRowId == 0){
-			String sql = "select a.* from (" +
-				"select o.id as rowId, channel.id as channelId, (EXTRACT(EPOCH FROM o.result_time)*1000)::int8 as millis,real_value(o.result_value,channel.spline_id) as value " + 
-				"from board join channel on board.id = channel.board_id " + 
-				"join all_observation o on channel.id = o.channel_id " +
-				"left outer join spline on spline.id = channel.spline_id " +
-				"where board.id = ? and o.result_time > (board.last_result_time - '60 min'::interval) order by 1 desc limit 600) a order by 1 asc;"; 						
-			return jdbcTemplate.query(sql,new Object[]{boardId},new ObservationMapper());			
+			String sql = "select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " + 
+			"from (select a.* from (select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id " + 
+			"from observation o, channel c where c.id = o.channel_id and c.board_id = ? order by id desc limit 600) a " + 
+			"union " + 
+			"select b.* from (select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id " + 
+			"from observation_exp o, channel c where c.id = o.channel_id and c.board_id = ? order by id desc limit 600) b " +
+			"order by id desc limit 600) c order by id asc;";
+			return jdbcTemplate.query(sql,new Object[]{boardId,boardId},new ObservationMapper());			
 		} else {
-			String sql = "select o.id as rowId, channel.id as channelId, (EXTRACT(EPOCH FROM o.result_time)*1000)::int8 as millis,real_value(o.result_value,channel.spline_id) as value " +
-					"from board join channel on board.id = channel.board_id " +
-					"join all_observation o on channel.id = o.channel_id " + 
-					"left outer join spline on spline.id = channel.spline_id " + 
-					"where board.id = ? and o.id > ? order by 1 asc;";			
-			return jdbcTemplate.query(sql,new Object[]{boardId,lastRowId}, new ObservationMapper());
+			String sql = "select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " + 
+			"from (select o.id, c.id as channel_id, o.result_time,o.result_value, c.spline_id " +
+			"from observation o, channel c where o.channel_id = c.id and c.board_id = ? and o.id > ? " +
+			"union " + 
+			"select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id " +
+			"from observation_exp o, channel c where o.channel_id = c.id and c.board_id = ? and o.id > ?) a " +
+			"order by id asc;";						
+			return jdbcTemplate.query(sql,new Object[]{boardId,lastRowId,boardId,lastRowId}, new ObservationMapper());
 		}		
 	}	
 	private static final class ObservationMapper implements RowMapper<Observation> {		
