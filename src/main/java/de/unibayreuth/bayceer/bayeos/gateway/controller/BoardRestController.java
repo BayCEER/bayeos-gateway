@@ -7,6 +7,7 @@ import java.util.List;
 import javax.sql.DataSource;
 import javax.validation.Valid;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
@@ -27,10 +28,14 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 @RestController
 public class BoardRestController {
 	
+	private static final Integer TOP_N_RECORDS = 300;
+
 	@Autowired
 	BoardRepository repo;
 	
 	private JdbcTemplate jdbcTemplate;
+	
+	private static Logger log = Logger.getLogger(BoardRestController.class);
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
@@ -48,16 +53,24 @@ public class BoardRestController {
 	
 	// See https://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html
 	@RequestMapping(path="/rest/boards/chartData", method = RequestMethod.GET)
-	public List<Observation> chartData(@RequestParam Long boardId, @RequestParam Long lastRowId){		
-	
-		if (lastRowId == 0){
-			String sql = "select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " + 
-			"from (select a.* from (select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id " + 
-			"from observation o, channel c where c.id = o.channel_id and c.board_id = ? order by id desc limit 600) a " + 
-			"union " + 
-			"select b.* from (select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id " + 
-			"from observation_exp o, channel c where c.id = o.channel_id and c.board_id = ? order by id desc limit 600) b " +
-			"order by id desc limit 600) c order by id asc;";
+	public List<Observation> chartData(@RequestParam Long boardId, @RequestParam Long lastRowId){				
+		if (lastRowId == 0){									
+			// Interval for top n records;
+			String interval = "1 hour";
+			Board b = repo.findOne(boardId);
+			if (b.getSamplingInterval() != null){				
+				interval = TOP_N_RECORDS * b.getSamplingInterval() + " secs"; 
+			} 
+			
+			String sql = "select * from (select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " +
+			"from ( " + 
+			"(select o.id, c.id as channel_id, o.result_time, o.result_value, c.spline_id from observation o, channel c " +  
+			"where c.id = o.channel_id and c.board_id = ? and o.result_time > c.last_result_time - '" + interval +"'::interval) " +
+			"UNION " +  
+			"(select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id from observation_exp o, channel c " + 
+			"where c.id = o.channel_id and c.board_id = ? and o.result_time > c.last_result_time - '" + interval + "'::interval)" + 			
+			") a order by id desc limit " + TOP_N_RECORDS + ") z order by 1 asc";						
+			log.debug(sql);
 			return jdbcTemplate.query(sql,new Object[]{boardId,boardId},new ObservationMapper());			
 		} else {
 			String sql = "select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " + 
@@ -66,7 +79,8 @@ public class BoardRestController {
 			"union " + 
 			"select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id " +
 			"from observation_exp o, channel c where o.channel_id = c.id and c.board_id = ? and o.id > ?) a " +
-			"order by id asc;";						
+			"order by id asc;";	
+			log.debug(sql);
 			return jdbcTemplate.query(sql,new Object[]{boardId,lastRowId,boardId,lastRowId}, new ObservationMapper());
 		}		
 	}	

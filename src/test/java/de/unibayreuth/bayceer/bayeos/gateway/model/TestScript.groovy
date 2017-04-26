@@ -17,8 +17,8 @@ class TestScript {
 	
 	@Before
 	public void setUp(){
-		//engine = new ScriptEngineManager().getEngineByName("js")		
-		engine = new ScriptEngineManager().getEngineByName("nashorn")
+		engine = new ScriptEngineManager().getEngineByName("js")		
+		// engine = new ScriptEngineManager().getEngineByName("nashorn")
 	}
 		
 	

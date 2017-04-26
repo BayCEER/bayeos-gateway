@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 
 import de.unibayreuth.bayceer.bayeos.client.Client
 import de.unibayreuth.bayceer.bayeos.objekt.ObjektNodeModel
+import de.unibayreuth.bayceer.bayeos.objekt.ObjektArt
 import groovy.sql.Sql
 import org.apache.xmlrpc.XmlRpcException
 import java.sql.SQLException

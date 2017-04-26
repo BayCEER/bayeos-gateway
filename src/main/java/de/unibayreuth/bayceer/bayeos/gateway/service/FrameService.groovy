@@ -3,6 +3,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.service
 import java.sql.Connection
 import java.sql.SQLException
 import java.text.SimpleDateFormat
+import java.util.List
 
 import javax.script.ScriptEngine
 import javax.sql.DataSource
@@ -90,7 +91,7 @@ class FrameService {
 
 					switch (res['type']) {
 						case "DataFrame":
-							res['data'].each { key, value ->
+							res['value'].each { key, value ->
 								if (!b.channels.containsKey(key)){
 									// log.info("Board:" + b.channels.toMapString())
 									b.channels[key] = findOrSaveChannel(db,b,key)
@@ -105,7 +106,7 @@ class FrameService {
 						// Write original values out using copy
 							CopyManager cm = ((PGConnection)con.unwrap(PGConnection.class)).getCopyAPI()
 							cin = cm.copyIn("COPY observation (channel_id,result_time,result_value) FROM STDIN WITH CSV")
-							res['data'].each { key, value ->
+							res['value'].each { key, value ->
 								Float fvalue = (Float)value
 								if (!fvalue.isNaN()){
 									StringBuffer sb = new StringBuffer(200)
@@ -123,7 +124,7 @@ class FrameService {
 						// Write calculated values out
 							for (VirtualChannel vc: b.vchannels){
 								try {
-									def vcValue = vc.eval(scriptEngine, res['data'])
+									def vcValue = vc.eval(scriptEngine, res['value'])
 									// println(vc.getDeclaration())
 									StringBuffer sb = new StringBuffer(200)
 									sb.append(b.channels[vc.getNr()])
@@ -276,7 +277,8 @@ class FrameService {
 									lastCount = s.sum
 								}
 							}
-							db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ?",[obs.result_value, obs.result_time, status_valid, status_valid_msg.toString(), lastCount, cha.id])
+							db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ? and (last_result_time is null or last_result_time < ?)",
+								[obs.result_value, obs.result_time, status_valid, status_valid_msg.toString(), lastCount, cha.id, obs.result_time])
 						}
 
 						def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [board.id])
@@ -289,6 +291,11 @@ class FrameService {
 					}
 				}
 	}
+
+
+
+
+	
 
 
 
