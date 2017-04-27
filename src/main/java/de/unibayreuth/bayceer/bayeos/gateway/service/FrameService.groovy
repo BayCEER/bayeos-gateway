@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 
 import bayeos.frame.FrameParserException
 import bayeos.frame.Parser
+import bayeos.frame.types.MapUtils
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository
 import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository
@@ -73,7 +74,14 @@ class FrameService {
 			
 			for(String f:frames) {
 				try {
+					if (log.debugEnabled){
+						log.debug("Frame:" + f);
+					}
 					def res = Parser.parseBase64(f,new Date(),sender,null)
+					
+					if (log.debugEnabled){
+						log.debug("Parsed:" + MapUtils.toString(res));
+					}
 
 					// Parser sends ts as nano secs
 					Date ts = new Date((long)(res['ts']/(1000*1000)))
@@ -165,10 +173,7 @@ class FrameService {
 				updateMetaInfo(db, board)
 				log.info("${board.records} observations for board ${board.origin} imported")
 				eventProducer.addFrameEvent(new FrameEvent(board.id,FrameEventType.NEW_OBSERVATION))
-			}
-
-
-			
+			}			
 			return true
 
 

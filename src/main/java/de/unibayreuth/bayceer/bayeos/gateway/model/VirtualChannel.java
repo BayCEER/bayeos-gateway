@@ -56,7 +56,6 @@ public class VirtualChannel extends UniqueEntity {
 	
 	public Object eval(ScriptEngine engine, Map<String,Object> values) throws ScriptException {				
 		Map<String,Object> params = new HashMap<>(channelBindings.size());	
-		// System.out.println(MapUtils.toString(values));
 		for(ChannelBinding b:channelBindings){
 			String nr = b.getParameter().getName();
 			Object o = values.get(b.getNr());
