@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			 http.csrf().disable();
-			 http.requestMatchers().antMatchers("/frame/**","/nagios/**")
+			 http.requestMatchers().antMatchers("/frame/**","/nagios/**","/grafana/**")
 			 .and().authorizeRequests().antMatchers("/**").hasAnyRole("ADMIN","USER","IMPORT")
 			 .and().httpBasic();
 		}		
