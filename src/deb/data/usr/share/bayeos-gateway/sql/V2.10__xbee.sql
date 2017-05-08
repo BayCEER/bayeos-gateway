@@ -60,7 +60,7 @@ INSERT INTO channel_function_parameter VALUES (3, 'ta', 'air temperature in degC
 SELECT pg_catalog.setval('channel_function_parameter_id_seq', 3, true);
 
 
-CREATE TABLE observation_calc
+CREATE TABLE IF NOT EXISTS observation_calc
 (
   id serial NOT NULL,
   db_series_id integer NOT NULL,
