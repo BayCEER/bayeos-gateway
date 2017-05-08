@@ -215,13 +215,13 @@ class ExportJob implements Runnable  {
 		Integer exported = 0		
 							 
 		try {																				
-			def id = db.firstRow("select max(id) from observation")
+			def id = db.firstRow("select max(id) from observation_calc")
 			if (id == null){
 				log.info("Nothing to export");
 				db.executeUpdate("update export_job_stat set exported = 0 where id = ?",statId)								
 			} else {
 				int row = 0
-				db.eachRow("SELECT * from get_bayeos_obs(${ts})"){
+				db.eachRow("SELECT * from observation_calc where id <= ?",[id.max]){
 					dout.writeInt(it.db_series_id)
 					dout.writeLong(it.result_time.getTime())
 					dout.writeFloat(it.result_value)
@@ -242,8 +242,8 @@ class ExportJob implements Runnable  {
 					exported += row					
 				}
 				db.executeUpdate("update export_job_stat set exported = ? where id = ?",exported,statId)
-				log.info("Move records to archive table.")
-				db.call("{ call delete_obs(?,?) }",[ts,id.max])							
+				db.execute("delete from observation_calc where id <= ?",[id.max])
+									
 			}																								
 		} catch (Exception e){
 			log.error(e.getMessage())

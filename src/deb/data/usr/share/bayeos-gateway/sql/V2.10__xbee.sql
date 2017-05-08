@@ -58,3 +58,16 @@ INSERT INTO channel_function_parameter VALUES (1, 'x', null, 1);
 INSERT INTO channel_function_parameter VALUES (2, 'rH', 'relative humidity in percent', 2);
 INSERT INTO channel_function_parameter VALUES (3, 'ta', 'air temperature in degC', 2);
 SELECT pg_catalog.setval('channel_function_parameter_id_seq', 3, true);
+
+
+CREATE TABLE observation_calc
+(
+  id serial NOT NULL,
+  db_series_id integer NOT NULL,
+  result_time timestamp with time zone NOT NULL,
+  result_value real NOT NULL,
+  CONSTRAINT pk_obs_calculated PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
