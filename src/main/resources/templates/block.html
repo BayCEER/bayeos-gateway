@@ -9,26 +9,26 @@
 		 		<div th:text="${header}" class="block-header"></div>
 		 		<div class="row">
 		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('criticalMin',#{chkDev.criticalMin},false)"></div>
+		 				<div th:replace="field::number('criticalMin',#{chkDev.criticalMin},false,'any')"></div>
 		 			</div>
 		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('criticalMax',#{chkDev.criticalMax},false)"></div>
-		 			</div>
-		 		</div>
-		 		<div class="row">
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('warningMin',#{chkDev.warningMin},false)"></div>
-		 			</div>
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('warningMax',#{chkDev.warningMax},false)"></div>
+		 				<div th:replace="field::number('criticalMax',#{chkDev.criticalMax},false,'any')"></div>
 		 			</div>
 		 		</div>
 		 		<div class="row">
 		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('samplingInterval',#{chkDev.samplingInt},false)"></div>
+		 				<div th:replace="field::number('warningMin',#{chkDev.warningMin},false,'any')"></div>
 		 			</div>
 		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('checkDelay',#{chkDev.checkDelay},false)"></div>
+		 				<div th:replace="field::number('warningMax',#{chkDev.warningMax},false,'any')"></div>
+		 			</div>
+		 		</div>
+		 		<div class="row">
+		 			<div class="col-sm-6">
+		 				<div th:replace="field::number('samplingInterval',#{chkDev.samplingInt},false,1)"></div>
+		 			</div>
+		 			<div class="col-sm-6">
+		 				<div th:replace="field::number('checkDelay',#{chkDev.checkDelay},false,1)"></div>
 		 			</div>
 		 		</div>		 				 				 	
 </div>

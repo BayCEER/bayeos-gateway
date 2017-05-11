@@ -209,42 +209,29 @@ class ExportJob implements Runnable  {
 	
 	private def exportObs(Long statId) {
 		log.info("Exporting observations")	
-		def ts = new Date().toTimestamp()
 		def bout  = new ByteArrayOutputStream(8*1024)
-		def dout = new DataOutputStream(bout)		
-		Integer exported = 0		
-							 
-		try {																				
-			def id = db.firstRow("select max(id) from observation_calc")
-			if (id == null){
-				log.info("Nothing to export");
-				db.executeUpdate("update export_job_stat set exported = 0 where id = ?",statId)								
-			} else {
-				int row = 0
-				db.eachRow("SELECT * from observation_calc where id <= ?",[id.max]){
-					dout.writeInt(it.db_series_id)
-					dout.writeLong(it.result_time.getTime())
-					dout.writeFloat(it.result_value)
-					row++
-					if (row%expBulkSize==0){
-						log.info("Exporting ${expBulkSize} observations")
-						cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
-						exported += expBulkSize
-						db.executeUpdate("update export_job_stat set exported = ? where id = ?",exported,statId)												
-						bout.reset()
-						row = 0						
+		def dout = new DataOutputStream(bout)								
+		def id = 0							 
+		try {																													
+				while (true){
+					def row = 0
+					db.eachRow("SELECT * FROM observation_calc order by id asc limit ${expBulkSize}")
+					{
+						id = it.id
+						dout.writeInt(it.db_series_id)
+						dout.writeLong(it.result_time.getTime())
+						dout.writeFloat(it.result_value)					
+						row++												
 					}
-				}
-				dout.flush()
-				if (row > 0) {
+					if (row==0) break					
+					dout.flush()					
 					log.info("Exporting ${row} observations")
 					cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
-					exported += row					
-				}
-				db.executeUpdate("update export_job_stat set exported = ? where id = ?",exported,statId)
-				db.execute("delete from observation_calc where id <= ?",[id.max])
-									
-			}																								
+					db.executeUpdate("update export_job_stat set exported = ? where id = ?",row,statId)
+					bout.reset()					
+					db.execute("delete from observation_calc where id <= ?",[id])
+				}						
+													
 		} catch (Exception e){
 			log.error(e.getMessage())
 		} finally {

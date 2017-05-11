@@ -25,9 +25,9 @@
 				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
 </div>
 
-<div th:fragment="number(prop,label,required)"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
+<div th:fragment="number(prop,label,required,step)" th:with="step=${step}?:'any'"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
 				<label th:text="${label} + (${required} ? '*':'') + ':'" class="control-label">Text:</label> 
-				<input type="number" class="form-control" th:field="*{__${prop}__}" th:required="${required}"/>
+				<input type="number" class="form-control" th:field="*{__${prop}__}" th:required="${required}" th:step="${step}"/>
 				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
 </div>
 
@@ -87,7 +87,7 @@
 <div th:fragment="status(code)">
 <div th:switch="${code}">
   	<span th:case="0" class="label label-success" th:text="#{status.ok}">Ok</span>
-  	<span th:case="1" class="label label-warning" th:text="#{status.warning}">Warning</span>
+  	<span th:case="1" class="label label-warning" th:text="#{status.warn}">Warning</span>
   	<span th:case="2" class="label label-danger" th:text="#{status.critical}">Critical</span>
   	<span th:case="*"></span>  										
 </div>
