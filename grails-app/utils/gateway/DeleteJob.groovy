@@ -27,7 +27,7 @@ class DeleteJob implements Runnable {
 				log.info("Deleting observations older than ${dt}.")
 				db.execute("delete from observation where insert_time < now() - ?::interval",[dt])
 				
-				log.info("Deleting exorted observations older than ${dt}.")
+				log.info("Deleting exported observations older than ${dt}.")
 				db.execute("delete from observation_exp where insert_time < now() - ?::interval",[dt])				
 				
 				dt = config.maxMessageInterval.toString()				

@@ -10,6 +10,7 @@ class BootStrap {
 	
 	def deleteObservationService
 	def exportObservationService
+	def calculateObservationService
 					
 	def init = { servletContext ->
 		def ctx = servletContext.getAttribute(ApplicationAttributes.APPLICATION_CONTEXT)
@@ -26,6 +27,8 @@ class BootStrap {
 		 if (ExportJobConfig.first()?.enabled) {
 			 exportObservationService.start()
 		 }
+
+		 calculateObservationService.start()
 		}
 		 
     }
@@ -34,6 +37,7 @@ class BootStrap {
 		if (Environment.current == Environment.PRODUCTION) {
 		 deleteObservationService.stop()
 		 exportObservationService.stop()
+		 calculateObservationService.stop()
 		}
     }
 }
