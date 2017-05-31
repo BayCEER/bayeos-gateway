@@ -2,6 +2,8 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -54,24 +56,26 @@ public class BoardRestController {
 	// See https://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html
 	@RequestMapping(path="/rest/boards/chartData", method = RequestMethod.GET)
 	public List<Observation> chartData(@RequestParam Long boardId, @RequestParam Long lastRowId){				
-		if (lastRowId == 0){									
-			// Interval for top n records;
-			String interval = "1 hour";
-			Board b = repo.findOne(boardId);
-			if (b.getSamplingInterval() != null){				
-				interval = TOP_N_RECORDS * b.getSamplingInterval() + " secs"; 
-			} 
+		if (lastRowId == 0){														
+			Board b = repo.findOne(boardId);			
+			int secs = (b.getSamplingInterval() == null) ? 3600:TOP_N_RECORDS * b.getSamplingInterval();			
+			Date lrt = (b.getLastResultTime() == null) ? new Date(): b.getLastResultTime();				
+			GregorianCalendar gc = new GregorianCalendar();			
+			gc.setTime(lrt);			
+			gc.add(GregorianCalendar.SECOND,secs*-1);						
+			Date qt = gc.getTime();			
 			
 			String sql = "select * from (select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " +
 			"from ( " + 
 			"(select o.id, c.id as channel_id, o.result_time, o.result_value, c.spline_id from observation o, channel c " +  
-			"where c.id = o.channel_id and c.board_id = ? and o.result_time > c.last_result_time - '" + interval +"'::interval) " +
+			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ?) " +
 			"UNION " +  
 			"(select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id from observation_exp o, channel c " + 
-			"where c.id = o.channel_id and c.board_id = ? and o.result_time > c.last_result_time - '" + interval + "'::interval)" + 			
+			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ?)" + 			
 			") a order by id desc limit " + TOP_N_RECORDS + ") z order by 1 asc";						
+			
 			log.debug(sql);
-			return jdbcTemplate.query(sql,new Object[]{boardId,boardId},new ObservationMapper());			
+			return jdbcTemplate.query(sql,new Object[]{boardId,qt,boardId,qt},new ObservationMapper());			
 		} else {
 			String sql = "select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " + 
 			"from (select o.id, c.id as channel_id, o.result_time,o.result_value, c.spline_id " +
