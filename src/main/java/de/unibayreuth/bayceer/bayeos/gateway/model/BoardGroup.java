@@ -48,37 +48,39 @@ public class BoardGroup extends UniqueEntity{
 	};
 	
 	
-	// @Formula("(select max(board.last_result_time) from board where board.board_group_id = id)")
 	@Transient
 	public Date getLastResultTime(){
 		Date d = null;
 		if (boards != null){
 			for(Board b:boards){
-				if (d == null){
-					d = b.getLastResultTime();
-				} else {					
-					if (b.getLastResultTime().after(d)){
+				if (b.getLastResultTime() != null){					
+					if (d!=null){
+						if (b.getLastResultTime().after(d)){
+							d = b.getLastResultTime();
+						}							
+					} else {
 						d = b.getLastResultTime();
-					}					
-				}				
+					}
+				}
 			}
 		}
 		return d;		
 	};
 
-	// @Formula("(select get_group_status(id))")	
 	@Transient
 	public Integer getGroupStatus(){
 		Integer ret = null;		
 		if (boards != null){
-			for(Board b:boards){
-				if (ret == null) {
-					ret = b.getStatus();
-				} else {
-					if (b.getStatus() > ret){
+			for(Board b:boards){				
+				if (b.getStatus()!=null){					
+					if (ret != null){
+						if (b.getStatus() > ret){
+							ret = b.getStatus();
+						}						
+					} else {
 						ret = b.getStatus();
-					}	
-				}				
+					}					
+				} 								
 			}
 		}
 		return ret;

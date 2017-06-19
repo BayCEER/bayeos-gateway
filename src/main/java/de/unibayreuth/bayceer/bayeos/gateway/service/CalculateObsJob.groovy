@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 import groovy.sql.Sql
 
 @Component
+@Profile("default")
 public class CalculateObsJob implements Runnable {
 	
 	@Autowired
