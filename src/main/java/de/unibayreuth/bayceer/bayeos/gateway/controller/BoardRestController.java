@@ -87,7 +87,15 @@ public class BoardRestController {
 			log.debug(sql);
 			return jdbcTemplate.query(sql,new Object[]{boardId,lastRowId,boardId,lastRowId}, new ObservationMapper());
 		}		
-	}	
+	}
+	
+	@RequestMapping(path="/rest/boards/findByOrigin", method = RequestMethod.GET)
+	private Board findByOrigin(@RequestParam String origin){
+		return repo.findByOrigin(origin);		
+	}
+	
+	
+	
 	private static final class ObservationMapper implements RowMapper<Observation> {		
 		public Observation mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Observation o = new Observation();
