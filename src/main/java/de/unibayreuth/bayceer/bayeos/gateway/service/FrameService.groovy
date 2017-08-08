@@ -116,9 +116,10 @@ class FrameService {
 							cin = cm.copyIn("COPY observation (channel_id,result_time,result_value) FROM STDIN WITH CSV")
 							res['value'].each { key, value ->
 								Float fvalue = (Float)value
-								if (!fvalue.isNaN()){
+								def chaId = b.channels[key]
+								if (!fvalue.isNaN() && (chaId != null)){
 									StringBuffer sb = new StringBuffer(200)
-									sb.append(b.channels[key])
+									sb.append(chaId)
 									sb.append(",").append(dateFormatter.format(ts))
 									sb.append(",").append(fvalue).append("\n")
 									byte[] pl = sb.toString().getBytes("UTF-8")
@@ -131,17 +132,20 @@ class FrameService {
 
 						// Write calculated values out
 							for (VirtualChannel vc: b.vchannels){
-								try {
-									def vcValue = vc.eval(scriptEngine, res['value'])
-									// println(vc.getDeclaration())
-									StringBuffer sb = new StringBuffer(200)
-									sb.append(b.channels[vc.getNr()])
-									sb.append(",").append(dateFormatter.format(ts))
-									sb.append(",").append(vcValue).append("\n")
-									byte[] pl = sb.toString().getBytes("UTF-8")
-									cin.writeToCopy(pl,0,pl.length)
-									sb = null
-									b.records++
+								try {									
+									def chaId = b.channels[vc.getNr()]
+									if (chaId != null){
+										def vcValue = vc.eval(scriptEngine, res['value'])
+										// 	println(vc.getDeclaration())
+										StringBuffer sb = new StringBuffer(200)
+										sb.append(chaId)
+										sb.append(",").append(dateFormatter.format(ts))
+										sb.append(",").append(vcValue).append("\n")
+										byte[] pl = sb.toString().getBytes("UTF-8")
+										cin.writeToCopy(pl,0,pl.length)
+										sb = null
+										b.records++
+									}
 								} catch (Exception e){
 									log.warn("Failed to calculate virtual channel value:${vc.nr}")
 									log.error(e.getMessage())

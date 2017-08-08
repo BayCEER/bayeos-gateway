@@ -225,8 +225,14 @@ class ExportJob implements Runnable  {
 					}
 					if (row==0) break					
 					dout.flush()					
-					log.info("Exporting ${row} observations")
-					cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
+										
+					Boolean ret = (Boolean)cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[]);
+					if (ret) {
+						log.info("${row} observations exported.")
+					} else {
+						log.error("Failed to export observations.")
+						break;						
+					}					
 					db.executeUpdate("update export_job_stat set exported = ? where id = ?",row,statId)
 					bout.reset()					
 					db.execute("delete from observation_calc where id <= ?",[id])

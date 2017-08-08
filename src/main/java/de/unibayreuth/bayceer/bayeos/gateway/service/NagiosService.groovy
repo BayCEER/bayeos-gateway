@@ -79,31 +79,26 @@ class NagiosService {
 		log.info("Query status of export job")
 		def db = new Sql(dataSource)				
 		try {
-			def conf = db.firstRow('select * from export_job_config')				
-			if (conf.enabled){
-				def stat = db.firstRow("""
-				select s.id, s.start_time, s.end_time, coalesce(s.exported,0) as exported, s.status, extract(EPOCH FROM s.end_time - s.start_time) as runtime,  round(coalesce(s.exported,0)/extract(EPOCH FROM s.end_time - s.start_time)) as rps
-				from export_job_stat s, export_job_config c where end_time is not null and now() - end_time < (2 * c.sleep_interval * '1 minutes'::interval) order by id desc limit 1
+							
+			def stat = db.firstRow("""
+				select id, start_time, end_time, coalesce(exported,0) as exported,status, extract(EPOCH FROM end_time - start_time) as runtime,  
+				round(coalesce(exported,0)/extract(EPOCH FROM end_time - start_time)) as rps
+				from export_job_stat where end_time is not null and now() - end_time < ('1 hour'::interval) order by id desc limit 1
 				""")						 
-				if (stat != null){
+			if (stat != null){
 					// In time
 					if (stat.status == 0){
 						// Finished job
-						return new NagiosMessage(text:"Job finished: runtime: ${stat.runtime} [sec] records:${stat.exported} rate: ${stat.rps} [rps]|time=${stat.runtime}ms recs=${stat.exported} rate=${stat.rps}" ,
-							status:ReturnCode.OK.getValue())
+						return new NagiosMessage(text:"Job finished: runtime: ${stat.runtime} [sec] records:${stat.exported} rate: ${stat.rps} [rps]|time=${stat.runtime}ms recs=${stat.exported} rate=${stat.rps}" , status:0)
 					} else {
-						// Cancelled job
-						return new NagiosMessage(text:"Job failed with error.", status:ReturnCode.CRITICAL.getValue())
+						// Critical job
+						return new NagiosMessage(text:"Job failed with error.", status:2)
 					}
-				} else {
-					// 	kein Eintrag -> CRITICAL
-					return new NagiosMessage(text:"Job is not running.", status:ReturnCode.CRITICAL.getValue())
-				}
-							
 			} else {
-				// Disabled job
-				return new NagiosMessage(text:"Job is disabled.", status:ReturnCode.CRITICAL.getValue())				
+					// 	Unknown
+					return new NagiosMessage(text:"No Job status found.", status:3)
 			}
+										
 		
 		} catch (SQLException e){
 			log.error(e.getMessage())

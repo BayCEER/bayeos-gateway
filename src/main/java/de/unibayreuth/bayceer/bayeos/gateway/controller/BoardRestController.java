@@ -2,17 +2,24 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.sql.DataSource;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +37,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 @RestController
 public class BoardRestController {
 	
-	private static final Integer TOP_N_RECORDS = 300;
-
+	
 	@Autowired
 	BoardRepository repo;
 	
@@ -56,24 +62,21 @@ public class BoardRestController {
 	// See https://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html
 	@RequestMapping(path="/rest/boards/chartData", method = RequestMethod.GET)
 	public List<Observation> chartData(@RequestParam Long boardId, @RequestParam Long lastRowId){				
-		if (lastRowId == 0){														
-			Board b = repo.findOne(boardId);			
-			int secs = (b.getSamplingInterval() == null) ? 3600:TOP_N_RECORDS * b.getSamplingInterval();			
+		if (lastRowId == 0){					
+			Board b = repo.findOne(boardId);							 						
 			Date lrt = (b.getLastResultTime() == null) ? new Date(): b.getLastResultTime();				
 			GregorianCalendar gc = new GregorianCalendar();			
 			gc.setTime(lrt);			
-			gc.add(GregorianCalendar.SECOND,secs*-1);						
-			Date qt = gc.getTime();			
-			
-			String sql = "select * from (select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " +
-			"from ( " + 
+			gc.add(GregorianCalendar.HOUR,-2);						
+			Date qt = gc.getTime();						
+			String sql = "select id as rowId, channel_id as channelId, (EXTRACT(EPOCH FROM result_time)*1000)::int8 as millis,real_value(result_value,spline_id) as value " +
+			"from " + 
 			"(select o.id, c.id as channel_id, o.result_time, o.result_value, c.spline_id from observation o, channel c " +  
-			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ?) " +
+			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ? " +
 			"UNION " +  
-			"(select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id from observation_exp o, channel c " + 
-			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ?)" + 			
-			") a order by id desc limit " + TOP_N_RECORDS + ") z order by 1 asc";						
-			
+			"select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id from observation_exp o, channel c " + 
+			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ?" + 			
+			") z order by 1 asc";									
 			log.debug(sql);
 			return jdbcTemplate.query(sql,new Object[]{boardId,qt,boardId,qt},new ObservationMapper());			
 		} else {
@@ -90,8 +93,26 @@ public class BoardRestController {
 	}
 	
 	@RequestMapping(path="/rest/boards/findByOrigin", method = RequestMethod.GET)
-	private Board findByOrigin(@RequestParam String origin){
-		return repo.findByOrigin(origin);		
+	public ResponseEntity findByOrigin(@RequestParam String origin){
+		Board b =  repo.findByOrigin(origin);
+		if (b == null) {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		}
+		TimeZone tz = TimeZone.getTimeZone("UTC");
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		sf.setTimeZone(tz);
+		JSONObject o = new JSONObject();
+		o.put("id", b.getId());
+		o.put("name", b.getName());
+		o.put("origin", b.getOrigin());
+		if (b.getLastResultTime() != null){
+			o.put("lastResultTime", sf.format(b.getLastResultTime()));
+		} 
+		
+		final HttpHeaders httpHeaders= new HttpHeaders();
+	    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+		return new ResponseEntity(o.toString(),httpHeaders, HttpStatus.OK);
+		
 	}
 	
 	

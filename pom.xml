@@ -5,7 +5,7 @@
 
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.2.11</version>
+	<version>2.2.15</version>
 
 
 	<licenses>
@@ -26,8 +26,8 @@
 	<description>BayEOS Gateway</description>
 
 	<properties>
-		<release>jessie</release>
-		<java.version>1.7</java.version>
+		<release>stretch</release>
+		<java.version>1.8</java.version>
 
 		<!-- Last version with reason phrase -->
 		<tomcat.version>8.0.37</tomcat.version>
@@ -35,8 +35,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 
 		<db.user>xbee</db.user>
 		<db.password>0b64debf8fae4239a7ca845f39878a3d</db.password>
@@ -474,6 +474,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
 		</dependency>
 		
 		<!-- This breaks web flow 

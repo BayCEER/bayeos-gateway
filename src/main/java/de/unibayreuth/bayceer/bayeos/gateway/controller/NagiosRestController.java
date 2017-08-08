@@ -10,7 +10,6 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.NagiosMessage;
 import de.unibayreuth.bayceer.bayeos.gateway.service.NagiosService;
 
 @RestController
-
 public class NagiosRestController {
 	
 	@Autowired

@@ -113,10 +113,9 @@
                     			return '<span class="label label-warning">' + [[ #{status.warn} ]] + '</span>';                    			
                     		} else if (row.channelStatus == 2) {                    			
                     			return '<span class="label label-critical">' + [[ #{status.critical} ]] + '</span>';
-                    		}
-                    	} else {
-                    			return "";                    			
-                     	}
+                    		} 
+                    	} 
+                    	return "";                    			                     	
                      }
                     },
                     { searchable: false, sortable: false,
