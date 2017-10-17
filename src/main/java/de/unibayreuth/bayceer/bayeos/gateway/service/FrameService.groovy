@@ -1,5 +1,6 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
+import java.nio.ByteBufferAsFloatBufferB
 import java.sql.Connection
 import java.sql.SQLException
 import java.text.SimpleDateFormat
@@ -106,46 +107,48 @@ class FrameService {
 								}
 							}
 
-						// Create virtual channels
+							// Create virtual channels
 							for (VirtualChannel vc: b.vchannels){
 								b.channels[vc.getNr()] = findOrSaveChannel(db,b,vc.getNr())
 							}
 
-						// Write original values out using copy
+							// Write original values out using copy
 							CopyManager cm = ((PGConnection)con.unwrap(PGConnection.class)).getCopyAPI()
 							cin = cm.copyIn("COPY observation (channel_id,result_time,result_value) FROM STDIN WITH CSV")
-							res['value'].each { key, value ->
-								Float fvalue = (Float)value
+							res['value'].each { key, value ->								
 								def chaId = b.channels[key]
-								if (!fvalue.isNaN() && (chaId != null)){
-									StringBuffer sb = new StringBuffer(200)
-									sb.append(chaId)
-									sb.append(",").append(dateFormatter.format(ts))
-									sb.append(",").append(fvalue).append("\n")
-									byte[] pl = sb.toString().getBytes("UTF-8")
-									cin.writeToCopy(pl,0,pl.length)
-									sb = null
-									b.records++
-								}
-							}
-
-
-						// Write calculated values out
-							for (VirtualChannel vc: b.vchannels){
-								try {									
-									def chaId = b.channels[vc.getNr()]
-									if (chaId != null){
-										def vcValue = vc.eval(scriptEngine, res['value'])
-										// 	println(vc.getDeclaration())
+								if (chaId != null && value != null) {									
+									Float fvalue = (Float)value	
+									if (!fvalue.isNaN()){
 										StringBuffer sb = new StringBuffer(200)
-										sb.append(chaId)
-										sb.append(",").append(dateFormatter.format(ts))
-										sb.append(",").append(vcValue).append("\n")
+										sb.append(chaId).append(",").append(dateFormatter.format(ts)).append(",").append(fvalue).append("\n")
 										byte[] pl = sb.toString().getBytes("UTF-8")
 										cin.writeToCopy(pl,0,pl.length)
 										sb = null
 										b.records++
+									}										
+								}
+																															
+							}
+
+
+							// Write calculated values out
+							for (VirtualChannel vc: b.vchannels){
+								try {									
+									def chaId = b.channels[vc.getNr()]
+									def vcValue = vc.eval(scriptEngine, res['value'])									
+									if (chaId != null && vcValue != null){																														
+										Float value = (Float)vcValue;
+											if (!value.isNaN()) {
+												StringBuffer sb = new StringBuffer(200)
+												sb.append(chaId).append(",").append(dateFormatter.format(ts)).append(",").append(value).append("\n")
+												byte[] pl = sb.toString().getBytes("UTF-8")
+												cin.writeToCopy(pl,0,pl.length)
+												sb = null
+												b.records++
+											}
 									}
+									
 								} catch (Exception e){
 									log.warn("Failed to calculate virtual channel value:${vc.nr}")
 									log.error(e.getMessage())

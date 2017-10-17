@@ -5,7 +5,7 @@
 
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.2.15</version>
+	<version>2.2.16</version>
 
 
 	<licenses>
@@ -160,7 +160,7 @@
 						<groupId>io.fabric8</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 						<extensions>true</extensions>
-						<version>0.18.1</version>
+						<version>0.22.1</version>
 						<configuration>
 							<logDate>default</logDate>
 							<verbose>true</verbose>
@@ -181,6 +181,7 @@
 									<name>bayceer/bayeos-gateway-db:${project.version}</name>
 									<build>
 										<from>bayceer/postgres-perl:9.4</from>
+										
 										<runCmds>
 											<runCmd>localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8</runCmd>
 											<runCmd>echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf</runCmd>
@@ -206,7 +207,7 @@
 											<tag>${project.version}</tag>
 										</tags>
 									</build>
-									<run>
+									<run>										
 										<wait>
 											<log>PostgreSQL init process complete; ready for start up.</log>
 											<time>60000</time>
@@ -222,7 +223,7 @@
 									<alias>bayeos-gateway</alias>
 									<name>bayceer/bayeos-gateway:${project.version}</name>
 									<build>
-										<from>java:7</from>
+										<from>java:8</from>
 										<env>
 											<EXPORT_HOST>bayeos-server</EXPORT_HOST>
 										</env>
@@ -245,7 +246,7 @@
 										</labels>
 										<ports>
 											<port>${server.port}:${server.port}</port>
-										</ports>
+										</ports>									
 										<wait>
 											<http>
 												<url>http://${docker.hostname}:${server.port}${server.contextPath}</url>
