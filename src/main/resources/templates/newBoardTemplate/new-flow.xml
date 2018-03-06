@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+	
+		
+	<var name="boardTemplate" class="de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate"/>	
+	
+	<on-start>	
+	 <evaluate result="flowScope.intervals" expression="intervalRepository.findAll()"></evaluate>
+	 <evaluate result="flowScope.functions" expression="functionRepository.findAll()"></evaluate>
+	 <evaluate result="flowScope.splines" expression="splineRepository.findAll()"></evaluate>
+	 <evaluate result="flowScope.units" expression="unitRepository.findAll()"></evaluate>		
+	</on-start>
+    
+    
+    <view-state id="props" model="boardTemplate" view="newBoardTemplate/props">
+		<binder>            	
+            <binding property="name"></binding>
+           	<binding property="description"></binding>
+           	<binding property="revision"></binding>
+           	<binding property="dataSheet"></binding>
+        </binder>        
+        <transition on="next" to="defaults">
+		</transition>		        
+    </view-state>
+    
+    <view-state id="defaults" model="boardTemplate" view="newBoardTemplate/defaults">
+    	<binder>            	
+            <binding property="criticalMin"></binding>
+           	<binding property="criticalMax"></binding>
+           	<binding property="warningMin"></binding>
+           	<binding property="warningMax"></binding>
+           	<binding property="samplingInterval"></binding>
+           	<binding property="checkDelay"></binding>
+        </binder>        
+        <transition on="back" to="props"/>
+        <transition on="next" to="channels">        
+		</transition>
+    </view-state>
+    
+    
+    
+    
+    <view-state id="channels" model="boardTemplate" view="newBoardTemplate/channels">
+    	<transition on="add" to="addTemplate">
+    		<evaluate result="flowScope.channelTemplate" expression="new de.unibayreuth.bayceer.bayeos.gateway.model.ChannelTemplate()"></evaluate>     		
+		</transition>
+		<transition on="edit" to="editTemplate">
+			<evaluate result="flowScope.channelTemplate" expression="boardTemplate.getTemplate(requestParameters.index)"/>
+		</transition>				
+		<transition on="remove" to="channels">
+			<evaluate expression="boardTemplate.removeTemplate(requestParameters.index)"/>
+		</transition>						
+		<transition on="submit" to="created">
+    	   	<evaluate expression="boardTemplateServiceImpl.persist(boardTemplate)"/>
+    	</transition>    	
+    	<transition on="back" to="defaults"/>
+    </view-state>
+    
+     <view-state id="editTemplate" model="channelTemplate" view="newBoardTemplate/channel">
+     	<transition on="back" to="channels"/>   
+    	<transition on="submit" to="channels"/>  	  
+    </view-state>
+    
+    <view-state id="addTemplate" model="channelTemplate" view="newBoardTemplate/channel">
+    	<transition on="submit" to="channels">
+    		<evaluate expression="boardTemplate.addTemplate(flowScope.channelTemplate)"></evaluate>
+    	</transition>    	
+    	<transition on="back" to="channels"/>
+    </view-state>
+            
+    <end-state id="created" view="externalRedirect:contextRelative:/boardTemplates">
+    	<output name="globalMessage" value="'Board Template created.'" />
+    </end-state>
+    
+    <end-state id="canceled" view="externalRedirect:contextRelative:/boardTemplates"/>
+    
+    <global-transitions>
+			<transition on="cancel" to="canceled" />			
+	</global-transitions>
+
+</flow>

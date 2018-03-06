@@ -1,5 +1,0 @@
-
-
-beans = {	
-	customPropertyEditorRegistrar(CustomPropertyEditorRegistrar)
-}

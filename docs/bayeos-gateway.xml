@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><entities>
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.Channel</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>368</entity-height>
+		<entity-X-Coordinate>340</entity-X-Coordinate>
+		<entity-Y-Coordinate>617</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.Board</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>328</entity-height>
+		<entity-X-Coordinate>340</entity-X-Coordinate>
+		<entity-Y-Coordinate>210</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.ChannelFunctionParameter</entity-name>
+		<entity-width>190</entity-width>
+		<entity-height>128</entity-height>
+		<entity-X-Coordinate>851</entity-X-Coordinate>
+		<entity-Y-Coordinate>541</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.ChannelFunction</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>128</entity-height>
+		<entity-X-Coordinate>886</entity-X-Coordinate>
+		<entity-Y-Coordinate>310</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.ChannelBinding</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>128</entity-height>
+		<entity-X-Coordinate>641</entity-X-Coordinate>
+		<entity-Y-Coordinate>531</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.Spline</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>128</entity-height>
+		<entity-X-Coordinate>130</entity-X-Coordinate>
+		<entity-Y-Coordinate>678</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.Interval</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>90</entity-height>
+		<entity-X-Coordinate>568</entity-X-Coordinate>
+		<entity-Y-Coordinate>738</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.KnotPoint</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>128</entity-height>
+		<entity-X-Coordinate>130</entity-X-Coordinate>
+		<entity-Y-Coordinate>875</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>148</entity-height>
+		<entity-X-Coordinate>641</entity-X-Coordinate>
+		<entity-Y-Coordinate>310</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.Unit</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>110</entity-height>
+		<entity-X-Coordinate>497</entity-X-Coordinate>
+		<entity-Y-Coordinate>900</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+
+	<entity>
+		<entity-name>de.unibayreuth.bayceer.bayeos.gateway.model.BoardGroup</entity-name>
+		<entity-width>120</entity-width>
+		<entity-height>188</entity-height>
+		<entity-X-Coordinate>80</entity-X-Coordinate>
+		<entity-Y-Coordinate>271</entity-Y-Coordinate>
+		<primary-collapsed>false</primary-collapsed>
+		<relation-collapsed>false</relation-collapsed>
+		<basic-collapsed>false</basic-collapsed>
+	</entity>
+</entities>

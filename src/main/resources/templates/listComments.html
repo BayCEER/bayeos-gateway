@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.comments}">Comments</title>
+</head>
+<body>
+	<div layout:fragment="content">
+	
+	  	<h3 th:text="#{e.comments}">comments</h3>	  
+		
+		<table class="table table-condensed table-striped col-sm-12">
+			<thead>
+				<tr>
+					<th class="col-sm-1">
+						<a class="sorted" sd:pagination-sort="insertTime" th:text="#{com.insertTime}">Time</a>
+					</th>					
+					<th class="col-sm-3">
+						<a class="sorted" sd:pagination-sort="user" th:text="#{com.user}">User</a>
+					</th>					
+					<th class="col-sm-6">
+						<a class="sorted" sd:pagination-sort="content" th:text="#{com.content}">Content</a>
+					</th>
+					<th class="col-sm-2">
+						<div th:replace="table::add(@{'/comments/create/__${board}__'})"></div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="com : *{comments}">					
+					<td th:text="${{com.insertTime}}" class="col-sm-3">Time</td>
+					<td th:text="${com.user.userName}" class="col-sm-1">User</td>					
+					<td th:text="${com.content}" class="col-sm-6">Content</td>
+					<td class="col-sm-2">
+						<div th:replace="table::delete(@{'/comments/delete/' + ${com.id}},false)"></div>
+						<div th:replace="table::edit(@{'/comments/edit/' + ${com.id}},false)"></div>
+					</td>
+				</tr>
+			</tbody>
+		</table>	
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

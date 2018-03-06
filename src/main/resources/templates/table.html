@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<!--  Add Button   -->
+<a th:fragment="add(href)" class="btn btn-default btn-xs" th:href="${href}"> <span
+		class="glyphicon glyphicon-plus"></span> <span
+		th:text="#{action.create}"></span>
+</a>
+
+<!--  Edit Button   -->
+<a th:fragment="edit(href,locked)" th:unless="${locked}" class="btn btn-default btn-xs" th:href="${href}"> <span
+		class="glyphicon glyphicon-edit"></span> <span
+		th:text="#{action.edit}"></span>
+</a>
+
+<!--  Delete Button   -->
+<a th:fragment="delete(href,locked)" th:unless="${locked}" class="btn btn-default btn-xs" th:href="${href}" th:onclick="#{dialog.confirm}"> <span
+		class="glyphicon glyphicon-remove"></span> <span
+		th:text="#{action.delete}"></span>
+</a>
+
+<!--  Export Button   -->
+<a th:fragment="export(href)" class="btn btn-default btn-xs" th:href="${href}"> <span
+		class="glyphicon glyphicon-save"></span> <span
+		th:text="#{action.export}"></span>
+</a>
+
+
+<!--  Pagination row below table  -->
+<div th:fragment="pagination" class="row">
+	<div class="col-sm-6">
+		<div sd:pagination-summary="">info</div>
+	</div>
+	<div class="col-sm-6">
+		<nav class="pull-right">
+			<ul class="pagination" sd:pagination="full">
+			</ul>
+		</nav>
+	</div>
+</div>
+
+
+</html>

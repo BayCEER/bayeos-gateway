@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.knotPoint}">Knot Point</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.knotPoint}">Knot Point</h3>
+		<form method="post" action="#" th:action="@{/knotpoints/save}" th:object="${knotPoint}">
+		 	<input type="hidden" th:field="*{id}"/>		
+		 	<input type="hidden" th:field="*{spline.id}"/>								 				
+			<div th:replace="field::text('x','X',true)"></div>			
+			<div th:replace="field::text('y','Y',true)"></div>
+			<button th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
+		</form>
+	</div>
+</body>
+</html>

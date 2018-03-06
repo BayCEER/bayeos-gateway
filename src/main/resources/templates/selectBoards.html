@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.boards}">Boards</title>
+</head>
+<body>
+	
+	<div layout:fragment="content">
+		<div class="alert alert-info" role="alert" th:text="#{msg.infoGroupAdd(${group.name})}">Please click on a row to add a board to the group:X</div>		
+		
+		<form class="form" method="post" action="#" th:action="@{/groups/addBoards}" th:object="${group}">
+		 	
+		 	<input type="hidden" name="id" th:value="*{id}" />
+		 	<input type="hidden" name="boards" id="boards" />
+		 	
+		 	<table id="table" class="table">
+		 		<thead>
+		 			<tr>
+		 				<th>Id</th>
+		 				<th th:text="#{board.origin}">Origin</th>
+						<th th:text="#{board.name}">Name</th>						
+						<th th:text="#{board.lrt}">Last Result Time</th> 
+		 			</tr>
+		 		</thead>
+		 		<tbody>
+		 			<tr th:each="i : ${boards}">
+		 				<th th:text="${i.id}"></th>
+		 				<th th:text="${i.origin}"></th>
+		 				<th th:text="${i.name}"></th>
+		 				<th th:text="${{i.lastResultTime}}"></th>
+		 			</tr>		 		
+		 		</tbody>		 			 	
+		 	</table>
+			<button th:text="#{action.save}" id="submit" type="submit" class="btn btn-default">Save</button>
+		</form>
+		<script type="text/javascript" class="init" th:inline="javascript">
+			$(document).ready(function() {
+				var dt = $('#table').DataTable({
+				"language": {
+ 					"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
+ 					"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ , 					
+ 					"info": /*[[#{datatable.info}]]*/, 
+ 					"infoEmpty": /*[[#{datatable.infoEmpty}]]*/,
+ 					"infoFiltered": /*[[#{datatable.infoFiltered}]]*/,
+ 					"loadingRecords": /*[[#{datatable.loadingRecords}]]*/,
+ 					"search": /*[[#{datatable.search}]]*/,
+ 					"paginate" : {
+ 						"first" : /*[[#{datatable.first}]]*/,
+ 						"last" : /*[[#{datatable.last}]]*/,
+ 						"next" : /*[[#{datatable.next}]]*/,
+ 						"previous" : /*[[#{datatable.previous}]]*/,
+ 					}
+ 		        },
+				"lengthChange" : false,
+				"info" : false,
+				"searching" : true,
+				"columnDefs" : [ 
+					{	"targets" : 0,
+						"visible" : false,
+						"searchable" : false
+					}					 
+					]
+				});
+
+				$('#table tbody').on('click', 'tr', function() {
+					$(this).toggleClass('selected');
+				});
+
+				$('#submit').click( function() {
+					var ids = [];
+					dt.rows('.selected').data().each( function(row) {
+						ids.push(row[0])
+					});									
+					$('#boards').val(ids)
+				});
+			});
+	</script> 
+		
+		
+	</div>	
+	
+</body>
+</html>

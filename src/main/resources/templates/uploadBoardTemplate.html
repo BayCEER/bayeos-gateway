@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.boardTemplate}">Board Template</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{action.upload}">Upload</h3>
+		<form method="post" action="#" th:action="@{/boardTemplates/upload}" role="form" enctype="multipart/form-data">
+		 	<div class="form-group">		 	
+				<label for="file" th:text="#{e.file} + ':'">File:</label>
+				<input type="file" id="file" name="file" accept="application/xml"/>							
+			</div>					
+			<div class="form-group">
+				<button th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
+			</div>					
+		</form>
+	</div>
+</body>
+</html>

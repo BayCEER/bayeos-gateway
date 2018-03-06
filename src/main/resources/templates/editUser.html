@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.user}">User</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.user}">Edit user</h3>
+		<form method="post" action="#" th:action="@{/users/save}" th:object="${user}">
+		 	<input type="hidden" th:field="*{id}"/>						
+			<div th:replace="field::text('userName',#{user.name},true)"></div>			
+			<div th:replace="field::password('newPassword',#{user.password},true)"></div>			
+			<div th:replace="field::radio('role',#{user.role},${allRoles})"></div>
+			<div th:replace="field::checkbox('locked',#{user.locked})"></div>					
+			<button th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
+		</form>
+	</div>
+</body>
+</html>

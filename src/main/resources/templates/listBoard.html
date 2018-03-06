@@ -1,0 +1,187 @@
+	<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"  xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
+<head>
+	<title th:text="#{board.list}">Board list</title>      
+	<script th:src="@{/resources/js/sockjs.min.js}"	src="../static/resources/js/sockjs.min.js"></script>
+	<script th:src="@{/resources/js/stomp.min.js}"	src="../static/resources/js/stomp.min.js"></script>  
+</head>
+<body>
+<div layout:fragment="content">	
+	<div class="row">		
+		<div class="col-xs-12">
+        <table id="table" class="table table-hover nowrap">
+        <thead>        	                        
+                <tr>                   
+                   <th th:text="#{board.origin}">Origin</th>                   
+                   <th th:text="#{board.group}" class="min-tablet-l">Group</th>
+                   <th th:text="#{board.name}" class="min-tablet-l">Name</th>
+                   <th th:text="#{board.rssi}" class="min-tablet-l">Rssi</th>
+                   <th th:text="#{board.lrt}">Last Result Time</th>
+                   <th th:text="#{board.status}">Status</th>
+                   <th></th>
+                   </tr>
+         </thead>
+         <tbody>
+         </tbody>
+		</table>
+		</div>
+	</div>
+
+	 <script type="text/javascript" class="init" th:inline="javascript">
+	 /*<![CDATA[*/
+ 		$(document).ready(function(){
+ 			
+ 			var boards = $('#table').DataTable( { 				
+ 				"language": {
+ 					"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
+ 					"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ , 					
+ 					"info": /*[[#{datatable.info}]]*/, 
+ 					"infoEmpty": /*[[#{datatable.infoEmpty}]]*/,
+ 					"infoFiltered": /*[[#{datatable.infoFiltered}]]*/,
+ 					"loadingRecords": /*[[#{datatable.loadingRecords}]]*/,
+ 					"search": /*[[#{datatable.search}]]*/,
+ 					"paginate" : {
+ 						"first" : /*[[#{datatable.first}]]*/,
+ 						"last" : /*[[#{datatable.last}]]*/,
+ 						"next" : /*[[#{datatable.next}]]*/,
+ 						"previous" : /*[[#{datatable.previous}]]*/,
+ 					}
+ 		        },
+ 				"responsive": true,
+        		"autoWidth": false,
+                "processing": false,
+                "serverSide": true,
+                "lengthChange": false,
+                "columns": [					
+                    {data: 'origin',
+                     render: function(data,type,row) {
+                    	 var url = /*[[ @{'/boards/'} ]]*/;
+                    	 return '<a href="' + url + row.id +'">' + row.origin + '</a>' ;
+                     } 
+                    },
+                    {data: 'boardGroup.name',
+                      	render: function (data, type, row) {
+                      		if (row.boardGroup != null) {
+                      			var url = /*[[ @{'/groups/'} ]]*/;
+                            	return '<a href="' + url + row.boardGroup.id +'">' + row.boardGroup.name + '</a>' ;
+                      		} else {
+                            	return '';
+                            }
+                      	}
+                    },
+                    {data: 'name',
+                      	render: function (data, type, row) {
+                      		if (row.name != null) {
+                      			return data;	
+                      		} else {
+                      			return '';
+                      		}
+                            
+                      	}
+                    },
+                    {data: 'lastRssi', searchable: false,
+                    	render: function(data,type,row){
+                    		if (row.lastRssi != null) {
+                    				if (row.lastRssi != 0){
+                    					var url = /*[[ @{/resources/img/level_} ]]*/;
+        	        			    	return '<img src="' + url + rssiLevel(row.lastRssi) + '.gif"/>';	
+                    				} else {
+                    					return '';
+                    				}	                    			             			        
+            			    } else {
+            			        return '';
+            			    }
+                    	}
+                    },
+                    {data: 'lastResultTime', searchable: false,
+                    	render: function(data,type,row){
+                    		if (row.lastResultTime != null){
+                    			var date = new Date(row.lastResultTime); 
+                    			return date.toLocaleDateString() + " " + date.toLocaleTimeString();                    			
+                    		} else {
+                    			return '';
+                    		}
+                        	
+                     	}
+                    },                    
+                    {data: 'channelStatus', searchable: false,
+                     render: function(data,type,row){
+                     	if (row.channelStatus != null){                                          
+                    		if (row.channelStatus == 0){                    	                    			 	
+                    			return '<span class="label label-success">' + [[ #{status.ok} ]] + '</span>';
+                    		} else if (row.channelStatus == 1) {                    			
+                    			return '<span class="label label-warning">' + [[ #{status.warn} ]] + '</span>';                    			
+                    		} else if (row.channelStatus == 2) {                    			
+                    			return '<span class="label label-critical">' + [[ #{status.critical} ]] + '</span>';
+                    		} 
+                    	} 
+                    	return "";                    			                     	
+                     }
+                    },
+                    { searchable: false, sortable: false,
+                      render: function ( data, type, row ) {                                           	                         	    
+                    	    var ret = '<td class="link">';
+                    	    var edit = /*[[ #{action.edit} ]]*/;
+                    	    var chart = /*[[ #{action.chart} ]]*/;
+                    	    var del = /*[[ #{action.delete} ]]*/;
+                    	    var confirm =  [[ #{dialog.confirm} ]];
+            		        ret += '<a class="btn btn-xs btn-default" href="./boards/' + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + edit + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default" href="./boards/chart/' + row.id + '"><span class="glyphicon glyphicon-stats"></span> ' + chart + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default" href="./boards/delete/' + row.id + '" onclick="' + confirm + '"><span class="glyphicon glyphicon-remove"></span> ' + del + '</a>';
+            			    return ret += '</td>';
+                		}	
+                    }                                                            
+                ],
+                "ajax": {
+                	'contentType': 'application/json',
+                	'url': /*[[ @{/rest/boards} ]]*/,
+                	'type': 'POST',
+                    'data': function(d) {                     		
+                            return JSON.stringify(d);
+                    }
+                },
+                "search": {
+                	"search": /*[[ ${boardSearch.searchString} ]]*/                	
+                },
+                "displayStart": /*[[ ${boardSearch.start} ]]*/,                
+                "order": /*[[ ${boardSearch.order} ]]*/
+ 			} );
+ 			
+ 			 			
+ 			
+ 			var stompClient = null;
+ 			var socket = new SockJS('/gateway/gs-guide-websocket');
+ 		    stompClient = Stomp.over(socket);
+ 		    
+ 		   	stompClient.connect({}, function (frame) {
+ 		        console.log('Connected: ' + frame);
+ 		        stompClient.subscribe('/topic/frameEvents', function (event) {
+ 		            handleFrameEvent(JSON.parse(event.body));
+ 		        });
+ 		    });
+ 		     		   	
+ 		   	function handleFrameEvent(e){ 		   		
+ 		   		if (e.type == 'NEW_OBSERVATION'){ 		   			
+ 					boards.ajax.reload( 							
+ 							function(d){ 																
+ 								for(var i = 0;i<d.data.length;i++){
+ 									var id = d.data[i].id; 									 									
+ 									if (id==e.id){
+ 										$(boards.rows(i).nodes()).addClass('info');
+ 										setTimeout(
+ 												function(a){
+ 													$(boards.rows(a).nodes()).removeClass('info');
+		        								},500,i);
+ 									}
+ 								}
+ 								
+ 							}
+ 							,false);
+ 		   		}
+ 		   	}
+		});
+		/*]]>*/
+	</script>
+</div>
+</body>
+</html>

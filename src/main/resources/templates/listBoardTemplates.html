@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.boardTemplates}">All templates</title>
+</head>
+<body>
+	<div layout:fragment="content">
+			<h3 th:text="#{nav.boardTemplates}">Board Templates</h3>			
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+						<th>
+							<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a>
+						</th>
+						
+						<th>
+							<a class="sorted" sd:pagination-sort="revision"	th:text="#{boardTemplate.revision}">Revision</a>
+						</th>
+						
+						<th>
+							<a class="sorted" sd:pagination-sort="dateCreated"	th:text="#{boardTemplate.dateCreated}">Date created</a>
+						</th>
+						
+						<th>
+							<a class="sorted" sd:pagination-sort="channelCount"	th:text="#{boardTemplate.channelCount}">Number of channels</a>
+						</th>
+						
+						<th>
+							<div class="pull-right">
+								<div th:replace="table::add(@{'/newBoardTemplate'})"></div>
+								<a th:href="@{/boardTemplates/upload}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-upload"></span> <span th:text="#{action.upload}">Upload</span></a>								
+							</div>				
+						</th>
+					</tr>					
+			
+				</thead>
+				<tbody>
+					<tr th:each="i : ${boardTemplates}">
+						<td>
+							<a th:href="@{/boardTemplates/{id}(id=${i.id})}" th:text="${i.name}">Name A</a>	
+						</td>
+						<td th:text="${i.revision}"/>
+						<td th:text="${{i.dateCreated}}"/>
+						<td th:text="${i.getTemplateCount()}"/>
+						
+						<td class="pull-right">		
+							<div th:replace="table::edit(@{'/boardTemplates/' + ${i.id}},false)"></div>
+							<div th:replace="table::delete(@{'/boardTemplates/delete/' + ${i.id}},false)"></div>
+							<div th:replace="table::export(@{'/boardTemplates/export/' + ${i.id}})"></div>							  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

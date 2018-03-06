@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.users}">All Users</title>
+</head>
+<body>
+	<div layout:fragment="content">	
+		<h3 th:text="#{nav.users}">Users</h3>
+		 	
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th><a class="sorted" sd:pagination-sort="userName"	th:text="#{user.name}">Username</a></th>					
+					<th><a class="sorted" sd:pagination-sort="role"	th:text="#{user.role}">Role</a></th>
+					<th><a class="sorted" sd:pagination-sort="locked" th:text="#{user.locked}">Locked</a></th>
+					<th>
+						<div class="btn-group pull-right">
+							<div th:replace="table::add(@{'/users/create'})"></div>									
+						</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="u : ${users}">
+					<td><a th:href="@{/users/{id}(id=${u.id})}" th:text="${u.userName}">User A</a></td>
+					<td th:text="${u.role}">Role</td>
+					<td><div th:include="field::yesno (${u.locked})"></div></td>					
+					<td>
+						<div class="pull-right">
+							<div th:replace="table::edit(@{'/users/' + ${u.id}},false)"></div>													
+							<div th:replace="table::delete(@{'/users/delete/' + ${u.id}},false)"></div>							
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>				
+		<div th:replace="table::pagination"></div>
+	</div>
+</body>
+</html>

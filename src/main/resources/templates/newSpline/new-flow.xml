@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+		
+	<var name="sp" class="de.unibayreuth.bayceer.bayeos.gateway.model.Spline"/>	
+	
+    <view-state id="name" model="sp" view="newSpline/name">
+		<binder>            	
+            <binding property="name"></binding>            
+        </binder>                
+        <transition on="next" to="knotpoints"/>        			        
+    </view-state>
+    
+    <view-state id="knotpoints" model="sp" view="newSpline/knotpoints">
+    	<transition on="addPoint" to="addKnotpoint">
+    		<set name="flowScope.point" value="new de.unibayreuth.bayceer.bayeos.gateway.model.KnotPoint()"></set>
+		</transition>		
+		<transition on="editPoint" to="editKnotpoint">
+			<set name="flowScope.point" value="sp.getKnotPoints().get(requestParameters.index)"/>
+		</transition>
+		<transition on="removePoint" to="knotpoints">
+			<evaluate expression="sp.removeKnotPoint(requestParameters.index)"/>
+		</transition>		
+		<transition on="submit" to="created">
+    	   	<evaluate expression="splineService.persist(sp)"/>
+    	</transition>
+    	<transition on="back" to="name"/>    		    	
+    </view-state>    
+                
+    <view-state id="editKnotpoint" model="point" view="newSpline/knotpoint">    	   
+    	<transition on="back" to="knotpoints"/>   
+    	<transition on="submit" to="knotpoints"/>  	  
+    </view-state>
+    
+    <view-state id="addKnotpoint" model="point" view="newSpline/knotpoint">    	   
+    	<transition on="submit" to="knotpoints">
+    		<evaluate expression="sp.addKnotPoint(flowScope.point)"></evaluate>
+    	</transition>
+    	<transition on="back" to="knotpoints"/>      	 
+    </view-state>    
+            
+    <end-state id="created" view="externalRedirect:contextRelative:/splines">
+    	<output name="globalMessage" value="'Created.'" />
+    </end-state>
+    
+	<end-state id="canceled" view="externalRedirect:contextRelative:/splines">
+    	<output name="globalMessage" value="'Canceled'" />
+    </end-state>
+    
+    <global-transitions>
+			<transition on="cancel" to="canceled"/>			
+	</global-transitions>
+
+</flow>

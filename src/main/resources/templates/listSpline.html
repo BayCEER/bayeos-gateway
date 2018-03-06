@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.splines}">All functions</title>
+</head>
+<body>
+	<div layout:fragment="content">
+			<h3 th:text="#{nav.splines}">Splines</h3>			
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+						<th>
+							<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a>
+						</th>
+						<th>
+							<div class="pull-right">
+								<div th:replace="table::add(@{'/newSpline'})"></div>
+								<a th:href="@{/splines/upload}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-upload"></span> <span th:text="#{action.upload}">Upload</span></a>								
+							</div>				
+						</th>
+					</tr>					
+			
+				</thead>
+				<tbody>
+					<tr th:each="i : ${splines}">
+						<td th:switch="${i.locked}">
+							<div th:case="true"> 
+								<span class="glyphicon glyphicon-lock" title="Spline is locked. Editing not allowed."></span> <span th:text="${i.name}">Spline Name</span>
+							</div>																		
+							<a th:case="false" th:href="@{/splines/{id}(id=${i.id})}" th:text="${i.name}">Name A</a>
+						</td>
+							
+						<td class="pull-right">		
+							<div th:replace="table::edit(@{'/splines/' + ${i.id}},${i.locked})"></div>
+							<div th:replace="table::delete(@{'/splines/delete/' + ${i.id}},${i.locked})"></div>
+							<div th:replace="table::export(@{'/splines/export/' + ${i.id}})"></div>							  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

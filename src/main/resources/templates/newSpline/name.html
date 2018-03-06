@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.spline}">Spline</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.spline}">Spline</h3>
+		<form id="sp" method="post" th:object="${sp}" th:action="${flowExecutionUrl}">
+			<div class="form-group">		 				 						
+				<div th:replace="field::text('name',#{a.name},true)"></div>																	
+			</div>						
+			<div class="form-group">
+				<a th:text="#{action.cancel}" th:href="${flowExecutionUrl}+'&amp;_eventId=cancel'" class="btn btn-default">Cancel</a>
+				<button type="submit" name ="_eventId_next" value="next" th:text="#{action.next}" class="btn btn-default">Next</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>
+
+  

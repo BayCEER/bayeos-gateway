@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>Login</title>
+
+<link th:href="@{/resources/css/bootstrap.min.css}"
+	href="../static/resources/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/resources/css/app.css}"
+	href="../static/resources/css/app.css" rel="stylesheet" />
+<script th:src="@{/resources/js/jquery-2.1.3.js}"
+	src="../static/resources/js/jquery-2.1.3.js"></script>
+<script th:src="@{/resources/js/bootstrap.min.js}"
+	src="../static/resources/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+	<div th:fragment="navbar">
+		<div th:with="currentUser=${#httpServletRequest.userPrincipal?.principal}">
+			<nav class="navbar navbar-default navbar-fixed-top">
+				<div class="container">
+					
+					<div class="navbar-header">
+						<div th:if="${currentUser != null}">
+						<button class="navbar-toggle collapsed" aria-controls="navbar"
+							aria-expanded="false" data-target="#navbar"
+							data-toggle="collapse" type="button">
+							<span class="sr-only" th:text="#{nav.toggle}">Toggle navigation</span> <span
+								class="icon-bar"></span> <span class="icon-bar"></span> <span
+								class="icon-bar"></span>
+						</button>
+						</div>
+						<a class="navbar-brand" th:href="@{/}" href="/"><strong>BayEOS</strong>	Gateway</a>
+					</div>
+					
+					<div th:if="${currentUser != null}">	
+										
+									
+					<div class="collapse navbar-collapse" id="navbar">
+						<ul class="nav navbar-nav">
+							<li th:classappend="${controllerName == 'BoardGroup'}? 'active'"><a th:href="@{/groups}"><span class="glyphicon glyphicon-flag"></span> <span th:text="#{nav.groups}">Groups</span></a></li>														
+							<li th:classappend="${controllerName == 'Board'}? 'active'"><a th:href="@{/}"><span class="glyphicon glyphicon-hdd"></span> <span th:text="#{nav.boards}">Boards</span></a></li>							
+							<li th:if="${currentUser.isAdmin()}"  class="dropdown"><a class="dropdown-toggle" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="#"><span
+									class="glyphicon glyphicon-wrench"></span> <span th:text="#{nav.admin}">Administration</span><span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li th:classappend="${controllerName == 'BoardTemplate'}? 'active'">
+										<a th:href="@{/boardTemplates}">
+											<span class="glyphicon glyphicon-hdd"></span> <span th:text="#{nav.boardTemplates}">Board Templates</span>
+										</a>
+									</li>
+									<li th:classappend="${controllerName == 'User'}? 'active'">
+										<a th:href="@{/users}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{nav.users}">Users</span></a></li>
+									<li class="divider" role="separator"></li>
+																		
+									<li th:classappend="${controllerName == 'Function'}? 'active'">
+										<a th:href="@{/functions}">
+											<span class="glyphicon glyphicon-resize-vertical"></span> <span th:text="#{nav.functions(#{nav.aggregate})}">Aggregation Functions</span>
+										</a>
+									</li>
+									  
+									<li th:classappend="${controllerName == 'Interval'}? 'active'">
+										<a th:href="@{/intervals}">
+										<span class="glyphicon glyphicon-resize-horizontal"></span> <span th:text="#{nav.intervals(#{nav.aggregate})}">Aggregation Intervals</span>
+										</a>
+									</li>
+									
+									<li class="divider" role="separator"></li>
+									
+									<li th:classappend="${controllerName == 'ChannelFunction'}? 'active'">
+										<a th:href="@{/channelFunctions}">										 
+										<span class="glyphicon glyphicon-subscript"></span> <span th:text="#{nav.channelFunctions}">Channel Functions</span>
+										</a>
+									</li>
+									
+									
+									<li th:classappend="${controllerName == 'Spline'}? 'active'">
+										<a th:href="@{/splines}">
+										<span class="glyphicon glyphicon-share-alt"></span> <span th:text="#{nav.splines}">Splines</span></a></li>
+									<li th:classappend="${controllerName == 'Unit'}? 'active'"><a th:href="@{/units}"><span class="glyphicon glyphicon-tag"></span> <span th:text="#{nav.units}">Units</span></a></li>
+								</ul>
+							</li>
+						</ul>
+						
+						<div class="navbar-right">
+							<form class="navbar-form" th:action="@{/logout}" method="post">
+							<div class="form-group">
+								<!-- <span th:text="|Logged in as ${currentUser.userName} with Role ${currentUser.role}|">Logged in as User</span> -->						
+								<span th:text="#{nav.logOnMessage(${currentUser.userName})}">Logged in as User</span>
+							</div>
+							<button class="btn btn-default" type="submit" th:text="#{nav.logOut}">Log out</button>								
+						</form>							
+						</div>					
+					</div>						
+					</div>
+				</div>
+			</nav>
+		</div>
+	</div>
+</body>
+</html>

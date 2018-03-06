@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.functions}">All functions</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{nav.functions}">Functions</h3>
+						
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+						<th><a class="sorted" sd:pagination-sort="name"
+							th:text="#{a.name}">Name</a></th>
+						<th>
+						<div class="btn-group pull-right">
+								<div th:replace="table::add(@{'/functions/create'})"></div>
+						</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="f : ${functions}">
+						<td><a th:href="@{/functions/{id}(id=${f.id})}"
+							th:text="${f.name}">Name A</a></td>
+						<td>
+							<div class="pull-right">																				
+								<div th:replace="table::edit(@{'/functions/' + ${f.id}},false)"></div>
+								<div th:replace="table::delete(@{'/functions/delete/' + ${f.id}},false)"></div>
+							</div>  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>
