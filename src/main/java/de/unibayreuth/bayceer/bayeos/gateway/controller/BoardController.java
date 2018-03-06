@@ -34,6 +34,9 @@ public class BoardController extends AbstractCRUDController {
 	BoardRepository repo;
 	
 	@Autowired
+	DataTableSearch boardSearch;
+	
+	@Autowired
 	BoardTemplateRepository repoBoardTemplate;
 	
 	@Autowired 
@@ -53,7 +56,8 @@ public class BoardController extends AbstractCRUDController {
 	
 		
 	@RequestMapping(value={"/","/boards"}, method=RequestMethod.GET)	
-	public String list() {
+	public String list(Model model) {
+		model.addAttribute("boardSearch",boardSearch);
 		return "listBoard";
 		
 	}

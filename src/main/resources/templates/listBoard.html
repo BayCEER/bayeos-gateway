@@ -139,9 +139,15 @@
                     'data': function(d) {                     		
                             return JSON.stringify(d);
                     }
-                }                
+                },
+                "search": {
+                	"search": /*[[ ${boardSearch.searchString} ]]*/                	
+                },
+                "displayStart": /*[[ ${boardSearch.start} ]]*/,                
+                "order": /*[[ ${boardSearch.order} ]]*/
  			} );
  			
+ 			 			
  			
  			var stompClient = null;
  			var socket = new SockJS('/gateway/gs-guide-websocket');

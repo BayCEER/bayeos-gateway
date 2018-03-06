@@ -41,6 +41,10 @@ public class BoardRestController {
 	@Autowired
 	BoardRepository repo;
 	
+	@Autowired
+	DataTableSearch boardSearch;
+	
+	
 	private JdbcTemplate jdbcTemplate;
 	
 	private static Logger log = Logger.getLogger(BoardRestController.class);
@@ -54,7 +58,8 @@ public class BoardRestController {
 	// Module: https://github.com/darrachequesne/spring-data-jpa-datatables
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(path ="/rest/boards", method = RequestMethod.POST)
-	public DataTablesOutput<Board> findBoards(@Valid @RequestBody DataTablesInput input) {
+	public DataTablesOutput<Board> findBoards(@Valid @RequestBody DataTablesInput input) {		
+		boardSearch.setInput(input);
 		return repo.findAll(input);
 	}
 	
