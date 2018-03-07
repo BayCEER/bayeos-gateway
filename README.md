@@ -28,6 +28,7 @@ Let's create a new data producer to send the cpu load to our local gateway:
 - Install the python [psutils](https://pypi.python.org/pypi/psutil) module
 - Run [MyFirstBoard.py](docs/MyFirstBoard.py)
 - Open `http://localhost/gateway` to identify your first board
+
 ![board list](docs/MyFirstBoard.png)
 - Set the board name and the channel names 
 - Turn the board export option on
