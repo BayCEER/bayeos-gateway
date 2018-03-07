@@ -1,4 +1,4 @@
-﻿# BayEOS Gateway
+﻿# ![BayEOS Gateway](docs/gateway_logo.png)
 A sensor gateway to receive, check and aggregate observation data
 
 Main characteristics:
