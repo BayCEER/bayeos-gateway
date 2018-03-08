@@ -3,7 +3,8 @@ A sensor gateway to receive, check and aggregate observation data
 
 Main characteristics:
 - Import service for observation data ([BayEOS Frames](https://www.bayceer.uni-bayreuth.de/bayeos/frames) over HTTP)
-- Configuration of boards, channels, checks, interpolations and aggregates
+- Completeness and value checks 
+- Interpolation and aggregation of observation data 
 - Live charts of measured values 
 - Export service to [BayEOS Server](https://github.com/BayCEER/bayeos-server)
 
@@ -13,17 +14,21 @@ Main characteristics:
 - Raspian on a Raspberry Pi (Model >=3) is working
 
 ### Installing
-- Import the repository key `wget -O - http://www.bayceer.uni-bayreuth.de/repos/apt/conf/bayceer_repo.gpg.key |apt-key add -`
-- Add the following repositories to /etc/apt/sources.list `deb http://www.bayceer.uni-bayreuth.de/repos/apt/debian stretch main`
-- Update your repository cache `apt-get update`
-- Install the package `apt-get install bayeos-gateway`
+- Import the repository key  
+`wget -O - http://www.bayceer.uni-bayreuth.de/repos/apt/conf/bayceer_repo.gpg.key |apt-key add -`
+- Add the following repository to /etc/apt/sources.list  
+`deb http://www.bayceer.uni-bayreuth.de/repos/apt/debian stretch main`
+- Update your repository cache  
+`apt-get update`
+- Install the package  
+`apt-get install bayeos-gateway`
 
 ### Configuration
 - Open the URL `http://localhost/gateway` and log in as user 'root' with password 'bayeos'
 - Open the administration menu and change the default root password
 
 ### My First Data Producer
-Let's create a new data producer to send the cpu load to our local gateway:
+It's very easy to create simple data producer. So let's create one to send the cpu load of our pc to a local gateway:
 - Install the [python-bayeosgatewayclient](https://github.com/BayCEER/bayeosgatewayclient) module
 - Install the python [psutils](https://pypi.python.org/pypi/psutil) module
 - Run [MyFirstBoard.py](docs/MyFirstBoard.py)
@@ -36,8 +41,8 @@ Let's create a new data producer to send the cpu load to our local gateway:
 - Access the board data on a [BayEOS Server](https://github.com/BayCEER/bayeos-server) 
 
 ## Authors 
-* **Oliver Archner** - *Programmer* - [University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
-* **Dr. Stefan Holzheu** - *Project lead* - [University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
+* **Dr. Stefan Holzheu** - *Project lead* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
+* **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
 ### Version 2.2.20, March 6, 2018
