@@ -28,11 +28,11 @@ Main characteristics:
 - Open the administration menu and change the default root password
 
 ### My First Data Producer
-It's very easy to create simple data producer. So let's create one to send the cpu load of our pc to a local gateway:
+Let's send the cpu load of our pc to a local gateway:
 - Install the [python-bayeosgatewayclient](https://github.com/BayCEER/bayeosgatewayclient) module
 - Install the python [psutils](https://pypi.python.org/pypi/psutil) module
 - Run [MyFirstBoard.py](docs/MyFirstBoard.py)
-- Open `http://localhost/gateway` to identify your first board
+- Open `http://localhost/gateway` to identify our new board record
 
 ![board list](docs/MyFirstBoard.png)
 - Set the board name and the channel names 
@@ -47,7 +47,7 @@ It's very easy to create simple data producer. So let's create one to send the c
 ## History
 ### Version 2.2.20, March 6, 2018
 - Enhanced usability in board list 
-- Fixed incomplete aggreagation bug
+- Fixed incomplete aggregation bug
 
 ### Version 2.1, March 30, 2017
 - Virtual channels 
