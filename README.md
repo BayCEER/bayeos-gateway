@@ -45,6 +45,9 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.2.21, March 20, 2018
+- Fixed delete_obs() procedure bug caused by wrong transaction isolation level
+
 ### Version 2.2.20, March 6, 2018
 - Enhanced usability in board list 
 - Fixed incomplete aggregation bug
