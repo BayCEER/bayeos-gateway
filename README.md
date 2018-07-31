@@ -35,16 +35,23 @@ Let's send the cpu load of our pc to a local gateway:
 - Open `http://localhost/gateway` to identify our new board record
 
 ![board list](docs/MyFirstBoard.png)
-- Set the board name and the channel names 
-- Turn the board export option on
-- Configure 10min average aggregation 
-- Access the board data on a [BayEOS Server](https://github.com/BayCEER/bayeos-server) 
-
+- Set the board name 
+- Set the channel names and units 
+- Configure 10min average aggregation on each channel
+- Turn the board auto export option on 
+- Access the board data on a [BayEOS Server](https://github.com/BayCEER/bayeos-server)
+ 
 ## Authors 
 * **Dr. Stefan Holzheu** - *Project lead* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.3.0, July 30, 2018
+- [Enhanced sync of objects between gateway and server](https://github.com/BayCEER/bayeos-gateway/issues/33)
+- [Exclude critical values from export](https://github.com/BayCEER/bayeos-gateway/issues/27)
+- Create NaN values for out of range numeric spline values
+- Internal configuration table for export job dropped
+
 ### Version 2.2.21, March 20, 2018
 - Fixed delete_obs() procedure bug caused by wrong transaction isolation level
 

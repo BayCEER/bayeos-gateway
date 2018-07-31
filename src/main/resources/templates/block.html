@@ -5,59 +5,80 @@
 </head>
 <body>
 
-<div th:fragment="channelSettings(header)" class="block">
-		 		<div th:text="${header}" class="block-header"></div>
-		 		<div class="row">
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('criticalMin',#{chkDev.criticalMin},false,'any')"></div>
-		 			</div>
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('criticalMax',#{chkDev.criticalMax},false,'any')"></div>
-		 			</div>
-		 		</div>
-		 		<div class="row">
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('warningMin',#{chkDev.warningMin},false,'any')"></div>
-		 			</div>
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('warningMax',#{chkDev.warningMax},false,'any')"></div>
-		 			</div>
-		 		</div>
-		 		<div class="row">
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('samplingInterval',#{chkDev.samplingInt},false,1)"></div>
-		 			</div>
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::number('checkDelay',#{chkDev.checkDelay},false,1)"></div>
-		 			</div>
-		 		</div>		 				 				 	
-</div>
+	<div th:fragment="channelSettings(header)" class="block">
+		<div th:text="${header}" class="block-header"></div>
+		<div class="row">
+			<div class="col-sm-3">
+				<div
+					th:replace="field::number('criticalMin',#{chkDev.criticalMin},false,'any')"></div>
+			</div>
+			<div class="col-sm-3">
+				<div
+					th:replace="field::number('warningMin',#{chkDev.warningMin},false,'any')"></div>
+			</div>
+			<div class="col-sm-3">
+				<div
+					th:replace="field::number('warningMax',#{chkDev.warningMax},false,'any')"></div>
+			</div>
+			<div class="col-sm-3">
+				<div
+					th:replace="field::number('criticalMax',#{chkDev.criticalMax},false,'any')"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-3">
+				<div
+					th:replace="field::number('samplingInterval',#{chkDev.samplingInt},false,1)"></div>
+			</div>
+			<div class="col-sm-3">
+				<div
+					th:replace="field::number('checkDelay',#{chkDev.checkDelay},false,1)"></div>
+			</div>
+			<div class="col-sm-6"></div>
+		</div>
+	</div>
+
+	<div th:fragment="export" class="block">
+		<div class="block-header">Exports</div>
+		<div class="row">
+			<div class="col-sm-4">
+				<div th:replace="field::number('dbSeriesId',#{a.dbId},false,1)"></div>
+			</div>
+			<div class="col-sm-4">
+				<div th:replace="field::checkbox('filterCriticalValues',#{channel.filterCriticalValues})"></div>
+			</div>
+			<div class="col-sm-4"></div>
+		</div>
+	</div>
 
 
-<div th:fragment="virtualChannels(board)">	
-	<table class="table table-striped">
+	<div th:fragment="virtualChannels(board)">
+		<table class="table table-striped">
 			<thead>
 				<tr>
-					<th th:text="#{e.channel}"></th>										
+					<th th:text="#{e.channel}"></th>
 					<th>
 						<div class="btn-group pull-right">
-							<div th:replace="table::add(@{'/newVirtualChannel?boardId=' + ${board.id}})"></div>									
+							<div
+								th:replace="table::add(@{'/newVirtualChannel?boardId=' + ${board.id}})"></div>
 						</div>
 					</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr th:each="vc : ${board.getVirtualChannels()}">
-					<td><a th:href="@{/virtualChannels/{id}(id=${vc.id})}" th:text="${vc.getDeclaration()}">x=fa(p=nr)</a></td>
+					<td><a th:href="@{/virtualChannels/{id}(id=${vc.id})}"
+						th:text="${vc.getDeclaration()}">x=fa(p=nr)</a></td>
 					<td>
-						<div class="pull-right">																
-							<div th:replace="table::delete(@{'/virtualChannels/delete/' + ${vc.id}},false)"></div>							
+						<div class="pull-right">
+							<div
+								th:replace="table::delete(@{'/virtualChannels/delete/' + ${vc.id}},false)"></div>
 						</div>
 					</td>
 				</tr>
 			</tbody>
-		</table>				
-</div>
+		</table>
+	</div>
 
 </body>
 </html>

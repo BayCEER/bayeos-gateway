@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.2.21</version>
+	<version>2.3.0</version>
 
 
 	<licenses>
@@ -45,19 +43,27 @@
 		<server.contextPath>/gateway</server.contextPath>
 
 	</properties>
-
-
+	
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.4.2.RELEASE</version>
 		<relativePath />
 	</parent>
-
-
-
+	
 	<profiles>
-		<profile>
+	<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<log.level>INFO</log.level>
+				<log.path>bayeos-gateway.log</log.path>
+				<db.url>jdbc:postgresql://virtualbox/xbee</db.url>
+			</properties>
+	</profile>
+	<profile>
 			<id>prod</id>
 			<properties>
 				<db.url>jdbc:postgresql://localhost/xbee</db.url>
@@ -98,22 +104,7 @@
 				</plugins>
 			</build>
 		</profile>
-
-
-		<profile>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<id>dev</id>
-			<properties>
-				<log.level>INFO</log.level>
-				<log.path>bayeos-gateway.log</log.path>
-				<db.url>jdbc:postgresql://db/xbee</db.url>
-			</properties>
-		</profile>
-
-
-		<profile>
+	<profile>
 			<id>test</id>
 			<properties>
 				<docker.hostname>docker</docker.hostname>
@@ -290,10 +281,9 @@
 				</plugins>
 			</build>
 		</profile>
-
 	</profiles>
-
-
+	
+	
 	<build>
 		<finalName>bayeos-gateway</finalName>
 		<resources>
@@ -349,7 +339,8 @@
 					<executable>true</executable>
 				</configuration>
 			</plugin>
-
+			
+			
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
@@ -369,14 +360,8 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-		</plugins>
-
-
-
-		<pluginManagement>
-			<plugins>
-				<!-- This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+			
+				
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -392,9 +377,7 @@
 										<artifactId>
 											maven-compiler-plugin
 										</artifactId>
-										<versionRange>
-											[3.7,)
-										</versionRange>
+										<versionRange>[3.1,)</versionRange>
 										<goals>
 											<goal>compile</goal>
 											<goal>testCompile</goal>
@@ -409,9 +392,9 @@
 					</configuration>
 				</plugin>
 			</plugins>
-		</pluginManagement>
+		
 	</build>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -433,24 +416,27 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>io.github.jpenren</groupId>
 			<artifactId>thymeleaf-spring-data-dialect</artifactId>
 			<version>2.1.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.github.darrachequesne</groupId>
 			<artifactId>spring-data-jpa-datatables</artifactId>
@@ -462,8 +448,7 @@
 			<artifactId>postgresql</artifactId>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
-		
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->	
 
 		<dependency>
 			<groupId>org.springframework.webflow</groupId>
@@ -510,13 +495,11 @@
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-xmlrpc</artifactId>
-			<version>1.9.9</version>
+			<version>2.0.0</version>
 		</dependency>
 
 		
 	</dependencies>
-
-
-
-
+	
+	
 </project>

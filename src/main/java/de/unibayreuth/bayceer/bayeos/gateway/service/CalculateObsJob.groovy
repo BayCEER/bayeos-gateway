@@ -42,7 +42,7 @@ public class CalculateObsJob implements Runnable {
 				if (id == null){
 					log.info("Nothing to calculate");					
 				} else {					
-					def rowCount = db.executeUpdate('insert into observation_calc (db_series_id, result_time, result_value) select db_series_id, result_time, result_value from get_bayeos_obs(?)',[ts])
+					def rowCount = db.executeUpdate('insert into observation_calc (id, channel_id, result_time, result_value) select id, channel_id, result_time, result_value from get_bayeos_obs(?)',[ts])
 					log.info("${rowCount} observations calculated")
 					
 					log.info("Move records to archive table.")

@@ -11,3 +11,4 @@ target/
 
 /.classpath
 /.project
+/.dbeaver-data-sources.xml
