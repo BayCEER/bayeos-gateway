@@ -75,6 +75,13 @@ Let's send the cpu load of our pc to a local gateway:
 ### Version 1.9.36, Dec 1, 2017
 - Final Grails version
 
+### Version 1.8.0, 2015
+- [Responsive design](https://getbootstrap.com/) for mobile devices 
+- Debian package
+
+### Version 1.0, 2012
+- Initial release 
+
 ## License
 GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1, February 1999
 
