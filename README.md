@@ -46,6 +46,10 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.4.0, (planned for September, 2018)
+- [Multitenancy based on domains](https://github.com/BayCEER/bayeos-gateway/issues/34)
+- [LDAP Authentication](https://github.com/BayCEER/bayeos-gateway/issues/44)
+
 ### Version 2.3.0, July 30, 2018
 - [Enhanced sync of objects between gateway and server](https://github.com/BayCEER/bayeos-gateway/issues/33)
 - [Exclude critical values from export](https://github.com/BayCEER/bayeos-gateway/issues/27)
