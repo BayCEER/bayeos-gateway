@@ -1,4 +1,4 @@
-# Grafana Howto
+# Grafana How-to
 This is a short instruction on how to use BayEOS Gateway observation data in Grafana. This combination allows you to produce all types of good looking dashboards based on your own live data.
 
 ## Requirements
