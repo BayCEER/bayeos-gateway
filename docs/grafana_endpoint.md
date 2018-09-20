@@ -11,6 +11,12 @@ Every request must include an [authorization header](https://tools.ietf.org/html
 **Content type**        
 The only accepted content type is JSON encoded in UTF-8. Please add the following information to every request header: ```Content-Type: application/json;charset=UTF-8```
 
+## Connection test
+**GET /**  
+**Response**   
+status-code: 200  
+message-body: {\"msg\":\"This is a grafana Endpoint.\"}
+
 ## Search
 Probably the first statement a client sends to the gateway. The returned path information can be used to [query](#query) the gateway. 
 
