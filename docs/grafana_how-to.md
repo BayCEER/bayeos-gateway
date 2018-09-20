@@ -17,3 +17,18 @@ Please follow the installation instruction on the [Grafana page](https://grafana
     ![grafana_datasource](./grafana_datasource.png)
 
 ## Dashbord Example
+Let's verify if everthing works as expected and create a new dashboard based on gateway data:
+1. Login on your grafana server
+1. Go on Dashboards/New Dashboard
+1. Add a new panel of your preferred type, for example a chart panel
+1. Click on the panel title 
+1. Click on edit to open the setting dialog
+1. Open the metrics tab
+1. Add a new query
+1. Choose your gateway data source on the data source drop down
+1. Type in a valid channel path name on the metric drop down to pick a gateway channel:
+ ![grafana_pick_channel](./grafana_pick_channel.png)
+1. The observation values are shown on your grafana panel element:
+ ![grafana_channel_picked](./grafana_channel_picked.png)
+1. Relax and create more dashboards :sunglasses: 
+
