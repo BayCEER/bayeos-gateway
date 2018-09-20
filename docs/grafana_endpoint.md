@@ -11,7 +11,7 @@ Every request must include an [authorization header](https://tools.ietf.org/html
 **Content type**        
 The only accepted content type is JSON encoded in UTF-8. Please add the following information to every request header: ```Content-Type: application/json;charset=UTF-8```
 
-##Search
+## Search
 Probably the first statement a client sends to the gateway. The returned path information can be used to [query](##Query) the gateway. 
 
 **POST /search**        
@@ -32,7 +32,7 @@ message-body:
 The response body contains a list of channel paths. A path is constructed as follows:
     ```COALESCE(board.name, board.origin) || '/') || COALESCE(channel.name,channel.nr)```
     
-##Query
+## Query
 Retrieve observation values as a list of value/timestamp pairs for each channel. The time range and interval information is used to filter records.
 
 **POST /query**        
