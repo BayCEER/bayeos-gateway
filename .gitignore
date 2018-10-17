@@ -13,3 +13,4 @@ target/
 /.project
 /.dbeaver-data-sources.xml
 src/main/resources/application-test.properties
+src/main/resources/application-dev.properties
