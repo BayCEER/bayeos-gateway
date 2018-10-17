@@ -16,13 +16,14 @@
 
 </head>
 <body>
+
 	<div th:fragment="navbar">
+	
 		<div th:with="currentUser=${#httpServletRequest.userPrincipal?.principal}">
 			<nav class="navbar navbar-default navbar-fixed-top">
-				<div class="container">
-					
+				<div class="container">					
 					<div class="navbar-header">
-						<div th:if="${currentUser != null}">
+						<div th:if="${currentUser != null}">						
 						<button class="navbar-toggle collapsed" aria-controls="navbar"
 							aria-expanded="false" data-target="#navbar"
 							data-toggle="collapse" type="button">
@@ -34,9 +35,8 @@
 						<a class="navbar-brand" th:href="@{/}" href="/"><strong>BayEOS</strong>	Gateway</a>
 					</div>
 					
-					<div th:if="${currentUser != null}">	
-										
-									
+					<th:block th:if="${currentUser != null}">	
+																													
 					<div class="collapse navbar-collapse" id="navbar">
 						<ul class="nav navbar-nav">
 							<li th:classappend="${controllerName == 'BoardGroup'}? 'active'"><a th:href="@{/groups}"><span class="glyphicon glyphicon-flag"></span> <span th:text="#{nav.groups}">Groups</span></a></li>														
@@ -44,6 +44,13 @@
 							<li th:if="${currentUser.isAdmin()}"  class="dropdown"><a class="dropdown-toggle" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="#"><span
 									class="glyphicon glyphicon-wrench"></span> <span th:text="#{nav.admin}">Administration</span><span class="caret"></span></a>
 								<ul class="dropdown-menu">
+								
+									<li th:if="${currentUser.inNullDomain()}" th:classappend="${controllerName == 'Domain'}? 'active'">
+										<a th:href="@{/domains}">
+											<span class="glyphicon glyphicon-tent"></span> <span th:text="#{nav.domains}">Domains</span>
+										</a>
+									</li>								
+								
 									<li th:classappend="${controllerName == 'BoardTemplate'}? 'active'">
 										<a th:href="@{/boardTemplates}">
 											<span class="glyphicon glyphicon-hdd"></span> <span th:text="#{nav.boardTemplates}">Board Templates</span>
@@ -79,23 +86,72 @@
 										<span class="glyphicon glyphicon-share-alt"></span> <span th:text="#{nav.splines}">Splines</span></a></li>
 									<li th:classappend="${controllerName == 'Unit'}? 'active'"><a th:href="@{/units}"><span class="glyphicon glyphicon-tag"></span> <span th:text="#{nav.units}">Units</span></a></li>
 								</ul>
-							</li>
+							</li>							
 						</ul>
 						
-						<div class="navbar-right">
-							<form class="navbar-form" th:action="@{/logout}" method="post">
-							<div class="form-group">
-								<!-- <span th:text="|Logged in as ${currentUser.userName} with Role ${currentUser.role}|">Logged in as User</span> -->						
-								<span th:text="#{nav.logOnMessage(${currentUser.userName})}">Logged in as User</span>
-							</div>
-							<button class="btn btn-default" type="submit" th:text="#{nav.logOut}">Log out</button>								
-						</form>							
-						</div>					
-					</div>						
+						<ul class="nav navbar-nav navbar-right">
+							
+							
+							<th:block th:if="${domainFilter != null} and ${controllerName != 'Domain'} ">
+							<li class="dropdown" th:if="${currentUser.inNullDomain() and domainFilter.domains.size()>0}">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<span class="glyphicon glyphicon-tent"></span> <span th:text="#{e.domain}">Domain</span><span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li th:classappend="${domainFilter.id == null}?'active'">
+											<a class="domainFilter" th:text="#{nav.allDomains}">All</a> 
+										</li>										
+										<li class="divider" role="separator"></li>										
+										<li th:each="d:${domainFilter.domains}" th:classappend="${domainFilter.id == d.id}?'active'">											
+											<a class="domainFilter" th:id="${d.id}" th:text="${d.name}"></a>
+										</li>									
+									</ul>								
+							</li>							
+							</th:block>
+							
+														
+							<li class="dropdown">
+          						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+          						<span class="glyphicon glyphicon-user"></span> <span th:text="${currentUser.name}">User A</span><span class="caret"></span></a>
+          						<ul class="dropdown-menu">
+            					<li>
+            					<form class="navbar-form" th:action="@{/logout}" method="post">									
+									<button class="btn navbar-btn" type="submit" th:text="#{nav.logOut}">Logout</button>								
+								</form>
+            					</li>            					
+            					<li><a th:href="@{/profile/edit}" th:text="#{nav.profile}">User Profile</a></li>            					
+            					<li role="separator" class="divider"></li>
+            					<li><a th:href="#{nav.helpUrl}" th:text="#{nav.help}">Hilfe</a></li>
+          						</ul>
+        					</li>						
+						</ul>
 					</div>
+					<script type="text/javascript" th:inline="javascript">
+   	/*<![CDATA[*/
+   		$('.domainFilter').on('click', function () {   			
+        var id = $(this).attr("id");
+        $.ajax({
+        	type: "POST",        	
+            url:  [[ @{'/rest/domainFilter'} ]],
+            success: function(data){
+            	location.reload(true);
+            },
+            data: {'id':id},            
+            error: function(xhr){
+            	$("#alert").addClass("alert-warning");
+            	$("#alertMessage").text([[ #{msg.refreshwarning} ]]);            	
+            	$("#alert").removeClass("hidden");            	
+            }
+        });
+    });
+   	/*]]>*/	
+   	</script>
+   																																
+					</th:block>
 				</div>
 			</nav>
+			
 		</div>
-	</div>
+		
+	</div>		
 </body>
 </html>

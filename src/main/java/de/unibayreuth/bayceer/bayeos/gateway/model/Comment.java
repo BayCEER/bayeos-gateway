@@ -38,36 +38,53 @@ public class Comment extends UniqueEntity {
 	@ManyToOne()
 	@JoinTable(name="board_comment",joinColumns=@JoinColumn(name="comment_id"),inverseJoinColumns=@JoinColumn(name="board_comments_id"))
 	Board board;
-	
+
+
 	public User getUser() {
 		return user;
 	}
+
+
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
-	public String getAuthor(){
-		return user.getUserName();
-	}
-	
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
-	}
+
+
 	public Date getInsertTime() {
 		return insertTime;
 	}
+
+
 	public void setInsertTime(Date insertTime) {
 		this.insertTime = insertTime;
 	}
+
+
+	public String getContent() {
+		return content;
+	}
+
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+
 	public Board getBoard() {
 		return board;
 	}
+
+
 	public void setBoard(Board board) {
 		this.board = board;
 	}
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+	
 	
 	
 	

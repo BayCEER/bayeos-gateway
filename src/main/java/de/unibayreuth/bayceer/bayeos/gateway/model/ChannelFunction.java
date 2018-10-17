@@ -12,53 +12,22 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "channel_function")
-public class ChannelFunction extends UniqueEntity {
+public class ChannelFunction extends NamedDomainEntity {
 	
-	
-	public ChannelFunction() {
-		super();
-	}
-	
-			
-	@Column(columnDefinition="text")
-	String name;
-	
+		
 	@Column(columnDefinition="text")
 	String body;
 	
 
 	@OneToMany(mappedBy="channelFunction", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	private List<ChannelFunctionParameter> params = new ArrayList<>();
+	private List<ChannelFunctionParameter> parameters = new ArrayList<>();
 	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getBody() {
-		return body;
-	}
-
-	public void setBody(String body) {
-		this.body = body;
-	}
-
-	public List<ChannelFunctionParameter> getParameters() {
-	    return params;
-	}
-
-	public void setParameters(List<ChannelFunctionParameter> params) {
-	    this.params = params;
-	}
-	
+		
 	public String getFunctionHead(){		
 		StringBuffer buf = new StringBuffer(name);
 		buf.append("(");
 		boolean first = true;
-		for(ChannelFunctionParameter p:params){
+		for(ChannelFunctionParameter p:parameters){
 			if (!first){
 				buf.append(",");
 			} else {
@@ -69,9 +38,26 @@ public class ChannelFunction extends UniqueEntity {
 		buf.append(")");
 		return buf.toString();
 	}
-	
-	public String toString(){
-		return getName();
+
+
+	public String getBody() {
+		return body;
 	}
+
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+
+	public List<ChannelFunctionParameter> getParameters() {
+		return parameters;
+	}
+
+
+	public void setParameters(List<ChannelFunctionParameter> parameters) {
+		this.parameters = parameters;
+	}
+			
 	
 }

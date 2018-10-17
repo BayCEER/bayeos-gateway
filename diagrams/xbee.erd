@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="xbee.erd" time="201809271109">
+	<entities>
+		<data-source id="postgres-jdbc-164b133b843-32f8b6cc601cfd05">
+			<entity id="1" name="board" fq-name="public.board" order="0" color-bg="255,128,128" x="480" y="180">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="2" name="board_comment" fq-name="public.board_comment" order="1" x="1020" y="200">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="3" name="board_group" fq-name="public.board_group" order="2" color-bg="255,128,128" x="760" y="100">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="4" name="board_template" fq-name="public.board_template" order="3" color-bg="255,128,128" x="1020" y="500">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="5" name="channel" fq-name="public.channel" order="4" x="220" y="360">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="6" name="channel_binding" fq-name="public.channel_binding" order="5" x="-20" y="120">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="7" name="channel_function" fq-name="public.channel_function" order="6" color-bg="255,128,128" x="480" y="20">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="8" name="channel_function_parameter" fq-name="public.channel_function_parameter" order="7" x="220" y="20">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="9" name="channel_template" fq-name="public.channel_template" order="8" x="720" y="680">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="10" name="comment" fq-name="public.&quot;comment&quot;" order="9" x="940" y="320">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="11" name="export_job_stat" fq-name="public.export_job_stat" order="10" x="1020" y="860">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="12" name="function" fq-name="public.&quot;function&quot;" order="11" color-bg="255,128,128" x="480" y="580">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="13" name="interval" fq-name="public.&quot;interval&quot;" order="12" color-bg="255,128,128" x="480" y="700">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="14" name="knot_point" fq-name="public.knot_point" order="13" x="240" y="940">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="15" name="message" fq-name="public.message" order="14" color-bg="255,128,128" x="20" y="840">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="16" name="observation" fq-name="public.observation" order="15" x="20" y="320">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="17" name="observation_calc" fq-name="public.observation_calc" order="16" x="20" y="500">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="18" name="spline" fq-name="public.spline" order="17" color-bg="255,128,128" x="420" y="980">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="19" name="unit" fq-name="public.unit" order="18" color-bg="255,128,128" x="500" y="840">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="20" name="users" fq-name="public.users" order="19" color-bg="255,128,128" x="720" y="460">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="21" name="virtual_channel" fq-name="public.virtual_channel" order="20" x="220" y="200">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="22" name="observation_exp" fq-name="public.observation_exp" order="21" x="20" y="660">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="23" name="domain" fq-name="public.&quot;domain&quot;" order="22" color-bg="255,128,128" x="1060" y="40">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="fk_board_comment_board" fq-name="public.board_comment.fk_board_comment_board" type="fk" pk-ref="1" fk-ref="2"/>
+		<relation name="fk2c0b7d03b4ecbfb0" fq-name="public.channel.fk2c0b7d03b4ecbfb0" type="fk" pk-ref="1" fk-ref="5"/>
+		<relation name="fk_virtual_channel_board_id" fq-name="public.virtual_channel.fk_virtual_channel_board_id" type="fk" pk-ref="1" fk-ref="21"/>
+		<relation name="fk_board_board_group" fq-name="public.board.fk_board_board_group" type="fk" pk-ref="3" fk-ref="1"/>
+		<relation name="fk_ch_template_brd_template" fq-name="public.channel_template.fk_ch_template_brd_template" type="fk" pk-ref="4" fk-ref="9"/>
+		<relation name="fk_obs_channel" fq-name="public.observation.fk_obs_channel" type="fk" pk-ref="5" fk-ref="16"/>
+		<relation name="fk_observation_calc_cha" fq-name="public.observation_calc.fk_observation_calc_cha" type="fk" pk-ref="5" fk-ref="17"/>
+		<relation name="fk_observation_exp_cha" fq-name="public.observation_exp.fk_observation_exp_cha" type="fk" pk-ref="5" fk-ref="22"/>
+		<relation name="fk_channel_function_parameter_channel_function_id" fq-name="public.channel_function_parameter.fk_channel_function_parameter_channel_function_id" type="fk" pk-ref="7" fk-ref="8"/>
+		<relation name="fk_virtual_channel_channelfunction_id" fq-name="public.virtual_channel.fk_virtual_channel_channelfunction_id" type="fk" pk-ref="7" fk-ref="21"/>
+		<relation name="fk_channel_binding_channel_function_param_id" fq-name="public.channel_binding.fk_channel_binding_channel_function_param_id" type="fk" pk-ref="8" fk-ref="6"/>
+		<relation name="fk_board_comment_comment" fq-name="public.board_comment.fk_board_comment_comment" type="fk" pk-ref="10" fk-ref="2"/>
+		<relation name="fk2c0b7d03cc75d396" fq-name="public.channel.fk2c0b7d03cc75d396" type="fk" pk-ref="12" fk-ref="5"/>
+		<relation name="fk_ch_template_function" fq-name="public.channel_template.fk_ch_template_function" type="fk" pk-ref="12" fk-ref="9"/>
+		<relation name="fk2c0b7d03a1cb9076" fq-name="public.channel.fk2c0b7d03a1cb9076" type="fk" pk-ref="13" fk-ref="5"/>
+		<relation name="fk_ch_template_interval" fq-name="public.channel_template.fk_ch_template_interval" type="fk" pk-ref="13" fk-ref="9"/>
+		<relation name="fk2c0b7d037d458b24" fq-name="public.channel.fk2c0b7d037d458b24" type="fk" pk-ref="18" fk-ref="5"/>
+		<relation name="fk_ch_template_spline" fq-name="public.channel_template.fk_ch_template_spline" type="fk" pk-ref="18" fk-ref="9"/>
+		<relation name="fk7b8a01197d458b24" fq-name="public.knot_point.fk7b8a01197d458b24" type="fk" pk-ref="18" fk-ref="14"/>
+		<relation name="fk2c0b7d03c86784c4" fq-name="public.channel.fk2c0b7d03c86784c4" type="fk" pk-ref="19" fk-ref="5"/>
+		<relation name="fk_ch_template_unit" fq-name="public.channel_template.fk_ch_template_unit" type="fk" pk-ref="19" fk-ref="9"/>
+		<relation name="fk_comment_users" fq-name="public.&quot;comment&quot;.fk_comment_users" type="fk" pk-ref="20" fk-ref="10"/>
+		<relation name="fk_board_tempalte_vc" fq-name="public.board_template.fk_board_tempalte_vc" type="fk" pk-ref="21" fk-ref="4"/>
+		<relation name="fk_channel_binding_virtual_channel_id" fq-name="public.channel_binding.fk_channel_binding_virtual_channel_id" type="fk" pk-ref="21" fk-ref="6"/>
+		<relation name="fk_board_domain" fq-name="public.board.fk_board_domain" type="fk" pk-ref="23" fk-ref="1"/>
+		<relation name="fk_board_group_domain" fq-name="public.board_group.fk_board_group_domain" type="fk" pk-ref="23" fk-ref="3"/>
+		<relation name="fk_board_template_domain" fq-name="public.board_template.fk_board_template_domain" type="fk" pk-ref="23" fk-ref="4"/>
+		<relation name="fk_channel_function_domain" fq-name="public.channel_function.fk_channel_function_domain" type="fk" pk-ref="23" fk-ref="7"/>
+		<relation name="fk_function_domain" fq-name="public.&quot;function&quot;.fk_function_domain" type="fk" pk-ref="23" fk-ref="12"/>
+		<relation name="fk_interval_domain" fq-name="public.&quot;interval&quot;.fk_interval_domain" type="fk" pk-ref="23" fk-ref="13"/>
+		<relation name="fk_message_domain" fq-name="public.message.fk_message_domain" type="fk" pk-ref="23" fk-ref="15"/>
+		<relation name="fk_spline_domain" fq-name="public.spline.fk_spline_domain" type="fk" pk-ref="23" fk-ref="18"/>
+		<relation name="fk_unit_domain" fq-name="public.unit.fk_unit_domain" type="fk" pk-ref="23" fk-ref="19"/>
+		<relation name="fk_users_domain" fq-name="public.users.fk_users_domain" type="fk" pk-ref="23" fk-ref="20"/>
+	</relations>
+	<notes>
+		<note order="23" x="20" y="20" w="100" h="50">Version 2.4.0
+27.09.2018</note>
+	</notes>
+</diagram>

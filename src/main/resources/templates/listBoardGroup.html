@@ -6,11 +6,13 @@
 <title th:text="#{nav.groups}">All groups</title>
 </head>
 <body>
-	<div layout:fragment="content">
-			<h3 th:text="#{nav.groups}">Groups</h3>			
+	<div layout:fragment="content">					
 			<table class="table table-striped" >
 				<thead>
 					<tr>
+						<th th:if="${#authentication.principal.inNullDomain()}">
+							<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
+						</th>
 						<th><a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a></th>												
 						<th th:text="#{nav.boards}"></th>
 						<th th:text="#{board.lrt}"></th>
@@ -25,6 +27,9 @@
 				</thead>
 				<tbody>
 					<tr th:each="i : ${groups}">
+						<td th:if="${#authentication.principal.inNullDomain()}">
+							<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
+						</td>
 						<td>																	
 							<a th:href="@{/groups/{id}(id=${i.id})}" th:text="${i.name}">Name A</a>
 						</td>

@@ -1,18 +1,42 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTemplate>{
-	
-	
+public class ChannelTemplate extends UniqueEntity implements Comparable<ChannelTemplate>{
+		
 	private static final long serialVersionUID = -2463673550735591743L;
 	
+	
+	
+	
+
 	String nr;
 	String name;
 	String phenomena;	
+	
+	// Validation Check
+	@Column(name="critical_max")
+	Float criticalMax;
+	@Column(name="critical_min")
+	Float criticalMin; 
+	@Column(name="warning_max")
+	Float warningMax;
+	@Column(name="warning_min")
+	Float warningMin;	
+	// Completeness Check
+	@Column(name="sampling_interval")
+	Integer samplingInterval;	
+	// Check Delay
+	@Column(name="check_delay")
+	Integer checkDelay;
+	// Disable Alerts   	
+	@Column(name="exclude_from_nagios")	
+	Boolean excludeFromNagios = false;
+	
 	
 	@ManyToOne()
 	@JoinColumn(name="unit_id")
@@ -48,67 +72,18 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 		this.aggrInterval = aggrInterval;
 		this.aggrFunction = aggrFunction;
 	}
-	
-	public ChannelTemplate() {
-		super();		
-	}
-
-	public String getNr() {
-		return nr;
-	}
 		
-	public void setNr(String nr) {
-		this.nr = nr;
-	}
+		
 
+	public ChannelTemplate() {
+		super();
+	}
 	
-	public String getPhenomena() {
-		return phenomena;
+	public ChannelTemplate(String name) {
+		this.name = name;
 	}
 
-	public void setPhenomena(String phenomena) {
-		this.phenomena = phenomena;
-	}
 
-	public Unit getUnit() {
-		return unit;
-	}
-
-	public void setUnit(Unit unit) {
-		this.unit = unit;
-	}
-
-	public Spline getSpline() {
-		return spline;
-	}
-
-	public void setSpline(Spline spline) {
-		this.spline = spline;
-	}
-
-	public Interval getAggrInterval() {
-		return aggrInterval;
-	}
-
-	public void setAggrInterval(Interval aggrInterval) {
-		this.aggrInterval = aggrInterval;
-	}
-
-	public Function getAggrFunction() {
-		return aggrFunction;
-	}
-
-	public void setAggrFunction(Function aggrFunction) {
-		this.aggrFunction = aggrFunction;
-	}
-
-	public BoardTemplate getBoardTemplate() {
-		return boardTemplate;
-	}
-
-	public void setBoardTemplate(BoardTemplate boardTemplate) {
-		this.boardTemplate = boardTemplate;
-	}
 
 	private boolean isNr(String s){
 		return s != null && s.matches("[0-9]+");
@@ -130,13 +105,198 @@ public class ChannelTemplate extends CheckDevice implements Comparable<ChannelTe
 		f.append(",Function:").append(aggrFunction);
 		return f.toString();			
 	}
+			
+	public Boolean getNagios() {
+		return !excludeFromNagios;
+	}
+	
+	public void setNagios(Boolean nagios) {
+		this.excludeFromNagios = !nagios;
+	}
+
+
+
+	public String getNr() {
+		return nr;
+	}
+
+
+
+	public void setNr(String nr) {
+		this.nr = nr;
+	}
+
+
 
 	public String getName() {
 		return name;
 	}
 
+
+
 	public void setName(String name) {
 		this.name = name;
 	}
-		
+
+
+
+	public String getPhenomena() {
+		return phenomena;
+	}
+
+
+
+	public void setPhenomena(String phenomena) {
+		this.phenomena = phenomena;
+	}
+
+
+
+	public Float getCriticalMax() {
+		return criticalMax;
+	}
+
+
+
+	public void setCriticalMax(Float criticalMax) {
+		this.criticalMax = criticalMax;
+	}
+
+
+
+	public Float getCriticalMin() {
+		return criticalMin;
+	}
+
+
+
+	public void setCriticalMin(Float criticalMin) {
+		this.criticalMin = criticalMin;
+	}
+
+
+
+	public Float getWarningMax() {
+		return warningMax;
+	}
+
+
+
+	public void setWarningMax(Float warningMax) {
+		this.warningMax = warningMax;
+	}
+
+
+
+	public Float getWarningMin() {
+		return warningMin;
+	}
+
+
+
+	public void setWarningMin(Float warningMin) {
+		this.warningMin = warningMin;
+	}
+
+
+
+	public Integer getSamplingInterval() {
+		return samplingInterval;
+	}
+
+
+
+	public void setSamplingInterval(Integer samplingInterval) {
+		this.samplingInterval = samplingInterval;
+	}
+
+
+
+	public Integer getCheckDelay() {
+		return checkDelay;
+	}
+
+
+
+	public void setCheckDelay(Integer checkDelay) {
+		this.checkDelay = checkDelay;
+	}
+
+
+
+	public Boolean getExcludeFromNagios() {
+		return excludeFromNagios;
+	}
+
+
+
+	public void setExcludeFromNagios(Boolean excludeFromNagios) {
+		this.excludeFromNagios = excludeFromNagios;
+	}
+
+
+
+	public Unit getUnit() {
+		return unit;
+	}
+
+
+
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
+
+
+	public Spline getSpline() {
+		return spline;
+	}
+
+
+
+	public void setSpline(Spline spline) {
+		this.spline = spline;
+	}
+
+
+
+	public Interval getAggrInterval() {
+		return aggrInterval;
+	}
+
+
+
+	public void setAggrInterval(Interval aggrInterval) {
+		this.aggrInterval = aggrInterval;
+	}
+
+
+
+	public Function getAggrFunction() {
+		return aggrFunction;
+	}
+
+
+
+	public void setAggrFunction(Function aggrFunction) {
+		this.aggrFunction = aggrFunction;
+	}
+
+
+
+	public BoardTemplate getBoardTemplate() {
+		return boardTemplate;
+	}
+
+
+
+	public void setBoardTemplate(BoardTemplate boardTemplate) {
+		this.boardTemplate = boardTemplate;
+	}
+
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 }

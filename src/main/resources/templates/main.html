@@ -29,9 +29,19 @@
 </head>
 <body>
 	 <div th:include="navigation :: navbar"></div>	
-	 <div class="container">	 
-	    <div class="alert alert-success" th:if="${globalMessage}" th:text="${globalMessage}">Some global message</div>
-        <div layout:fragment="content">main content</div>
+	 <div class="container">	 	 	 
+	    <div class="alert alert-success alert-dismissible" th:if="${globalMessage}">
+	    	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<span th:text="${globalMessage}">A global message</span>
+	    </div>
+	    
+	    <div class="hidden alert" id="alert">	    	
+			<span id="alertMessage"></span>
+	    </div>
+	    
+	    <div layout:fragment="content">main content</div>
 	 </div>	 
 	 <div th:include="footer :: foot"></div>
 </body>

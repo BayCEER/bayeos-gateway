@@ -4,10 +4,17 @@
       xsi:schemaLocation="http://www.springframework.org/schema/webflow
                           http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
 		
-	<var name="sp" class="de.unibayreuth.bayceer.bayeos.gateway.model.Spline"/>	
+	<var name="sp" class="de.unibayreuth.bayceer.bayeos.gateway.model.Spline"/>
+	
+	<on-start>	
+	 <evaluate result="flowScope.domainFilter" expression="splineController.domainFilter"></evaluate>
+	 <evaluate result="flowScope.user" expression="splineController.userSession.getUser()"></evaluate>	
+	  	
+	</on-start>	
 	
     <view-state id="name" model="sp" view="newSpline/name">
 		<binder>            	
+			<binding property="domain"></binding>
             <binding property="name"></binding>            
         </binder>                
         <transition on="next" to="knotpoints"/>        			        

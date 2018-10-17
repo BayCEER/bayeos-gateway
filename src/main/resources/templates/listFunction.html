@@ -12,9 +12,12 @@
 			<table class="table table-striped" >
 				<thead>
 					<tr>
-						<th><a class="sorted" sd:pagination-sort="name"
-							th:text="#{a.name}">Name</a></th>
-						<th>
+					<th th:if="${#authentication.principal.inNullDomain()}">
+						<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
+					</th>
+					<th><a class="sorted" sd:pagination-sort="name"
+						th:text="#{a.name}">Name</a></th>
+					<th>
 						<div class="btn-group pull-right">
 								<div th:replace="table::add(@{'/functions/create'})"></div>
 						</div>
@@ -23,6 +26,9 @@
 				</thead>
 				<tbody>
 					<tr th:each="f : ${functions}">
+						<td th:if="${#authentication.principal.inNullDomain()}">
+								<a th:if="${f.domain} != null" th:href="@{/domains/{id}(id=${f.domain.id})}" th:text="${f.domain.name}">Domain</a>
+						</td>
 						<td><a th:href="@{/functions/{id}(id=${f.id})}"
 							th:text="${f.name}">Name A</a></td>
 						<td>

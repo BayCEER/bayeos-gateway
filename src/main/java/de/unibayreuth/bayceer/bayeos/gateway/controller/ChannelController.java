@@ -2,9 +2,11 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,10 +26,11 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UnitRepository;
 
 @Controller
-public class ChannelController extends AbstractCRUDController {
+public class ChannelController extends AbstractController {
 	
 	@Autowired
 	ChannelRepository repo;
+	
 	@Autowired
 	IntervalRepository repoInterval;	
 	@Autowired
@@ -37,42 +40,53 @@ public class ChannelController extends AbstractCRUDController {
 	@Autowired
 	UnitRepository repoUnit;
 	
+	
+	
+	
 	@RequestMapping(path ="/channels/toggleNagios/{id}", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
-	public void toggleNagios(@PathVariable Long id, @RequestParam Boolean enabled){		
-		Channel c = repo.findOne(id);		
-		c.setNagios(enabled);		
-		repo.save(c);		
+	public void toggleNagios(@PathVariable Long id, @RequestParam Boolean enabled){
+		Channel c = repo.findOne(id);
+		if (c == null) throw new EntityNotFoundException("Entity not found");
+		c.setExcludeFromNagios(enabled);
+		checkWrite(c.getBoard());
+		repo.save(c);
+		
 	}
 	
 	@RequestMapping(value="/channels/save", method=RequestMethod.POST)
 	public String save(@Valid Channel channel, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
 			return "editUser";
-		}				
+		}						
+		checkWrite(channel.getBoard());
 		Channel c = repo.save(channel);		
 		redirect.addFlashAttribute("globalMessage",getActionMsg("saved", locale));
 		return "redirect:/boards/" + c.getBoard().getId();			
 	}
 	
 	@RequestMapping(path ="/channels/{id}", method = RequestMethod.GET)		
-	public String edit(@PathVariable Long id, Model model){
-		model.addAttribute("intervals",repoInterval.findAll());
-		model.addAttribute("functions",repoFunction.findAll());
-		model.addAttribute("splines",repoSpline.findAll());
-		model.addAttribute("units",repoUnit.findAll());		
-		model.addAttribute("channel",repo.findOne(id));
+	public String edit(@PathVariable Long id, Model model){		
+		Channel c = repo.findOne(id);
+		if (c == null) throw new EntityNotFoundException("Entity not found");
+		checkWrite(c.getBoard());
+		model.addAttribute("channel",c);
+		model.addAttribute("intervals",repoInterval.findAll(userSession.getUser(),null));
+		model.addAttribute("functions",repoFunction.findAllSortedByName(userSession.getUser(),null));
+		model.addAttribute("splines",repoSpline.findAllSortedByName(userSession.getUser(),null));
+		model.addAttribute("units",repoUnit.findAllSortedByName(userSession.getUser(),null));
 		return "editChannel";	
 	}
 
 	
 	@RequestMapping(path ="/channels/delete/{id}", method = RequestMethod.GET)
 	public String delete(@PathVariable Long id, RedirectAttributes redirect, Locale locale){		
-		Channel c = repo.findOne(id);		
+		Channel c = repo.findOne(id);
+		if (c == null) throw new EntityNotFoundException("Entity not found");
+		checkWrite(c.getBoard());
 		repo.delete(c);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
-		return "redirect:/boards/" + c.getBoard().getId();		
-		
+		return "redirect:/boards/" + c.getBoard().getId();				
 	}
 	
 }

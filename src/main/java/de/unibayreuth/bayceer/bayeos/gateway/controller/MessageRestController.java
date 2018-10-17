@@ -1,9 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
+import static org.springframework.data.jpa.domain.Specifications.where;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,24 +22,35 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.MessageRepository;
 
 @RestController
-public class MessageRestController {
+public class MessageRestController extends AbstractController {
+	
 	@Autowired
 	MessageRepository repo;
-
+	
 	@Autowired
 	BoardRepository repoBoard;
+	
+	
+	private Specification<Message> origin(String origin) {
+		return (root, query, cb) -> {
+			return cb.equal(root.get("origin"),origin);
+		};
+	}
+	
+	private Specification<Message> domain(Long id) {
+		return (root, query, cb) -> {
+			return cb.equal(root.get("domain").get("id"), id);
+		};
+	};
 
+	
+	
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(path = "/rest/messages/{id}", method = RequestMethod.POST)
-	public DataTablesOutput<Message> findMessages(@Valid @RequestBody DataTablesInput input, @PathVariable Long id) {
-		final Board b = repoBoard.findOne(id);
-		Specification<Message> spec = new Specification<Message>() {
-			@Override
-			public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				return cb.equal(root.get("origin"), b.getOrigin());
-			}
-		};
-		return repo.findAll(input, spec);
+	public DataTablesOutput<Message> findMessages(@Valid @RequestBody DataTablesInput input, @PathVariable Long id) {		
+		Board b = repoBoard.findOne(userSession.getUser(),id);
+		if (b== null) throw new EntityNotFoundException("Could not find board.");		
+		return repo.findAll(input, where( origin(b.getOrigin())).and(domain(b.getDomainId())));
 	}
 
 }

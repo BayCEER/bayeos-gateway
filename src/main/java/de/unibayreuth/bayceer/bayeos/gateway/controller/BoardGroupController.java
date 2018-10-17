@@ -24,23 +24,20 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardGroupRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 
 @Controller
-public class BoardGroupController extends AbstractCRUDController {
+public class BoardGroupController extends AbstractController {
 
-	@Autowired
-	BoardGroupRepository repo;
-	
 	@Autowired 
 	BoardRepository repoBoard;
 	
-	@RequestMapping(value="/groups",method=RequestMethod.GET)
-	public String list(Model model, @SortDefault("name") Pageable pageable){
-		model.addAttribute("groups",repo.findAll(pageable));
-		return "listBoardGroup";
-	}
+	@Autowired 
+	BoardGroupRepository  repo;
+			
 	
 	@RequestMapping(value="/groups/create",method=RequestMethod.GET)
-	public String create(Model model){
-		model.addAttribute("group",new BoardGroup());
+	public String create(Model model){		
+		BoardGroup g = new BoardGroup();
+		g.setDomain(userSession.getUser().getDomain());		
+		model.addAttribute("group",g);
 		return "createBoardGroup";
 	}
 	
@@ -49,48 +46,61 @@ public class BoardGroupController extends AbstractCRUDController {
 		if (bindingResult.hasErrors()){
 			return "editBoardGroup";
 		}				
-		repo.save(group);
+		repo.save(userSession.getUser(),group);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/groups";
 	}
 	
+	@RequestMapping(value="/groups",method=RequestMethod.GET)
+	public String list(Model model, @SortDefault("name") Pageable pageable){		
+		model.addAttribute("groups", repo.findAll(userSession.getUser(),domainFilter, pageable));
+		return "listBoardGroup";
+	}
+	
+	
+	
 	@RequestMapping(value="/groups/{id}", method=RequestMethod.GET)
-	public String edit(@PathVariable Long id, Model model){		
-		model.addAttribute("group",repo.findOne(id));
+	public String edit(@PathVariable Long id, Model model){	
+		model.addAttribute("group",repo.findOne(userSession.getUser(),id));
 		return "editBoardGroup";		
 	}
 	
 	@RequestMapping(value="/groups/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);
+		repo.delete(userSession.getUser(),id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/groups";
 	}
 	
 	@RequestMapping(value="/groups/selectBoards/{id}", method=RequestMethod.GET)
 	public String selectBoards(@PathVariable Long id, Model model){
-		model.addAttribute("group",repo.findOne(id));
-		model.addAttribute("boards", repoBoard.findByBoardGroupIsNull());
+		
+		BoardGroup g = repo.findOne(userSession.getUser(),id);
+		model.addAttribute("group",g);
+		
+		List<Board> boards = repoBoard.findByBoardGroupIsNullAndDomain(g.getDomain());
+		model.addAttribute("boards", boards);
+		
 		return "selectBoards";
 	}
 	
 	@RequestMapping(value="/groups/addBoards", method=RequestMethod.POST)	
 	public String addBoards(@RequestParam("id") Long id, @RequestParam("boards") List<Long> boards){			
-		BoardGroup s = repo.findOne(id);			
+		BoardGroup s = repo.findOne(userSession.getUser(),id);			
 		for(Long i:boards){
-				Board b = repoBoard.findOne(i);
+				Board b = repoBoard.findOne(userSession.getUser(),i);
 				b.setBoardGroup(s);
-				repoBoard.save(b);								
+				repoBoard.save(userSession.getUser(),b);								
 		}		
 		return "redirect:/groups/" + s.getId();
 	}
 	
 	@RequestMapping(value="/groups/removeBoard/{id}",method=RequestMethod.GET)
 	public String removeBoard(@PathVariable("id") Long id){
-		Board b = repoBoard.findOne(id);
+		Board b = repoBoard.findOne(userSession.getUser(),id);
 		Long g = b.getBoardGroup().getId();
 		b.setBoardGroup(null);
-		repoBoard.save(b);
+		repoBoard.save(userSession.getUser(),b);
 		return "redirect:/groups/" + g;
 	}
 	

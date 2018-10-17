@@ -1,12 +1,13 @@
 package de.unibayreuth.bayceer.bayeos.gateway.repo;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 
-public interface UserRepository extends PagingAndSortingRepository<User, Long>{
+public interface UserRepository extends DomainFilteredRepository<User>{
 
+	User findFirstByNameAndDomainName(String name, String domainName);
 
-	User findFirstByUserName(String userName);	
+	User findFirstByNameAndDomainIsNull(String name);
+	
+	
 
 }

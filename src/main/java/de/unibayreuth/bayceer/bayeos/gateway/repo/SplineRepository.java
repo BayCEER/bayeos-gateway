@@ -1,11 +1,9 @@
 package de.unibayreuth.bayceer.bayeos.gateway.repo;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
 
-public interface SplineRepository extends PagingAndSortingRepository<Spline, Long> {
+public interface SplineRepository extends DomainFilteredRepository<Spline> {
 		
 	Spline findFirstByName(String name);
-	
+		
 }

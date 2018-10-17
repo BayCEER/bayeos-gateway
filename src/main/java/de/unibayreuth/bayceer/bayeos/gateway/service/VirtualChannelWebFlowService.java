@@ -2,9 +2,12 @@ package de.unibayreuth.bayceer.bayeos.gateway.service;
 
 import java.util.ArrayList;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelBinding;
 import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelFunction;
@@ -22,8 +25,16 @@ public class VirtualChannelWebFlowService {
 	@Autowired
 	BoardRepository repoBoard;
 	
-	public void create(Long boardId, VirtualChannelWebFlow wf, ChannelFunction f){		
-		Board b = repoBoard.findOne(boardId);
+	
+	@Autowired
+	public UserSession userSession;
+		
+	
+	public void create(Long boardId, VirtualChannelWebFlow wf, ChannelFunction f){
+		
+		
+		Board b = repoBoard.findOne(userSession.getUser(),boardId);
+		if (b == null) throw new EntityNotFoundException("Failed to load board data."); 
 		VirtualChannel c = new VirtualChannel();		
 		c.setChannelFunction(f);
 		c.setNr(wf.getNr());
@@ -36,6 +47,7 @@ public class VirtualChannelWebFlowService {
 			cb.setVirtualchannel(c);
 			c.getChannelBindings().add(cb);						
 		}
+		
 		repoVC.save(c);		
 	}
 

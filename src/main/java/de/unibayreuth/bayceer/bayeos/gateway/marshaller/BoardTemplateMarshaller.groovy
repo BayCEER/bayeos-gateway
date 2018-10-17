@@ -1,7 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.marshaller
 
-import java.io.InputStream
-
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate
 import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelTemplate
 import de.unibayreuth.bayceer.bayeos.gateway.model.Function
@@ -19,9 +17,7 @@ class BoardTemplateMarshaller {
 		xml.setOmitNullAttributes(true)
 		xml.setOmitEmptyAttributes(true)
 		xml.board(name:board.name,description:board.description,revision:board.revision,
-		dataSheet:board.dataSheet, criticalMax:board.criticalMax,criticalMin:board.criticalMin,
-		warningMax:board.warningMax,warningMin:board.warningMin,
-		samplingInterval:board.samplingInterval,checkDelay:board.checkDelay){
+		dataSheet:board.dataSheet, samplingInterval:board.samplingInterval,checkDelay:board.checkDelay){
 			board.templates.each { item ->
 				channel(nr:item.nr, name:item.name, phenomena:item.phenomena,aggrInterval:item.aggrInterval, aggrFunction:item.aggrFunction,
 				criticalMax:item.criticalMax,criticalMin:item.criticalMin,warningMax:item.warningMax,warningMin:item.warningMin,samplingInterval:item.samplingInterval,checkDelay:item.checkDelay){
@@ -48,24 +44,7 @@ class BoardTemplateMarshaller {
 		if (n['@samplingInterval']){
 			template.samplingInterval = Integer.valueOf(n['@samplingInterval'])
 		}
-		if (n['@aggrInterval']){
-			template.aggrInterval = new Interval(name:n['@aggrInterval'])
-		}
-		if (n['@aggrFunction']){
-			template.aggrFunction = new Function(name:n['@aggrFunction'])			 
-		}
-		if (n['@criticalMax']){
-			template.criticalMax = Float.valueOf(n['@criticalMax'])
-		}
-		if (n['@criticalMin']){
-			template.criticalMin = Float.valueOf(n['@criticalMin'])
-		}
-		if (n['@warningMax']){
-			template.warningMax = Float.valueOf(n['@warningMax'])
-		}
-		if (n['@warningMin']){
-			template.warningMin = Float.valueOf(n['@warningMin'])
-		}
+		
 		if (n['@checkDelay']){
 			template.checkDelay = Integer.valueOf(n['@checkDelay'])
 		}	

@@ -5,16 +5,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
 import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelTemplate;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Function;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Interval;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Unit;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardTemplateRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.FunctionRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.IntervalRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
@@ -23,7 +26,8 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.UnitRepository;
 @Service
 public class BoardTemplateServiceImpl implements BoardTemplateService {
 	
-	
+	@Autowired
+	DomainRepository repoDomain;
 	@Autowired
 	BoardTemplateRepository repoTemplate;		
 	@Autowired
@@ -37,47 +41,52 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 	@Autowired
 	BoardRepository repoBoard;
 	
+	@Autowired
+	UserSession userSession;
+	
 		
 	@Override
 	@Transactional
-	public BoardTemplate save(BoardTemplate s) {				
+	public BoardTemplate save(BoardTemplate s) {	
+		
+				
 		for(ChannelTemplate t: s.getTemplates()){
 								
 			Function f = t.getAggrFunction();
 			if (f != null){											
-				Function ft = repoFunc.findFirstByName(f.getName());				
+				Function ft = repoFunc.findOneByName(userSession.getUser(), f.getName());				
 				if (ft != null) {
 					t.setAggrFunction(ft);
 				} else {					
-					t.setAggrFunction(repoFunc.save(f));					
+					t.setAggrFunction(repoFunc.save(userSession.getUser(),f));					
 				}								
 			}
 			
 			Interval i = t.getAggrInterval();
 			if (i != null){											
-				Interval it = repoInt.findFirstByName(i.getName());				
+				Interval it = repoInt.findOneByName(userSession.getUser(), i.getName());				
 				if (it != null) {
 					t.setAggrInterval(it);
 				} else {
-					t.setAggrInterval(repoInt.save(i));					
+					t.setAggrInterval(repoInt.save(userSession.getUser(),i));					
 				}								
 			}
 			Spline sp = t.getSpline();
 			if (sp != null){											
-				Spline st = repoSpline.findFirstByName(sp.getName());				
+				Spline st = repoSpline.findOneByName(userSession.getUser(), sp.getName());				
 				if (st != null) {
 					t.setSpline(st);
 				} else {
-					t.setSpline(repoSpline.save(sp));					
+					t.setSpline(repoSpline.save(userSession.getUser(),sp));					
 				}								
 			}			
 			Unit u = t.getUnit();
 			if (u != null){											
-				Unit ut = repoUnit.findFirstByName(u.getName());				
+				Unit ut = repoUnit.findOneByName(userSession.getUser(),u.getName());				
 				if (ut != null) {
 					t.setUnit(ut);
 				} else {
-					t.setUnit(repoUnit.save(u));					
+					t.setUnit(repoUnit.save(userSession.getUser(),u));					
 				}								
 			}								
 		}		
@@ -90,6 +99,14 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 		// Custom handling due to wrong binding in field name with spring web flow  
 		// "" empty String -> null
 		// "ID" -> id
+		
+		Domain d = bt.getDomain();		
+		if (!d.getName().isEmpty()) {			
+			bt.setDomain(repoDomain.findOne(Long.valueOf(d.getName())));
+		} else {
+			bt.setDomain(null);
+		}
+			
 		for (ChannelTemplate t: bt.getTemplates()){			
 			Unit u = t.getUnit();			
 			if (u.getName().isEmpty()){
@@ -122,7 +139,9 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 	@Override
 	public BoardTemplate saveAsTemplate(Long boardId) {		
 		Board b = repoBoard.findOne(boardId);						
-		BoardTemplate t = new BoardTemplate("New Template","");							
+		BoardTemplate t = new BoardTemplate();
+		t.setName("New Template");
+		t.setDescription("");
 		BeanUtils.copyProperties(b, t, new String[]{"id","name"});						
 		for(Channel c:b.getChannels()){			
 			ChannelTemplate ct = new ChannelTemplate();

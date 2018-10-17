@@ -7,13 +7,15 @@
 </head>
 <body>
 <div layout:fragment="content">	
-	<div class="row">		
+	<div class="row">				
 		<div class="col-xs-12">
         <table id="table" class="table table-hover nowrap">
         <thead>        	                        
-                <tr>                   
+                <tr>
+                	                                                	               	 	                  
+                   <th th:text="#{e.domain}" th:class="min-tablet-l" th:if="${#authentication.principal.inNullDomain()}">Domain</th>                                                         
                    <th th:text="#{board.origin}">Origin</th>                   
-                   <th th:text="#{board.group}" class="min-tablet-l">Group</th>
+                   <th th:text="#{board.group}" class="min-tablet-l">Group</th>                   
                    <th th:text="#{board.name}" class="min-tablet-l">Name</th>
                    <th th:text="#{board.rssi}" class="min-tablet-l">Rssi</th>
                    <th th:text="#{board.lrt}">Last Result Time</th>
@@ -30,29 +32,22 @@
 	 <script type="text/javascript" class="init" th:inline="javascript">
 	 /*<![CDATA[*/
  		$(document).ready(function(){
- 			
- 			var boards = $('#table').DataTable( { 				
- 				"language": {
- 					"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
- 					"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ , 					
- 					"info": /*[[#{datatable.info}]]*/, 
- 					"infoEmpty": /*[[#{datatable.infoEmpty}]]*/,
- 					"infoFiltered": /*[[#{datatable.infoFiltered}]]*/,
- 					"loadingRecords": /*[[#{datatable.loadingRecords}]]*/,
- 					"search": /*[[#{datatable.search}]]*/,
- 					"paginate" : {
- 						"first" : /*[[#{datatable.first}]]*/,
- 						"last" : /*[[#{datatable.last}]]*/,
- 						"next" : /*[[#{datatable.next}]]*/,
- 						"previous" : /*[[#{datatable.previous}]]*/,
- 					}
- 		        },
- 				"responsive": true,
-        		"autoWidth": false,
-                "processing": false,
-                "serverSide": true,
-                "lengthChange": false,
-                "columns": [					
+ 			var columns = []; 			
+ 			if (/*[[ ${#authentication.principal.inNullDomain()} ]]*/) { 				
+ 				columns.push(
+ 				{data: 'domain.name', 
+                    render: function(data,type,row) {
+                		if (row.domain != null) {
+                  			var url = /*[[ @{'/domains/'} ]]*/;
+                        	return '<a href="' + url + row.domain.id +'">' + row.domain.name + '</a>' ;
+                  		} else {
+                        	return '';
+                        }                        	
+                    } 
+                }
+ 				); 				
+ 			} 			
+ 			columns.push( 					
                     {data: 'origin',
                      render: function(data,type,row) {
                     	 var url = /*[[ @{'/boards/'} ]]*/;
@@ -130,8 +125,31 @@
             		        ret += '<a class="btn btn-xs btn-default" href="./boards/delete/' + row.id + '" onclick="' + confirm + '"><span class="glyphicon glyphicon-remove"></span> ' + del + '</a>';
             			    return ret += '</td>';
                 		}	
-                    }                                                            
-                ],
+                    }
+ 			);
+ 			 			
+ 			var boards = $('#table').DataTable( { 				
+ 				"language": {
+ 					"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
+ 					"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ , 					
+ 					"info": /*[[#{datatable.info}]]*/, 
+ 					"infoEmpty": /*[[#{datatable.infoEmpty}]]*/,
+ 					"infoFiltered": /*[[#{datatable.infoFiltered}]]*/,
+ 					"loadingRecords": /*[[#{datatable.loadingRecords}]]*/,
+ 					"search": /*[[#{datatable.search}]]*/,
+ 					"paginate" : {
+ 						"first" : /*[[#{datatable.first}]]*/,
+ 						"last" : /*[[#{datatable.last}]]*/,
+ 						"next" : /*[[#{datatable.next}]]*/,
+ 						"previous" : /*[[#{datatable.previous}]]*/,
+ 					}
+ 		        },
+ 				"responsive": true,
+        		"autoWidth": false,
+                "processing": false,
+                "serverSide": true,
+                "lengthChange": false,
+                "columns": columns,
                 "ajax": {
                 	'contentType': 'application/json',
                 	'url': /*[[ @{/rest/boards} ]]*/,

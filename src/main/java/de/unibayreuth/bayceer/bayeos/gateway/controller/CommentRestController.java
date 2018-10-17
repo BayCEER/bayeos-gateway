@@ -1,15 +1,15 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import static org.springframework.data.jpa.domain.Specifications.where;
+
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,27 +21,58 @@ import com.fasterxml.jackson.annotation.JsonView;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Comment;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.CommentRepository;
 
+
 @RestController
-public class CommentRestController {
+public class CommentRestController extends AbstractController {
+	
+	
 	@Autowired 
 	CommentRepository repo;
 	
+	private Specification<Comment> boardId(Long id) {
+		return (root, query, cb) -> {
+			return cb.equal(root.get("board").get("id"),id);			
+		};
+	}
+	
+	private Specification<Comment> id(Long id) {
+		return (root, query, cb) -> {
+			return cb.equal(root.get("id"),id);			
+		};
+	}
+	
+	
+	private Specification<Comment> domainId(Long id) {
+		return (root, query, cb) -> {
+			return cb.equal(root.get("board").get("domain").get("id"),id);
+		};
+	}
+	
+						
+	
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(path ="/rest/comments/{id}", method = RequestMethod.POST)
-	public DataTablesOutput<Comment> findComments(@Valid @RequestBody DataTablesInput input, @PathVariable final Long id) {		
-		Specification<Comment> spec = new Specification<Comment>() {
-			@Override
-			public Predicate toPredicate(Root<Comment> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				return cb.equal(root.get("board").get("id"),id);
-			}
-		};		
-		return repo.findAll(input, spec);
+	public DataTablesOutput<Comment> findComments(@Valid @RequestBody DataTablesInput input, @PathVariable final Long id) {	
+		if (userSession.getUser().inNullDomain()) {
+				return repo.findAll(input, boardId(id) );			
+		} else {
+				return repo.findAll(input, where(boardId(id)).and(domainId(userSession.getUser().getDomainId())) );
+		}
 	}
 
 	
 	@RequestMapping(path="/rest/comments/delete/{id}", method= RequestMethod.GET)
+	@Transactional
 	public void delete(@PathVariable Long id){
-		repo.delete(id);		
+		if (userSession.getUser().inNullDomain()) {
+			repo.delete(id);	
+		} else {
+			if (repo.findOne(where(id(id)).and(domainId(userSession.getUser().getDomainId())))!=null) {
+				repo.delete(id);
+			} else {
+				throw new AccessDeniedException("Failed to delete comment.");
+			};
+		}		
 	}
 	
 }

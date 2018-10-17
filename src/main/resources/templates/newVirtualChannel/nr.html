@@ -8,7 +8,7 @@
 <body>
 	<div layout:fragment="content">
 		<h3 th:text="#{e.virtualChannel}">Virtual Channel</h3>
-		<form method="post" th:object="${vc}" th:action="${flowExecutionUrl}">
+		<form method="post" th:object="${vc}" th:action="${flowExecutionUrl}">			
 			<div class="form-group">		 				 						
 				<div th:replace="field::text('nr',#{vc.nr},true)"></div>																	
 			</div>						

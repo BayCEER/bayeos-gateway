@@ -5,18 +5,22 @@
                           http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
 	
 		
-	<var name="boardTemplate" class="de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate"/>	
-	
-	<on-start>	
-	 <evaluate result="flowScope.intervals" expression="intervalRepository.findAll()"></evaluate>
-	 <evaluate result="flowScope.functions" expression="functionRepository.findAll()"></evaluate>
-	 <evaluate result="flowScope.splines" expression="splineRepository.findAll()"></evaluate>
-	 <evaluate result="flowScope.units" expression="unitRepository.findAll()"></evaluate>		
+	<var name="boardTemplate" class="de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate"/>
+	 
+		
+	<on-start>	 
+	 <evaluate result="flowScope.user" expression="boardTemplateController.userSession.getUser()"></evaluate>
+	 <evaluate result="flowScope.domainFilter" expression="boardTemplateController.domainFilter"></evaluate>	 
+	 <evaluate result="flowScope.intervals" expression="intervalRepository.findAll(flowScope.user,null)"></evaluate>
+	 <evaluate result="flowScope.functions" expression="functionRepository.findAllSortedByName(flowScope.user,null)"></evaluate>
+	 <evaluate result="flowScope.splines" expression="splineRepository.findAllSortedByName(flowScope.user,null)"></evaluate>
+	 <evaluate result="flowScope.units" expression="unitRepository.findAllSortedByName(flowScope.user,null)"></evaluate>	 	 		
 	</on-start>
-    
+	
     
     <view-state id="props" model="boardTemplate" view="newBoardTemplate/props">
-		<binder>            	
+		<binder>
+			<binding property="domain"></binding>		    
             <binding property="name"></binding>
            	<binding property="description"></binding>
            	<binding property="revision"></binding>
@@ -28,21 +32,14 @@
     
     <view-state id="defaults" model="boardTemplate" view="newBoardTemplate/defaults">
     	<binder>            	
-            <binding property="criticalMin"></binding>
-           	<binding property="criticalMax"></binding>
-           	<binding property="warningMin"></binding>
-           	<binding property="warningMax"></binding>
-           	<binding property="samplingInterval"></binding>
+            <binding property="samplingInterval"></binding>
            	<binding property="checkDelay"></binding>
         </binder>        
         <transition on="back" to="props"/>
         <transition on="next" to="channels">        
 		</transition>
     </view-state>
-    
-    
-    
-    
+        
     <view-state id="channels" model="boardTemplate" view="newBoardTemplate/channels">
     	<transition on="add" to="addTemplate">
     		<evaluate result="flowScope.channelTemplate" expression="new de.unibayreuth.bayceer.bayeos.gateway.model.ChannelTemplate()"></evaluate>     		

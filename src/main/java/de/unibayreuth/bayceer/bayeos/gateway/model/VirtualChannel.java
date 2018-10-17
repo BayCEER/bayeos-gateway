@@ -22,9 +22,8 @@ import javax.script.SimpleBindings;
  */
 @Entity
 @Table(name = "virtual_channel")
-public class VirtualChannel extends UniqueEntity {
-	
-	
+public class VirtualChannel extends UniqueEntity {				
+		
 	@Column(columnDefinition = "text")
 	private String nr;
 	private static final long serialVersionUID = 1L;
@@ -40,20 +39,7 @@ public class VirtualChannel extends UniqueEntity {
 	@JoinColumn(name="board_id")
 	private Board board;
 		
-	public VirtualChannel() {
-		super();
-	}
-	
-	
-
-	public ChannelFunction getChannelFunction() {
-		return channelFunction;
-	}
-
-	public void setChannelFunction(ChannelFunction function) {
-		this.channelFunction = function;
-	}
-	
+		
 	public Object eval(ScriptEngine engine, Map<String,Object> values) throws ScriptException {				
 		Map<String,Object> params = new HashMap<>(channelBindings.size());	
 		for(ChannelBinding b:channelBindings){
@@ -66,15 +52,6 @@ public class VirtualChannel extends UniqueEntity {
 	}
 
 
-
-	public String getNr() {
-		return nr;
-	}
-
-
-	public void setNr(String nr) {
-		this.nr = nr;
-	}
 	
 	public String getDeclaration(){
 		StringBuffer b = new StringBuffer(nr);
@@ -95,6 +72,24 @@ public class VirtualChannel extends UniqueEntity {
 	}
 
 
+	@Override
+	public String toString() {
+		return getDeclaration();
+	}
+
+
+
+	public String getNr() {
+		return nr;
+	}
+
+
+
+	public void setNr(String nr) {
+		this.nr = nr;
+	}
+
+
 
 	public List<ChannelBinding> getChannelBindings() {
 		return channelBindings;
@@ -108,18 +103,26 @@ public class VirtualChannel extends UniqueEntity {
 
 
 
+	public ChannelFunction getChannelFunction() {
+		return channelFunction;
+	}
+
+
+
+	public void setChannelFunction(ChannelFunction channelFunction) {
+		this.channelFunction = channelFunction;
+	}
+
+
+
 	public Board getBoard() {
 		return board;
 	}
 
 
+
 	public void setBoard(Board board) {
 		this.board = board;
-	}
-
-	@Override
-	public String toString() {
-		return getDeclaration();
 	}
 
 	

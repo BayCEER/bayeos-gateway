@@ -6,13 +6,12 @@ public class Observation {
 	Long channelId;
 	Long millis;
 	Float value;
-	
-	
-	public Observation() {
-		super();		
+	public Long getRowId() {
+		return rowId;
 	}
-	
-	
+	public void setRowId(Long rowId) {
+		this.rowId = rowId;
+	}
 	public Long getChannelId() {
 		return channelId;
 	}
@@ -31,15 +30,9 @@ public class Observation {
 	public void setValue(Float value) {
 		this.value = value;
 	}
-
-	public Long getRowId() {
-		return rowId;
-	}
-
-
-	public void setRowId(Long rowId) {
-		this.rowId = rowId;
-	}
+	
+	
+	
 	
 
 }

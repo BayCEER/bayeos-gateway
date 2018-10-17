@@ -29,29 +29,41 @@ public class ChannelBinding extends UniqueEntity implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="channel_function_param_id")
 	private ChannelFunctionParameter parameter;
-	
-	
-	public ChannelBinding() {
-		super();
-	}   
+
+
 	public String getNr() {
-		return this.nr;
+		return nr;
 	}
+
 
 	public void setNr(String nr) {
 		this.nr = nr;
-	}   
+	}
+
+
 	public VirtualChannel getVirtualchannel() {
 		return virtualchannel;
 	}
+
+
 	public void setVirtualchannel(VirtualChannel virtualchannel) {
 		this.virtualchannel = virtualchannel;
 	}
+
+
 	public ChannelFunctionParameter getParameter() {
 		return parameter;
 	}
+
+
 	public void setParameter(ChannelFunctionParameter parameter) {
 		this.parameter = parameter;
 	}
-   
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+	   
 }

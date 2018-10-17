@@ -3,6 +3,7 @@ package de.unibayreuth.bayceer.bayeos.gateway;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +26,9 @@ import org.thymeleaf.spring4.view.FlowAjaxThymeleafView;
 
     @Configuration
     @AutoConfigureAfter(WebMvcConfig.class)
+    
     public class WebFlowConfig extends AbstractFlowConfiguration {
+    	
 
         @Autowired
         private SpringTemplateEngine templateEngine;
@@ -51,7 +54,7 @@ import org.thymeleaf.spring4.view.FlowAjaxThymeleafView;
                     .setValidator(validator())
                     // Add Conversion Service 
                     //.setConversionService(conversionService())
-                    .setDevelopmentMode(false)
+                    .setDevelopmentMode(true)                 
                     .build();
         }
         

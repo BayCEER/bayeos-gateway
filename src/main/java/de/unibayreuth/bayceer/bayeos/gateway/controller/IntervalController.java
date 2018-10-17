@@ -20,7 +20,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Interval;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.IntervalRepository;
 
 @Controller
-public class IntervalController extends AbstractCRUDController {
+public class IntervalController extends AbstractController {
 	
 	
 	@Autowired
@@ -28,7 +28,9 @@ public class IntervalController extends AbstractCRUDController {
 	
 	@RequestMapping(value="/intervals/create", method=RequestMethod.GET)
 	public String create(Model model){
-		model.addAttribute("interval", new Interval());		
+		Interval i = new Interval();
+		i.setDomain(userSession.getUser().getDomain());
+		model.addAttribute("interval", i);		
 		return "editInterval";
 	}
 	
@@ -37,7 +39,7 @@ public class IntervalController extends AbstractCRUDController {
 		if (bindingResult.hasErrors()){
 			return "editInterval";
 		}				
-		repo.save(interval);
+		repo.save(userSession.getUser(),interval);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/intervals";
 	}
@@ -47,19 +49,19 @@ public class IntervalController extends AbstractCRUDController {
 	public String list(Model model, @SortDefault("name") Pageable pageable){
 		// Map name sort order to epoch (derived property) 
 		PageRequest r = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().getOrderFor("name").getDirection(), "epoch", "name");
-		model.addAttribute("intervals", repo.findAll(r));
+		model.addAttribute("intervals", repo.findAll(userSession.getUser(),domainFilter,r));
 		return "listInterval";
 	}
 	
 	@RequestMapping(value="/intervals/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){		
-		model.addAttribute("interval",repo.findOne(id));
+		model.addAttribute("interval",repo.findOne(userSession.getUser(),id));
 		return "editInterval";		
 	}
 	
 	@RequestMapping(value="/intervals/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);
+		repo.delete(userSession.getUser(),id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/intervals";
 	}

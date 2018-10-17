@@ -14,11 +14,14 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 		
 	@Autowired
 	HandlerInterceptor controllerNameInterceptor;
-			
 	
+	@Autowired 
+	HandlerInterceptor domainFilterInterceptor; 
+		
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(controllerNameInterceptor);				
+		registry.addInterceptor(controllerNameInterceptor);	
+		registry.addInterceptor(domainFilterInterceptor);
 	}
 		
 	@Override 	

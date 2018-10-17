@@ -3,13 +3,6 @@ package de.unibayreuth.bayceer.bayeos.gateway.model;
 public class NagiosMessage {	
 	Integer status;
 	String text;
-	
-	
-	
-	public NagiosMessage() {
-		super();		
-	}
-	
 	public Integer getStatus() {
 		return status;
 	}

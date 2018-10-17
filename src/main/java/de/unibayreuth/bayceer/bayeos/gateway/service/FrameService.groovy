@@ -1,11 +1,8 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import java.nio.ByteBufferAsFloatBufferB
 import java.sql.Connection
 import java.sql.SQLException
 import java.text.SimpleDateFormat
-import java.util.List
-
 import javax.script.ScriptEngine
 import javax.sql.DataSource
 
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service
 
 import bayeos.frame.FrameParserException
 import bayeos.frame.Parser
+import bayeos.frame.types.ByteFrame
 import bayeos.frame.types.MapUtils
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository
@@ -26,6 +24,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEvent
 import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEventProducer
 import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEventType
 import groovy.sql.Sql
+import org.apache.commons.codec.binary.Base64
 
 
 @Service
@@ -49,6 +48,7 @@ class FrameService {
 	private Logger log = Logger.getLogger(FrameService.class)
 
 	class Board {
+		Integer domainId
 		String origin
 		Integer id
 		Date lrt
@@ -57,8 +57,12 @@ class FrameService {
 		Integer lrssi
 		Long records = 0
 	}
+	
+	def boolean saveFrame(String sender, ByteFrame frame) {
+		return saveFrames(null,sender,[Base64.encodeBase64String(frame.getBytes())] as List<String>)
+	}
 
-	def saveFrames(String sender, List<String> frames) {
+	def boolean saveFrames(Long domainId, String sender, List<String> frames) {
 		if ((frames == null) || (sender == null)) return
 		Connection con = null
 		CopyIn cin = null
@@ -89,9 +93,10 @@ class FrameService {
 
 					// Check if board exists
 					Board b = boards[res['origin']]
-					if (b == null) {
-						def id = findOrSaveBoard(db,res['origin'])
-						b = new Board(id:id, origin:res['origin'], lrt:ts,lrssi:res['rssi'], channels:[:], vchannels: boardRepo.findByOrigin(res['origin']).getVirtualChannels())
+					if (b == null) {																								
+						Long id = findOrSaveBoard(db,domainId,res['origin'])
+						b = new Board(id:id, domainId: domainId, origin:res['origin'], lrt:ts,lrssi:res['rssi'], channels:[:],
+							 vchannels: boardRepo.findOne(id).getVirtualChannels())
 						boards[res['origin']] = b
 					} else {
 						b.lrt = ts
@@ -158,12 +163,12 @@ class FrameService {
 							long r = cin.endCopy()
 							break
 						case "Message":
-							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "INFO"])
+							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "INFO", domainId])
 							eventProducer.addFrameEvent(new FrameEvent(b.id,FrameEventType.NEW_MESSAGE))
 							log.debug("Message saved")
 							break
 						case "ErrorMessage":
-							db.executeInsert("insert into message (content, origin, result_time, type) values (?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "ERROR"])
+							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "ERROR", domainId])
 							eventProducer.addFrameEvent(new FrameEvent(b.id,FrameEventType.NEW_MESSAGE))
 							log.debug("ErrorMessage saved")
 							break
@@ -199,13 +204,18 @@ class FrameService {
 
 
 
-	private Integer findOrSaveBoard(Sql db, String origin) throws SQLException {
-		log.debug("findOrSaveBoard:${origin}")
-		def b = db.firstRow("select id from board where origin like ?;",[origin])
+	private Long findOrSaveBoard(Sql db, Long domainId, String origin) throws SQLException {
+		def b;	
+		if (domainId == null) {
+			b = db.firstRow("select id from board where origin like ? and (domain_id is null or domain_id_created is null);",[origin])
+		} else {
+			b = db.firstRow("select id from board where origin like ? and domain_id = ?;",[origin, domainId])			
+		}
+					
 		if (b==null) {
 			log.info("Creating new board:${origin}")
 			def seq = db.firstRow("select nextval('board_id_seq') as id;")
-			db.execute """ insert into board (id, origin) values (${seq.id},${origin});"""
+			db.execute """insert into board (id,domain_id,domain_id_created, origin) values (${seq.id},${domainId},${domainId},${origin});"""
 			eventProducer.addFrameEvent(new FrameEvent(seq.id, FrameEventType.NEW_BOARD))
 			return seq.id
 		} else {
@@ -213,8 +223,7 @@ class FrameService {
 		}
 	}
 
-	private Integer findOrSaveChannel(Sql db, Board board, String channelNr) throws SQLException {
-		log.debug("findOrSaveChannel: Board id:${board.id},Channel nr:${channelNr}")
+	private Long findOrSaveChannel(Sql db, Board board, String channelNr) throws SQLException {		
 		def c = db.firstRow("select id from channel c where board_id = ? and nr = ?;",[board.id, channelNr])
 		if (c==null){
 			def b = db.firstRow("select deny_new_channels from board where id=?",[board.id])
@@ -240,13 +249,13 @@ class FrameService {
 		db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
 												coalesce(c.check_delay,b.check_delay,0) as check_delay,
 												c.spline_id,
-											    coalesce(c.critical_max, b.critical_max) as critical_max, 
-												coalesce(c.critical_min, b.critical_min) as critical_min, 
-												coalesce(c.warning_max, b.warning_max) as warning_max, 
-												coalesce(c.warning_min, b.warning_min) as warning_min 												 											
+											    c.critical_max, 
+												c.critical_min, 
+												c.warning_max, 
+												c.warning_min									 											
 										FROM channel c, board b WHERE b.id = c.board_id and b.id = ?""",[board.id]){ cha ->
 
-					if(channels.containsValue((int)cha.id)){
+					if(channels.containsValue(cha.id)){
 						log.debug("Update meta information for channel ${cha.id}")
 						//	Get values
 						def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from

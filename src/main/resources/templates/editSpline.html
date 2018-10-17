@@ -9,7 +9,8 @@
 	<div layout:fragment="content">
 		<h3 th:text="#{e.spline}">Spline</h3>
 		<form method="post" action="#" th:action="@{/splines/save}" th:object="${spline}">
-		 	<input type="hidden" th:field="*{id}"/>		 						
+		 	<input type="hidden" th:field="*{id}"/>
+		 	<div th:replace="field::selectDomain"></div>	 						
 			<div th:replace="field::text('name',#{a.name},true)"></div>				
 			<div class="form-group">
 				<label th:text="#{nav.knotPoints} + ':'">Knot Points:</label>

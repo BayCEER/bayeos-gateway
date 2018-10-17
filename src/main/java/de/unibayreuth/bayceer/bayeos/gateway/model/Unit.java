@@ -4,31 +4,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
-public class Unit extends UniqueEntity  {
+public class Unit extends NamedDomainEntity  {
 	
-	@Column(nullable=false)
-	private String name;
+	public Unit() {
+		super();
+	}
+	
+	public Unit(String name) {
+		this.name = name;
+	}
 
 	private String abbrevation;
 
 	@Column(name="db_unit_id")
 	private Integer dbUnitId;
-	
-	
-	public Unit() {
-	}
-	
-	public Unit(String name){
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public String getAbbrevation() {
 		return abbrevation;
@@ -45,11 +34,5 @@ public class Unit extends UniqueEntity  {
 	public void setDbUnitId(Integer dbUnitId) {
 		this.dbUnitId = dbUnitId;
 	}
-	
-	@Override
-	public String toString() {
-		return this.name;
-	}
-
 	
 }

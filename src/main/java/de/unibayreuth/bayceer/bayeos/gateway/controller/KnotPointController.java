@@ -3,6 +3,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.KnotPointRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
 
 @Controller
-public class KnotPointController extends AbstractCRUDController{
+public class KnotPointController extends AbstractController{
 	
 	@Autowired
 	KnotPointRepository repo;
@@ -31,7 +32,9 @@ public class KnotPointController extends AbstractCRUDController{
 	
 	@RequestMapping(value="/knotpoints/create/{id}", method=RequestMethod.GET)
 	public String create(@PathVariable Long id, Model model){
-		Spline s = repoSpline.findOne(id);						
+		Spline s = repoSpline.findOne(userSession.getUser(),id);
+		if (s == null) throw new EntityNotFoundException("Entity not found");
+		checkWrite(s);	
 		KnotPoint k = new KnotPoint();
 		s.addKnotPoint(k);				
 		model.addAttribute("knotPoint", k);		
@@ -44,6 +47,7 @@ public class KnotPointController extends AbstractCRUDController{
 		if (bindingResult.hasErrors()){
 			return "editKnotPoint";
 		}				
+		checkWrite(point.getSpline());
 		repo.save(point);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
 		return "redirect:/splines/" + point.getSpline().getId();
@@ -59,7 +63,9 @@ public class KnotPointController extends AbstractCRUDController{
 		
 	@RequestMapping(value="/knotpoints/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {		
-		KnotPoint k = repo.findOne(id);	
+		KnotPoint k = repo.findOne(id);
+		if (k == null) throw new EntityNotFoundException("Entity not found");
+		checkWrite(k.getSpline());
 		repo.delete(id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/splines/" + k.getSpline().getId();

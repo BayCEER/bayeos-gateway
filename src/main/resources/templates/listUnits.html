@@ -11,6 +11,9 @@
 			<table class="table table-striped" >
 				<thead>
 					<tr>
+						<th th:if="${#authentication.principal.inNullDomain()}"><a
+										class="sorted" sd:pagination-sort="domainName"
+										th:text="#{e.domain}">Domain</a></th>
 						<th><a class="sorted" sd:pagination-sort="name"
 							th:text="#{a.name}">Name</a>
 						</th>
@@ -31,6 +34,9 @@
 				</thead>
 				<tbody>
 					<tr th:each="u : ${units}">
+						<td th:if="${#authentication.principal.inNullDomain()}">
+										<a th:if="${u.domain} != null" th:href="@{/domains/{id}(id=${u.domain.id})}" th:text="${u.domain.name}">Domain</a>
+						</td>
 						<td><a th:href="@{/units/{id}(id=${u.id})}"
 							th:text="${u.name}">Name A</a>
 						</td>					

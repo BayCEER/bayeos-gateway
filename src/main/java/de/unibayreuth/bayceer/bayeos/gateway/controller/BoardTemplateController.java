@@ -31,16 +31,16 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardTemplateRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.BoardTemplateService;
 
 @Controller
-public class BoardTemplateController extends AbstractCRUDController {
+public class BoardTemplateController extends AbstractController {
 	
 	private final static Logger log = Logger.getLogger(BoardTemplateController.class);
 	
-	@Autowired
-	BoardTemplateRepository repo;
-	
-	
+		
 	@Autowired
 	BoardTemplateService serviceBoardTemplate;
+	
+	@Autowired
+	BoardTemplateRepository repo;
 					
 		
 	@RequestMapping(value="/boardTemplates/save", method=RequestMethod.POST)
@@ -48,7 +48,7 @@ public class BoardTemplateController extends AbstractCRUDController {
 		if (bindingResult.hasErrors()){
 			return "editBoardTemplate";
 		}				
-		repo.save(template);
+		repo.save(userSession.getUser(),template);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/boardTemplates";
 	}
@@ -56,13 +56,13 @@ public class BoardTemplateController extends AbstractCRUDController {
 	
 	@RequestMapping(value="/boardTemplates", method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){
-		model.addAttribute("boardTemplates", repo.findAll(pageable));
+		model.addAttribute("boardTemplates", repo.findAll(userSession.getUser(),domainFilter,pageable));
 		return "listBoardTemplates";
 	}
 	
 	@RequestMapping(value="/boardTemplates/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){	
-		BoardTemplate s = repo.findOne(id);
+		BoardTemplate s = repo.findOne(userSession.getUser(),id);
 		if (s!=null && s.getTemplates()!=null){
 			Collections.sort(s.getTemplates());			
 		}
@@ -72,7 +72,7 @@ public class BoardTemplateController extends AbstractCRUDController {
 	
 	@RequestMapping(value="/boardTemplates/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);
+		repo.delete(userSession.getUser(),id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/boardTemplates";
 	}
@@ -84,9 +84,9 @@ public class BoardTemplateController extends AbstractCRUDController {
 	
 	@RequestMapping(value="/boardTemplates/upload", method=RequestMethod.POST)
 	public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirect) {
-			try {
-				
+			try {				
 				BoardTemplate t = BoardTemplateMarshaller.unmarshal(file.getInputStream());
+				t.setDomain(userSession.getUser().getDomain());
 				serviceBoardTemplate.save(t);
 				
 			} catch (IOException e) {
@@ -101,7 +101,7 @@ public class BoardTemplateController extends AbstractCRUDController {
 	@RequestMapping(value="/boardTemplates/export/{id}", method=RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<String> export(@PathVariable Long id, RedirectAttributes redirect) throws UnsupportedEncodingException, IOException {														
-			BoardTemplate t =  repo.findOne(id);								
+			BoardTemplate t =  repo.findOne(userSession.getUser(),id);								
 			if (t == null) throw new IOException("Failed to read board template.");			
 			String b = BoardTemplateMarshaller.marshal(t);			
 			return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename="+ URLEncoder.encode(t.getName(),"UTF-8") +".xml").body(b.toString());
@@ -111,7 +111,7 @@ public class BoardTemplateController extends AbstractCRUDController {
 	@RequestMapping(value="/boardTemplates/create/{id}", method=RequestMethod.GET)
 	public String create(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {		
 		BoardTemplate t = serviceBoardTemplate.saveAsTemplate(id);	
-		redirect.addFlashAttribute("globalMessage", getActionMsg("creaeted", locale));
+		redirect.addFlashAttribute("globalMessage", getActionMsg("created", locale));
 		return "redirect:/boardTemplates/" + t.getId();
 	}
 	

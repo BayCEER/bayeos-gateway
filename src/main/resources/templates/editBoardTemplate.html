@@ -9,15 +9,25 @@
 	<div layout:fragment="content">
 		<h3 th:text="#{e.boardTemplate}">Edit board template</h3>
 		<form method="post" action="#" th:action="@{/boardTemplates/save}" th:object="${boardTemplate}">
-		 	<input type="hidden" th:field="*{id}"/>			
+		 	<input type="hidden" th:field="*{id}"/>	
+		 	
+		 	
 		 				
 		 	<div id="props" class="block">
 		 		<div class="block-header" th:text="#{a.properties}">Board Template</div>
+		 		
+		 		<div class="row">
+		 			<div class="col-sm-3">
+		 				<div th:replace="field::selectDomain"></div>
+		 			</div>
+		 		</div>
+		 		
+		 		
 		 		<div class="row">
 		 			<div class="col-sm-6">
 		 				<div th:replace="field::text('name',#{a.name},true)"></div>
 		 			</div>
-		 				<div class="col-sm-6">
+		 			<div class="col-sm-6">
 		 				<div th:replace="field::text('description',#{boardTemplate.desc},false)"></div>
 		 			</div>
 		 		</div>
@@ -31,7 +41,7 @@
 		 		</div>
 		 	</div>
 		 	
-		 	<div id="defaults" th:replace="block::channelSettings(#{a.defaultValues})"></div>
+		 	<div id="defaults" th:replace="block::boardSettings(#{a.defaultValues})"></div>
 		 			 	
 		 	
 		 	<div id="channels" class="block">

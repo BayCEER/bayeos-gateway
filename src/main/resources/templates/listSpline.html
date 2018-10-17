@@ -10,7 +10,11 @@
 			<h3 th:text="#{nav.splines}">Splines</h3>			
 			<table class="table table-striped" >
 				<thead>
+					
 					<tr>
+						<th th:if="${#authentication.principal.inNullDomain()}"><a
+										class="sorted" sd:pagination-sort="domainName"
+										th:text="#{e.domain}">Domain</a></th>
 						<th>
 							<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a>
 						</th>
@@ -25,6 +29,9 @@
 				</thead>
 				<tbody>
 					<tr th:each="i : ${splines}">
+						<td th:if="${#authentication.principal.inNullDomain()}">
+							<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
+						</td>
 						<td th:switch="${i.locked}">
 							<div th:case="true"> 
 								<span class="glyphicon glyphicon-lock" title="Spline is locked. Editing not allowed."></span> <span th:text="${i.name}">Spline Name</span>

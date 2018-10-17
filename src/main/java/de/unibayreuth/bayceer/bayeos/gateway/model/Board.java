@@ -7,9 +7,11 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
@@ -17,39 +19,64 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-public class Board extends CheckDevice {
-			
+public class Board extends NamedDomainEntity {
+	
+	// Completeness Check
+	@Column(name="sampling_interval")
+	Integer samplingInterval;	
+	
+	// Check Delay
+	@Column(name="check_delay")
+	Integer checkDelay;	
+	
+	// Disable Alerts   	
+	@Column(name="exclude_from_nagios")	
+	Boolean excludeFromNagios = false;
+	
+	// Export valid records only
+	@Column(name="filter_critical_values")
+	Boolean filterCriticalValues = false;
+	
+	@Transient	
+	Long domainIdCreated;
+		
 	@JsonView(DataTablesOutput.View.class)
 	String origin;
 	
 	@JsonView(DataTablesOutput.View.class)
-	String name;
-	
-	@JsonView(DataTablesOutput.View.class)
 	/* Column is managed by import routines */
-	@Column(insertable=false,updatable=false)
+	@Column(insertable=false,updatable=false)	
 	Short  lastRssi;
 	
 	@JsonView(DataTablesOutput.View.class)	
 	/* Column is managed by import routines !! */
 	@Column(insertable=false,updatable=false)
+	
 	Date lastResultTime;
 	
+	
 	Integer dbFolderId;
+	
 	Boolean dbAutoExport = false;
+	
 	Boolean denyNewChannels = false;
+	
 	
 	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)
 	List<Channel> channels;
 	
-	@OneToMany(mappedBy="board", cascade=CascadeType.ALL)
+	
+	@OneToMany(mappedBy="board", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	List<VirtualChannel> virtualChannels;
 		
+	
 	@Formula("(select count(*) from board_comment where board_comment.board_comments_id = id)")
 	Integer commentCount;
 	
+	
 	@Formula("(select count(*) from message where message.origin = origin)")
 	Integer messageCount;
+	
 	
 	@JsonView(DataTablesOutput.View.class)	
 	@Formula("(select get_board_status(id))")
@@ -57,25 +84,93 @@ public class Board extends CheckDevice {
 	
 	@ManyToOne	
 	@JoinColumn(name = "board_group_id")
-	@JsonView(DataTablesOutput.View.class)
+	@JsonView(DataTablesOutput.View.class)	
 	BoardGroup boardGroup;
 	
-	
-	public Board(){
-		super();
-	}
-		
-	public Board(String origin) {
-		this.origin = origin;
-	}
-
-	
+				
 	public Integer getStatus() {
-		if (excludeFromNagios) {
+		if (getExcludeFromNagios()) {
 			return null;
 		} else {
 			return channelStatus;
 		}
+	}
+
+	public Channel findOrCreateChannel(String nr) {				
+		for(Channel c:channels){
+			if (c.getNr().equals(nr)){
+				return c;
+			}
+		}		
+		Channel c = new Channel();
+		c.setBoard(this);
+		c.setNr(nr);
+		channels.add(c);		
+		return c;
+	}
+
+	
+	public List<String> getChannelNrs() {
+		List<String> ret = new ArrayList<String>();		
+		for(Channel c:channels){
+			ret.add(c.getNr());
+		}
+		return ret;
+	}
+	
+	public List<Long> getChannelIds(){
+		List<Long> ret = new ArrayList<>();		
+		for(Channel c:channels){
+			ret.add(c.getId());
+		}
+		return ret;
+	}
+	
+	public Boolean getNagios() {
+		return !excludeFromNagios;
+	}
+	public void setNagios(Boolean nagios) {
+		this.excludeFromNagios = !nagios;
+}
+
+	public Integer getSamplingInterval() {
+		return samplingInterval;
+	}
+
+	public void setSamplingInterval(Integer samplingInterval) {
+		this.samplingInterval = samplingInterval;
+	}
+
+	public Integer getCheckDelay() {
+		return checkDelay;
+	}
+
+	public void setCheckDelay(Integer checkDelay) {
+		this.checkDelay = checkDelay;
+	}
+
+	public Boolean getExcludeFromNagios() {
+		return excludeFromNagios;
+	}
+
+	public void setExcludeFromNagios(Boolean excludeFromNagios) {
+		this.excludeFromNagios = excludeFromNagios;
+	}
+
+	public Boolean getFilterCriticalValues() {
+		return filterCriticalValues;
+	}
+
+	public void setFilterCriticalValues(Boolean filterCriticalValues) {
+		this.filterCriticalValues = filterCriticalValues;
+	}
+
+	public Long getDomainIdCreated() {
+		return domainIdCreated;
+	}
+
+	public void setDomainIdCreated(Long domainIdCreated) {
+		this.domainIdCreated = domainIdCreated;
 	}
 
 	public String getOrigin() {
@@ -84,14 +179,6 @@ public class Board extends CheckDevice {
 
 	public void setOrigin(String origin) {
 		this.origin = origin;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public Short getLastRssi() {
@@ -134,7 +221,37 @@ public class Board extends CheckDevice {
 		this.denyNewChannels = denyNewChannels;
 	}
 
-	
+	public List<Channel> getChannels() {
+		return channels;
+	}
+
+	public void setChannels(List<Channel> channels) {
+		this.channels = channels;
+	}
+
+	public List<VirtualChannel> getVirtualChannels() {
+		return virtualChannels;
+	}
+
+	public void setVirtualChannels(List<VirtualChannel> virtualChannels) {
+		this.virtualChannels = virtualChannels;
+	}
+
+	public Integer getCommentCount() {
+		return commentCount;
+	}
+
+	public void setCommentCount(Integer commentCount) {
+		this.commentCount = commentCount;
+	}
+
+	public Integer getMessageCount() {
+		return messageCount;
+	}
+
+	public void setMessageCount(Integer messageCount) {
+		this.messageCount = messageCount;
+	}
 
 	public Integer getChannelStatus() {
 		return channelStatus;
@@ -151,78 +268,6 @@ public class Board extends CheckDevice {
 	public void setBoardGroup(BoardGroup boardGroup) {
 		this.boardGroup = boardGroup;
 	}
-
-	public Integer getCommentCount() {
-		return commentCount;
-	}
-
-	
-	public Integer getMessageCount() {
-		return messageCount;
-	}
-
-	public void setMessageCount(Integer messageCount) {
-		this.messageCount = messageCount;
-	}
-	
-
-	public Channel findOrCreateChannel(String nr) {				
-		for(Channel c:channels){
-			if (c.getNr().equals(nr)){
-				return c;
-			}
-		}		
-		Channel c = new Channel(this,nr);
-		channels.add(c);		
-		return c;
-	}
-
-	public List<Channel> getChannels() {
-		return channels;
-	}
-	
-	public List<String> getChannelNrs() {
-		List<String> ret = new ArrayList();		
-		for(Channel c:channels){
-			ret.add(c.getNr());
-		}
-		return ret;
-	}
-	
-	public List<Long> getChannelIds(){
-		List<Long> ret = new ArrayList<>();		
-		for(Channel c:channels){
-			ret.add(c.getId());
-		}
-		return ret;
-	}
-
-	public void setChannels(List<Channel> channels) {
-		this.channels = channels;
-	}
-
-	public List<VirtualChannel> getVirtualChannels() {
-		return virtualChannels;
-	}
-	
-	
-	public void setVirtualChannels(List<VirtualChannel> virtualChannels) {
-		this.virtualChannels = virtualChannels;
-	}
-	
-	
-	@Override
-	public String toString() {
-		StringBuffer b = new StringBuffer();
-		b.append("ID:").append(getId()).append(",ORIGIN:").append(getOrigin());
-		for(VirtualChannel vc:getVirtualChannels()){
-			b.append(",VC:{ID:").append(vc.getId()).append(",DEC:").append(vc.getDeclaration()).append("}\n");
-		}
-		return b.toString();
-	}
-	
-	
-	 
 
 	
 }

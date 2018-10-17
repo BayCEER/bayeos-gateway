@@ -29,7 +29,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
 
 @Controller
-public class SplineController extends AbstractCRUDController{
+public class SplineController extends AbstractController{
 	
 	private final static Logger log = Logger.getLogger(SplineController.class);
 	
@@ -41,7 +41,7 @@ public class SplineController extends AbstractCRUDController{
 		if (bindingResult.hasErrors()){
 			return "editSpline";
 		}				
-		repo.save(spline);
+		repo.save(userSession.getUser(),spline);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/splines";
 	}
@@ -49,19 +49,19 @@ public class SplineController extends AbstractCRUDController{
 	
 	@RequestMapping(value="/splines", method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){
-		model.addAttribute("splines", repo.findAll(pageable));
+		model.addAttribute("splines", repo.findAll(userSession.getUser(),domainFilter,pageable));
 		return "listSpline";
 	}
 	
 	@RequestMapping(value="/splines/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){		
-		model.addAttribute("spline",repo.findOne(id));
+		model.addAttribute("spline",repo.findOne(userSession.getUser(),id));
 		return "editSpline";		
 	}
 	
 	@RequestMapping(value="/splines/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);
+		repo.delete(userSession.getUser(),id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/splines";
 	}
@@ -75,6 +75,7 @@ public class SplineController extends AbstractCRUDController{
 	public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirect) {
 			try {
 				Spline s = SplineMarshaller.unmarshal(file.getInputStream());
+				s.setDomain(userSession.getUser().getDomain());
 				repo.save(s);				
 			} catch (IOException e) {
 				log.error(e.getMessage());
@@ -88,7 +89,7 @@ public class SplineController extends AbstractCRUDController{
 	@RequestMapping(value="/splines/export/{id}", method=RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<String> export(@PathVariable Long id, RedirectAttributes redirect) throws UnsupportedEncodingException, IOException {														
-			Spline s =  repo.findOne(id);			
+			Spline s =  repo.findOne(userSession.getUser(),id);			
 			if (s == null) throw new IOException("Failed to read spline.");
 			String b = SplineMarshaller.marshal(s);			
 			return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename="+ URLEncoder.encode(s.getName(),"UTF-8") +".xml").body(b.toString());

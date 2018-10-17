@@ -11,8 +11,11 @@
 			<table class="table table-striped" >
 				<thead>
 					<tr>
-						<th><a class="sorted" sd:pagination-sort="name"
-							th:text="#{a.name}">Name</a>
+						<th th:if="${#authentication.principal.inNullDomain()}">
+							<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
+						</th>
+						<th>
+							<a class="sorted" sd:pagination-sort="name" th:text="#{a.name}">Name</a>
 						</th>										
 						<th>
 							<div class="pull-right">
@@ -25,6 +28,9 @@
 				</thead>
 				<tbody>
 					<tr th:each="f : ${channelFunctions}">
+						<td th:if="${#authentication.principal.inNullDomain()}">
+								<a th:if="${f.domain} != null" th:href="@{/domains/{id}(id=${f.domain.id})}" th:text="${f.domain.name}">Domain</a>
+						</td>
 						<td><a th:href="@{/channelFunctions/{id}(id=${f.id})}"
 							th:text="${f.getFunctionHead()}">Name A</a>
 						</td>											

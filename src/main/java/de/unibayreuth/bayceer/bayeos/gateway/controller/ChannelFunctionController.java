@@ -21,7 +21,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelFunctionParameterReposi
 import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelFunctionRepository;
 
 @Controller
-public class ChannelFunctionController extends AbstractCRUDController{
+public class ChannelFunctionController extends AbstractController{
 	
 	@Autowired
 	ChannelFunctionRepository repo;
@@ -32,6 +32,8 @@ public class ChannelFunctionController extends AbstractCRUDController{
 	
 	@RequestMapping(value="/channelFunctions/create", method=RequestMethod.GET)
 	public String create(Model model){
+		ChannelFunction cf = new ChannelFunction();
+		cf.setDomain(userSession.getUser().getDomain());
 		model.addAttribute("channelFunction", new ChannelFunction());		
 		return "editChannelFunction";
 	}
@@ -44,7 +46,7 @@ public class ChannelFunctionController extends AbstractCRUDController{
 		for(ChannelFunctionParameter p: channelFunction.getParameters()){
 			p.setChannelFunction(channelFunction);
 		}
-		repo.save(channelFunction);
+		repo.save(userSession.getUser(),channelFunction);
 		redirect.addFlashAttribute("globalMessage",getActionMsg("saved", locale));
 		return "redirect:/channelFunctions";
 	}
@@ -68,19 +70,19 @@ public class ChannelFunctionController extends AbstractCRUDController{
 	
 	@RequestMapping(value="/channelFunctions", method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){	
-		model.addAttribute("channelFunctions", repo.findAll(pageable));
+		model.addAttribute("channelFunctions", repo.findAll(userSession.getUser(),domainFilter,pageable));
 		return "listChannelFunctions";
 	}
 	
 	@RequestMapping(value="/channelFunctions/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){		
-		model.addAttribute("channelFunction",repo.findOne(id));
+		model.addAttribute("channelFunction",repo.findOne(userSession.getUser(),id));
 		return "editChannelFunction";	
 	}
 					
 	@RequestMapping(value="/channelFunctions/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);
+		repo.delete(userSession.getUser(),id);
 		redirect.addFlashAttribute("globalMessage",getActionMsg("deleted", locale)) ;		
 		return "redirect:/channelFunctions";
 	}

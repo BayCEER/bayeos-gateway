@@ -14,11 +14,6 @@
 </head>
 <body>
 	<div layout:fragment="content">
-		<div class="hidden" id="timeOutWarning">
-			<div class="alert-warning" th:text="#{msg.timeOutWarning}">Data
-				loading stopped. Please reload the page.</div>
-		</div>
-
 		<div class="block">
 			<div class="block-header" th:text="|#{e.board}:${board.origin}|"></div>
 
@@ -105,8 +100,10 @@
 	function fetchData() {
 	 	// Show a message and stop loading after 10 min         
 	 	if (++refreshCounts > 60){
-	 	 		clearInterval(interval)
-	 	 		$("#timeOutWarning").removeClass("hidden") 	 		
+	 	 		clearInterval(interval);	 	 		
+	 	 		$("#alert").addClass("alert-warning");
+	            $("#alertMessage").text([[ #{msg.timeOutWarning} ]]);            	
+	            $("#alert").removeClass("hidden");            		            	 	 		
 	 	 		return;
 	 	}
 
@@ -129,6 +126,12 @@
 	            });
 	            drawChart();                                          	            
 	          },
+	          error: function(xhr){
+	            	$("#alert").addClass("alert-warning");
+	            	$("#alertMessage").text([[ #{msg.refreshwarning} ]]);            	
+	            	$("#alert").removeClass("hidden");            	
+	          }
+	         
 	         }) // ajax end 
     } // fetch Data end 
 	

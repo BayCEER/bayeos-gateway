@@ -13,14 +13,37 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.Formula;
 
 
-@Entity 
-public class Channel extends CheckDevice implements Comparable<Channel>{
-
+@Entity
+public class Channel extends UniqueEntity implements Comparable<Channel>{
+	
 	private String nr;
 	private String name;
+	
 	private String phenomena;
 	
-	
+	// Validation Check
+	@Column(name="critical_max")
+	Float criticalMax;
+	@Column(name="critical_min")
+	Float criticalMin; 
+	@Column(name="warning_max")
+	Float warningMax;
+	@Column(name="warning_min")
+	Float warningMin;	
+	// Completeness Check
+	@Column(name="sampling_interval")
+	Integer samplingInterval;	
+	// Check Delay
+	@Column(name="check_delay")
+	Integer checkDelay;
+	// Disable Alerts   	
+	@Column(name="exclude_from_nagios")
+	Boolean excludeFromNagios = false;		
+	// Import valid records only
+	@Column(name="filter_critical_values")
+	Boolean filterCriticalValues = false;
+		
+
 	@Column(name="status_valid",insertable=false,updatable=false)	
 	@Enumerated(EnumType.ORDINAL)
 	private NagiosStatus statusValid;
@@ -31,7 +54,7 @@ public class Channel extends CheckDevice implements Comparable<Channel>{
 	@Formula("(select get_channel_count(id))")
 	private Integer channelCounts;		
 	
-	@Column(name="last_result_time",insertable=false,updatable=false)	
+	@Column(name="last_result_time",insertable=false,updatable=false)
 	private Date lastResultTime;
 
 	@Column(name="last_result_value",insertable=false,updatable=false)
@@ -65,107 +88,12 @@ public class Channel extends CheckDevice implements Comparable<Channel>{
 	Function aggrFunction = new Function();	
 		
 			
-	public Channel() {
-	}
-
-	public Channel(Board board, String nr) {
-		this.nr = nr;
-		this.board = board;
-	}
-
-	public String getNr() {
-		return nr;
-	}
-
-	public void setNr(String nr) {
-		this.nr = nr;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getPhenomena() {
-		return phenomena;
-	}
-
-	public void setPhenomena(String phenomena) {
-		this.phenomena = phenomena;
-	}
-
-	public Date getLastResultTime() {
-		return lastResultTime;
-	}
-
-	public void setLastResultTime(Date lastResultTime) {
-		this.lastResultTime = lastResultTime;
-	}
-
-	public Float getLastResultValue() {
-		return lastResultValue;
-	}
-
-	public void setLastResultValue(Float lastResultValue) {
-		this.lastResultValue = lastResultValue;
-	}
-
-	public Integer getDbSeriesId() {
-		return dbSeriesId;
-	}
-
-	public void setDbSeriesId(Integer dbSeriesId) {
-		this.dbSeriesId = dbSeriesId;
-	}
-
-	public Boolean getDbExcludeAutoExport() {
-		return dbExcludeAutoExport;
-	}
-
-	public void setDbExcludeAutoExport(Boolean dbExcludeAutoExport) {
-		this.dbExcludeAutoExport = dbExcludeAutoExport;
-	}
-
-	public Board getBoard() {
-		return board;
-	}
-
-	public void setBoard(Board board) {
-		this.board = board;
-	}
-
-	public Unit getUnit() {
-		return unit;
-	}
-
-	public void setUnit(Unit unit) {
-		this.unit = unit;
-	}
 	
 	private boolean isNr(String s){
 		return s != null && s.matches("[0-9]+");
 	}
 	
-	
-	public String getStatusValidMsg() {
-		return statusValidMsg;
-	}
-
-	public void setStatusValidMsg(String statusValidMsg) {
-		this.statusValidMsg = statusValidMsg;
-	}
-	
-	public NagiosStatus getStatusValid() {
-		return statusValid;
-	}
-
-	public void setStatusValid(NagiosStatus statusValid) {
-		this.statusValid = statusValid;
-	}
-
+		
 	
 	@Override
 	public int compareTo(Channel o) {
@@ -193,7 +121,7 @@ public class Channel extends CheckDevice implements Comparable<Channel>{
 	
 	public String getQuantity(){		
 		if (unit != null){
-			return name + "[" + getUnit().getName() + "]";
+			return this.name + "[" + getUnit().getName() + "]";
 		} else {
 			return name;
 		}
@@ -212,48 +140,301 @@ public class Channel extends CheckDevice implements Comparable<Channel>{
 		}		   			
 	}
 
-	public Integer getChannelCounts() {
-		return channelCounts;
-	}
-
-	public void setChannelCounts(Integer channelCounts) {
-		this.channelCounts = channelCounts;
-	}
-	
-	public Interval getAggrInterval() {
-		return aggrInterval;
-	}
-
-	public void setAggrInterval(Interval aggrInterval) {
-		this.aggrInterval = aggrInterval;
-	}
-
-	public Function getAggrFunction() {
-		return aggrFunction;
-	}
-
-	public void setAggrFunction(Function aggrFunction) {
-		this.aggrFunction = aggrFunction;
-	}
-
-	public Spline getSpline() {
-		return spline;
-	}
-
-	public void setSpline(Spline spline) {
-		this.spline = spline;
-	}
-	
-	public void setAutoExport(Boolean value){
-		this.dbExcludeAutoExport = !value;
-	}
-	
 	public Boolean getAutoExport(){
 		return !this.dbExcludeAutoExport;
 	}
 
 	
+	public Boolean getNagios() {
+		return !excludeFromNagios;
+	}
 	
+	public void setNagios(Boolean nagios) {
+		this.excludeFromNagios = !nagios;
+	}
 	
+	@Override
+	public String toString() {
+		return name;
+	}
+
+
+
+	public String getNr() {
+		return nr;
+	}
+
+
+
+	public void setNr(String nr) {
+		this.nr = nr;
+	}
+
+
+
+	public String getName() {
+		return name;
+	}
+
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+
+	public String getPhenomena() {
+		return phenomena;
+	}
+
+
+
+	public void setPhenomena(String phenomena) {
+		this.phenomena = phenomena;
+	}
+
+
+
+	public Float getCriticalMax() {
+		return criticalMax;
+	}
+
+
+
+	public void setCriticalMax(Float criticalMax) {
+		this.criticalMax = criticalMax;
+	}
+
+
+
+	public Float getCriticalMin() {
+		return criticalMin;
+	}
+
+
+
+	public void setCriticalMin(Float criticalMin) {
+		this.criticalMin = criticalMin;
+	}
+
+
+
+	public Float getWarningMax() {
+		return warningMax;
+	}
+
+
+
+	public void setWarningMax(Float warningMax) {
+		this.warningMax = warningMax;
+	}
+
+
+
+	public Float getWarningMin() {
+		return warningMin;
+	}
+
+
+
+	public void setWarningMin(Float warningMin) {
+		this.warningMin = warningMin;
+	}
+
+
+
+	public Integer getSamplingInterval() {
+		return samplingInterval;
+	}
+
+
+
+	public void setSamplingInterval(Integer samplingInterval) {
+		this.samplingInterval = samplingInterval;
+	}
+
+
+
+	public Integer getCheckDelay() {
+		return checkDelay;
+	}
+
+
+
+	public void setCheckDelay(Integer checkDelay) {
+		this.checkDelay = checkDelay;
+	}
+
+
+
+	public Boolean getExcludeFromNagios() {
+		return excludeFromNagios;
+	}
+
+
+
+	public void setExcludeFromNagios(Boolean excludeFromNagios) {
+		this.excludeFromNagios = excludeFromNagios;
+	}
+
+
+
+	public Boolean getFilterCriticalValues() {
+		return filterCriticalValues;
+	}
+
+
+
+	public void setFilterCriticalValues(Boolean filterCriticalValues) {
+		this.filterCriticalValues = filterCriticalValues;
+	}
+
+
+
+	public NagiosStatus getStatusValid() {
+		return statusValid;
+	}
+
+
+
+	public void setStatusValid(NagiosStatus statusValid) {
+		this.statusValid = statusValid;
+	}
+
+
+
+	public String getStatusValidMsg() {
+		return statusValidMsg;
+	}
+
+
+
+	public void setStatusValidMsg(String statusValidMsg) {
+		this.statusValidMsg = statusValidMsg;
+	}
+
+
+
+	public Integer getChannelCounts() {
+		return channelCounts;
+	}
+
+
+
+	public void setChannelCounts(Integer channelCounts) {
+		this.channelCounts = channelCounts;
+	}
+
+
+
+	public Date getLastResultTime() {
+		return lastResultTime;
+	}
+
+
+
+	public void setLastResultTime(Date lastResultTime) {
+		this.lastResultTime = lastResultTime;
+	}
+
+
+
+	public Float getLastResultValue() {
+		return lastResultValue;
+	}
+
+
+
+	public void setLastResultValue(Float lastResultValue) {
+		this.lastResultValue = lastResultValue;
+	}
+
+
+
+	public Integer getDbSeriesId() {
+		return dbSeriesId;
+	}
+
+
+
+	public void setDbSeriesId(Integer dbSeriesId) {
+		this.dbSeriesId = dbSeriesId;
+	}
+
+
+
+	public Boolean getDbExcludeAutoExport() {
+		return dbExcludeAutoExport;
+	}
+
+
+
+	public void setDbExcludeAutoExport(Boolean dbExcludeAutoExport) {
+		this.dbExcludeAutoExport = dbExcludeAutoExport;
+	}
+
+
+
+	public Board getBoard() {
+		return board;
+	}
+
+
+
+	public void setBoard(Board board) {
+		this.board = board;
+	}
+
+
+
+	public Unit getUnit() {
+		return unit;
+	}
+
+
+
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
+
+
+	public Spline getSpline() {
+		return spline;
+	}
+
+
+
+	public void setSpline(Spline spline) {
+		this.spline = spline;
+	}
+
+
+
+	public Interval getAggrInterval() {
+		return aggrInterval;
+	}
+
+
+
+	public void setAggrInterval(Interval aggrInterval) {
+		this.aggrInterval = aggrInterval;
+	}
+
+
+
+	public Function getAggrFunction() {
+		return aggrFunction;
+	}
+
+
+
+	public void setAggrFunction(Function aggrFunction) {
+		this.aggrFunction = aggrFunction;
+	}
+	
+
+
 	
 }

@@ -8,18 +8,33 @@
     <div layout:fragment="content">
       	<form class="form-signin" th:action="@{/login}" method='post' autocomplete='off'>
 			<p class="lead strong" th:text="#{login.msg}">Please log in</p>			
-			<div th:if="${param.error}" class="alert alert-warning" role="alert" th:text="#{login.errorMsg}">Invalid user name and password.</div>
-            <div th:if="${param.logout}" class="alert alert-info" role="alert" th:text="#{login.logOutMsg}">You have been logged out.</div>			
-			<input id="username" name="username" class="form-control" type="text" autofocus="" th:attr="placeholder=#{login.user}" placeholder="Username"/>			
-			<input id="password" name="password" class="form-control" type="password" th:attr="placeholder=#{login.password}" placeholder="Password"/>
+			<div th:if="${param.error}" class="alert alert-danger alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<span th:text="#{login.errorMsg}">Login failed</span>
+			</div>
+            <div th:if="${param.logout}" class="alert alert-info alert-dismissible" role="alert">
+            	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><span th:text="#{login.logOutMsg}">Logged out</span>
+            </div>
+            
+            <div class="form-group">
+            	<label  for="username" th:text="#{login.user}">Username</label>
+            	<input  id="username" name="username" type="text" required="true" class="form-control" th:attr="placeholder=#{login.userPlaceholder}" placeholder="Username"/>
+            </div>
+            
+            <div class="form-group">
+            	<label for="password"  th:text="#{login.password}">Password</label>
+            	<input id="password" name="password" type="password" required="true" class="form-control" th:attr="placeholder=#{login.password}" placeholder="Password"/>
+            </div>
+                            	
 			<script type="text/javascript">
     			var tz = jstz.determine(); 
     			document.write('<input type="hidden" name="tz" value="'+tz.name()+'"/>');    			
 			</script> 	
 			<button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.btn}" value="Login">Log in</button>				
-		</form>
+		</form>		
     </div>  
   </body>
- 
 </html>
 

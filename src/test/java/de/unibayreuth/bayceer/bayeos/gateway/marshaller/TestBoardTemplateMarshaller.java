@@ -32,7 +32,8 @@ public class TestBoardTemplateMarshaller {
 	
 	@Test
 	public void marshal(){
-		BoardTemplate d = new BoardTemplate("BayEOS Wetterstation","Einfache Wetterstation mit LE Board");
+		BoardTemplate d = new BoardTemplate();
+		d.setName("BayEOS Wetterstation");
 		d.setRevision("2.0");
 		d.setSamplingInterval(15);
 		

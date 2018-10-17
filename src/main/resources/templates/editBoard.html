@@ -8,12 +8,19 @@
 <body>
 	<div layout:fragment="content">
 		<form method="post" action="#" th:action="@{/boards}" th:object="${board}">
-			<input type="hidden" name="id" th:field="*{id}" /> <input
-				type="hidden" name="origin" th:field="*{origin}" />
-
+			<input type="hidden" name="id" th:field="*{id}" />
+			<input type="hidden" name="origin" th:field="*{origin}" />
+			
 			<div id="props" class="block">
 				<div class="block-header" th:text="'ORIGIN:' + *{origin}"></div>
+				
 				<div class="row">
+					<div class="col-sm-3">
+		 				<div th:replace="field::selectDomain"></div>
+		 			</div>		 		
+				</div>
+						 						
+				<div class="row">																	
 					<div class="col-sm-4">
 						<div th:replace="field::text('name',#{board.name},false)"></div>
 					</div>
@@ -98,7 +105,7 @@
 							</table>
 						</div>
 						<div role="tabpanel" class="tab-pane fade" id="settings">
-							<div th:replace="block::channelSettings(Checks)"></div>
+							<div th:replace="block::boardSettings(Checks)"></div>
 							<div class="block">
 								<div class="block-header">Exports</div>
 								<div class="row">
@@ -300,9 +307,9 @@
                     		}
                      } 
                     },
-                    {data: 'user.userName', width: "10%",
+                    {data: 'user.name', width: "10%",
                      render: function(data,type,row) {
-                    	 return row.user.userName;
+                    	 return row.user.name;
                      } 
                     },
                     {data: 'content',

@@ -9,8 +9,9 @@
 	<div layout:fragment="content">
 		<h3 th:text="#{e.boardGroup}">Board Group</h3>
 		<form method="post" action="#" th:action="@{/groups/save}" th:object="${group}">
-		 	<input type="hidden" th:field="*{id}"/>						
-			<div th:replace="field::text('name',#{a.name},true)"></div>									
+		 	<input type="hidden" th:field="*{id}"/>
+		 	<div th:replace="field::selectDomain"></div>
+		 	<div th:replace="field::text('name',#{a.name},true)"></div>									
 			<div th:replace="field::number('dbFolderId',#{a.dbId},false,1)"></div>								
 			<button th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
 		</form>

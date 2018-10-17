@@ -6,8 +6,8 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Message;
 
 
 public interface MessageRepository extends  DataTablesRepository<Message, Long> {
-	
-	
+
+
 
 }
 

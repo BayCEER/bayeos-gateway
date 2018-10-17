@@ -13,43 +13,37 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name="channel_function_parameter")
+@Table(name = "channel_function_parameter")
+
 public class ChannelFunctionParameter extends UniqueEntity implements Serializable {
 
 	@Column(columnDefinition = "text")
 	private String name;
 	private static final long serialVersionUID = 1L;
-	
-	
+
 	@Column(columnDefinition = "text")
 	private String description;
-	
-	
+
 	@ManyToOne()
-	@JoinColumn(name="channel_function_id")
+	@JoinColumn(name = "channel_function_id")
 	private ChannelFunction channelFunction;
-	
-	public ChannelFunctionParameter(String name){
-		super();
-		this.name = name;
-	}
+
 
 	public ChannelFunctionParameter() {
 		super();
-	}   
-	
-	
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	@Override
-	public String toString() {
-		return name;
 	}
 
 	public String getDescription() {
@@ -67,5 +61,9 @@ public class ChannelFunctionParameter extends UniqueEntity implements Serializab
 	public void setChannelFunction(ChannelFunction channelFunction) {
 		this.channelFunction = channelFunction;
 	}
-   
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
 }

@@ -1,6 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,14 +11,15 @@ import javax.persistence.OrderBy;
 import org.hibernate.annotations.Formula;
 
 @Entity
-public class Spline extends UniqueEntity implements Serializable { 
+public class Spline extends NamedDomainEntity {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1238818881211009181L;
-
-	String name;
+	public Spline() {
+		super();
+	}
+	
+	public Spline(String name) {
+		this.name = name;
+	}
     
 	@OneToMany(mappedBy="spline", cascade=CascadeType.ALL)
 	@OrderBy("x ASC")
@@ -29,38 +29,7 @@ public class Spline extends UniqueEntity implements Serializable {
 	@Formula("(select count(c.id) > 0  from channel c where c.spline_id = id)")
 	Boolean locked;
 			
-	
-	public Spline() {		
-	}
-	
-	public Spline(String name){
-		this.name = name;
-	}
 		
-	public Boolean getLocked() {
-		return locked;
-	}
-
-	public void setLocked(Boolean locked) {
-		this.locked = locked;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public List<KnotPoint> getKnotPoints() {
-		return knotPoints;
-	}
-
-	public void setKnotPoints(List<KnotPoint> knotPoints) {
-		this.knotPoints = knotPoints;
-	}
-	
 	public void addKnotPoint(KnotPoint k){
 		if (knotPoints == null){
 			knotPoints = new ArrayList<>(10);
@@ -77,11 +46,22 @@ public class Spline extends UniqueEntity implements Serializable {
 	public void removeKnotPoint(int index){
 		knotPoints.remove(index);
 	}
-	        
-	
-	@Override
-	public String toString() {
-		return this.name;
+
+	public List<KnotPoint> getKnotPoints() {
+		return knotPoints;
 	}
-    
+
+	public void setKnotPoints(List<KnotPoint> knotPoints) {
+		this.knotPoints = knotPoints;
+	}
+
+	public Boolean getLocked() {
+		return locked;
+	}
+
+	public void setLocked(Boolean locked) {
+		this.locked = locked;
+	}
+	  	
+
 }

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-public class Message extends UniqueEntity {
+public class Message extends DomainEntity {
 	
 	@JsonView(DataTablesOutput.View.class)
 	String origin;		
@@ -28,11 +28,7 @@ public class Message extends UniqueEntity {
 	
 	@Column(name="insert_time")
 	Date insertTime = new Date();
-	
-	public Message() {
-		// TODO Auto-generated constructor stub
-	}
-	
+		
 	public Message(String value){
 		// Hotfix 1.9.12: replace all null chars with space
 		this.content = value.replace((char)0x00,(char)0x20).trim();
@@ -77,5 +73,6 @@ public class Message extends UniqueEntity {
 	public void setInsertTime(Date insertTime) {
 		this.insertTime = insertTime;
 	}
-    
+
+	
 }

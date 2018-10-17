@@ -30,6 +30,7 @@
 		<h3 th:text="#{e.channelFunction}">Channel Function</h3>
 		<form method="post" action="#" th:action="@{/channelFunctions}"	th:object="${channelFunction}">
 			<input type="hidden" th:field="*{id}" />			
+			<div th:replace="field::selectDomain"></div>
 			<div th:replace="field::text('name',#{a.name},true)"></div>
 			<div class="form-group">
 				<label th:text="#{cf.parameters} +':'" class="control-label">Parameters:</label>				

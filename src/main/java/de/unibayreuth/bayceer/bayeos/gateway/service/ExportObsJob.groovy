@@ -1,32 +1,34 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import java.sql.SQLException
-
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
+
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
+import bayeos.frame.types.LabeledFrame
 import de.unibayreuth.bayceer.bayeos.objekt.ObjektArt
-
-
 import de.unibayreuth.bayceer.bayeos.client.Client
+import de.unibayreuth.bayceer.bayeos.xmlrpc.types.XmlRpcType
+
+import org.apache.xmlrpc.XmlRpcException;
+import bayeos.frame.types.NumberType;
+
 import groovy.sql.Sql
+import java.sql.SQLException
 
-import org.apache.log4j.Logger
-import org.apache.xmlrpc.XmlRpcException
-
-
-//TODO IOException prüfen
 
 @Component
-@Profile("default")
 class ExportObsJob implements Runnable  {
-
+	
 	private Logger log = Logger.getLogger(ExportObsJob.class)
-
+	
+	@Autowired
+	FrameService frameService	
+	
 	@Autowired
 	private DataSource dataSource
 
@@ -59,20 +61,177 @@ class ExportObsJob implements Runnable  {
 
 	private Client cli = null
 	private Sql db
+	
+	
+	@Override
+	public void run() {
+		try {
+			Thread.sleep(1000*expWaitSecs);
+			while(true){
+												
+				def exit = -1
+				def start = new Date()
+				def records = 0
+								 								
+				try {
+					log.info("ExportObsJob running")
+					cli = Client.getInstance()
+					db = new Sql(dataSource)
+					
+					// Authentication user root by ip
+					cli.connect(getExportUrL(),expUser,"")					
+					
+					if (expHomeUnitId == null || !cli.nodeExists(expHomeUnitId, ObjektArt.MESS_EINHEIT)) {
+						log.info("Set home unit id to root")
+						expHomeUnitId = cli.getRoot(ObjektArt.MESS_EINHEIT).id
+					}
+					if (expHomeFolderId == null || !cli.nodeExists(expHomeFolderId, ObjektArt.MESSUNG_ORDNER)) {
+						log.info("Set home folder id to root")
+						expHomeFolderId = cli.getRoot(ObjektArt.MESSUNG_ORDNER).id
+					}
+					createNewFoldersForDomains()
+					createNewFoldersForGroups()
+					createNewFoldersForBoards()
+					createNewSeriesForChannels()										
+					records = exportNewObservations()	
+					exit = (records<0)?-1:0																		
+				} catch (Exception e){
+					log.error(e.getMessage())
+					exit = -1
+				} finally {
+					try{
+						cli.close()
+					} catch(XmlRpcException e){
+						log.error(e.getMessage())
+						exit = -1
+					}																				
+				}
+				def millis = (new Date()).getTime() - start.getTime()
+				frameService.saveFrame("\$SYS/ExporterJob",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'records':${records},'millis':${millis}}".toString()))
+				log.info("ExportObsJob finished")
+				Thread.sleep(1000*expWaitSecs)
+			}
 
+		} catch (InterruptedException e){
+			log.error(e.getMessage())
+		}
+	}
+	
+	
+	private def createNewFoldersForDomains() {
+		db.eachRow("select id from domain where db_folder_id is null"){ it ->
+			createFolderForDomain(it.id);
+		}	
+	}
+	
+	private def createFolderForDomain(domain_id) {
+		try {
+			def dom = db.firstRow("select name from domain where id=${domain_id}")
+			def id = cli.newNode(expHomeFolderId, dom.name, ObjektArt.MESSUNG_ORDNER).getId()
+			log.info("Created domain: ${dom.name}")
+			db.execute("update domain set db_folder_id = ${id} where id = ${domain_id}")
+		} catch (XmlRpcException e) {	
+			log.error(e.getMessage())		
+			return false;
+		}		
+		return true;
+	}
+	
+				
+	private def createNewFoldersForGroups() {
+		db.eachRow("select id from board_group where db_folder_id is null"){ it ->
+			createFolderForGroup(it.id);
+		}		
+	}
+	
+	private def createFolderForGroup(group_id) {
+		def group = db.firstRow("""select g.name, d.id as domain_id, d.db_folder_id as domain_folder_id from board_group g 
+				left join domain d on d.id = g.domain_id where g.id =${group_id}""")
+		def pFolderId = group.domain_folder_id ?: expHomeFolderId		
+		try {			
+			def id = cli.newNode(pFolderId, group.name, ObjektArt.MESSUNG_ORDNER).getId()
+			log.info("Created folder for group: ${group.name}")
+			updateFolderDescription(id, group.name, "Created by BayEOS-Gateway (${InetAddress.getLocalHost().getHostName()})".toString())
+			db.execute("update board_group set db_folder_id = ${id} where id = ${group_id}")
+			return true;
+		} catch (XmlRpcException e) {
+			log.error(e.getMessage())
+			// Fix
+			if (!cli.nodeExists(pFolderId,ObjektArt.MESSUNG_ORDNER)) {
+				if (pFolderId == group.domain_folder_id) {
+					if (createFolderForDomain(group.domain_id)) {
+						return createFolderForGroup(group_id)
+					}					
+				}										 											
+			} 
+			return false;						
+		}		
+	}
+	
+	
 
+	private def createNewFoldersForBoards(){
+		db.eachRow("SELECT id from board where db_folder_id is null and db_auto_export and name is not null"){ it ->
+			createFolderForBoard(it.id)
+		}
+	}
+
+	
+	private def createFolderForBoard(board_id) {
+		def board = db.firstRow("""select b.name, b.origin, b.board_group_id, b.domain_id, g.db_folder_id as group_folder_id, d.db_folder_id as domain_folder_id 
+				from board b left outer join board_group g on g.id = b.board_group_id
+				left outer join domain d on d.id = b.domain_id where b.id=${board_id}""")
+		def pFolderId = board.group_folder_id ?: board.domain_folder_id ?: expHomeFolderId
+		try {			
+			def id = cli.newNode(pFolderId, board.name, ObjektArt.MESSUNG_ORDNER).getId()
+			log.info("Created folder for board: ${board.name}")
+			updateFolderDescription(id, board.name, "Created by BayEOS-Gateway (${InetAddress.getLocalHost().getHostName()}), Board (${board.origin})".toString())
+			db.execute("update board set db_folder_id = ${id} where id = ${board_id}")
+			return true
+		} catch (XmlRpcException e){
+			log.error(e.getMessage())
+			// Fix 			
+			if (!cli.nodeExists(pFolderId,ObjektArt.MESSUNG_ORDNER)) {								
+				// GW -> D -> B -> C
+				if (pFolderId == board.domain_folder_id){
+					if (createFolderForDomain(board.domain_id)) {
+						return createFolderForBoard(board_id)
+					}
+				// GW -> G -> B -> C
+				} else if (pFolderId == board.group_folder_id) {
+					if (createFolderForGroup(board.board_group_id)) {
+						return createFolderForBoard(board_id)
+					}
+				}
+			} 		
+			return false
+									
+		}
+		
+	}
+	
+
+	private def createNewSeriesForChannels(){
+		db.eachRow("""select c.id from channel c join board b on b.id = c.board_id where b.db_folder_id is not null and c.name is not null and c.db_series_id is null and 
+			(c.db_exclude_auto_export is null or c.db_exclude_auto_export is false)"""){ it ->
+			createSeriesForChannel(it.id)
+		}
+	}
+
+	
 	private def createSeriesForChannel(channel_id) {
 		def channel = db.firstRow("select c.*, b.db_folder_id from channel c join board b on c.board_id = b.id where c.id=${channel_id}")
 		def sId
 		try {
 			sId = cli.newNode(channel.db_folder_id, channel.name,ObjektArt.MESSUNG_MASSENDATEN).getId()
 			log.info("Created new series for channel ${channel.name}")
-		} catch (XmlRpcException e){
-			if (createFolderForBoard(channel.board_id)) {
-				return createSeriesForChannel(channel.id)
-			} else {
-				return False
-			}
+		} catch (XmlRpcException e){			
+			if (!cli.nodeExists(channel.db_folder_id,ObjektArt.MESSUNG_ORDNER)) {
+				if (createFolderForBoard(channel.board_id)) {
+					return createSeriesForChannel(channel.id)
+				} 				
+			}		
+			return false;
 		}
 		if (channel.unit_id){
 			createReferenceForUnit(sId, channel.unit_id)
@@ -81,47 +240,38 @@ class ExportObsJob implements Runnable  {
 		return true
 	}
 
-	def createReferenceForUnit(channel_db_series_id, unit_id){
+	private def createReferenceForUnit(channel_db_series_id, unit_id){
 		def unit = db.firstRow("select * from unit where id = ${unit_id}")
 		try {
 			cli.setNodeReference(unit.db_unit_id,channel_db_series_id,ObjektArt.MESS_EINHEIT)
 			log.info("Created reference on unit:${unit.name} for series ${channel_db_series_id}")
 		} catch (XmlRpcException e){
+			log.error(e.getMessage())
 			if (createUnitForUnit(unit.name, unit_id)){
 				return createReferenceForUnit(channel_db_series_id, unit_id)
-			} else {
-				return false
-			}
+			} 
+			return false		
 		}
 		return true
 	}
 
-	def createUnitForUnit(unit_name, unit_id) {
-		def parentId = expHomeUnitId
-		def fId = cli.newNode(parentId, unit_name, ObjektArt.MESS_EINHEIT).getId()
-		log.info("Created unit: ${unit_name}")
-		db.execute("update unit set db_unit_id = ${fId} where id = ${unit_id}")
-		return true
-	}
-
-
-
-	def createFolderForBoard(board_id) {
-		def board = db.firstRow("select b.*, g.db_folder_id as group_folder_id from board b left outer join board_group g on g.id = b.board_group_id where b.id=${board_id}")
-		def fId
+	private def createUnitForUnit(unit_name, unit_id) {
 		try {
-			def parentId = board.group_folder_id ?: expHomeFolderId
-			fId = cli.newNode(parentId, board.name, ObjektArt.MESSUNG_ORDNER).getId()
-			log.info("Created folder for board: ${board.name}")
-			def desc = "Created by BayEOS-Gateway (${InetAddress.getLocalHost().getHostName()}), Board (${board.origin})"
-			cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",fId,ObjektArt.MESSUNG_ORDNER.toString(),[board.name, desc.toString(), null, null, null, null, 2] as Object[])			
+			def parentId = expHomeUnitId
+			def fId = cli.newNode(parentId, unit_name, ObjektArt.MESS_EINHEIT).getId()
+			log.info("Created unit: ${unit_name}")
+			db.execute("update unit set db_unit_id = ${fId} where id = ${unit_id}")
 		} catch (XmlRpcException e){
-			db.execute("update board_group set db_folder_id = null where id = ${board.board_group_id}")
-			return createFolderForBoard(board.id)
+			log.error(e.getMessage())
+			return false
 		}
-		db.execute("update board set db_folder_id = ${fId} where id = ${board.id}")
 		return true
 	}
+
+
+
+	
+	
 
 	private def validateChannels(channelIds){
 		channelIds.each{ it ->		
@@ -132,25 +282,18 @@ class ExportObsJob implements Runnable  {
 			}
 		}
 	}
+	
+	
+	
 
-	private def createNewSeriesForChannels(){
-		db.eachRow("select c.id from channel c join board b on b.id = c.board_id where b.db_folder_id is not null and c.name is not null and c.db_series_id is null and (c.db_exclude_auto_export is null or c.db_exclude_auto_export is false)"){ it ->
-			createSeriesForChannel(it.id)
-		}
-	}
+	
 
-	private def createNewFoldersForBoards(){
-		db.eachRow("SELECT id from board where db_folder_id is null and db_auto_export and name is not null"){ it ->
-			createFolderForBoard(it.id)
-		}
-	}
-
-
-	private def exportNewObservations(Long statId) {
+	private def exportNewObservations() {
 		log.info("Exporting observations")
 		def bout  = new ByteArrayOutputStream(8*1024)
 		def dout = new DataOutputStream(bout)
 		def id = 0
+		def records = 0
 		try {
 			while (true){
 				def row = 0
@@ -175,16 +318,18 @@ class ExportObsJob implements Runnable  {
 
 
 				log.info("${row} records exported")
-				db.executeUpdate("update export_job_stat set exported = ? where id = ?",row,statId)
+				records = records + row 				
 				bout.reset()
 				db.execute("delete from observation_calc where id <= ?",[id])
 			}
 
 		} catch (Exception e){
 			log.error(e.getMessage())
+			records = -1
 		} finally {
-			dout.close()
+			dout.close()		
 		}
+		return records;
 	}
 
 	@PostConstruct
@@ -196,67 +341,11 @@ class ExportObsJob implements Runnable  {
 		return expProto + "://" + expHost + ":" + expPort + expContext
 	}
 
-
-	@Override
-	public void run() {
-		try {
-			Thread.sleep(1000*expWaitSecs);
-			while(true){
-				
-				
-				def id = null
-				try {					
-					log.info("ExportObsJob running")
-					cli = Client.getInstance()
-					db = new Sql(dataSource)
-					
-					// Stats
-					id = db.executeInsert("INSERT INTO export_job_stat (start_time) values (${new Date().toTimestamp()});")[0][0]																									
-
-					// Authentication user root by ip
-					cli.connect(getExportUrL(),expUser,"")
-					
-					
-					if (expHomeUnitId == null || !cli.nodeExists(expHomeUnitId, ObjektArt.MESS_EINHEIT)) {
-						log.info("Set home unit id to root")
-						expHomeUnitId = cli.getRoot(ObjektArt.MESS_EINHEIT).id
-					}
-					if (expHomeFolderId == null || !cli.nodeExists(expHomeFolderId, ObjektArt.MESSUNG_ORDNER)) {						
-						log.info("Set home folder id to root")
-						expHomeFolderId = cli.getRoot(ObjektArt.MESSUNG_ORDNER).id
-					}
-					createNewFoldersForBoards()
-					createNewSeriesForChannels()
-					exportNewObservations(id)
-					
-					db.execute "UPDATE export_job_stat set status=0 WHERE id = $id;"
-					
-				} catch (Exception e){					
-					log.error(e.getMessage())
-				} finally {
-					try{
-						cli.close()
-					} catch(XmlRpcException e){
-						log.error(e.getMessage())
-					}
-					try{
-						db.execute "UPDATE export_job_stat set end_time = ${new Date().toTimestamp()} WHERE id = ${id};"
-						db.close()
-					} catch(SQLException e){
-						log.error(e.getMessage())
-					}
-					log.info("ExportObsJob finished")
-					Thread.sleep(1000*expWaitSecs)
-				}
-			}
-
-		} catch (InterruptedException e){
-			log.error(e.getMessage())
-		}
-
-
+	private def updateFolderDescription(id,name,desc) {
+		cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id, ObjektArt.MESSUNG_ORDNER.toString(),[name, desc, null, null, null, null, 2] as Object[])
 	}
-
+	
+	
 
 
 

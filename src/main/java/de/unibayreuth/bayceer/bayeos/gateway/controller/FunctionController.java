@@ -19,7 +19,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Function;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.FunctionRepository;
 
 @Controller
-public class FunctionController extends AbstractCRUDController{
+public class FunctionController extends AbstractController{
 	
 	
 	@Autowired
@@ -27,7 +27,9 @@ public class FunctionController extends AbstractCRUDController{
 	
 	@RequestMapping(value="/functions/create", method=RequestMethod.GET)
 	public String create(Model model){
-		model.addAttribute("function", new Function());		
+		Function f = new Function();
+		f.setDomain(userSession.getUser().getDomain());		
+		model.addAttribute("function", f);		
 		return "editFunction";
 	}
 	
@@ -36,7 +38,7 @@ public class FunctionController extends AbstractCRUDController{
 		if (bindingResult.hasErrors()){
 			return "editFunction";
 		}				
-		repo.save(function);
+		repo.save(userSession.getUser(),function);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/functions";
 	}
@@ -44,19 +46,19 @@ public class FunctionController extends AbstractCRUDController{
 	
 	@RequestMapping(value="/functions", method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){	
-		model.addAttribute("functions", repo.findAll(pageable));
+		model.addAttribute("functions", repo.findAll(userSession.getUser(),domainFilter, pageable));
 		return "listFunction";
 	}
 	
 	@RequestMapping(value="/functions/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){		
-		model.addAttribute("function",repo.findOne(id));
+		model.addAttribute("function",repo.findOne(userSession.getUser(),id));
 		return "editFunction";		
 	}
 	
 	@RequestMapping(value="/functions/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);
+		repo.delete(userSession.getUser(),id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/functions";
 	}

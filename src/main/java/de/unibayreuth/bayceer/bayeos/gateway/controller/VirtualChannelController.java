@@ -2,6 +2,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelFunctionRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository;
 
 @Controller
-public class VirtualChannelController extends AbstractCRUDController {
+public class VirtualChannelController extends AbstractController {
 
 	@Autowired
 	VirtualChannelRepository repo;
@@ -30,30 +31,13 @@ public class VirtualChannelController extends AbstractCRUDController {
 	
 	@Autowired
 	ChannelFunctionRepository repoFunction;
-
-	@RequestMapping(value = "/virtualChannels/save", method = RequestMethod.POST)
-	public String save(@Valid VirtualChannel vc, BindingResult bindingResult, RedirectAttributes redirect,
-			Locale locale) {
-		if (bindingResult.hasErrors()) {
-			return "editVirtualChannel";
-		}
-		repo.save(vc);
-		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
-		return "redirect:/boards/" + vc.getBoard().getId() + "?tab=virtualChannels";
-	}
 	
-
-	@RequestMapping(value = "/virtualChannels/delete/{id}", method = RequestMethod.GET)
-	public String delete(@PathVariable Long id, RedirectAttributes redirect, Locale locale) {
-		VirtualChannel vc = repo.findOne(id);
-		repo.delete(vc);
-		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
-		return "redirect:/boards/" + vc.getBoard().getId() + "?tab=virtualChannels";
-	}
-
+	
 	@RequestMapping(value = "/virtualChannels/create/{id}", method = RequestMethod.GET)
 	public String create(@PathVariable Long id, Model model) {
-		Board b = repoBoard.findOne(id);
+		Board b = repoBoard.findOne(userSession.getUser(),id);
+		if (b == null) throw new EntityNotFoundException("Entity not found");
+		checkWrite(b);
 		VirtualChannel vc = new VirtualChannel();
 		b.getVirtualChannels().add(vc);
 		model.addAttribute(vc);
@@ -61,12 +45,39 @@ public class VirtualChannelController extends AbstractCRUDController {
 		return "editVirtualChannel";
 
 	}
+
+	@RequestMapping(value = "/virtualChannels/save", method = RequestMethod.POST)
+	public String save(@Valid VirtualChannel vc, BindingResult bindingResult, RedirectAttributes redirect,
+			Locale locale) {
+		if (bindingResult.hasErrors()) {
+			return "editVirtualChannel";
+		}
+		checkWrite(vc.getBoard());
+		repo.save(vc);
+		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
+		return "redirect:/boards/" + vc.getBoard().getId() + "?tab=virtualChannels";
+	}
+	
+		
 	
 	@RequestMapping(path="/virtualChannels/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-		 model.addAttribute(repo.findOne(id));
-		 model.addAttribute("channelFunctions",repoFunction.findAll());
+		 VirtualChannel vc = repo.findOne(id);
+		 if (vc == null) throw new EntityNotFoundException("Entity not found");
+		 checkWrite(vc.getBoard());		 
+		 model.addAttribute(vc);
+		 model.addAttribute("channelFunctions",repoFunction.findAll(userSession.getUser(),null));
 		 return "editVirtualChannel";
+	}
+	
+	@RequestMapping(value = "/virtualChannels/delete/{id}", method = RequestMethod.GET)
+	public String delete(@PathVariable Long id, RedirectAttributes redirect, Locale locale) {
+		VirtualChannel vc = repo.findOne(id);
+		if (vc == null) throw new EntityNotFoundException("Entity not found");
+		checkWrite(vc.getBoard());
+		repo.delete(vc);
+		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
+		return "redirect:/boards/" + vc.getBoard().getId() + "?tab=virtualChannels";
 	}
 
 }

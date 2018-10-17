@@ -19,13 +19,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import de.unibayreuth.bayceer.bayeos.gateway.service.FrameService;
 
 @Controller
-public class FrameController {
+public class FrameController extends AbstractController {
 	
 	@Autowired
 	FrameService frameService;
 	
 //	@Autowired
 //	FrameImporterService frameImporter;
+	
+	
 		
 	private Logger log = Logger.getLogger(FrameController.class);
 
@@ -37,9 +39,14 @@ public class FrameController {
 				String sender = getSender(params);
 				List<String> frames = getFrames(params);
 				log.info("Received " + frames.size() + " frames from " + sender);															
-				frameService.saveFrames(sender,frames);
-				log.debug("Frames saved.");
-				return new ResponseEntity(HttpStatus.OK);
+				if (frameService.saveFrames(userSession.getUser().getDomainId(), sender,frames)) {
+					log.debug("Frames saved.");	
+					return new ResponseEntity(HttpStatus.OK);
+				} else {
+					log.warn("Failed to save frames.");
+					return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+								
 			} catch (RuntimeException e){
 				log.error(e.getMessage());
 				log.warn("Failed to save frames.");

@@ -20,14 +20,16 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Unit;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UnitRepository;
 
 @Controller
-public class UnitController extends AbstractCRUDController{
+public class UnitController extends AbstractController{
 	
 	@Autowired
 	UnitRepository repo;
 	
 	@RequestMapping(value="/units/create", method=RequestMethod.GET)
 	public String create(Model model){
-		model.addAttribute("unit", new Unit());		
+		Unit u = new Unit();
+		u.setDomain(userSession.getUser().getDomain());		
+		model.addAttribute("unit", u);		
 		return "editUnit";
 	}
 		
@@ -36,27 +38,26 @@ public class UnitController extends AbstractCRUDController{
 		if (bindingResult.hasErrors()){
 			return "editUser";
 		}				
-		repo.save(unit);
-		
+		repo.save(userSession.getUser(),unit);		
 		redirect.addFlashAttribute("globalMessage",getActionMsg("created", locale));
 		return "redirect:/units";
 	}
 		
 	@RequestMapping(value="/units", method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){	
-		model.addAttribute("units", repo.findAll(pageable));
+		model.addAttribute("units", repo.findAll(userSession.getUser(),domainFilter,pageable));
 		return "listUnits";
 	}
 	
 	@RequestMapping(value="/units/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){		
-		model.addAttribute("unit",repo.findOne(id));
+		model.addAttribute("unit",repo.findOne(userSession.getUser(),id));
 		return "editUnit";		
 	}
 					
 	@RequestMapping(value="/units/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);
+		repo.delete(userSession.getUser(),id);
 		redirect.addFlashAttribute("globalMessage",getActionMsg("deleted", locale)) ;		
 		return "redirect:/units";
 	}

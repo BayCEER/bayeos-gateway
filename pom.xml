@@ -3,7 +3,7 @@
   
   <groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.3.0</version>
+	<version>2.4.0-DEV</version>
 
 
 	<licenses>
@@ -26,9 +26,9 @@
 	<properties>
 		<release>stretch</release>
 		<java.version>1.8</java.version>
-
-		<!-- Last version with reason phrase -->
-		<tomcat.version>8.0.37</tomcat.version>
+		
+		<tomcat.version>8.0.37</tomcat.version>		
+		<pg.version>9.6</pg.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -38,16 +38,21 @@
 
 		<db.user>xbee</db.user>
 		<db.password>0b64debf8fae4239a7ca845f39878a3d</db.password>
+		<db.url>jdbc:postgresql://localhost/xbee</db.url>
 
 		<server.port>5533</server.port>
 		<server.contextPath>/gateway</server.contextPath>
+		
+		<build.year>${maven.build.timestamp}</build.year>
+   		<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+
 
 	</properties>
 	
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.4.2.RELEASE</version>
+		<version>1.5.16.RELEASE</version>
 		<relativePath />
 	</parent>
 	
@@ -59,14 +64,12 @@
 			</activation>
 			<properties>
 				<log.level>INFO</log.level>
-				<log.path>bayeos-gateway.log</log.path>
-				<db.url>jdbc:postgresql://virtualbox/xbee</db.url>
+				<log.path>bayeos-gateway.log</log.path>				
 			</properties>
 	</profile>
 	<profile>
 			<id>prod</id>
-			<properties>
-				<db.url>jdbc:postgresql://localhost/xbee</db.url>
+			<properties>				
 				<skipTests>true</skipTests>
 				<log.level>INFO</log.level>
 				<log.path>/var/log/bayeos-gateway.log</log.path>
@@ -104,12 +107,12 @@
 				</plugins>
 			</build>
 		</profile>
+
 	<profile>
 			<id>test</id>
 			<properties>
-				<docker.hostname>docker</docker.hostname>
-				<docker.host>https://${docker.hostname}:2376</docker.host>
-				<db.url>jdbc:postgresql://db/xbee</db.url>
+				<docker.hostname>localhost</docker.hostname>
+				<db.url>jdbc:postgresql://db/xbee</db.url>				
 			</properties>
 			<build>
 				<plugins>
@@ -151,36 +154,24 @@
 						<groupId>io.fabric8</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 						<extensions>true</extensions>
-						<version>0.22.1</version>
+						<version>0.27.2</version>
 						<configuration>
-							<logDate>default</logDate>
 							<verbose>true</verbose>
 							<useColor>true</useColor>
-							<images>
-								<image>
-									<alias>postgres-perl</alias>
-									<name>bayceer/postgres-perl:9.4</name>
-									<build>
-										<from>postgres:9.4</from>
-										<runCmds>
-											<runCmd>apt-get update &amp;&amp; apt-get install -y postgresql-plperl-9.4 libpq-dev libmath-spline-perl</runCmd>
-										</runCmds>
-									</build>
-								</image>
-								<image>
+							<images>								
+								<image>									
+									<name>bayeos-gateway-db:${project.version}</name>
 									<alias>db</alias>
-									<name>bayceer/bayeos-gateway-db:${project.version}</name>
 									<build>
-										<from>bayceer/postgres-perl:9.4</from>
-										
-										<runCmds>
-											<runCmd>localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8</runCmd>
-											<runCmd>echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf</runCmd>
+										<from>postgres:${pg.version}</from>
+										<runCmds>		
+											<runCmd>localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8</runCmd>																	
+											<runCmd>apt-get update &amp;&amp; apt-get install -y --no-install-recommends postgresql-plperl-${pg.version} libpq-dev libmath-spline-perl</runCmd>
 										</runCmds>
-										<env>
-											<POSTGRES_USER>${db.user}</POSTGRES_USER>
-											<POSTGRES_PASSWORD>${db.password}</POSTGRES_PASSWORD>
+										<env>																					
 											<POSTGRES_INITDB_ARGS>--locale de_DE.UTF-8</POSTGRES_INITDB_ARGS>
+											<POSTGRES_PASSWORD>${db.password}</POSTGRES_PASSWORD>
+											<POSTGRES_USER>${db.user}</POSTGRES_USER>
 										</env>
 										<assembly>
 											<targetDir>/docker-entrypoint-initdb.d</targetDir>
@@ -192,15 +183,15 @@
 													</fileSet>
 												</fileSets>
 											</inline>
-										</assembly>
+										</assembly>	
 										<tags>
-											<tag>latest</tag>
 											<tag>${project.version}</tag>
-										</tags>
+											<tag>latest</tag>
+										</tags>								
 									</build>
 									<run>										
 										<wait>
-											<log>PostgreSQL init process complete; ready for start up.</log>
+											<log>Datenbanksystem ist bereit, um Verbindungen anzunehmen</log>
 											<time>60000</time>
 										</wait>
 										<log>
@@ -210,9 +201,9 @@
 									</run>
 								</image>
 
-								<image>
+								<image>									
+									<name>bayeos-gateway:${project.version}</name>
 									<alias>bayeos-gateway</alias>
-									<name>bayceer/bayeos-gateway:${project.version}</name>
 									<build>
 										<from>java:8</from>
 										<env>
@@ -223,14 +214,13 @@
 										</assembly>
 										<cmd>
 											<shell>java -jar /maven/bayeos-gateway.jar</shell>
-										</cmd>
+										</cmd>									
 										<tags>
-											<tag>latest</tag>
 											<tag>${project.version}</tag>
-										</tags>
+											<tag>latest</tag>
+										</tags>								
 									</build>
-									<run>
-
+									<run>										
 										<labels>
 											<environment>development</environment>
 											<version>${project.version}</version>
@@ -244,7 +234,6 @@
 											</http>
 											<time>60000</time>
 										</wait>
-
 										<links>
 											<link>db:db</link>
 										</links>
@@ -345,52 +334,23 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<compilerId>groovy-eclipse-compiler</compilerId>
-					<version>3.7.0</version>
+					<version>3.1</version>								
 				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
-						<artifactId>groovy-eclipse-compiler</artifactId>
+						<artifactId>groovy-eclipse-compiler</artifactId>						
 						<version>2.9.1-01</version>
 					</dependency>
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
-						<artifactId>groovy-eclipse-batch</artifactId>
+						<artifactId>groovy-eclipse-batch</artifactId>						
 						<version>2.3.7-01</version>
 					</dependency>
 				</dependencies>
 			</plugin>
 			
 				
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-compiler-plugin
-										</artifactId>
-										<versionRange>[3.1,)</versionRange>
-										<goals>
-											<goal>compile</goal>
-											<goal>testCompile</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
 			</plugins>
 		
 	</build>
@@ -466,15 +426,13 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 		</dependency>
-		
-		<!-- This breaks web flow 
-		<dependency> 
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId> 
-			<optional>true</optional> 
-		</dependency>
-		-->
-		
+				
+		<dependency>
+			<groupId>com.novell.ldap</groupId>
+			<artifactId>jldap</artifactId>
+			<version>4.3</version>
+		</dependency>    	
+
 		<dependency>
     		<groupId>io.rest-assured</groupId>
     		<artifactId>rest-assured</artifactId>
@@ -497,7 +455,14 @@
 			<artifactId>bayeos-xmlrpc</artifactId>
 			<version>2.0.0</version>
 		</dependency>
-
+      	
+      	<!-- This breaks web flow  -->
+      	<!-- <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency> -->  
+ 
 		
 	</dependencies>
 	

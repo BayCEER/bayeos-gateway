@@ -1,6 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.marshaller
 
-import java.io.InputStream
 import de.unibayreuth.bayceer.bayeos.gateway.model.KnotPoint
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline
 import groovy.xml.MarkupBuilder

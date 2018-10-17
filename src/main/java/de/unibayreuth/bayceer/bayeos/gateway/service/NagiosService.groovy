@@ -1,8 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import java.sql.SQLException
-import java.util.List
-
 import javax.sql.DataSource
 
 import org.apache.log4j.Logger
@@ -11,6 +8,7 @@ import org.springframework.stereotype.Service
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.NagiosMessage
 import groovy.sql.Sql
+import java.sql.SQLException
 
 @Service
 class NagiosService {
@@ -21,23 +19,36 @@ class NagiosService {
 
 	Logger log = Logger.getLogger(NagiosService.class)
 
-
 	NagiosMessage msgGateway() {
 		log.info("Query status of gateway")
 		def db = new Sql(dataSource)
-		NagiosMessage m = getNagiosMsg(db.rows("select * from nagios_status order by group_name, board_origin, channel_nr"))
+		NagiosMessage m = getNagiosMsg(db.rows("select * from nagios_status"))
 		db.close()
 		return m;
 	}
-
-	NagiosMessage msgGroup(String name) {
-		log.info("Query status of group: ${name}")
+		
+	NagiosMessage msgDomain(Integer id) {
+		log.info("Query status of domain: ${id}")
 		def db = new Sql(dataSource)
-		if (db.rows("select true from board_group where name like ?",[name]).empty ){
+		if (db.rows("select true from domain where id = ?",[id]).empty ){
 			db.close();
-			return new NagiosMessage(status:3,text:"Group ${name} not found");
+			return new NagiosMessage(status:3,text:"Domain ${id} not found");
 		} else {
-			List channels = db.rows("select * from nagios_status where group_name like ? order by board_origin, channel_nr",[name])
+			List channels = db.rows("select * from nagios_status where domain_id  =  ?",[id])
+			db.close()
+			NagiosMessage m = getNagiosMsg(channels)
+			return m;
+		}		
+	}
+
+	NagiosMessage msgGroup(Integer id) {
+		log.info("Query status of group: ${id}")
+		def db = new Sql(dataSource)
+		if (db.rows("select true from board_group where id = ?",[id]).empty ){
+			db.close();
+			return new NagiosMessage(status:3,text:"Group ${id} not found");
+		} else {
+			List channels = db.rows("select * from nagios_status where group_id = ?",[id])
 			db.close()
 			NagiosMessage m = getNagiosMsg(channels)
 			return m;
@@ -51,7 +62,7 @@ class NagiosService {
 			db.close();
 			return new NagiosMessage(status:3,text:"Board with id:${id} not found");
 		} else {
-			List channels = db.rows("select * from nagios_status where board_id=? order by channel_nr",[id]);
+			List channels = db.rows("select * from nagios_status where board_id=?",[id]);
 			db.close()
 			NagiosMessage m = getNagiosMsg(channels)
 			return m;
@@ -116,6 +127,14 @@ class NagiosService {
 		def groupName
 		def boardOrigin
 		channels.each{
+			
+			// Domain
+			if (it.domain_name != domainName){
+				out.append("Domain[${it.domain_name}]\n")
+				domainName = it.domain_name
+			}
+			
+			// Group
 			if (it.group_name != groupName){
 				out.append("Group[${it.group_name}]\n")
 				groupName = it.group_name
