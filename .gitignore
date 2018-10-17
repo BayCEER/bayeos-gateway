@@ -12,3 +12,4 @@ target/
 /.classpath
 /.project
 /.dbeaver-data-sources.xml
+src/main/resources/application-test.properties
