@@ -74,7 +74,7 @@ public class Board extends NamedDomainEntity {
 	Integer commentCount;
 	
 	
-	@Formula("(select count(*) from message where message.origin = origin)")
+	@Formula("(select count(*) from message join board on board.origin = message.origin and board.domain_id = message.domain_id where message.origin = origin)")
 	Integer messageCount;
 	
 	
