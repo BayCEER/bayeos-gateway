@@ -229,15 +229,7 @@
  					}
  		 };
 	   	
-	   	 $(document).ready(function(){		
-			$("input[name^='nsw']").bootstrapToggle();		
-			$("input[name^='nsw']").change(function() {
-				$.ajax({
-				 url: [[@{/channels/toggleNagios}]] + '/' + $(this).prop('id') ,          
-		         type: "POST",	                  
-		         data: "enabled="+ $(this).prop('checked')		               			 			 				 
-		 		})															
-		 	});
+	   	 $(document).ready(function(){					
 		 
 		 // Table messages 
 		 $('#tableMessages').DataTable( {

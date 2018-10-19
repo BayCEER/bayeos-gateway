@@ -42,7 +42,7 @@ public class CommentController extends AbstractController {
 	public String edit(@PathVariable Long id, Model model){
 		Comment c = repo.findOne(id);
 		if (c == null) throw new EntityNotFoundException("Entity not found");
-		checkWrite(c.getBoard());		
+		checkWrite(repoBoard.findOne(c.getBoard().getId()));		
 		model.addAttribute("comment",c);
 		model.addAttribute("board",c.getBoard().getId());
 		return "editComment";

@@ -9,10 +9,7 @@ import javax.persistence.ManyToOne;
 public class ChannelTemplate extends UniqueEntity implements Comparable<ChannelTemplate>{
 		
 	private static final long serialVersionUID = -2463673550735591743L;
-	
-	
-	
-	
+		
 
 	String nr;
 	String name;

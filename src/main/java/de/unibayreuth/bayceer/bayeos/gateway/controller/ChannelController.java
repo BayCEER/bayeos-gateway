@@ -6,7 +6,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.FunctionRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.IntervalRepository;
@@ -29,8 +29,9 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.UnitRepository;
 public class ChannelController extends AbstractController {
 	
 	@Autowired
-	ChannelRepository repo;
-	
+	ChannelRepository repo;	
+	@Autowired
+	BoardRepository repoBoard;
 	@Autowired
 	IntervalRepository repoInterval;	
 	@Autowired
@@ -41,25 +42,12 @@ public class ChannelController extends AbstractController {
 	UnitRepository repoUnit;
 	
 	
-	
-	
-	@RequestMapping(path ="/channels/toggleNagios/{id}", method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.OK)
-	public void toggleNagios(@PathVariable Long id, @RequestParam Boolean enabled){
-		Channel c = repo.findOne(id);
-		if (c == null) throw new EntityNotFoundException("Entity not found");
-		c.setExcludeFromNagios(enabled);
-		checkWrite(c.getBoard());
-		repo.save(c);
-		
-	}
-	
 	@RequestMapping(value="/channels/save", method=RequestMethod.POST)
 	public String save(@Valid Channel channel, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
 			return "editUser";
 		}						
-		checkWrite(channel.getBoard());
+		checkWrite(repoBoard.findOne(channel.getBoard().getId()));
 		Channel c = repo.save(channel);		
 		redirect.addFlashAttribute("globalMessage",getActionMsg("saved", locale));
 		return "redirect:/boards/" + c.getBoard().getId();			

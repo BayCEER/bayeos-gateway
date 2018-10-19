@@ -67,7 +67,7 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 	@Column(name="db_exclude_auto_export")
 	private Boolean dbExcludeAutoExport = false;
 
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="board_id", nullable = false)
 	private Board board;
 

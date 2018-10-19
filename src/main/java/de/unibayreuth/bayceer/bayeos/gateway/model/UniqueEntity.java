@@ -12,14 +12,12 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @MappedSuperclass
-public abstract class UniqueEntity implements Serializable  {
+public abstract class UniqueEntity  implements Serializable{
 	
 	public UniqueEntity() {
 		super();
 	}
-		
-	private static final long serialVersionUID = 2082710865576938551L;
-		
+			
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	
 	@JsonView(DataTablesOutput.View.class)	

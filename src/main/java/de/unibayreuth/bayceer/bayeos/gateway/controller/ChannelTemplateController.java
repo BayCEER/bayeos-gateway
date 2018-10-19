@@ -66,7 +66,7 @@ public class ChannelTemplateController extends AbstractController {
 		if (bindingResult.hasErrors()){
 			return "editChannelTemplate";
 		}	
-		checkWrite(cha.getBoardTemplate());
+		checkWrite(repoBoard.findOne(cha.getBoardTemplate().getId()));
 		repoChannel.save(cha);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/boardTemplates/" + cha.getBoardTemplate().getId();

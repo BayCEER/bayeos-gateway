@@ -56,18 +56,21 @@ public abstract class AbstractController {
 	}
 	
 	protected  void checkWrite(DomainEntity d) {
-		Domain o = d.getDomain();
-		if (userDomain()!=null && userDomain() != o) {
-			throw new AccessDeniedException("Missing rights to save domain object"); 
-		}
+		Domain du = userDomain();		
+		if (du != null) {
+			if (du.getId() != d.getDomain().getId()) {
+				throw new AccessDeniedException("Missing rights to save domain object");
+			}
+		}			 		
 	}
 	
 	protected  void checkRead(DomainEntity d) {
-		Domain o = d.getDomain();
-		if (userDomain() != null && userDomain()!= o && !o.getName().matches(DomainFilteredRepository.nullDomainReadAble)){
-			throw new AccessDeniedException("Missing rights to read domain object");
+		Domain du = d.getDomain();
+		if (du != null) {
+			if (du.getId() != d.getDomain().getId() && !d.getDomain().getName().matches(DomainFilteredRepository.nullDomainReadAble)){
+				throw new AccessDeniedException("Missing rights to read domain object");
+			}	
 		}
-		
 	}
 	
 	

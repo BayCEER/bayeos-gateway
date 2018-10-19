@@ -47,7 +47,7 @@ public class KnotPointController extends AbstractController{
 		if (bindingResult.hasErrors()){
 			return "editKnotPoint";
 		}				
-		checkWrite(point.getSpline());
+		checkWrite(repoSpline.findOne(point.getSpline().getId()));
 		repo.save(point);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
 		return "redirect:/splines/" + point.getSpline().getId();
@@ -55,8 +55,11 @@ public class KnotPointController extends AbstractController{
 		
 	
 	@RequestMapping(value="/knotpoints/{id}", method=RequestMethod.GET)
-	public String edit(@PathVariable Long id, Model model){		
-		model.addAttribute("knotPoint",repo.findOne(id));
+	public String edit(@PathVariable Long id, Model model){
+		KnotPoint k = repo.findOne(id);		
+		if (k==null) throw new EntityNotFoundException("Entity not found");
+		checkWrite(k.getSpline());		
+		model.addAttribute("knotPoint",k);
 		return "editKnotPoint";		
 	}
 	
