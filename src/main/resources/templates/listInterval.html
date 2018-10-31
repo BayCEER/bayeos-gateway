@@ -29,12 +29,15 @@
 						<td th:if="${#authentication.principal.inNullDomain()}">
 								<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
 						</td>
-						<td><a th:href="@{/intervals/{id}(id=${i.id})}"
-							th:text="${i.name}">Name A</a></td>
 						<td>
-							<div class="pull-right">																				
+						<span th:if="${i.domain == null}" class="glyphicon glyphicon-share" th:title="#{tt.publicObject}"></span>
+						<a th:href="@{/intervals/{id}(id=${i.id})}"	th:text="${i.name}">Name A</a></td>
+						<td>
+							<div class="pull-right">	
+								<th:block th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}">																			
 								<div th:replace="table::edit(@{'/intervals/' + ${i.id}},false)"></div>
 								<div th:replace="table::delete(@{'/intervals/delete/' + ${i.id}},false)"></div>
+								</th:block>
 							</div>  								  								  								
 						</td>
 					</tr>

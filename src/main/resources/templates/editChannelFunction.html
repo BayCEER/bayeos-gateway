@@ -7,7 +7,7 @@
 
 
 <script th:src="@{/resources/js/ace.js}"
-	src="../static/resources/js/ace.js"></script>
+	src="../static/resources/js/ace.js" charset="utf-8"></script>
 <script th:src="@{/resources/js/mode-javascript.js}"
 	src="../static/resources/js/mode-javascript.js"></script>
 <script th:src="@{/resources/js/worker-javascript.js}"
@@ -31,7 +31,7 @@
 		<form method="post" action="#" th:action="@{/channelFunctions}"	th:object="${channelFunction}">
 			<input type="hidden" th:field="*{id}" />			
 			<div th:replace="field::selectDomain"></div>
-			<div th:replace="field::text('name',#{a.name},true)"></div>
+			<div th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>
 			<div class="form-group">
 				<label th:text="#{cf.parameters} +':'" class="control-label">Parameters:</label>				
 				<table class="table table-condensed">
@@ -42,7 +42,7 @@
 						<th th:text="#{cfp.sample}" class="col-xs-2">Sample</th>
 						<th class="col-xs-2">
 						<div class="btn-group pull-right">
-							<button id="addParam-btn" type="submit" class="btn btn-default" name="addParam" th:text="#{action.create}">Add</button>													
+							<button th:if="${writeable}" id="addParam-btn" type="submit" class="btn btn-default" name="addParam" th:text="#{action.create}">Add</button>													
 						</div>
 						</th>
 					</tr>
@@ -50,18 +50,18 @@
 				<tbody>
 					<tr th:each="p,stat :*{parameters}" class="param">
 						<td>
-							<input type="text" th:field="*{parameters[__${stat.index}__].name}" class="form-control name"/>
+							<input type="text"  th:readonly="${!writeable}" th:field="*{parameters[__${stat.index}__].name}" class="form-control name"/>
 							<input type="hidden" th:field="*{parameters[__${stat.index}__].id}"/>						
 						</td>
 						<td>
-							<input type="text" th:field="*{parameters[__${stat.index}__].description}" class="form-control"/>
+							<input type="text" th:readonly="${!writeable}"  th:field="*{parameters[__${stat.index}__].description}" class="form-control"/>
 						</td>						
 						<td>
-							<input type="number" class="form-control sample"/>
+							<input type="number" th:readonly="${!writeable}" class="form-control sample"/>
 						</td>	
 						<td>
 						<div class="pull-right">
-							<button type="submit" th:value="${stat.index}" class="btn btn-default" name="removeParam" th:text="#{action.delete}">Remove</button>
+							<button type="submit" th:if="${writeable}" th:value="${stat.index}" class="btn btn-default" name="removeParam" th:text="#{action.delete}">Remove</button>
 						</div>
 						</td>
 					</tr>
@@ -75,9 +75,9 @@
 				<div id="editor"></div>			
 			</div>
 			
-			<button id="save-btn" name="save" th:text="#{action.save}" type="submit" class="btn btn-primary pull-right">Save</button>
+			<button id="save-btn" th:if="${writeable}" name="save" th:text="#{action.save}" type="submit" class="btn btn-primary pull-right">Save</button>
 			<div class="form-group">
-			 	<button id="exec-btn" name="exec" th:text="#{action.execute}" type="button" class="btn btn-default">Execute</button>
+			 	<button th:if="${writeable}" id="exec-btn" name="exec" th:text="#{action.execute}" type="button" class="btn btn-default">Execute</button>
 			 	<span id="out-msg"></span>
 			 	<span id="out-value"></span>
 			</div>											
@@ -86,10 +86,15 @@
 		<script th:inline="javascript" class="init">
 			var editor = ace.edit("editor");
 			var body = $('#body');
+						
+									
 			editor.setTheme("ace/theme/eclipse");
 			editor.getSession().setMode("ace/mode/javascript");			
 			var content = [[ ${channelFunction.body} ]];
-			editor.getSession().setValue(content);
+			if (content != null){
+				editor.getSession().setValue(content);	
+			}
+			
 			
 			$("#save-btn").on('click', function () {
 				body.val(editor.getSession().getValue());
@@ -122,11 +127,11 @@
 					$("#out-msg").html(err);
 					$("#out-value").html('');
 				}
-				
-				
-								
+																
 				
 			});
+			
+			editor.setReadOnly([[ ${!writeable} ]]);
 
 			
 		</script>

@@ -7,6 +7,10 @@
 	<var name="sp" class="de.unibayreuth.bayceer.bayeos.gateway.model.Spline"/>
 	
 	<on-start>	
+	
+	
+     <evaluate expression="sp.domain = splineController.userSession.getDomain()" /> 				
+     	
 	 <evaluate result="flowScope.domainFilter" expression="splineController.domainFilter"></evaluate>
 	 <evaluate result="flowScope.user" expression="splineController.userSession.getUser()"></evaluate>	
 	  	

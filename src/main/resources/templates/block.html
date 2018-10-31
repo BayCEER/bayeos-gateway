@@ -13,29 +13,29 @@
 		<div class="row">
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('criticalMin',#{chkDev.criticalMin},false,'any')"></div>
+					th:replace="field::number('criticalMin',#{chkDev.criticalMin})"></div>
 			</div>
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('warningMin',#{chkDev.warningMin},false,'any')"></div>
+					th:replace="field::number('warningMin',#{chkDev.warningMin})"></div>
 			</div>
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('warningMax',#{chkDev.warningMax},false,'any')"></div>
+					th:replace="field::number('warningMax',#{chkDev.warningMax})"></div>
 			</div>
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('criticalMax',#{chkDev.criticalMax},false,'any')"></div>
+					th:replace="field::number('criticalMax',#{chkDev.criticalMax})"></div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('samplingInterval',#{chkDev.samplingInt},false,1)"></div>
+					th:replace="field::number('samplingInterval',#{chkDev.samplingInt})"></div>
 			</div>
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('checkDelay',#{chkDev.checkDelay},false,1)"></div>
+					th:replace="field::number('checkDelay',#{chkDev.checkDelay})"></div>
 			</div>
 			<div class="col-sm-6"></div>
 		</div>
@@ -43,16 +43,16 @@
 	
 	
 	
-	<div th:fragment="boardSettings(header)" class="block">
+	<div th:fragment="boardSettings(header)" th:with="disabled=${disabled}?true:false" class="block">
 		<div th:text="${header}" class="block-header"></div>
 		<div class="row">
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('samplingInterval',#{chkDev.samplingInt},false,1)"></div>
+					th:replace="field::number(prop='samplingInterval',label=#{chkDev.samplingInt},step=1)"></div>
 			</div>
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('checkDelay',#{chkDev.checkDelay},false,1)"></div>
+					th:replace="field::number(prop='checkDelay',label=#{chkDev.checkDelay},step=1)"></div>
 			</div>
 			<div class="col-sm-6"></div>
 		</div>
@@ -62,7 +62,7 @@
 		<div class="block-header">Exports</div>
 		<div class="row">
 			<div class="col-sm-4">
-				<div th:replace="field::number('dbSeriesId',#{a.dbId},false,1)"></div>
+				<div th:replace="field::number(prop='dbSeriesId',label=#{a.dbId},step=1)"></div>
 			</div>
 			<div class="col-sm-4">
 				<div th:replace="field::checkbox('filterCriticalValues',#{channel.filterCriticalValues})"></div>

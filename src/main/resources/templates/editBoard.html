@@ -22,11 +22,11 @@
 						 						
 				<div class="row">																	
 					<div class="col-sm-4">
-						<div th:replace="field::text('name',#{board.name},false)"></div>
+						<div th:replace="field::text('name',#{board.name})"></div>
 					</div>
 					<div class="col-sm-4">
 						<div
-							th:replace="field::select('boardGroup',#{e.boardGroup},${groups},false)"></div>
+							th:replace="field::select('boardGroup',#{e.boardGroup},${groups})"></div>
 					</div>
 					<div class="col-sm-4">
 						<div th:replace="field::checkbox('nagios',#{chkDev.nagios})"></div>
@@ -49,12 +49,12 @@
 						<li role="presentation"><a href="#messages"
 							aria-controls="messages" role="tab" data-toggle="tab"> <span
 								th:text="#{e.messages}"></span> <span class="badge"
-								id="msgBadge" th:text="${board.messageCount}">0</span>
+								id="msgBadge"></span>
 						</a></li>
 						<li role="presentation"><a href="#comments"
 							aria-controls="comments" role="tab" data-toggle="tab"> <span
 								th:text="#{e.comments}"></span> <span class="badge"
-								id="comBadge" th:text="${board.commentCount}">0</span>
+								id="comBadge"></span>
 						</a></li>
 						<li role="presentation"><a href="#virtualChannels"
 							aria-controls="virtualChannels" role="tab" data-toggle="tab">
@@ -110,7 +110,7 @@
 								<div class="block-header">Exports</div>
 								<div class="row">
 									<div class="col-sm-6">
-										<div th:replace="field::number('dbFolderId',#{a.dbId},false,1)"></div>
+										<div th:replace="field::number(prop='dbFolderId',label=#{a.dbId},step=1)"></div>
 									</div>
 									<div class="col-sm-6"></div>
 								</div>
@@ -208,9 +208,7 @@
 	     
 	    // Default: channels 			   
 	   	var tab = [[ ${tab} ]];
-	   	
-	   	var comCount = 0;
-	   	
+	   		   	   	
 	   	$('#myTab a[aria-controls="' + tab + '"]').tab('show');
 	   	
 	   	var language = {
@@ -229,7 +227,15 @@
  					}
  		 };
 	   	
-	   	 $(document).ready(function(){					
+	   	 $(document).ready(function(){		
+			$("input[name^='nsw']").bootstrapToggle();		
+			$("input[name^='nsw']").change(function() {
+				$.ajax({
+				 url: [[@{/channels/toggleNagios}]] + '/' + $(this).prop('id') ,          
+		         type: "POST",	                  
+		         data: "enabled="+ $(this).prop('checked')		               			 			 				 
+		 		})															
+		 	});
 		 
 		 // Table messages 
 		 $('#tableMessages').DataTable( {
@@ -271,8 +277,9 @@
                             return JSON.stringify(d);
                     }
                 },
-               "initComplete": function(settings, json) {               		
-               		$('#msgBadge').text(this.api().page.info().recordsFiltered);   
+               "initComplete": function(settings, json) { 
+            	    var i = this.api().page.info();            	    
+               		$('#msgBadge').text(i.recordsTotal);   
                } 
              });
              
@@ -328,19 +335,20 @@
                     }
                 },
                "initComplete": function(settings, json) {
-               		comCount = this.api().page.info().recordsFiltered             		
-               		$('#comBadge').text(comCount);   
+               		var i = this.api().page.info();             		
+               		$('#comBadge').text(i.recordsTotal);   
                } 
              });
              
            $('#comments tbody').on('click','.deleteComment', function () {
         	if (confirm( [[#{msg.confirm}]] )) {            
-           		 var id = $(this).parent().parent().attr('id');
+           		var id = $(this).parent().parent().attr('id');
             	$.ajax({
 				 url: [[ @{/rest/comments/delete} ]] + '/' + id,          
-		         success: function(){		        	 		        	 
-		        	 comments.row(id).remove().draw(true);	
-		        	 $('#comBadge').text(--comCount);
+		         success: function(){
+		        	 comments.row(id).remove().draw(true);		        	 
+		        	 var n = parseInt($('#comBadge').text(),10) - 1 ;		        	 
+		        	 $('#comBadge').text(n);
 			     }		               			 			 				 
 		 	});
         	}

@@ -32,7 +32,7 @@
 								class="icon-bar"></span>
 						</button>
 						</div>
-						<a class="navbar-brand" th:href="@{/}" href="/"><strong>BayEOS</strong>	Gateway</a>
+						<a class="navbar-brand" th:href="@{/}" href="/"><strong>BayEOS</strong> Gateway</a>
 					</div>
 					
 					<th:block th:if="${currentUser != null}">	
@@ -41,8 +41,8 @@
 						<ul class="nav navbar-nav">
 							<li th:classappend="${controllerName == 'BoardGroup'}? 'active'"><a th:href="@{/groups}"><span class="glyphicon glyphicon-flag"></span> <span th:text="#{nav.groups}">Groups</span></a></li>														
 							<li th:classappend="${controllerName == 'Board'}? 'active'"><a th:href="@{/}"><span class="glyphicon glyphicon-hdd"></span> <span th:text="#{nav.boards}">Boards</span></a></li>							
-							<li th:if="${currentUser.isAdmin()}"  class="dropdown"><a class="dropdown-toggle" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="#"><span
-									class="glyphicon glyphicon-wrench"></span> <span th:text="#{nav.admin}">Administration</span><span class="caret"></span></a>
+							<li th:if="${currentUser.isUser()}"  class="dropdown"><a class="dropdown-toggle" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="#"><span
+									class="glyphicon glyphicon-wrench"></span> <span th:text="#{nav.settings}">Settings</span><span class="caret"></span></a>
 								<ul class="dropdown-menu">
 								
 									<li th:if="${currentUser.inNullDomain()}" th:classappend="${controllerName == 'Domain'}? 'active'">

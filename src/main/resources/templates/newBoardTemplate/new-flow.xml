@@ -8,13 +8,16 @@
 	<var name="boardTemplate" class="de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate"/>
 	 
 		
-	<on-start>	 
+	<on-start>
+	
+     <evaluate expression="boardTemplate.domain = boardTemplateController.userSession.getDomain()" /> 				
+	 
 	 <evaluate result="flowScope.user" expression="boardTemplateController.userSession.getUser()"></evaluate>
 	 <evaluate result="flowScope.domainFilter" expression="boardTemplateController.domainFilter"></evaluate>	 
 	 <evaluate result="flowScope.intervals" expression="intervalRepository.findAll(flowScope.user,null)"></evaluate>
 	 <evaluate result="flowScope.functions" expression="functionRepository.findAllSortedByName(flowScope.user,null)"></evaluate>
 	 <evaluate result="flowScope.splines" expression="splineRepository.findAllSortedByName(flowScope.user,null)"></evaluate>
-	 <evaluate result="flowScope.units" expression="unitRepository.findAllSortedByName(flowScope.user,null)"></evaluate>	 	 		
+	 <evaluate result="flowScope.units" expression="unitRepository.findAllSortedByName(flowScope.user,null)"></evaluate>
 	</on-start>
 	
     

@@ -37,15 +37,18 @@
 						<td th:if="${#authentication.principal.inNullDomain()}">
 										<a th:if="${u.domain} != null" th:href="@{/domains/{id}(id=${u.domain.id})}" th:text="${u.domain.name}">Domain</a>
 						</td>
-						<td><a th:href="@{/units/{id}(id=${u.id})}"
-							th:text="${u.name}">Name A</a>
+						<td>
+						<span th:if="${u.domain == null}" class="glyphicon glyphicon-share" th:title="#{tt.publicObject}"></span>
+						<a th:href="@{/units/{id}(id=${u.id})}"	th:text="${u.name}">Name A</a>
 						</td>					
 						<td th:text="${u.abbrevation}">Abbrevation A</td>
 						<td th:text="${u.dbUnitId}">Server ID</td>
 						<td>
-							<div class="pull-right">																				
+							<div class="pull-right">
+							<th:block th:if="${(#authentication.principal.domainId eq u.domainId) or #authentication.principal.inNullDomain()}">																				
 								<div th:replace="table::edit(@{'/units/' + ${u.id}},false)"></div>
 								<div th:replace="table::delete(@{'/units/delete/' + ${u.id}},false)"></div>
+							</th:block>
 							</div>  								  								  								
 						</td>
 					</tr>

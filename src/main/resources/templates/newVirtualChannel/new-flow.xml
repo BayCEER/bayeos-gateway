@@ -11,7 +11,7 @@
 	
 	<input name="boardId" type="long" required="true"/>
 	 	  
-	<on-start>	
+	<on-start>		      					
 		 <evaluate result="flowScope.domainFilter" expression="virtualChannelController.domainFilter"></evaluate>
 		 <evaluate result="flowScope.user" expression="virtualChannelController.userSession.getUser()"></evaluate>
 	     <evaluate result="flowScope.channelFunctions" expression="channelFunctionRepository.findAllSortedByName(flowScope.user,null)"></evaluate>	     

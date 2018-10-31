@@ -10,7 +10,7 @@
 		<h3 th:text="#{e.virtualChannel}">Virtual Channel</h3>
 		<form method="post" th:object="${vc}" th:action="${flowExecutionUrl}">			
 			<div class="form-group">		 				 						
-				<div th:replace="field::text('nr',#{vc.nr},true)"></div>																	
+				<div th:replace="field::text(prop='nr',label=#{vc.nr},required=true)"></div>																	
 			</div>						
 			<div class="form-group">
 				<a th:text="#{action.cancel}" th:href="${flowExecutionUrl}+'&amp;_eventId=cancel'" class="btn btn-default">Cancel</a>

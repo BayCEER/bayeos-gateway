@@ -46,15 +46,18 @@
 							<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
 						</td>
 						<td>
+							<span th:if="${i.domain == null}" class="glyphicon glyphicon-share" th:title="#{tt.publicObject}"></span>
 							<a th:href="@{/boardTemplates/{id}(id=${i.id})}" th:text="${i.name}">Name A</a>	
 						</td>
 						<td th:text="${i.revision}"/>
 						<td th:text="${{i.dateCreated}}"/>
 						<td th:text="${i.getTemplateCount()}"/>
 						
-						<td class="pull-right">		
-							<div th:replace="table::edit(@{'/boardTemplates/' + ${i.id}},false)"></div>
-							<div th:replace="table::delete(@{'/boardTemplates/delete/' + ${i.id}},false)"></div>
+						<td class="pull-right">										
+							<th:block th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}">
+								<div th:replace="table::edit(@{'/boardTemplates/' + ${i.id}},false)"></div>
+								<div th:replace="table::delete(@{'/boardTemplates/delete/' + ${i.id}},false)"></div>
+							</th:block>						
 							<div th:replace="table::export(@{'/boardTemplates/export/' + ${i.id}})"></div>							  								  								  								
 						</td>
 					</tr>

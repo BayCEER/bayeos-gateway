@@ -1,0 +1,1 @@
+flyway -user=bayeos -password=4336bc9de7a6b11940e897ee22956d51 -url=

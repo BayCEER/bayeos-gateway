@@ -32,17 +32,19 @@
 						<td th:if="${#authentication.principal.inNullDomain()}">
 							<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
 						</td>
-						<td th:switch="${i.locked}">
-							<div th:case="true"> 
-								<span class="glyphicon glyphicon-lock" title="Spline is locked. Editing not allowed."></span> <span th:text="${i.name}">Spline Name</span>
-							</div>																		
-							<a th:case="false" th:href="@{/splines/{id}(id=${i.id})}" th:text="${i.name}">Name A</a>
+						
+						<td>
+						<span th:if="${i.domain == null}" class="glyphicon glyphicon-share" th:title="#{tt.publicObject}"></span>
+						<span th:if="${i.locked}" class="glyphicon glyphicon-lock" title="Spline is locked. Editing not allowed."></span>
+						<span th:if="${i.locked}" th:text="${i.name}">Spline Name</span>							
+						<a th:if="${not i.locked}" th:href="@{/splines/{id}(id=${i.id})}" th:text="${i.name}">Name A</a>																																
 						</td>
-							
-						<td class="pull-right">		
+						<td class="pull-right">	
+						<th:block th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}">	
 							<div th:replace="table::edit(@{'/splines/' + ${i.id}},${i.locked})"></div>
-							<div th:replace="table::delete(@{'/splines/delete/' + ${i.id}},${i.locked})"></div>
-							<div th:replace="table::export(@{'/splines/export/' + ${i.id}})"></div>							  								  								  								
+							<div th:replace="table::delete(@{'/splines/delete/' + ${i.id}},${i.locked})"></div>						
+						</th:block>							  								  					
+							<div th:replace="table::export(@{'/splines/export/' + ${i.id}})"></div>			  								
 						</td>
 					</tr>
 				</tbody>

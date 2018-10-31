@@ -22,8 +22,8 @@
 
 		<form method="post" action="#" th:action="@{/profile/save}" th:object="${user}">
 			<input type="hidden" th:field="*{userName}" />														
-			<div th:replace="field::password('newPassword',#{user.password},true)"></div>
-			<div th:replace="field::password('newPasswordRepetition',#{user.passwordVerification},true)"></div>			
+			<div th:replace="field::password(prop='newPassword',label=#{user.password},required=true)"></div>
+			<div th:replace="field::password(prop='newPasswordRepetition',label=#{user.passwordVerification},required=true)"></div>			
 			<button th:text="#{action.save}" type="submit"	class="btn btn-default">Save</button>
 		</form>
 	</div>

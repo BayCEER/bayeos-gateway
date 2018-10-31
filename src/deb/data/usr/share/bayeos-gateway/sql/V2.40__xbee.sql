@@ -42,7 +42,7 @@ alter table board_template
   add constraint fk_board_template_domain foreign key (domain_id)
       references "domain" (id) match simple
       on update no action on delete cascade;
-alter table board_template add constraint board_template_ukey unique(domain_id, name);      
+      
 
 -- function
 alter table function add column domain_id bigint;
@@ -239,6 +239,12 @@ end;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ 
+-- Simplify roles: Admin=User
+UPDATE users SET role = 'USER' WHERE role = 'ADMIN';
+
+ 
+
 
 
  

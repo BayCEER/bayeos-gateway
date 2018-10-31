@@ -11,12 +11,12 @@
 		<form method="post" action="#" th:action="@{/splines/save}" th:object="${spline}">
 		 	<input type="hidden" th:field="*{id}"/>
 		 	<div th:replace="field::selectDomain"></div>	 						
-			<div th:replace="field::text('name',#{a.name},true)"></div>				
+			<div th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>				
 			<div class="form-group">
 				<label th:text="#{nav.knotPoints} + ':'">Knot Points:</label>
 				
-				<div class="btn-group pull-right btn-sm">
-					<div th:replace="table::add(@{'/knotpoints/create/' + ${spline.id}})"></div>
+				<div th:if="${writeable}" class="btn-group pull-right btn-sm">					
+					<div th:replace="table::add(@{'/knotpoints/create/' + ${spline.id}})"></div>					
 				</div>
 				
 				<table class="table table-striped" >
@@ -27,7 +27,7 @@
 						<td><a th:href="@{/knotpoints/{id}(id=${k.id})}"
 							th:text="${k.x} + ';' + ${k.y}"></a></td>
 						<td>
-							<div class="pull-right">																				
+							<div th:if="${writeable}" class="pull-right">																				
 								<div th:replace="table::edit(@{'/knotpoints/' + ${k.id}},false)"></div>
 								<div th:replace="table::delete(@{'/knotpoints/delete/' + ${k.id}},false)"></div>
 							</div>  								  								  								
@@ -38,7 +38,7 @@
 			</div>		
 					
 					
-			<button th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
+			<button th:if="${writeable}" th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
 		</form>
 	</div>
 </body>

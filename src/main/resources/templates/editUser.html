@@ -24,11 +24,11 @@
 
 			<input type="hidden" th:field="*{id}" />
 			<div th:replace="field::selectDomain"></div>			
-			<div th:replace="field::text('name',#{user.name},true)"></div>
+			<div th:replace="field::text(prop='name',label=#{user.name},required=true)"></div>
 			<div
-				th:replace="field::password('newPassword',#{user.password},(${action}=='create'))"></div>
+				th:replace="field::password(prop='newPassword',label=#{user.password},required=(${action}=='create'))"></div>
 			<div
-				th:replace="field::password('newPasswordRepetition',#{user.passwordVerification},(${action}=='create'))"></div>
+				th:replace="field::password(prop='newPasswordRepetition',label=#{user.passwordVerification},required=(${action}=='create'))"></div>
 			<div th:replace="field::radio('role',#{user.role},${allRoles})"></div>
 			<th:block th:if="*{id} != ${#authentication.principal.id}">
 				<div th:replace="field::checkbox('locked',#{user.locked})"></div>

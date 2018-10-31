@@ -10,10 +10,10 @@
 		<h3 th:text="#{e.knotPoint}">Knot point</h3>
 		<form method="post" th:object="${point}" th:action="${flowExecutionUrl}">
 			<div class="form-group">	
-				<div th:replace="field::text('X','X',true)"></div>
+				<div th:replace="field::text(prop='X',label='X',required=true)"></div>
 			</div>
 			<div class="form-group">
-				<div th:replace="field::text('Y','Y',true)"></div>
+				<div th:replace="field::text(prop='Y',label='Y',required=true)"></div>
 			</div>
 						
 			<div class="form-group">

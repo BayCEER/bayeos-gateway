@@ -31,13 +31,16 @@
 						<td th:if="${#authentication.principal.inNullDomain()}">
 								<a th:if="${f.domain} != null" th:href="@{/domains/{id}(id=${f.domain.id})}" th:text="${f.domain.name}">Domain</a>
 						</td>
-						<td><a th:href="@{/channelFunctions/{id}(id=${f.id})}"
-							th:text="${f.getFunctionHead()}">Name A</a>
+						<td>
+						<span th:if="${f.domain == null}" class="glyphicon glyphicon-share" th:title="#{tt.publicObject}"></span>
+						<a th:href="@{/channelFunctions/{id}(id=${f.id})}"	th:text="${f.getFunctionHead()}">Name A</a>
 						</td>											
 						<td>
-							<div class="pull-right">																				
+							<div class="pull-right">	
+							<th:block th:if="${(#authentication.principal.domainId eq f.domainId) or #authentication.principal.inNullDomain()}">																			
 								<div th:replace="table::edit(@{'/channelFunctions/' + ${f.id}},false)"></div>
 								<div th:replace="table::delete(@{'/channelFunctions/delete/' + ${f.id}},false)"></div>
+							</th:block>
 							</div>  								  								  								
 						</td>
 					</tr>

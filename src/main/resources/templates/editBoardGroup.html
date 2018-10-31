@@ -21,10 +21,10 @@
 		 		</div>
 				<div class="row">			
 					<div class="col-sm-6">
-						<div th:replace="field::text('name',#{a.name},true)"></div>
+						<div th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>
 					</div>
 					<div class="col-sm-6">
-						<div th:replace="field::number('dbFolderId',#{a.dbId},false,1)"></div>
+						<div th:replace="field::number(prop='dbFolderId',label=#{a.dbId},step=1)"></div>
 					</div>				
 				</div>				 			 	
 		 	</div>
