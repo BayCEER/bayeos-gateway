@@ -51,21 +51,15 @@ public class GrafanaRestController {
 	public List<String> search(@RequestBody Search search){
     	log.debug("Search:" + search);
     	List<String> f = new ArrayList<String>(100);
-    	try (Connection con = dataSource.getConnection()){
-    		Domain d = userSession.getUser().getDomain();    		
-    		PreparedStatement st;    		
-    		if (d == null) {
-    			 st = con.prepareStatement("select path from channel_path where path ilike ? and domain_id is null order by 1");    			 
-    		} else {
-    			st = con.prepareStatement("select path from channel_path where path ilike ? and domain_id = ? order by 1");
-    			st.setLong(2, d.getId());
-    		}    		
-    		st.setString(1, String.format("%%%s%%",search.getTarget()));
+    	try (Connection con = dataSource.getConnection();
+    			PreparedStatement st = con.prepareStatement("select path from channel_path where path ilike ? and domain_id is not distinct from ? order by 1")){
+    		Domain d = userSession.getUser().getDomain();    		    		
+    		st.setString(1, String.format("%%%s%%",search.getTarget()));    		    		    			 
+    		st.setLong(2, d.getId());
     		ResultSet rs = st.executeQuery();    		
     		while(rs.next()) {
     			f.add(rs.getString(1));    			
-    		}    		    		    		
-    		st.close();    		
+    		}    		    		    		    		    	
     	} catch (SQLException e) {
     		log.error(e.getMessage());    		
     	} 

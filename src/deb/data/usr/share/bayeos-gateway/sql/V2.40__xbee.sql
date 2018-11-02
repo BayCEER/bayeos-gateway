@@ -108,14 +108,14 @@ CREATE OR REPLACE VIEW channel_path AS
    FROM channel, board WHERE board.id = channel.board_id;
       
 drop function get_grafana_obs(text, text, timestamp with time zone, timestamp with time zone);      
-create or replace function get_grafana_obs(
-	_domain_id bigint, 
+CREATE OR REPLACE FUNCTION public.get_grafana_obs(
+    _domain_id bigint,
     _path text,
     _interval text,
     _from timestamp with time zone,
     _to timestamp with time zone)
-  returns setof time_value as
-$body$
+  RETURNS SETOF time_value AS
+$BODY$
 declare
 b time_value%rowtype;
 cha record;
@@ -124,16 +124,20 @@ select into cha c.id, c.spline_id, coalesce(c.sampling_interval, b.sampling_inte
   from channel_path cp join channel c on (c.id = cp.channel_id) 
   join board b on (b.id = c.board_id) 
   left join function f on (f.id = c.aggr_function_id)
-  where cp.path = _path and cp.domain_id = _domain_id;
+  where cp.path = _path and cp.domain_id is not distinct from _domain_id;
+
+  if (cha.id is not null) 
+  then
   if extract(epoch from _interval::interval) < cha.sampling_interval then
 	return query execute 'select result_time, real_value(result_value,$1) as result_value from all_observation where channel_id = $2 and result_time between $3 and $4' using cha.spline_id, cha.id, _from, _to;
   else
 	return query execute 'select date_truncate(result_time,interval ''' || _interval || ''') as result_time, ' || cha.function_name || '(real_value(result_value,$1))::real as result_value 
 	from all_observation where channel_id = $2 and result_time between $3 and $4 group by date_truncate(result_time, interval ''' || _interval || ''')' using cha.spline_id, cha.id, _from, _to;
   end if;
+  end if;
 return;
-end;$body$
-  language plpgsql volatile;
+end;$BODY$
+  LANGUAGE plpgsql;
   
 -- drop acl 
 drop table if exists acl_entry;
