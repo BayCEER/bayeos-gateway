@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 
 import org.hibernate.annotations.Formula;
 
-import de.unibayreuth.bayceer.bayeos.gateway.validator.FunctionExists;
 import de.unibayreuth.bayceer.bayeos.gateway.validator.TimeInterval;
 
 @Entity
