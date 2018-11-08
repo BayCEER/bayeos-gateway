@@ -100,7 +100,7 @@ class FrameService {
 					if (b == null) {																								
 						Long id = findOrSaveBoard(db,domainId,res['origin'])
 						b = new Board(id:id, domainId: domainId, origin:res['origin'], lrt:ts,lrssi:res['rssi'], channels:[:],
-							 vchannels: boardRepo.findOne(id).getVirtualChannels())
+							 vchannels: vcRepo.findByBoardId(id))
 						boards[res['origin']] = b
 					} else {
 						b.lrt = ts
