@@ -17,7 +17,7 @@ public abstract class DomainEntity extends UniqueEntity {
 	}
 	
 	
-	@ManyToOne(fetch=FetchType.EAGER)	
+	@ManyToOne	
 	@JoinColumn(name = "domain_id", nullable=true)	
 	@JsonView(DataTablesOutput.View.class)
 	protected Domain domain;
