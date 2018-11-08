@@ -7,15 +7,12 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.Formula;
+import javax.persistence.Transient;
 
 
 @Entity
 public class BoardGroup extends NamedDomainEntity {
-	
-	
-
+		
 	
 	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.PERSIST)
 	List<Board> boards;
@@ -23,15 +20,6 @@ public class BoardGroup extends NamedDomainEntity {
 	@Column(name="db_folder_id")
 	Integer dbFolderId;
 		
-	@Formula("(select count(*) from board where board.board_group_id = id)")
-	Integer boardCount;
-	
-	@Formula("(select max(board.last_result_time) from board where board.board_group_id = id)")
-	Date lastResultTime;
-	
-	@Formula("(select max(get_board_status(board.id)) from board where board.board_group_id = id)")
-	Integer groupStatus;
-
 	public List<Board> getBoards() {
 		return boards;
 	}
@@ -47,30 +35,31 @@ public class BoardGroup extends NamedDomainEntity {
 	public void setDbFolderId(Integer dbFolderId) {
 		this.dbFolderId = dbFolderId;
 	}
+			
+	@Transient
+	public Integer getBoardCount(){
+		return boards.size();
+	};
+		
+	@Transient
+	public Date getLastResultTime(){
+		Date d = null;
+		if (boards != null){
+			for(Board b:boards){
+				if (b.getLastResultTime() != null){					
+					if (d!=null){
+						if (b.getLastResultTime().after(d)){
+							d = b.getLastResultTime();
+						}							
+					} else {
+						d = b.getLastResultTime();
+					}
+				}
+			}
+		}
+		return d;		
+	};
 
-	public Integer getBoardCount() {
-		return boardCount;
-	}
-
-	public void setBoardCount(Integer boardCount) {
-		this.boardCount = boardCount;
-	}
-
-	public Date getLastResultTime() {
-		return lastResultTime;
-	}
-
-	public void setLastResultTime(Date lastResultTime) {
-		this.lastResultTime = lastResultTime;
-	}
-
-	public Integer getGroupStatus() {
-		return groupStatus;
-	}
-
-	public void setGroupStatus(Integer groupStatus) {
-		this.groupStatus = groupStatus;
-	}
 					
 	
 }
