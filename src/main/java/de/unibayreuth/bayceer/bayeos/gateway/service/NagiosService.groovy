@@ -120,6 +120,7 @@ class NagiosService {
 		def out = new StringBuffer(200)
 		def maxStat = 0
 		def groupName
+		def domainName
 		def boardOrigin
 		channels.each{
 			
