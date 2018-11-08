@@ -168,7 +168,7 @@
  			 			
  			
  			var stompClient = null;
- 			var socket = new SockJS('/gateway/gs-guide-websocket');
+ 			var socket = new SockJS('/gateway/websocket');
  		    stompClient = Stomp.over(socket);
  		    
  		   	stompClient.connect({}, function (frame) {

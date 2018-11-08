@@ -1,4 +1,4 @@
-package de.unibayreuth.bayceer.bayeos.gateway.websocket;
+package de.unibayreuth.bayceer.bayeos.gateway.event;
 
 import java.util.Date;
 

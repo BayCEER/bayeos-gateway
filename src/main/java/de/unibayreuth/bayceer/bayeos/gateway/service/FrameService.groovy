@@ -17,12 +17,16 @@ import bayeos.frame.FrameParserException
 import bayeos.frame.Parser
 import bayeos.frame.types.ByteFrame
 import bayeos.frame.types.MapUtils
+import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEvent
+import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEventProducer
+import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEventType
+import de.unibayreuth.bayceer.bayeos.gateway.event.NewBoardEvent
+import de.unibayreuth.bayceer.bayeos.gateway.event.NewChannelEvent
+import de.unibayreuth.bayceer.bayeos.gateway.event.NewMessageEvent
+import de.unibayreuth.bayceer.bayeos.gateway.event.NewObservationEvent
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository
 import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository
-import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEvent
-import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEventProducer
-import de.unibayreuth.bayceer.bayeos.gateway.websocket.FrameEventType
 import groovy.sql.Sql
 import org.apache.commons.codec.binary.Base64
 
@@ -164,12 +168,12 @@ class FrameService {
 							break
 						case "Message":
 							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "INFO", domainId])
-							eventProducer.addFrameEvent(new FrameEvent(b.id,FrameEventType.NEW_MESSAGE))
+							eventProducer.addFrameEvent(new NewMessageEvent(b.id))
 							log.debug("Message saved")
 							break
 						case "ErrorMessage":
 							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "ERROR", domainId])
-							eventProducer.addFrameEvent(new FrameEvent(b.id,FrameEventType.NEW_MESSAGE))
+							eventProducer.addFrameEvent(new NewMessageEvent(b.id))
 							log.debug("ErrorMessage saved")
 							break
 						default:
@@ -183,8 +187,8 @@ class FrameService {
 			// Update channel and board meta data
 			boards.each{ id, board ->
 				updateMetaInfo(db, board)
-				log.info("${board.records} observations for board ${board.origin} imported")
-				eventProducer.addFrameEvent(new FrameEvent(board.id,FrameEventType.NEW_OBSERVATION))
+				log.info("${board.records} observations for board ${board.origin} imported")				
+				eventProducer.addFrameEvent(new NewObservationEvent(board.id,board.origin,board.records))								
 			}			
 			return true
 
@@ -216,7 +220,7 @@ class FrameService {
 			log.info("Creating new board:${origin}")
 			def seq = db.firstRow("select nextval('board_id_seq') as id;")
 			db.execute """insert into board (id,domain_id,domain_id_created, origin) values (${seq.id},${domainId},${domainId},${origin});"""
-			eventProducer.addFrameEvent(new FrameEvent(seq.id, FrameEventType.NEW_BOARD))
+			eventProducer.addFrameEvent(new NewBoardEvent(seq.id))
 			return seq.id
 		} else {
 			return b.id
@@ -231,7 +235,7 @@ class FrameService {
 				log.info("Creating new channel:${channelNr} for board:${board.id}")
 				def seq = db.firstRow("select nextval('channel_id_seq') as id;")
 				db.execute 	"""insert into channel (id, board_id, nr) values (${seq.id},${board.id},${channelNr});"""
-				eventProducer.addFrameEvent(new FrameEvent(board.id,FrameEventType.NEW_CHANNEL))
+				eventProducer.addFrameEvent(new NewChannelEvent(board.id))
 				return seq.id
 			} else {
 				log.info("Deny new channel:${channelNr} for board:${board.id}")
