@@ -94,7 +94,7 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 				}								
 			}								
 		}		
-		return repoTemplate.save(s);
+		return repoTemplate.save(userSession.getUser(),s);
 		
 	}
 
@@ -137,7 +137,7 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 				t.setAggrFunction(repoFunc.findOne(Long.valueOf(f.getName())));
 			}									
 		}	
-		repoTemplate.save(bt);		
+		repoTemplate.save(userSession.getUser(),bt);		
 	}
 
 	@Override
@@ -163,12 +163,12 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 	public void applyTemplate(Long boardId, Long templateId) {		
 		Board b = repoBoard.findOne(boardId);		
 		BoardTemplate t = repoTemplate.findOne(templateId);
-		BeanUtils.copyProperties(t, b, new String[]{"id","name"});		
+		BeanUtils.copyProperties(t, b, new String[]{"id","name","domain"});		
 		for(ChannelTemplate ct:t.getTemplates()){					
 			Channel c = b.findOrCreateChannel(ct.getNr());			
 			BeanUtils.copyProperties(ct, c, new String[]{"id"});
 			
 		}
-		repoBoard.save(b);	
+		repoBoard.save(userSession.getUser(),b);	
 	}
 }
