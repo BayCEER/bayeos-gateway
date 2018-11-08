@@ -35,8 +35,8 @@ public class CalculateObsJob implements Runnable {
 
 	@Override
 	public void run() {
-		while(true) {	
-			
+		Thread.sleep(1000*waitSecs);
+		while(true) {				
 		 def exit = -1
 		 def start = new Date()
 		 def rowCalculated = 0
