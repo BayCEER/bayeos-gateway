@@ -89,28 +89,23 @@ class NagiosService {
 	NagiosMessage msgExporter() {
 		log.info("Query status of export job")
 		def db = new Sql(dataSource)				
-		try {
-							
-			def stat = db.firstRow("""
-				select id, start_time, end_time, coalesce(exported,0) as exported,status, extract(EPOCH FROM end_time - start_time) as runtime,  
-				round(coalesce(exported,0)/extract(EPOCH FROM end_time - start_time)) as rps
-				from export_job_stat where end_time is not null and now() - end_time < ('1 hour'::interval) order by id desc limit 1
-				""")						 
-			if (stat != null){
-					// In time
-					if (stat.status == 0){
-						// Finished job
-						return new NagiosMessage(text:"Job finished: runtime: ${stat.runtime} [sec] records:${stat.exported} rate: ${stat.rps} [rps]|time=${stat.runtime}ms recs=${stat.exported} rate=${stat.rps}" , status:0)
+		try {							
+			def r = db.firstRow("""
+						select result_value from board join channel on (board.id = channel.board_id) 
+						join all_observation on all_observation.channel_id = channel.id 
+				 		where board.origin like '\$SYS/ExporterJob' and channel.nr like 'exit' order by result_time desc limit 1;""")						 
+			if (r != null){
+					if (r.result_value > 0){
+						return new NagiosMessage(text:"Job finished succesfully.",status:0)
 					} else {
 						// Critical job
-						return new NagiosMessage(text:"Job failed with error.", status:2)
+						return new NagiosMessage(text:"Job failed with error.",status:2)
 					}
 			} else {
 					// 	Unknown
-					return new NagiosMessage(text:"No Job status found.", status:3)
+					return new NagiosMessage(text:"No job status found.", status:3)
 			}
-										
-		
+												
 		} catch (SQLException e){
 			log.error(e.getMessage())
 		} finally {
