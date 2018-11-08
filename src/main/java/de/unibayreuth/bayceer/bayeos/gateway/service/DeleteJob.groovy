@@ -15,6 +15,7 @@ import bayeos.frame.types.LabeledFrame
 
 
 @Component
+@Profile("default")
 class DeleteJob implements Runnable {
 
 	@Autowired

@@ -15,6 +15,7 @@ import bayeos.frame.types.LabeledFrame
 
 
 @Component
+@Profile("default")
 public class CalculateObsJob implements Runnable {
 	
 	@Autowired

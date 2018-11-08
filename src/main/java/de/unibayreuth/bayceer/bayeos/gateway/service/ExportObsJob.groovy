@@ -22,6 +22,7 @@ import java.sql.SQLException
 
 
 @Component
+@Profile("default")
 class ExportObsJob implements Runnable  {
 	
 	private Logger log = Logger.getLogger(ExportObsJob.class)
