@@ -67,7 +67,7 @@ public class Board extends NamedDomainEntity {
 	List<Channel> channels;
 	
 	
-	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE, fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)
 	List<VirtualChannel> virtualChannels;
 		
 		
