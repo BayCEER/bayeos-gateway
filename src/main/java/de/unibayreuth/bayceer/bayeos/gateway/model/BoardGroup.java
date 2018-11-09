@@ -60,6 +60,22 @@ public class BoardGroup extends NamedDomainEntity {
 		return d;		
 	};
 
-					
+		
+	@Transient 
+	public Integer getGroupStatus() {
+		Integer s = null;		
+		if (boards != null){
+			for(Board b:boards){
+				if (b.getStatus()!=null) {
+					if (s != null) {
+						s = (b.getStatus()>s)?b.getStatus():s;
+					} else {
+						s = b.getStatus();
+					}					
+				};				
+			}
+		}
+		return s;
+	};
 	
 }
