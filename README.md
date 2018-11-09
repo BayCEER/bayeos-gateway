@@ -46,6 +46,12 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.4.3, November 11, 2018
+- Report metrics data to redis
+- Linux like configuration in /etc/bayeos-gateway/application.properties 
+- Constants values in virtual channel functions 
+- Fixed performance bug in group and device list
+ 
 ### Version 2.4.0, October 17, 2018
 - [Multitenancy based on domains](https://github.com/BayCEER/bayeos-gateway/issues/34)
 - [LDAP Authentication](https://github.com/BayCEER/bayeos-gateway/issues/44)
