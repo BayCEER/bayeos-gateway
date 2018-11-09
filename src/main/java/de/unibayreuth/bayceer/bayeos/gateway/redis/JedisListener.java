@@ -12,14 +12,16 @@ import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEvent;
 import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEventListener;
 import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEventType;
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewObservationEvent;
+ 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
 @Component
 public class JedisListener implements FrameEventListener {
 	
 	@Autowired
-	private Jedis jedis;
+	private JedisPool jedisPool;
 	
 	private String hostname;
 	
@@ -35,42 +37,38 @@ public class JedisListener implements FrameEventListener {
 	@Override
 	public void eventFired(FrameEvent e) throws IOException {
 		if (e.getType() == FrameEventType.NEW_OBSERVATION) {
-			try {				
+			try (Jedis jedis = jedisPool.getResource()){				
 				NewObservationEvent o = (NewObservationEvent) e;
 				if (!o.getOrigin().startsWith("$SYS")) {									
 					LocalDateTime d = LocalDateTime.now();										
 					Long counts = o.getCounts();
 					jedis.sadd("gateways", hostname);
 					String key = "gateway:" + hostname;					
-					updateHash(key,"y",d.getYear(),counts);
-					updateHash(key,"m",d.getMonthValue(),counts);					
-					updateHash(key,"d",d.getDayOfMonth(),counts);
-					updateHash(key,"h",d.getHour(),counts);					
+					updateHash(jedis,key,"y",d.getYear(),counts);
+					updateHash(jedis, key,"m",d.getMonthValue(),counts);					
+					updateHash(jedis, key,"d",d.getDayOfMonth(),counts);
+					updateHash(jedis, key,"h",d.getHour(),counts);					
 				}
 				
 			} catch (JedisException ex) {
 				throw new IOException(ex.getMessage());
 			}
 			
-		}
-		
-
+		}		
 	}
 
 
-	private void updateHash(String key, String field, int value, Long counts) {
-				String ct = jedis.hget(key, field);
-				String fieldC = field + ":c";
-				if (ct == null || Long.valueOf(ct) < value) {
-					jedis.hset(key,field,Long.toString(value));
-					jedis.hset(key,fieldC,Long.toString(counts));
+	private void updateHash(Jedis jedis,String key, String interval, int value, Long counts) {
+				String intervalCount = interval + ":c";				
+				if (jedis.hget(key,interval).equals(String.valueOf(value))) {
+					jedis.hincrBy(key,intervalCount,counts);						
 				} else {
-					jedis.hincrBy(key,fieldC, counts);					
+					jedis.hset(key,interval,Long.toString(value));
+					jedis.hset(key,intervalCount,Long.toString(counts));		
 				}
-						
-								
-				
-	
 	}
-
+	
+	
+	
+	
 }
