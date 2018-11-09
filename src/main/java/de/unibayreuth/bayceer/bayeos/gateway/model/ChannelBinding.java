@@ -19,6 +19,10 @@ public class ChannelBinding extends UniqueEntity implements Serializable {
 	@Column(columnDefinition="text")
 	private String nr;
 	
+	
+	@Column
+	private Float value;
+	
 	private static final long serialVersionUID = 1L;
 	
 	@ManyToOne
@@ -29,6 +33,8 @@ public class ChannelBinding extends UniqueEntity implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="channel_function_param_id")
 	private ChannelFunctionParameter parameter;
+	
+	
 
 
 	public String getNr() {
@@ -64,6 +70,19 @@ public class ChannelBinding extends UniqueEntity implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+
+
+	public Float getValue() {
+		return value;
+	}
+
+
+	public void setValue(Float value) {
+		this.value = value;
+	}
+
+
+	
 	
 	   
 }

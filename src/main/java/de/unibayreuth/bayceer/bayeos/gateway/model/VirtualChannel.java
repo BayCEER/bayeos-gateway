@@ -47,11 +47,10 @@ public class VirtualChannel extends UniqueEntity {
 		
 	public Object eval(ScriptEngine engine, Map<String,Object> values) throws ScriptException {				
 		Map<String,Object> params = new HashMap<>(channelBindings.size());	
-		for(ChannelBinding b:channelBindings){
-			String nr = b.getParameter().getName();
-			Object o = values.get(b.getNr());
-			if (o == null) throw new ScriptException("Missing input value for parameter " + nr + "."); 
-			params.put(nr,o);
+		for(ChannelBinding b:channelBindings){			
+			String pName = b.getParameter().getName();
+			// Overwrite channel value with constant
+			params.put(pName,(b.getValue() != null)?b.getValue():values.get(b.getNr()));
 		}						
 		return engine.eval(getChannelFunction().getBody(), new SimpleBindings(params));		
 	}
@@ -70,7 +69,7 @@ public class VirtualChannel extends UniqueEntity {
 			} else {
 				first = false;				
 			}			
-			b.append(cb.getParameter().getName()).append("=").append(cb.getNr());
+			b.append(cb.getParameter().getName()).append("=").append((cb.getValue()!=null)?cb.getValue():cb.getNr());
 		}		
 		b.append(")");
 		return b.toString();

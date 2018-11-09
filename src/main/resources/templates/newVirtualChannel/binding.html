@@ -19,7 +19,8 @@
 				<thead>
 					<tr>					
 						<th th:text="#{cfp.parameter}" class="col-xs-2">Parameter</th>
-						<th th:text="#{cfp.description}" class="col-xs-8">Description</th>
+						<th th:text="#{cfp.description}" class="col-xs-6">Description</th>
+						<th th:text="#{a.value}" class="col-xs-2">Wert</th>
 						<th th:text="#{e.channel}" class="col-xs-2">Kanal</th>												
 					</tr>
 				</thead>				
@@ -31,9 +32,12 @@
 						</td>
 						<td>							
 							<span th:text="${p.description}"></span>
-						</td>						
+						</td>	
+						<td>
+							<input type="text" class="form-control" th:field="*{bindings[__${stat.index}__].value}"/>
+						</td>					
 						<td>																
-							<input type="text" class="form-control" required="required" th:field="*{channelNrs[__${stat.index}__]}"/>
+							<input type="text" class="form-control" th:field="*{bindings[__${stat.index}__].nr}"/>
 						</td>							
 					</tr>	
 				</tbody>		

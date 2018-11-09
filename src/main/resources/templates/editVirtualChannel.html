@@ -26,7 +26,8 @@
 				<thead>
 					<tr>					
 						<th th:text="#{cfp.parameter}" class="col-xs-2">Parameter</th>
-						<th th:text="#{cfp.description}" class="col-xs-8">Description</th>
+						<th th:text="#{cfp.description}" class="col-xs-6">Description</th>
+						<th th:text="#{a.value}" class="col-xs-2">Wert</th>
 						<th th:text="#{e.channel}" class="col-xs-2">Kanal</th>												
 					</tr>
 				</thead>				
@@ -39,10 +40,13 @@
 							<input type="hidden" th:field="*{channelBindings[__${stat.index}__].virtualchannel.id}"/>
 						   	<span th:text="${b.parameter.name}"></span>						   			
 						</td>
-						<td>
-							
+						
+						<td>							
 							<span th:text="${b.parameter.description}"></span>
-						</td>						
+						</td>
+						<td>
+							<input type="text" th:field="*{channelBindings[__${stat.index}__].value}"/>
+						</td>												
 						<td>
 							<input type="text" th:field="*{channelBindings[__${stat.index}__].nr}"/>
 						</td>							

@@ -11,11 +11,33 @@ public class VirtualChannelWebFlow implements Serializable {
 
 	public String nr;
 	public Integer index;	
-	public List<String> channelNrs = new ArrayList<String>(5);
+	
+	public class Binding implements Serializable {
+		
+		public Binding() {		
+		}
+		
+		private String nr;
+		private Float value;
+		public String getNr() {
+			return nr;
+		}
+		public void setNr(String nr) {
+			this.nr = nr;
+		}
+		public Float getValue() {
+			return value;
+		}
+		public void setValue(Float value) {
+			this.value = value;
+		}
+	}
+		 
+	public List<Binding> bindings = new ArrayList<Binding>(5);
 	
 	public void init(ChannelFunction f){
 		for(ChannelFunctionParameter p:f.getParameters()){
-			channelNrs.add("");
+			bindings.add(new Binding());			
 		}
 	}
 		
@@ -38,27 +60,16 @@ public class VirtualChannelWebFlow implements Serializable {
 		this.index = index;
 	}
 
+	public List<Binding> getBindings() {
+		return bindings;
+	}
 
-	public List<String> getChannelNrs() {
-		return channelNrs;
+	public void setBindings(List<Binding> bindings) {
+		this.bindings = bindings;
 	}
 
 
-	public void setChannelNrs(List<String> channelNrs) {
-		this.channelNrs = channelNrs;
-	}
 	
-	@Override
-	public String toString() {
-		StringBuffer b = new StringBuffer();
-		b.append("nr:").append(nr).append(" index:").append(index).append(" size:");
-		if (channelNrs!=null){
-			b.append(channelNrs.size());	
-		} else {
-			b.append(0);			
-		}
 		
-		return b.toString();
-	}
 	
 }
