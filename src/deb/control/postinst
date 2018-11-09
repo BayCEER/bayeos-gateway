@@ -11,6 +11,8 @@ su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
 # Gateway 
 chmod +x /var/lib/bayeos-gateway/bayeos-gateway.jar
 ln -sf /var/lib/bayeos-gateway/bayeos-gateway.jar /etc/init.d/bayeos-gateway
+ln -sf /etc/bayeos-gateway/application.properties /var/lib/bayeos-gateway/application.properties
+
 update-rc.d bayeos-gateway defaults
 service bayeos-gateway start  
 
