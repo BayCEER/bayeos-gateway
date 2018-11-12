@@ -26,7 +26,7 @@ public class JedisListener implements FrameEventListener {
 	private String hostname;
 	
 	public JedisListener() {		
-		try {
+		try {	
 			hostname = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
 			hostname = "";
@@ -59,8 +59,9 @@ public class JedisListener implements FrameEventListener {
 
 
 	private void updateHash(Jedis jedis,String key, String interval, int value, Long counts) {
-				String intervalCount = interval + ":c";				
-				if (jedis.hget(key,interval).equals(String.valueOf(value))) {
+				String intervalCount = interval + ":c";	
+				String v = jedis.hget(key,interval);
+				if (v!=null && v.equals(String.valueOf(value))) {
 					jedis.hincrBy(key,intervalCount,counts);						
 				} else {
 					jedis.hset(key,interval,Long.toString(value));
