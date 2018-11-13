@@ -24,6 +24,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+
 
 @Configuration
 @EnableWebSecurity
@@ -50,6 +52,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 	
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private UserRepository userRepo;
 	
 	
 	@Override
@@ -150,9 +155,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	authProvider.setPort(ldap_port);
     	authProvider.setSsl(ldap_ssl);
     	authProvider.setVersion(ldap_version);
-    	authProvider.setUserDetailsService(userDetailsService);    	
+    	authProvider.setUserRepo(userRepo);    	
     	return authProvider;
     }
+
+	public Boolean getLdapAuth() {
+		return ldap_auth;
+	}
     
     
     	

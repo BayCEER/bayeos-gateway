@@ -17,20 +17,24 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
 	@Autowired
     private UserRepository userRepository;
         
-    @Override
+    
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {    	
     	String[] context = StringUtils.split(name, "@");
         User user;
     	if (context.length < 2) {
-    		user = userRepository.findFirstByNameAndDomainIsNull(context[0]);
+    		user = userRepository.findFirstByNameAndDomainIsNullAndLockedIsFalseAndPasswordIsNotNull(context[0]);
     	} else {
-    		user = userRepository.findFirstByNameAndDomainName(context[0],context[1]);
+    		user = userRepository.findFirstByNameAndDomainNameAndLockedIsFalseAndPasswordIsNotNull(context[0],context[1]);
     	}    		               
         if(user == null) {
             throw new UsernameNotFoundException("Invalid credentials");
         } 
         return new CustomUserDetails(user);
     }
+       
     
-      
+    
+        
+    
+         
 }

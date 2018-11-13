@@ -17,6 +17,12 @@ public class User extends NamedDomainEntity {
 			
 	protected String password;
 	
+	@Column(name="first_name")
+	private String firstName;
+	
+	@Column(name="last_name")
+	private String lastName;	
+	
 	@Enumerated(EnumType.STRING)
 	private Role role = Role.USER;;
 	
@@ -29,9 +35,7 @@ public class User extends NamedDomainEntity {
 	@Transient
 	private String newPasswordRepetition;
 	
-	public boolean newPassword() {
-		return (newPassword != null) && (newPasswordRepetition != null); 
-	}
+	
 	
 	public void encodeNewPassword() {
 		MessageDigestPasswordEncoder pwe = new ShaPasswordEncoder();
@@ -41,11 +45,12 @@ public class User extends NamedDomainEntity {
 	
 	@AssertTrue
 	public boolean isPasswordMatch() {
-		if (newPassword()) {			
+		if (newPassword != null && newPasswordRepetition != null) {
 			return newPassword.equals(newPasswordRepetition);
 		} else {
-			return true;
+			return newPassword == newPasswordRepetition;	
 		}
+		 
 	}
 		
 	public boolean isUser() {
@@ -120,6 +125,22 @@ public class User extends NamedDomainEntity {
 	
 	public void setUserName(String name) {
 		this.name = name;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 	
 	

@@ -9,29 +9,45 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.thymeleaf.util.StringUtils;
 
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPException;
 import com.novell.ldap.LDAPJSSESecureSocketFactory;
 
+import de.unibayreuth.bayceer.bayeos.gateway.model.User;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+
 
 
 public class LdapAuthenticationProvider implements AuthenticationProvider{
-				
+	
+	
 	private String dn;
 	private String host;	
 	private int port;
 	private Boolean ssl;
-	private int version;	
-	private UserDetailsService userDetailsService;
-	private LDAPConnection con;
-	
+	private int version;
+	private UserRepository userRepo;	
+	private LDAPConnection con;	
 	private Logger log = Logger.getLogger(LdapAuthenticationProvider.class);
+
 
 	
 	@Override
-	public Authentication authenticate(Authentication auth) throws AuthenticationException {		
-		UserDetails u = userDetailsService.loadUserByUsername(auth.getName());						
+	public Authentication authenticate(Authentication auth) throws AuthenticationException {			
+		String[] context = StringUtils.split(auth.getName(), "@");
+        User user;
+    	if (context.length < 2) {
+    		user = userRepo.findFirstByNameAndDomainIsNullAndLockedIsFalse(context[0]);
+    	} else {
+    		user = userRepo.findFirstByNameAndDomainNameAndLockedIsFalse(context[0],context[1]);
+    	}    		               
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid credentials");
+        } 
+													
 		if (con == null) {
 			if (ssl) {
 				con = new LDAPConnection(new LDAPJSSESecureSocketFactory());
@@ -39,13 +55,14 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 				con = new LDAPConnection();
 			}			
 		}
-		
+		 
+		UserDetails ud = new CustomUserDetails(user);
 		try {
 			con.connect(host, port);			
-			con.bind(version, String.format(dn,u.getUsername()), auth.getCredentials().toString().getBytes("UTF8"));			
+			con.bind(version, String.format(dn,ud.getUsername()), auth.getCredentials().toString().getBytes("UTF8"));			
 			if (con.isBound()) {
-				UsernamePasswordAuthenticationToken a = new UsernamePasswordAuthenticationToken(u, auth.getCredentials(),u.getAuthorities()); 				
-				a.setDetails(u);
+				UsernamePasswordAuthenticationToken a = new UsernamePasswordAuthenticationToken(ud, auth.getCredentials(),ud.getAuthorities()); 				
+				a.setDetails(ud);
 				return a;
 			} else {
 				return null;			
@@ -109,14 +126,7 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	public void setVersion(int version) {
 		this.version = version;
 	}
-
-	public UserDetailsService getUserDetailsService() {
-		return userDetailsService;
-	}
-
-	public void setUserDetailsService(UserDetailsService userDetailsService) {
-		this.userDetailsService = userDetailsService;
-	}
+	
 
 	public LDAPConnection getCon() {
 		return con;
@@ -133,6 +143,16 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	public void setLog(Logger log) {
 		this.log = log;
 	}
+
+		
+
+	public void setUserRepo(UserRepository userRepo) {
+		this.userRepo = userRepo;		
+	}
+
+	
+
+	
 	
 
 }

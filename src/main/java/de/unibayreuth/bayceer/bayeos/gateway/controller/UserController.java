@@ -33,8 +33,7 @@ public class UserController extends AbstractController {
 	public String create(Model model){
 		User u = new User();
 		u.setDomain(userSession.getUser().getDomain());
-		model.addAttribute("user",u);	
-		model.addAttribute("action","create");
+		model.addAttribute("user",u);			
 		return "editUser";		
 	}
 			
@@ -42,17 +41,12 @@ public class UserController extends AbstractController {
 	@RequestMapping(value="/users/save", method=RequestMethod.POST)
 	public String save(@Valid User user, BindingResult bindingResult, RedirectAttributes redirect, Locale locale, Model model){
 		if (bindingResult.hasErrors()){
-			model.addAttribute("action",(user.getId()==null)?"create":"edit");
 			return "editUser";
-		}					
-		if (user.newPassword()){
-			user.encodeNewPassword();			
-		} else {
-			// Re-fetch old password			
-			User u = repo.findOne(user.getId());
-			user.setPassword(u.getPassword());						
 		}
-		repo.save(user);		
+				
+		if (user.getNewPassword()!=null) user.encodeNewPassword();
+		
+		repo.save(userSession.getUser(),user);		
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/users";
 	}
@@ -65,19 +59,46 @@ public class UserController extends AbstractController {
 	}
 	
 	
+	
+	@RequestMapping(value="/users/editPassword/{id}", method=RequestMethod.GET)
+	public String editPassword(@PathVariable Long id , Model model) {
+		User u = repo.findOne(id);				 
+		u.setPassword(null);
+		model.addAttribute("user",u);
+		return "editPassword";
+	}
+	
+	@RequestMapping(value="/users/savePassword", method=RequestMethod.POST)
+	public String savePassword(@Valid User user, BindingResult bindingResult, RedirectAttributes redirect, Locale locale, Model model){
+		if (bindingResult.hasErrors()){
+			return "editPassword";
+		}		
+		User u = repo.findOne(userSession.getUser(), user.getId());		
+		if (user.getNewPassword()!=null) {
+			user.encodeNewPassword();
+			u.setPassword(user.getPassword());
+		} else {
+			u.setPassword(null);
+		}
+		
+		repo.save(userSession.getUser(),u);		
+		redirect.addFlashAttribute("globalMessage", getMsg("login.password", locale) + " " + getMsg("action.saved", locale));
+		return "redirect:/users";
+	}
+	
+	
 	@RequestMapping(value="/users/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
 		User u = repo.findOne(id);				 
 		u.setPassword(null);
-		model.addAttribute("user",u);
-		model.addAttribute("action","edit");
+		model.addAttribute("user",u);		
 		return "editUser";		
 	}
 	
 		
 	@RequestMapping(value="/users/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {
-		repo.delete(id);		
+		repo.delete(userSession.getUser(),id);		
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/users";
 	}

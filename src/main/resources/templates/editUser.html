@@ -22,13 +22,15 @@
 
 		<form method="post" action="#" th:action="@{/users/save}" th:object="${user}">
 
-			<input type="hidden" th:field="*{id}" />
-			<div th:replace="field::selectDomain"></div>			
+			<input type="hidden" th:field="*{id}"/>
+			<div th:replace="field::selectDomain"></div>
+			<div th:replace="field::text(prop='firstName',label=#{user.firstName},required=false)"></div>
+			<div th:replace="field::text(prop='lastName',label=#{user.lastName},required=false)"></div>
 			<div th:replace="field::text(prop='name',label=#{user.name},required=true)"></div>
-			<div
-				th:replace="field::password(prop='newPassword',label=#{user.password},required=(${action}=='create'))"></div>
-			<div
-				th:replace="field::password(prop='newPasswordRepetition',label=#{user.passwordVerification},required=(${action}=='create'))"></div>
+			<th:block th:if="*{id} == null">			
+				<div th:replace="field::password(prop='newPassword',label=#{user.password},required=false)"></div>
+				<div th:replace="field::password(prop='newPasswordRepetition',label=#{user.passwordVerification},required=false)"></div>			
+			</th:block>			
 			<div th:replace="field::radio('role',#{user.role},${allRoles})"></div>
 			<th:block th:if="*{id} != ${#authentication.principal.id}">
 				<div th:replace="field::checkbox('locked',#{user.locked})"></div>

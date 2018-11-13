@@ -20,11 +20,18 @@
 			</ul>
 		</div>		
 
-		<form method="post" action="#" th:action="@{/profile/save}" th:object="${user}">
-			<input type="hidden" th:field="*{userName}" />														
-			<div th:replace="field::password(prop='newPassword',label=#{user.password},required=true)"></div>
-			<div th:replace="field::password(prop='newPasswordRepetition',label=#{user.passwordVerification},required=true)"></div>			
-			<button th:text="#{action.save}" type="submit"	class="btn btn-default">Save</button>
+		<form method="post" action="#" th:action="@{/profile/save}" th:object="${user}">			
+			<div th:replace="field::text(prop='firstName',label=#{user.firstName},required=false)"></div>
+			<div th:replace="field::text(prop='lastName',label=#{user.lastName},required=false)"></div>								
+			<div th:replace="field::text(prop='userName',label=#{user.name},required=true)"></div>
+				
+			<div class="block-action">																						
+			<button th:text="#{action.save}" type="submit"	class="btn btn-primary"></button>
+			<a th:href="@{'/users/editPassword/' + *{id}}" class="btn btn-default">
+			<span class="glyphicon glyphicon-lock">
+			</span> <span th:text="#{action.editPassword}"></span>
+			</a>
+			</div>
 		</form>
 	</div>
 </body>

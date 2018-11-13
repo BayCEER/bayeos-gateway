@@ -22,15 +22,14 @@ public class ProfileController extends AbstractController {
 	@Autowired
 	UserRepository repo;
 				
-
 	@RequestMapping(value="/profile/save", method=RequestMethod.POST)
 	public String save(@Valid User user, BindingResult bindingResult, RedirectAttributes redirect, Locale locale, Model model){			
 		if (bindingResult.hasErrors()){			
 			return "editProfile";
-		}		
-		user.encodeNewPassword();		
-		User u = repo.findOne(userSession.getUser().getId());				
-		u.setPassword(user.getPassword());
+		}						
+		User u = repo.findOne(userSession.getUser().getId());
+		u.setFirstName(user.getFirstName());
+		u.setLastName(user.getLastName());				
 		repo.save(u);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/";

@@ -18,6 +18,10 @@
 									<th th:if="${#authentication.principal.inNullDomain()}"><a
 										class="sorted" sd:pagination-sort="domainName"
 										th:text="#{e.domain}">Domain</a></th>
+									<th><a class="sorted" sd:pagination-sort="lastName"
+										th:text="#{user.lastName}">Last Name</a></th>										
+									<th><a class="sorted" sd:pagination-sort="firstName"
+										th:text="#{user.firstName}">Last Name</a></th>										
 									<th><a class="sorted" sd:pagination-sort="name"
 										th:text="#{user.name}">Name</a></th>
 									<th><a class="sorted" sd:pagination-sort="role"
@@ -36,21 +40,27 @@
 									<td th:if="${#authentication.principal.inNullDomain()}">
 										<a th:if="${u.domain} != null" th:href="@{/domains/{id}(id=${u.domain.id})}" th:text="${u.domain.name}">Domain</a>
 									</td>
+									<td th:text="${u.lastName}">Last Name</td>
+									<td th:text="${u.firstName}">First Name</td>
 									<td>
 										<a th:href="@{/users/{id}(id=${u.id})}"	th:text="${u.name}">User A</a>
 									</td>
 									<td th:text="${u.role}">Role</td>
 									<td>
 										<div th:include="field::yesno (${u.locked})"></div></td>
-									<td>
-										<div class="pull-right">
-											<div th:replace="table::edit(@{'/users/' + ${u.id}},false)"></div>
-											<th:block th:if="${u.id} != ${#authentication.principal.id}">
-												<div
-													th:replace="table::delete(@{'/users/delete/' + ${u.id}},false)"></div>
-											</th:block>
-
-										</div>
+									<td>										
+										<div class="btn-group pull-right">
+											<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown"><span
+												th:text="#{e.user}"></span> <span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu">
+												<li><a th:href="@{'/users/' + ${u.id}}"><span class="glyphicon glyphicon-edit"></span> <span th:text="#{action.edit}"></span></a></li>
+												<li><a th:href="@{'/users/editPassword/' + ${u.id}}"><span class="glyphicon glyphicon-lock"></span> <span th:text="#{action.editPassword}"></span></a></li>												
+												<th:block th:if="${u.id} != ${#authentication.principal.id}">
+													<li><a th:href="@{'/users/delete/' + ${u.id}}"><span class="glyphicon glyphicon-remove"></span> <span th:text="#{action.delete}"></span></a></li>
+												</th:block>												
+											</ul>
+										</div>											
 									</td>
 								</tr>
 							</tbody>
