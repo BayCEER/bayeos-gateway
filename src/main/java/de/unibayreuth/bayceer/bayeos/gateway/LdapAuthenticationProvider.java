@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.thymeleaf.util.StringUtils;
 
 import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;
 import com.novell.ldap.LDAPJSSESecureSocketFactory;
 
@@ -25,6 +26,9 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	
 	
 	private String dn;
+	private String sn;
+	private String givenName;
+	
 	private String host;	
 	private int port;
 	private Boolean ssl;
@@ -32,6 +36,7 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	private UserRepository userRepo;	
 	private LDAPConnection con;	
 	private Logger log = Logger.getLogger(LdapAuthenticationProvider.class);
+	private Boolean refineUser;
 
 
 	
@@ -58,9 +63,19 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 		 
 		UserDetails ud = new CustomUserDetails(user);
 		try {
-			con.connect(host, port);			
-			con.bind(version, String.format(dn,ud.getUsername()), auth.getCredentials().toString().getBytes("UTF8"));			
-			if (con.isBound()) {
+			con.connect(host, port);
+			String dname  = String.format(dn,ud.getUsername());
+			con.bind(version, dname, auth.getCredentials().toString().getBytes("UTF8"));			
+			if (con.isBound()) {				
+				if (refineUser) {
+					if (user.getFirstName() == null || user.getLastName() == null) {
+						LDAPEntry e = con.read(dname,new String[] {givenName,sn} );						
+						user.setFirstName(e.getAttribute(givenName).getStringValue());
+						user.setLastName(e.getAttribute(sn).getStringValue());
+						userRepo.save(user);
+						log.info("Refined user " + user.getName() + " with LDAP information");
+					}
+				}											
 				UsernamePasswordAuthenticationToken a = new UsernamePasswordAuthenticationToken(ud, auth.getCredentials(),ud.getAuthorities()); 				
 				a.setDetails(ud);
 				return a;
@@ -148,6 +163,26 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 
 	public void setUserRepo(UserRepository userRepo) {
 		this.userRepo = userRepo;		
+	}
+
+	public String getSn() {
+		return sn;
+	}
+
+	public void setSn(String sn) {
+		this.sn = sn;
+	}
+
+	public String getGivenName() {
+		return givenName;
+	}
+
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+
+	public void setRefineUser(Boolean value) {
+		this.refineUser = value;		
 	}
 
 	

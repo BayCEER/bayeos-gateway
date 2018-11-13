@@ -37,6 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${LDAP_DN:cn=%s}")
 	private String ldap_dn;
 	
+		
 	@Value("${LDAP_HOST:localhost}")
 	private String ldap_host;
 	
@@ -49,6 +50,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${LDAP_VERSION:3}")	
 	private int ldap_version;
 	
+	@Value("${LDAP_REFINE_USER:true}")
+	private Boolean ldap_refine_user;
+	
+	@Value("${LDAP_SN:sn}")
+	private String ldap_sn;
+		
+	@Value("${LDAP_GIVEN_NAME:givenName}")
+	private String ldap_givenName;
+	
+				
 	 	
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -155,7 +166,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	authProvider.setPort(ldap_port);
     	authProvider.setSsl(ldap_ssl);
     	authProvider.setVersion(ldap_version);
-    	authProvider.setUserRepo(userRepo);    	
+    	authProvider.setUserRepo(userRepo); 
+    	authProvider.setSn(ldap_sn);
+    	authProvider.setGivenName(ldap_givenName);
+    	authProvider.setRefineUser(ldap_refine_user);
     	return authProvider;
     }
 
