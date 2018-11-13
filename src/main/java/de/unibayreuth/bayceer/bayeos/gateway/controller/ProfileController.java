@@ -36,8 +36,9 @@ public class ProfileController extends AbstractController {
 	}		
 	
 	@RequestMapping(value="/profile/edit", method=RequestMethod.GET)
-	public String edit(Model model){		
-		model.addAttribute("user", userSession.getUser());		
+	public String edit(Model model){	
+		User u = repo.findOne(userSession.getUser().getId());
+		model.addAttribute("user", u);		
 		return "editProfile";		
 	}
 	
