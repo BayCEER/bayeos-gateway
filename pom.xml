@@ -3,7 +3,7 @@
   
   <groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.4.4</version>
+	<version>2.4.5</version>
 
 
 	<licenses>
@@ -65,8 +65,9 @@
 				<log.level>INFO</log.level>
 				<log.path>bayeos-gateway.log</log.path>								
 			</properties>
-			
+						
 			<build>
+			
 			<resources>
 			<resource>
             	<directory>src/main/resources</directory>
@@ -482,7 +483,12 @@
 			<version>2.0.0</version>
 		</dependency>
 
-
+<!-- 
+		<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+ -->
 
 	</dependencies>
 	
