@@ -46,6 +46,11 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.4.5, November 13, 2018
+- New attributes for users    
+- LDAP: Fetch empty user attributes
+- LDAP: Optional user password
+
 ### Version 2.4.3, November 11, 2018
 - Report metrics data to redis
 - Linux like configuration in /etc/bayeos-gateway/application.properties 
