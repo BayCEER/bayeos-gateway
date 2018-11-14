@@ -1,0 +1,18 @@
+<configuration>
+  <appender name="A" class="ch.qos.logback.core.rolling.RollingFileAppender">    
+    <File>${log.file}</File>
+    <encoder>
+      <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <maxIndex>10</maxIndex>
+      <FileNamePattern>${log.file}.%i</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>5MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+  <root level="${log.level}">
+    <appender-ref ref="A"/>
+  </root>
+</configuration>
