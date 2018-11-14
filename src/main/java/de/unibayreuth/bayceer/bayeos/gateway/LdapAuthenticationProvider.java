@@ -45,9 +45,9 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 		String[] context = StringUtils.split(auth.getName(), "@");
         User user;
     	if (context.length < 2) {
-    		user = userRepo.findFirstByNameAndDomainIsNullAndLockedIsFalse(context[0]);
+    		user = userRepo.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalse(context[0]);
     	} else {
-    		user = userRepo.findFirstByNameAndDomainNameAndLockedIsFalse(context[0],context[1]);
+    		user = userRepo.findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalse(context[0],context[1]);
     	}    		               
         if (user == null) {
             throw new UsernameNotFoundException("Invalid credentials");
