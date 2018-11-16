@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import de.unibayreuth.bayceer.bayeos.gateway.ldap.LDAPSearchController;
+import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapAuthenticationProvider;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Role;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
@@ -29,11 +31,19 @@ public class UserController extends AbstractController {
 	@Autowired 
 	UserRepository repo;
 	
+	@Autowired
+	LdapAuthenticationProvider ldapAuthenticationProvider;
+	
+	@Autowired
+	LDAPSearchController ldapSearchController;
+		
+	
 	@RequestMapping(value="/users/create", method=RequestMethod.GET)
 	public String create(Model model){
 		User u = new User();
 		u.setDomain(userSession.getUser().getDomain());
-		model.addAttribute("user",u);			
+		model.addAttribute("user",u);	
+		model.addAttribute("ldap", ldapAuthenticationProvider != null);
 		return "editUser";		
 	}
 			
@@ -41,6 +51,7 @@ public class UserController extends AbstractController {
 	@RequestMapping(value="/users/save", method=RequestMethod.POST)
 	public String save(@Valid User user, BindingResult bindingResult, RedirectAttributes redirect, Locale locale, Model model){
 		if (bindingResult.hasErrors()){
+			model.addAttribute("ldap", ldapAuthenticationProvider != null);
 			return "editUser";
 		}
 				
@@ -91,10 +102,11 @@ public class UserController extends AbstractController {
 	public String edit(@PathVariable Long id, Model model){
 		User u = repo.findOne(id);				 
 		u.setPassword(null);
-		model.addAttribute("user",u);		
+		model.addAttribute("user",u);
+		model.addAttribute("ldap", ldapAuthenticationProvider != null);
 		return "editUser";		
 	}
-	
+		
 		
 	@RequestMapping(value="/users/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {

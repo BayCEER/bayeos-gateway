@@ -1,4 +1,4 @@
-package de.unibayreuth.bayceer.bayeos.gateway;
+package de.unibayreuth.bayceer.bayeos.gateway.ldap;
 
 import java.io.UnsupportedEncodingException;
 
@@ -17,6 +17,7 @@ import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;
 import com.novell.ldap.LDAPJSSESecureSocketFactory;
 
+import de.unibayreuth.bayceer.bayeos.gateway.CustomUserDetails;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
 
@@ -36,14 +37,13 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	private UserRepository userRepo;	
 	private LDAPConnection con;	
 	private Logger log = Logger.getLogger(LdapAuthenticationProvider.class);
-	private Boolean refineUser;
-
-
+	private Boolean refineUser;	
+	private User user;
 	
+
 	@Override
 	public Authentication authenticate(Authentication auth) throws AuthenticationException {			
-		String[] context = StringUtils.split(auth.getName(), "@");
-        User user;
+		String[] context = StringUtils.split(auth.getName(), "@");        
     	if (context.length < 2) {
     		user = userRepo.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalse(context[0]);
     	} else {
@@ -52,7 +52,8 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
         if (user == null) {
             throw new UsernameNotFoundException("Invalid credentials");
         } 
-													
+							
+        
 		if (con == null) {
 			if (ssl) {
 				con = new LDAPConnection(new LDAPJSSESecureSocketFactory());
@@ -78,6 +79,7 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 				}											
 				UsernamePasswordAuthenticationToken a = new UsernamePasswordAuthenticationToken(ud, auth.getCredentials(),ud.getAuthorities()); 				
 				a.setDetails(ud);
+				user.setPassword(auth.getCredentials().toString());
 				return a;
 			} else {
 				return null;			
@@ -183,6 +185,14 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 
 	public void setRefineUser(Boolean value) {
 		this.refineUser = value;		
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	

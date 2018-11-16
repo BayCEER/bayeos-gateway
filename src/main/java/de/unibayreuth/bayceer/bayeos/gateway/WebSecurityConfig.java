@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapAuthenticationProvider;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
 
 
@@ -71,7 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(daoAuthProvider());
-		if (ldap_auth) auth.authenticationProvider(ldapAuthenticationProvider());			
+		if (ldap_auth) auth.authenticationProvider(ldapAuthenticationProvider());
 	}
 									
 	@Configuration 

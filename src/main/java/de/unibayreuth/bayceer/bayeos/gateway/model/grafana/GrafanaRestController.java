@@ -1,4 +1,4 @@
-package de.unibayreuth.bayceer.bayeos.gateway.controller;
+package de.unibayreuth.bayceer.bayeos.gateway.model.grafana;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,11 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
-import de.unibayreuth.bayceer.bayeos.gateway.model.grafana.DataPoint;
-import de.unibayreuth.bayceer.bayeos.gateway.model.grafana.Metric;
-import de.unibayreuth.bayceer.bayeos.gateway.model.grafana.Query;
-import de.unibayreuth.bayceer.bayeos.gateway.model.grafana.Search;
-import de.unibayreuth.bayceer.bayeos.gateway.model.grafana.Target;
 
 @RestController
 @RequestMapping("/grafana")
@@ -43,7 +38,7 @@ public class GrafanaRestController {
 	
     @GetMapping
 	public String index(){
-		return "{\"msg\":\"This is a grafana Endpoint.\"}";
+		return "{\"msg\":\"This is a grafana endpoint.\"}";
 	}
 	
     @PostMapping("/search")	

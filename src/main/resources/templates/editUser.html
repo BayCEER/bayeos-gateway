@@ -18,6 +18,8 @@
 				<li th:each="err : ${#fields.errors('${user.*}')}" th:text="${err}">Input is incorrect</li>
 			</ul>
 		</div>
+		
+		
 
 
 		<form method="post" action="#" th:action="@{/users/save}" th:object="${user}">
@@ -26,7 +28,18 @@
 			<div th:replace="field::selectDomain"></div>
 			<div th:replace="field::text(prop='firstName',label=#{user.firstName},required=false)"></div>
 			<div th:replace="field::text(prop='lastName',label=#{user.lastName},required=false)"></div>
-			<div th:replace="field::text(prop='name',label=#{user.name},required=true)"></div>
+							
+			<div class="form-group">
+			<label th:text="|#{user.name}*|" class="control-label"></label>	
+	 		<div class="input-group">
+      		
+		    <input type="text" class="form-control" th:required="true" th:field="*{name}"/>
+		    <!-- <span class="input-group-btn" th:if="${ldap}">
+        		<a href="" class="btn btn-default" th:text="#{action.search}" id="ldapSearch">Search</a>
+      		</span> -->		     
+    		</div>
+			</div>
+					
 			<th:block th:if="*{id} == null">			
 				<div th:replace="field::password(prop='newPassword',label=#{user.password},required=false)"></div>
 				<div th:replace="field::password(prop='newPasswordRepetition',label=#{user.passwordVerification},required=false)"></div>			
@@ -36,8 +49,35 @@
 				<div th:replace="field::checkbox('locked',#{user.locked})"></div>
 			</th:block>
 			<button th:text="#{action.save}" type="submit"
-				class="btn btn-default">Save</button>
+				class="btn btn-primary">Save</button>
 		</form>
-	</div>
+		<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+	 /* $('#ldapSearch').click(function(){
+		 var payload = {givenName:"Oliver", cn:"Archner"};
+		  // { givenName:$("#firstName").val(),cn:$("#lastName").val()}
+		 
+		 $.ajax(
+			        {
+			          url: [[ @{'/rest/ldap/search'} ]] ,          
+			          contentType: "application/json",
+			          dataType: "json",
+			          method: "POST",			          
+			          cache: false,
+			          data: JSON.stringify(payload),
+			          timeout: 5000, 
+			          success: function(data){    	              	        
+			            $.each(data, function(val) {	            	              
+			                console.log(val);
+			            });			                                                     	            
+			          },
+			          error: function(xhr){					        	  				            
+			        	  	console.log(xhr);
+			          }			         
+			         }); 
+     }); */
+	/*]]>*/	
+	</script>
+	</div>	
 </body>
 </html>
