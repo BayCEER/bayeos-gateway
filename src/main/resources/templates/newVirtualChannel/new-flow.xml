@@ -39,7 +39,7 @@
                
     <view-state id="binding" model="vc" view="newVirtualChannel/binding">    						
 		<transition on="submit" to="created">
-			<evaluate expression="virtualChannelWebFlowService.create(boardId,vc,channelFunctions[vc.index])"></evaluate>		    	   	
+			<evaluate expression="virtualChannelWebFlowService.create(boardId,vc)"></evaluate>		    	   	
     	</transition>    	
     	<transition on="back" to="func"/>
     </view-state>

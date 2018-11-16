@@ -52,7 +52,7 @@ public class VirtualChannelController extends AbstractController {
 		if (bindingResult.hasErrors()) {
 			return "editVirtualChannel";
 		}
-		checkWrite(vc.getBoard());
+		checkWrite(repoBoard.findOne(vc.getBoard().getId()));
 		repo.save(vc);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/boards/" + vc.getBoard().getId() + "?tab=virtualChannels";

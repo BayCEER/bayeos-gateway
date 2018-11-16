@@ -20,24 +20,25 @@
 					<tr>					
 						<th th:text="#{cfp.parameter}" class="col-xs-2">Parameter</th>
 						<th th:text="#{cfp.description}" class="col-xs-6">Description</th>
-						<th th:text="#{a.value}" class="col-xs-2">Wert</th>
+						<th class="col-xs-2" data-toggle="tooltip" data-placement="top" th:title="#{vc.binding.note}"><span th:text="#{a.const}"></span>
+						<span class="glyphicon glyphicon-info-sign info"></span></th>
 						<th th:text="#{e.channel}" class="col-xs-2">Kanal</th>												
 					</tr>
 				</thead>				
 				<tbody>
 				 
-					<tr th:each="p,stat :${channelFunctions[__${vc.index}__].parameters}">
+					<tr th:each="p:${channelFunctions[__${vc.index}__].parameters}">
 						<td>											
 						   	<span th:text="${p.name}"></span>						   			
 						</td>
 						<td>							
 							<span th:text="${p.description}"></span>
 						</td>	
-						<td>
-							<input type="text" class="form-control" th:field="*{bindings[__${stat.index}__].value}"/>
+						<td>							
+							<input type="text" class="form-control" th:field="*{binding[__${p.name}__].value}"/>
 						</td>					
 						<td>																
-							<input type="text" class="form-control" th:field="*{bindings[__${stat.index}__].nr}"/>
+							<input type="text" class="form-control" th:field="*{binding[__${p.name}__].nr}"/>
 						</td>							
 					</tr>	
 				</tbody>		
