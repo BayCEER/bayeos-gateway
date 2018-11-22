@@ -39,7 +39,7 @@
 												<li>
 													<a th:href="@{'/users/create'}" th:text="#{user.local}"></a> 	
 												</li>																					
-												<li th:if="${@ldapAuthenticationProvider}">
+												<li th:if="${@ldapRestController.ldap_search}">
 													<a th:href="@{'/ldap/selectUser'}" th:text="#{user.ldap}">LDAP User</a>
 												</li>
 											</ul>
