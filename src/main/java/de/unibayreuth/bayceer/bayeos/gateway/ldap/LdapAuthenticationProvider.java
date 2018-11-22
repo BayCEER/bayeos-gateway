@@ -8,7 +8,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.thymeleaf.util.StringUtils;
 
@@ -42,7 +41,8 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	
 
 	@Override
-	public Authentication authenticate(Authentication auth) throws AuthenticationException {			
+	public Authentication authenticate(Authentication auth) throws AuthenticationException {
+		log.debug("Authenticate:" + auth.getName());
 		String[] context = StringUtils.split(auth.getName(), "@");        
     	if (context.length < 2) {
     		user = userRepo.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalse(context[0]);
@@ -66,7 +66,7 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 		try {
 			con.connect(host, port);
 			String dname  = String.format(dn,ud.getUsername());
-			con.bind(version, dname, auth.getCredentials().toString().getBytes("UTF8"));			
+			con.bind(version, dname, auth.getCredentials().toString().getBytes("UTF-8"));			
 			if (con.isBound()) {				
 				if (refineUser) {
 					if (user.getFirstName() == null || user.getLastName() == null) {

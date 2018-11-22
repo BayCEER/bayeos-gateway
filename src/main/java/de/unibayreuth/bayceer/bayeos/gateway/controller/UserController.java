@@ -15,11 +15,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import de.unibayreuth.bayceer.bayeos.gateway.ldap.LDAPSearchController;
+import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapRestController;
 import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapAuthenticationProvider;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Role;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
@@ -35,23 +36,35 @@ public class UserController extends AbstractController {
 	LdapAuthenticationProvider ldapAuthenticationProvider;
 	
 	@Autowired
-	LDAPSearchController ldapSearchController;
+	LdapRestController ldapSearchController;
 		
 	
 	@RequestMapping(value="/users/create", method=RequestMethod.GET)
 	public String create(Model model){
 		User u = new User();
 		u.setDomain(userSession.getUser().getDomain());
-		model.addAttribute("user",u);	
-		model.addAttribute("ldap", ldapAuthenticationProvider != null);
+		model.addAttribute("user",u);			
 		return "editUser";		
 	}
+	
+	
+	@RequestMapping(value="/users/create", method=RequestMethod.POST)
+	public String createWithName(String firstName, String lastName, String userName, Model model){
+		User u = new User();
+		u.setDomain(userSession.getUser().getDomain());
+		u.setFirstName(firstName);
+		u.setLastName(lastName);
+		u.setUserName(userName);		
+		model.addAttribute("user",u);			
+		return "editUser";		
+	}
+	
+	
 			
 		
 	@RequestMapping(value="/users/save", method=RequestMethod.POST)
 	public String save(@Valid User user, BindingResult bindingResult, RedirectAttributes redirect, Locale locale, Model model){
-		if (bindingResult.hasErrors()){
-			model.addAttribute("ldap", ldapAuthenticationProvider != null);
+		if (bindingResult.hasErrors()){			
 			return "editUser";
 		}
 				
@@ -102,10 +115,11 @@ public class UserController extends AbstractController {
 	public String edit(@PathVariable Long id, Model model){
 		User u = repo.findOne(id);				 
 		u.setPassword(null);
-		model.addAttribute("user",u);
-		model.addAttribute("ldap", ldapAuthenticationProvider != null);
+		model.addAttribute("user",u);		
 		return "editUser";		
 	}
+	
+	
 		
 		
 	@RequestMapping(value="/users/delete/{id}", method=RequestMethod.GET)
@@ -115,9 +129,18 @@ public class UserController extends AbstractController {
 		return "redirect:/users";
 	}
 	
+	
+	
 	@ModelAttribute("allRoles")
 	public List<Role> populateFeatures() {
-	    return Arrays.asList(Role.ALL);
+		return Arrays.asList(Role.ALL);
 	}
-
+	
+	@PostMapping(value="/users/search")
+	public String search(@Valid User u, Model model) {		
+		model.addAttribute("user",u);
+		return "searchUser";
+	}
+		
+		
 }

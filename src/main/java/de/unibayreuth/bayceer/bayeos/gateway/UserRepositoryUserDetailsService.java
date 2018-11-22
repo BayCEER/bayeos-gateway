@@ -1,5 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,9 +18,12 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
 	
 	@Autowired
     private UserRepository userRepository;
-        
+
+	private Logger log = LoggerFactory.getLogger(UserRepositoryUserDetailsService.class);
+
     
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {    	
+    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {    
+    	log.debug("Load user:" + name);
     	String[] context = StringUtils.split(name, "@");
         User user;
     	if (context.length < 2) {

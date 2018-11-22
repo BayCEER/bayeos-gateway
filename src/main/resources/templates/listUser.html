@@ -30,9 +30,21 @@
 										th:text="#{user.locked}">Locked</a></th>
 									<th>
 										<div class="btn-group pull-right">
-											<div th:replace="table::add(@{'/users/create'})"></div>
+										<button class="btn btn-default dropdown-toggle" type="button"
+											data-toggle="dropdown">
+										<span class="glyphicon glyphicon-plus"> </span> <span
+											th:text="#{e.user}"></span> <span class="caret"></span>
+										</button>
+											<ul class="dropdown-menu">
+												<li>
+													<a th:href="@{'/users/create'}" th:text="#{user.local}"></a> 	
+												</li>																					
+												<li th:if="${@ldapAuthenticationProvider}">
+													<a th:href="@{'/ldap/selectUser'}" th:text="#{user.ldap}">LDAP User</a>
+												</li>
+											</ul>
 										</div>
-									</th>
+									</th>									
 								</tr>
 							</thead>
 							<tbody>

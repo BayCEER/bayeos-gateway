@@ -46,6 +46,11 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.4.7, November 22, 2018
+- Improved DeleteJob performance
+- LDAP: User search 
+- Grafana search and query for non domain users 
+
 ### Version 2.4.5, November 13, 2018
 - New attributes for users    
 - LDAP: Fetch empty user attributes
