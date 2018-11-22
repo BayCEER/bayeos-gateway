@@ -46,10 +46,16 @@ public class GrafanaRestController {
     	log.debug("Search:" + search);
     	List<String> f = new ArrayList<String>(100);
     	try (Connection con = dataSource.getConnection();
-    			PreparedStatement st = con.prepareStatement("select path from channel_path where path ilike ? and domain_id is not distinct from ? order by 1")){
-    		Domain d = userSession.getUser().getDomain();    		    		
-    		st.setString(1, String.format("%%%s%%",search.getTarget()));    		    		    			 
-    		st.setLong(2, d.getId());
+    			PreparedStatement st = con.prepareStatement("select path from channel_path where path ilike ? and (domain_id = ? or ? is null) order by 1")){    		
+    		st.setString(1, String.format("%%%s%%",search.getTarget()));    		
+    		if (userSession.getDomain()==null) {
+    			st.setNull(2, java.sql.Types.BIGINT);
+    			st.setNull(3, java.sql.Types.BIGINT);
+    		} else {
+    			st.setLong(2, userSession.getDomain().getId());	
+    			st.setLong(3, userSession.getDomain().getId());
+    		}
+    		
     		ResultSet rs = st.executeQuery();    		
     		while(rs.next()) {
     			f.add(rs.getString(1));    			
@@ -72,12 +78,11 @@ public class GrafanaRestController {
     	List<Metric> ret = new ArrayList<Metric>(q.getTargets().size());    	
     	try (Connection con = dataSource.getConnection();PreparedStatement st = con.prepareStatement("select * from get_grafana_obs(?,?,?,?,?) order by result_time asc")   ){    	
     		for(Target t:q.getTargets()){        		
-        		List<DataPoint> points = new ArrayList<>(100);        		
-        		Domain d = userSession.getUser().getDomain();
-        		if (d == null) {
+        		List<DataPoint> points = new ArrayList<>(100);        		        		 
+        		if (userSession.getDomain() == null) {
         			st.setNull(1,java.sql.Types.BIGINT);    			
         		} else {
-        			st.setLong(1, d.getId());
+        			st.setLong(1,userSession.getDomain().getId());
         		}        		
         		st.setString(2,t.getName());
         		st.setString(3,q.getInterval());        		      		
@@ -87,8 +92,7 @@ public class GrafanaRestController {
         		ResultSet rs = st.executeQuery();    		
         		while(rs.next()) {
         			points.add(new DataPoint(rs.getFloat("result_value"),rs.getTimestamp("result_time").getTime()));			
-        		}
-        		st.close();
+        		}        		
         		Metric m = new Metric(t.getName());
         		m.setDatapoints(points);
         		log.debug("Metric:" + t.getName() + " Datapoints:" + points.size());
