@@ -167,12 +167,12 @@ class FrameService {
 							long r = cin.endCopy()
 							break
 						case "Message":
-							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "INFO", domainId])
+							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "INFO", b.domainId])
 							eventProducer.addFrameEvent(new NewMessageEvent(b.id))
 							log.debug("Message saved")
 							break
 						case "ErrorMessage":
-							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "ERROR", domainId])
+							db.executeInsert("insert into message (content, origin, result_time, type, domain_id) values (?,?,?,?,?);",[res['value'], res['origin'], ts.toTimestamp(), "ERROR", b.domainId])
 							eventProducer.addFrameEvent(new NewMessageEvent(b.id))
 							log.debug("ErrorMessage saved")
 							break

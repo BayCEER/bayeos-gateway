@@ -39,7 +39,12 @@ public class MessageRestController extends AbstractController {
 	
 	private Specification<Message> domain(Long id) {
 		return (root, query, cb) -> {
-			return cb.equal(root.get("domain").get("id"), id);
+			if (id == null) {
+				return cb.isNull(root.get("domain"));
+			} else {
+				return cb.equal(root.get("domain").get("id"), id);	
+			}
+			
 		};
 	};
 
