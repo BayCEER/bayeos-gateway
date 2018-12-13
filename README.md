@@ -46,6 +46,9 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.4.9, December 13, 2018
+- Enhanced metrics with board, domain and user counts and calculated frames/h
+
 ### Version 2.4.8, November 28, 2018
 - [Fixed: Message not shown in GUI bug](https://github.com/BayCEER/bayeos-gateway/issues/50)
   
