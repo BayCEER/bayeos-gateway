@@ -65,7 +65,7 @@ Let's send the cpu load of our pc to a local gateway:
 ### Version 2.4.3, November 11, 2018
 - Report metrics data to redis
 - Linux like configuration in /etc/bayeos-gateway/application.properties 
-- Constants values in virtual channel functions 
+- Constant values in virtual channel functions 
 - Fixed performance bug in group and device list
  
 ### Version 2.4.0, October 17, 2018
