@@ -1,6 +1,4 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
-import static org.springframework.data.jpa.domain.Specifications.where;
-
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
@@ -30,32 +28,18 @@ public class MessageRestController extends AbstractController {
 	@Autowired
 	BoardRepository repoBoard;
 	
-	
-	private Specification<Message> origin(String origin) {
+	private Specification<Message> board(Long id) {
 		return (root, query, cb) -> {
-			return cb.equal(root.get("origin"),origin);
+			return cb.equal(root.get("boardId"),id);
 		};
 	}
-	
-	private Specification<Message> domain(Long id) {
-		return (root, query, cb) -> {
-			if (id == null) {
-				return cb.isNull(root.get("domain"));
-			} else {
-				return cb.equal(root.get("domain").get("id"), id);	
-			}
-			
-		};
-	};
-
-	
 	
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(path = "/rest/messages/{id}", method = RequestMethod.POST)
 	public DataTablesOutput<Message> findMessages(@Valid @RequestBody DataTablesInput input, @PathVariable Long id) {		
 		Board b = repoBoard.findOne(userSession.getUser(),id);
 		if (b== null) throw new EntityNotFoundException("Could not find board.");		
-		return repo.findAll(input, null,where( origin(b.getOrigin())).and(domain(b.getDomainId())));
+		return repo.findAll(input,null,board(b.getId()));
 	}
 
 }

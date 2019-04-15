@@ -8,3 +8,4 @@ Depends: postgresql (>= 9.5), postgresql-contrib, postgresql-plperl, apache2, li
 Recommends: ssl-cert
 Description: BayEOS Gateway
 Maintainer: oliver.archner@uni-bayreuth.de
+Homepage: https://github.com/BayCEER/bayeos-gateway  

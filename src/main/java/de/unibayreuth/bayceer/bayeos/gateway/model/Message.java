@@ -10,20 +10,15 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-public class Message extends DomainEntity {
+public class Message extends UniqueEntity {
 	
-	
-	
+		
 	public Message() {
 		super();		
 	}
-
-	@JsonView(DataTablesOutput.View.class)
-	String origin;		
 	
 	@JsonView(DataTablesOutput.View.class)
-	String type;
-	
+	String type;		
 	
 	@JsonView(DataTablesOutput.View.class)
 	String content;
@@ -34,18 +29,22 @@ public class Message extends DomainEntity {
 	
 	@Column(name="insert_time")
 	Date insertTime = new Date();
+	
+	@Column(name="board_id")
+	Long boardId;
+	
 		
+	public Long getBoardId() {
+		return boardId;
+	}
+
+	public void setBoardId(Long boardId) {
+		this.boardId = boardId;
+	}
+
 	public Message(String value){
 		// Hotfix 1.9.12: replace all null chars with space
 		this.content = value.replace((char)0x00,(char)0x20).trim();
-	}
-
-	public String getOrigin() {
-		return origin;
-	}
-
-	public void setOrigin(String origin) {
-		this.origin = origin;
 	}
 
 	public String getType() {

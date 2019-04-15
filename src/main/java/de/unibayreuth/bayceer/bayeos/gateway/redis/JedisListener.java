@@ -32,31 +32,39 @@ public class JedisListener implements FrameEventListener {
 			hostname = "";
 		}		
 	}
+	
+	
+		
+	
+	
+	private Integer calcRate(Jedis jedis, String key, Integer score) throws JedisException {	
+		// Update cached values 
+		// z-ordered set: score: ts , value: counts:ts as string 
+		// value must be unique!
+		ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.systemDefault());					
+		jedis.zremrangeByScore(key, 0, now.minusHours(1).toInstant().toEpochMilli());										
+		jedis.zadd(key,now.toInstant().toEpochMilli(), score + ":" + now.toInstant().toEpochMilli());										
+		
+		// Calculate rate for last hour 
+		int sum = 0;
+		for(String value:jedis.zrange(key, 0, -1)) {
+			sum+= Integer.valueOf(value.split(":")[0]);						
+		}
+		return sum;		
+	}
 		
 	 
 	@Override
 	public void eventFired(FrameEvent e) throws IOException {
 		
 		switch (e.getType()) {
-		case NEW_OBSERVATION :			
-			try (Jedis jedis = jedisPool.getResource()){				
+		case NEW_OBSERVATION :		
+			try (Jedis jedis = jedisPool.getResource()){		
+				jedis.sadd("hostnames", hostname);
 				NewObservationEvent o = (NewObservationEvent) e;
-				if (!o.getOrigin().startsWith("$SYS")) {					
-					jedis.sadd("hostnames", hostname);					
-					String key = hostname + ":obs";										
-					// Update z-ordered set: score: ts , value: counts:ts as string
-					ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.systemDefault());					
-					jedis.zremrangeByScore(key, 0, now.minusHours(1).toInstant().toEpochMilli());										
-					jedis.zadd(key,now.toInstant().toEpochMilli(), o.getCounts() + ":" + now.toInstant().toEpochMilli());										
-					
-					// Calculate rate for last hour 
-					int obs_per_hour = 0;
-					for(String value:jedis.zrange(key, 0, -1)) {
-						obs_per_hour+= Integer.valueOf(value.split(":")[0]);						
-					}					
-					jedis.hset(hostname + ":stats", "obs_per_hour",String.valueOf(obs_per_hour));										
-				}
-				
+				if (!o.getOrigin().startsWith("$SYS")) {																			 								
+					jedis.hset(hostname + ":stats", "obs_per_hour",String.valueOf(calcRate(jedis, hostname + ":obs", o.getCounts().intValue())));										
+				}  				
 			} catch (JedisException ex) {
 				throw new IOException(ex.getMessage());
 			}
