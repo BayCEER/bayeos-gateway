@@ -34,11 +34,13 @@ public class NotificationService implements Runnable {
 	@Autowired(required = false)
 	private MailSender mailSender
 	
-	@Value('${NOTIFICATION_HOST:}')				
-	private String notification_host; 	
+	
 
 	@Value('${NOTIFICATION:false}')
 	private Boolean notification;
+	
+	@Value('${NOTIFICATION_HOST:}')
+	private String notification_host;
 	
 	@Value('${NOTIFICATION_WAIT_SECS:60}')
 	private int waitSecs
@@ -46,8 +48,8 @@ public class NotificationService implements Runnable {
 	@Value('${NOTIFICATION_MAX_SOFT_STATES:4}')
 	private int maxSoftStates
 	
-	@Value('${NOTIFICATION_SENDER:"admin@bayeos.uni-bayreuth.de"}')
-	private String sender;
+	@Value('${NOTIFICATION_SENDER:}')
+	private String notification_sender;
 
 	private Logger log = Logger.getLogger(NotificationService.class)
 	
@@ -57,7 +59,11 @@ public class NotificationService implements Runnable {
 		if (notification_host.equals("")) {			
 			notification_host =  InetAddress.getLocalHost().getCanonicalHostName();		
 		} 	
-		log.info("Notification Host:" + notification_host);
+		log.info("Notification host:" + notification_host);
+		if (notification_sender.equals("")) {
+			notification_sender =  "admin@" + notification_host;
+		}
+		log.info("Notification sender:" + notification_sender);
 		if (notification && (mailSender != null)) {			
 			new Thread(this).start()
 			log.info("Notification service started")
@@ -232,7 +238,7 @@ public class NotificationService implements Runnable {
 				mh.setText(m.body, true);
 				mh.setTo(it.email)								
 				mh.setSubject(subject)																
-				mh.setFrom( (sender=="")?"admin@${notification_host}":sender)
+				mh.setFrom(notification_sender)
 				try{
 					mailSender.send(msg)
 				} catch (MailException ex) {
