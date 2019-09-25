@@ -7,6 +7,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
 
 import org.hibernate.annotations.Formula;
 
@@ -14,11 +17,14 @@ import org.hibernate.annotations.Formula;
 public class Spline extends NamedDomainEntity {
 	
 	
-    
+	
+		
+
 	@OneToMany(mappedBy="spline", cascade=CascadeType.ALL)
 	@OrderBy("x ASC")
-	List<KnotPoint> knotPoints;
-	
+	@NotNull()
+	@Size(min=1)
+	List<KnotPoint> knotPoints;	
 			
 	@Formula("(select count(c.id) > 0  from channel c where c.spline_id = id)")
 	Boolean locked;

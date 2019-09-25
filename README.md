@@ -3,14 +3,14 @@ A sensor gateway to receive, check and aggregate observation data
 
 Main characteristics:
 - Import service for observation data ([BayEOS Frames](https://www.bayceer.uni-bayreuth.de/bayeos/frames) over HTTP)
-- Completeness and value checks 
+- Completeness and value checks  
 - Interpolation and aggregation of observation data 
 - Live charts of measured values 
 - Export service to [BayEOS Server](https://github.com/BayCEER/bayeos-server)
 
 ## Getting Started
 ### Prerequisites
-- Debian/Ubuntu Linux Server with a minimum of 2GB RAM is recommended
+- Debian Linux with a minimum of 2GB RAM
 - Raspian on a Raspberry Pi (Model >=3) is working
 
 ### Installing
@@ -46,6 +46,16 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.5.0, July, 2019
+- State calculation and alerting for devices and device groups
+- DelayedSecondFrame support 
+- Enhanced login dialog with domain drop down
+- REST Interface for channel observations 
+- [Fixed: Incomplete spline function crashes export job](https://github.com/BayCEER/bayeos-gateway/issues/49)
+
+### Version 2.4.10, April 15, 2019
+- [Fixed:  Message not shown after board has been moved to a new domainissue](https://github.com/BayCEER/bayeos-gateway/issues/51) 
+
 ### Version 2.4.9, December 13, 2018
 - Enhanced metrics with board, domain and user counts and calculated frames/h
 
@@ -110,8 +120,4 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## License
 GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1, February 1999
-
-
-
-
 

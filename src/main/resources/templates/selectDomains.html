@@ -3,37 +3,31 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="main">
 <head>
-<title th:text="#{nav.boards}">Boards</title>
+<title th:text="#{nav.domains}">Domains</title>
 </head>
 <body>
 	
 	<div layout:fragment="content">
 		<div class="alert alert-info" role="alert" th:text="#{msg.infoAdd(${parent.name})}"></div>		
 		
-		<form class="form" method="post" action="#" th:action="@{/{controller}/addBoards(controller=${controller})}" th:object="${parent}">
+		<form class="form" method="post" action="#" th:action="@{/{controller}/addDomains(controller=${controller})}" th:object="${parent}">
 		 	
 		 	<input type="hidden" name="id" th:value="*{id}"/>
-		 	<input type="hidden" name="boards" id="boards"/>
+		 	<input type="hidden" name="groups" id="domains"/>
 		 	
 		 	<table id="table" class="table">
 		 		<thead>
 		 			<tr>
-		 				<th>Id</th>
-		 				<th th:text="#{e.domain}" th:if="${#authentication.principal.inNullDomain()}">Domain</th>
-		 				<th th:text="#{board.origin}">Origin</th>
-						<th th:text="#{board.name}">Name</th>						
-						<th th:text="#{board.lrt}">Last Result Time</th> 
+		 				<th>Id</th>		 					
+						<th th:text="#{a.name}">Name</th>												 
 		 			</tr>
 		 		</thead>
 		 		<tbody>
-		 			<tr th:each="i : ${boards}">		 			
-		 				<th th:text="${i.id}"></th>
-		 				<td th:if="${#authentication.principal.inNullDomain()}">
-							<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
-						</td>		 
-		 				<th th:text="${i.origin}"></th>
-		 				<th th:text="${i.name}"></th>
-		 				<th th:text="${{i.lastResultTime}}"></th>
+		 			<tr th:each="i : ${groups}">
+		 				<th th:text="${i.id}"></th>		 			
+		 				<td>																	
+							<a th:href="@{/domains/{id}(id=${i.id})}" th:text="${i.name}">Name</a>
+						</td>						
 		 			</tr>		 		
 		 		</tbody>		 			 	
 		 	</table>

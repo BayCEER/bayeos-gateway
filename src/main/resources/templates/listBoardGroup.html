@@ -38,9 +38,13 @@
 						<td>
 							<div th:replace="field::status(${i.groupStatus})">OK</div>
 						</td>							
-						<td class="pull-right">		
-							<div th:replace="table::edit(@{'/groups/' + ${i.id}},false)"></div>
-							<div th:replace="table::delete(@{'/groups/delete/' + ${i.id}},false)"></div>														  								  								  								
+						<td>		
+							<div class="pull-right">
+								<div th:replace="table::edit(@{'/groups/' + ${i.id}},false)"></div>
+							</div>
+							<div class="pull-right">
+								<div th:replace="table::delete(@{'/groups/delete/' + ${i.id}},false)"></div>
+							</div>														  								  								  								
 						</td>
 					</tr>
 				</tbody>

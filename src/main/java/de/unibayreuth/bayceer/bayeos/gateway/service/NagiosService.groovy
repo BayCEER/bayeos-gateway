@@ -4,6 +4,7 @@ import javax.sql.DataSource
 
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.NagiosMessage
@@ -15,10 +16,8 @@ class NagiosService {
 
 	@Autowired
 	DataSource dataSource
-
-
 	Logger log = Logger.getLogger(NagiosService.class)
-
+	
 	NagiosMessage msgGateway() {
 		log.info("Query status of gateway")
 		def db = new Sql(dataSource)
@@ -41,14 +40,14 @@ class NagiosService {
 		}		
 	}
 
-	NagiosMessage msgGroup(Integer id) {
-		log.info("Query status of group: ${id}")
+	NagiosMessage msgBoardGroup(Integer id) {
+		log.info("Query status of board group: ${id}")
 		def db = new Sql(dataSource)
 		if (db.rows("select true from board_group where id = ?",[id]).empty ){
 			db.close();
 			return new NagiosMessage(status:3,text:"Group ${id} not found");
 		} else {
-			List channels = db.rows("select * from nagios_status where group_id = ?",[id])
+			List channels = db.rows("select * from nagios_status where board_group_id = ?",[id])
 			db.close()
 			NagiosMessage m = getNagiosMsg(channels)
 			return m;
@@ -114,12 +113,10 @@ class NagiosService {
 
 	}
 
-
-
 	private NagiosMessage getNagiosMsg(List channels){
 		def out = new StringBuffer(200)
 		def maxStat = 0
-		def groupName
+		def boardGroupName
 		def domainName
 		def boardOrigin
 		channels.each{
@@ -131,9 +128,9 @@ class NagiosService {
 			}
 			
 			// Group
-			if (it.group_name != groupName){
-				out.append("Group[${it.group_name}]\n")
-				groupName = it.group_name
+			if (it.board_group_name != boardGroupName){
+				out.append("Board Group[${it.board_group_name}]\n")
+				boardGroupName = it.board_group_name
 			}
 			// Board
 			if (it.board_origin != boardOrigin){

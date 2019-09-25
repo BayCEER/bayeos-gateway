@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.notifications}">Notifications</title>
+</head>
+<body>
+	<div layout:fragment="content">
+			<div class="alert alert-info" role="alert" th:if="${!user.hasEmail()}">
+				<a th:href="@{'/profile/edit'}" class="alert-link" th:text="#{msg.infoNoEmail}"></a>				  
+			</div>
+			<div th:if="${user.hasEmail()}">
+			<h3 th:text="#{nav.notifications}">Notifications</h3>
+			<table class="table table-striped" >
+				<thead>
+					
+					<tr>												
+						<th th:if="${#authentication.principal.inNullDomain()}">
+							<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
+						</th>
+						<th>
+							<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a>
+						</th>
+						
+						<th>																				
+							<div class="btn-group pull-right">
+								<button class="btn btn-default dropdown-toggle btn-xs" type="button"
+									data-toggle="dropdown">
+								<span class="glyphicon glyphicon-plus"> </span> <span
+									th:text="#{action.create}"></span> <span class="caret"></span>
+								</button>
+									<ul class="dropdown-menu">
+										<li>
+											<a th:href="@{'/notifications/selectGroups'}">
+											 <span class="glyphicon glyphicon-flag"></span> <span th:text="#{e.boardGroups}">Board Groups</span>
+											</a> 	
+										</li>																					
+										<li>
+											<a th:href="@{'/notifications/selectBoards'}">
+											 <span class="glyphicon glyphicon-hdd"></span> <span th:text="#{e.boards}">Boards</span>
+											</a>
+										</li>
+									</ul>
+							</div>																																									
+						</th>
+					</tr>					
+			
+				</thead>
+				<tbody>
+					<tr th:each="i : ${notifications}">										
+						<td th:if="${#authentication.principal.inNullDomain()}">						
+							<div th:if="${i.board != null}">
+								<div th:if="${i.board.domain != null}">
+									<a th:href="@{/domains/{id}(id=${i.board.domain.id})}" th:text="${i.board.domain.name}">Domain</a>
+								</div>
+							</div>
+							<div th:if="${i.boardGroup != null}">
+								<div th:if="${i.boardGroup.domain != null}">
+									<a th:href="@{/domains/{id}(id=${i.boardGroup.domain.id})}" th:text="${i.boardGroup.domain.name}">Domain</a>
+								</div>
+							</div>																					
+						</td>
+						
+						<td>
+							<div th:if="${i.board} != null">
+								<span class="glyphicon glyphicon-hdd"> </span>
+								<a th:href="@{/boards/{id}(id=${i.board.id})}" th:text="${(i.board.name)?:(i.board.origin)}">Board</a>
+							</div>
+							
+							<div th:if="${i.boardGroup} != null">
+								<span class="glyphicon glyphicon-flag"> </span>
+								<a th:href="@{/groups/{id}(id=${i.boardGroup.id})}" th:text="${i.boardGroup.name}">Board Group</a>															
+							</div>
+						</td>
+						<td>
+							<div class="pull-right">
+								<div th:replace="table::delete(@{'/notifications/remove/' + ${i.id}},false)"></div>
+							</div>													
+						</td>
+						
+						
+						
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>
+		</div>		
+	</div>	
+</body>
+</html>

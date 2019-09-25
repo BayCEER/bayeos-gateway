@@ -15,6 +15,7 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import de.unibayreuth.bayceer.bayeos.gateway.DomainFilter;
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
+import de.unibayreuth.bayceer.bayeos.gateway.model.ObsRow;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Observation;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 
@@ -106,7 +108,11 @@ public class BoardRestController {
 			return jdbcTemplate.query(sql,new Object[]{boardId,lastRowId,boardId,lastRowId}, new ObservationMapper());
 		}		
 	}
-			
+	
+	
+	
+	
+				
 	private static final class ObservationMapper implements RowMapper<Observation> {		
 		public Observation mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Observation o = new Observation();
@@ -117,6 +123,8 @@ public class BoardRestController {
 			return o;
 		}
 	}
+	
+	
 	
 	
 

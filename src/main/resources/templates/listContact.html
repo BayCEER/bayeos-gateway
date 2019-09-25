@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.contacts}">All contacts</title>
+</head>
+<body>
+	<div layout:fragment="content">
+			<h3 th:text="#{nav.contacts}">contacts</h3>
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+						<th th:if="${#authentication.principal.inNullDomain()}"><a
+										class="sorted" sd:pagination-sort="domainName"
+										th:text="#{e.domain}">Domain</a></th>
+						<th><a class="sorted" sd:pagination-sort="name"
+							th:text="#{a.name}">Name</a></th>
+						<th>
+						<div class="btn-group pull-right">
+							<div th:replace="table::add(@{'/contacts/create'})"></div>
+						</div>	
+						
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="i : ${contacts}">
+						<td th:if="${#authentication.principal.inNullDomain()}">
+								<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
+						</td>
+						<td><a th:href="@{/contacts/{id}(id=${i.id})}" th:text="${i.email}">Email</a></td>
+						<td>
+							<div class="pull-right">	
+								<th:block th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}">																			
+								<div th:replace="table::edit(@{'/contacts/' + ${i.id}},false)"></div>
+								<div th:replace="table::delete(@{'/contacts/delete/' + ${i.id}},false)"></div>
+								</th:block>
+							</div>  								  								  								
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

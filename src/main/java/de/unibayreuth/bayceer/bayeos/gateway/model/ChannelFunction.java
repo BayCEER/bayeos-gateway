@@ -18,11 +18,10 @@ public class ChannelFunction extends NamedDomainEntity {
 	@Column(columnDefinition="text")
 	String body;
 	
-
 	@OneToMany(mappedBy="channelFunction", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	private List<ChannelFunctionParameter> parameters = new ArrayList<>();
 	
-		
+	
 	public String getFunctionHead(){		
 		StringBuffer buf = new StringBuffer(name);
 		buf.append("(");

@@ -3,41 +3,37 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="main">
 <head>
-<title th:text="#{nav.boards}">Boards</title>
+<title th:text="#{nav.contacts}">Contacts</title>
 </head>
 <body>
 	
-	<div layout:fragment="content">
-		<div class="alert alert-info" role="alert" th:text="#{msg.infoAdd(${parent.name})}"></div>		
-		
-		<form class="form" method="post" action="#" th:action="@{/{controller}/addBoards(controller=${controller})}" th:object="${parent}">
+	<div layout:fragment="content">	
+		<form class="form" method="post" action="#" th:action="@{/{controller}/addContacts(controller=${controller})}" th:object="${parent}">
 		 	
 		 	<input type="hidden" name="id" th:value="*{id}"/>
-		 	<input type="hidden" name="boards" id="boards"/>
-		 	
-		 	<table id="table" class="table">
+		 	<input type="hidden" name="contacts" id="contacts"/>
+		 		 	
+		 	<table id="table" class="table">		 		
 		 		<thead>
 		 			<tr>
 		 				<th>Id</th>
 		 				<th th:text="#{e.domain}" th:if="${#authentication.principal.inNullDomain()}">Domain</th>
-		 				<th th:text="#{board.origin}">Origin</th>
-						<th th:text="#{board.name}">Name</th>						
-						<th th:text="#{board.lrt}">Last Result Time</th> 
+		 				<th th:text="#{contact.email}">E-mail</th>												 
 		 			</tr>
 		 		</thead>
 		 		<tbody>
-		 			<tr th:each="i : ${boards}">		 			
-		 				<th th:text="${i.id}"></th>
+		 			<tr th:each="i : ${contacts}">		 			
+		 				<td th:text="${i.id}"></td>
 		 				<td th:if="${#authentication.principal.inNullDomain()}">
 							<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
-						</td>		 
-		 				<th th:text="${i.origin}"></th>
-		 				<th th:text="${i.name}"></th>
-		 				<th th:text="${{i.lastResultTime}}"></th>
-		 			</tr>		 		
+						</td>		 		 				
+		 				<td th:text="${i.email}"></td>		 			
+		 			</tr>			 				 		
 		 		</tbody>		 			 	
 		 	</table>
-			<button th:text="#{action.save}" id="submit" type="submit" class="btn btn-default">Save</button>
+		 	<div class="block-action">
+				<button th:text="#{action.save}" id="submit" type="submit" class="btn btn-default">Save</button>				
+			</div>
 		</form>
 		
 		<script type="text/javascript" class="init" th:inline="javascript">
@@ -78,8 +74,16 @@
 					dt.rows('.selected').data().each( function(row) {
 						ids.push(row[0])
 					});									
-					$('#boards').val(ids)
+					$('#contacts').val(ids)
 				});
+				
+				var url = [[@{/__${controller}__/createNewContact/__${parent.id}__}]];
+				
+				 
+				$(".col-sm-6:first").html('<a class="btn btn-default btn-xs" href="' + 	url  + '"><span class="glyphicon glyphicon-plus"/> ' + [[#{action.create}]] + '</a>');
+				
+				
+				
 			});
 	</script> 
 		

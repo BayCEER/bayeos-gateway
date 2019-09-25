@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapRestController;
 import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapAuthenticationProvider;
+import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapRestController;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Role;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.ContactRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
 
 @Controller
@@ -31,6 +33,9 @@ public class UserController extends AbstractController {
 	
 	@Autowired 
 	UserRepository repo;
+	
+	@Autowired
+	ContactRepository repoContact;
 	
 	@Autowired
 	LdapAuthenticationProvider ldapAuthenticationProvider;
@@ -68,8 +73,22 @@ public class UserController extends AbstractController {
 			return "editUser";
 		}
 				
-		if (user.getNewPassword()!=null) user.encodeNewPassword();
-		
+		if (user.getNewPassword()!=null) user.encodeNewPassword();		
+														
+		if (user.getContact().getEmail() == null) {						 
+			user.setContact(null);									
+		} else {					
+				Contact c = repoContact.findOneByEmailAndDomain(user.getContact().getEmail(),user.getDomain());
+				if (c == null) {
+					// Add New								
+					Contact nc = new Contact();	
+					nc.setDomain(user.getDomain());
+					nc.setEmail(user.getContact().getEmail());				
+					user.setContact(repoContact.save(nc));					
+				} else {
+					user.setContact(c);
+				}					
+		}																
 		repo.save(userSession.getUser(),user);		
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/users";

@@ -6,9 +6,8 @@
 <title th:text="#{e.profile}">Profile</title>
 </head>
 <body>
-	<div layout:fragment="content">
+	<div layout:fragment="content">		
 		<h3 th:text="#{e.profile}">Edit Profile</h3>		
-
 		<div class="alert alert-danger alert-dismissible"
 			th:if="${#fields.hasErrors('${user.*}')}">
 			<button type="button" class="close" data-dismiss="alert"
@@ -18,19 +17,37 @@
 			<ul>
 				<li th:each="err : ${#fields.errors('${user.*}')}" th:text="${err}">Input is incorrect</li>
 			</ul>
-		</div>		
-
+		</div>			
 		<form method="post" action="#" th:action="@{/profile/save}" th:object="${user}">			
-			<div th:replace="field::text(prop='firstName',label=#{user.firstName},required=false)"></div>
-			<div th:replace="field::text(prop='lastName',label=#{user.lastName},required=false)"></div>								
-			<div th:replace="field::text(prop='userName',label=#{user.name},required=true)"></div>
-				
+			<input type="hidden" th:field="*{id}"/>				
+						<div class="block" id="settings">
+								<div class="block-header" th:text="#{a.properties}"></div>
+								
+		 						<div class="row">
+		 							<div class="col-sm-6">
+		 								<div th:replace="field::text(prop='firstName',label=#{user.firstName},required=false)"></div>
+		 							</div>
+		 							<div class="col-sm-6">
+		 								<div th:replace="field::text(prop='lastName',label=#{user.lastName},required=false)"></div>
+		 							</div>		 									 								 									 						
+		 						</div>
+		 						
+		 						<div class="row">
+		 							<div class="col-sm-6">
+		 								<div th:replace="field::text(prop='userName',label=#{user.name},required=true)"></div>
+		 							</div>
+		 							<div class="col-sm-6">
+		 								<div th:replace="field::text(prop='contact.email',label=#{contact.email},required=false)"></div>
+		 							</div>		 									 								 									 						
+		 						</div>
+						</div>						
+					
 			<div class="block-action">																						
 			<button th:text="#{action.save}" type="submit"	class="btn btn-primary"></button>
 			<a th:href="@{'/users/editPassword/' + *{id}}" class="btn btn-default">
 			<span class="glyphicon glyphicon-lock">
 			</span> <span th:text="#{action.editPassword}"></span>
-			</a>
+			</a>						
 			</div>
 		</form>
 	</div>

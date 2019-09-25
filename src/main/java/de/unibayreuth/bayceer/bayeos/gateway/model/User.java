@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.AssertTrue;
@@ -11,6 +12,7 @@ import javax.validation.constraints.AssertTrue;
 import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
+@SuppressWarnings("deprecation")
 @Entity
 @Table(name="users")
 public class User extends NamedDomainEntity {
@@ -35,8 +37,10 @@ public class User extends NamedDomainEntity {
 	@Transient
 	private String newPasswordRepetition;
 	
-	
-	
+	@OneToOne
+	private Contact contact;
+				
+		
 	public void encodeNewPassword() {
 		MessageDigestPasswordEncoder pwe = new ShaPasswordEncoder();
 		pwe.setEncodeHashAsBase64(true);
@@ -77,6 +81,7 @@ public class User extends NamedDomainEntity {
 		this.role = user.getRole();
 		this.locked = user.getLocked();	
 		this.domain = user.getDomain();
+		this.contact  = user.getContact();
 	}
 
 	public String getPassword() {
@@ -142,8 +147,19 @@ public class User extends NamedDomainEntity {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
+	public Contact getContact() {
+		return contact;
+	}
+
+	public void setContact(Contact contact) {
+		this.contact = contact;
+	}
 	
-	
-	
+	public boolean hasEmail() {
+		return this.contact != null && this.contact.getEmail() != null;
+	}
+
+		
 	
 }

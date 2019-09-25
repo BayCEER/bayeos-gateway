@@ -21,13 +21,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapAuthenticationProvider;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
 
 
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -107,11 +110,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			 http.csrf().disable();	 
 			 http.authorizeRequests()
 			 .antMatchers("/resources/**").permitAll()
-			 .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**","/splines/**","/units/**","/knotpoints/**", "/domains/**").hasRole("USER")             
+			 .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**",
+					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**").hasRole("USER")             
 			 .anyRequest().authenticated()
 			 .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)			 
 			 //.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)			 
-			 .formLogin().loginPage("/login").permitAll().and().logout().permitAll();
+			 .formLogin().loginPage("/login").successHandler(customSuccessHandler())
+			 .permitAll().and().logout().permitAll();
 		}
 		
 		@Override
@@ -137,6 +142,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public SimpleUrlAuthenticationFailureHandler failureHandler() {
 	    return new SimpleUrlAuthenticationFailureHandler("/login?error");
 	}
+	
+	@Bean
+	public AuthenticationSuccessHandler customSuccessHandler() {
+		 return new CustomSuccessHandler();
+	}
+	
+	
 	
 	@Bean
     public RoleHierarchy roleHierarchy() {

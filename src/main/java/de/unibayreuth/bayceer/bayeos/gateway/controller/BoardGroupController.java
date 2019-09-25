@@ -20,18 +20,28 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardGroup;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Notification;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardGroupRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.ContactRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.NotificationRepository;
 
 @Controller
 public class BoardGroupController extends AbstractController {
-
-	@Autowired 
-	BoardRepository repoBoard;
 	
 	@Autowired 
 	BoardGroupRepository  repo;
-			
+	
+	@Autowired 
+	BoardRepository repoBoard;
+	
+	@Autowired
+	NotificationRepository repoNotification;
+	
+	@Autowired
+	ContactRepository repoContacts;
+	
 	
 	@RequestMapping(value="/groups/create",method=RequestMethod.GET)
 	public String create(Model model){		
@@ -60,8 +70,9 @@ public class BoardGroupController extends AbstractController {
 	
 	
 	@RequestMapping(value="/groups/{id}", method=RequestMethod.GET)
-	public String edit(@PathVariable Long id, Model model){	
+	public String edit(@PathVariable Long id, Model model,@RequestParam(defaultValue = "boards") String tab){	
 		model.addAttribute("group",repo.findOne(userSession.getUser(),id));
+		model.addAttribute("tab", tab);
 		return "editBoardGroup";		
 	}
 	
@@ -73,14 +84,12 @@ public class BoardGroupController extends AbstractController {
 	}
 	
 	@RequestMapping(value="/groups/selectBoards/{id}", method=RequestMethod.GET)
-	public String selectBoards(@PathVariable Long id, Model model){
-		
+	public String selectBoards(@PathVariable Long id, Model model){		
 		BoardGroup g = repo.findOne(userSession.getUser(),id);
-		model.addAttribute("group",g);
-		
+		model.addAttribute("parent",g);
+		model.addAttribute("controller","groups");				
 		List<Board> boards = repoBoard.findByBoardGroupIsNullAndDomain(g.getDomain());
-		model.addAttribute("boards", boards);
-		
+		model.addAttribute("boards", boards);		
 		return "selectBoards";
 	}
 	
@@ -102,6 +111,72 @@ public class BoardGroupController extends AbstractController {
 		b.setBoardGroup(null);
 		repoBoard.save(userSession.getUser(),b);
 		return "redirect:/groups/" + g;
+	}
+	
+	
+	@RequestMapping(value="/groups/selectContacts/{id}", method=RequestMethod.GET)
+	public String selectContacts(@PathVariable Long id, Model model) {
+		BoardGroup g = repo.findOne(userSession.getUser(),id);
+		model.addAttribute("parent",g);
+		model.addAttribute("controller","groups");
+		List<Contact> cs = repoContacts.findAll(userSession.getUser(),domainFilter);
+		model.addAttribute("contacts", cs);		
+		return "selectContacts";
+	}
+	
+	@RequestMapping(value="/groups/addContacts", method=RequestMethod.POST)
+	public String addContacts(@RequestParam("id") Long id,  @RequestParam("contacts") List<Long> contacts) {
+		BoardGroup g = repo.findOne(userSession.getUser(),id);			
+		for(Long i:contacts){
+			Contact c = repoContacts.findOne(userSession.getUser(),i);
+			if (c!=null) {
+				Notification n = new Notification();
+				n.setBoardGroup(g);				
+				n.setContact(c);				
+				repoNotification.save(n);
+			}										
+		}		
+		return "redirect:/groups/" + g.getId() + "?tab=notifications";		
+	}
+			
+		
+	@RequestMapping(value="/groups/removeNotification/{id}", method = RequestMethod.GET)
+	public String removeNotification(@PathVariable("id") Long id) {		
+		Notification n = repoNotification.findOne(id);
+		checkWrite(n.getBoardGroup());
+		Long g = n.getBoardGroup().getId();		
+		repoNotification.delete(n.getId());	
+		return "redirect:/groups/" + g + "?tab=notifications";
+	}
+	
+	
+	@RequestMapping(value="/groups/createNewContact/{id}", method=RequestMethod.GET)
+	public String createNewContact(@PathVariable Long id, Model model){
+		BoardGroup b = repo.findOne(userSession.getUser(),id);		
+		Contact c = new Contact();					
+		c.setDomain(b.getDomain());
+		model.addAttribute("parent",b);
+		model.addAttribute("controller","groups");						
+		model.addAttribute("contact",c);
+		return "createNewContact";
+	}
+	
+	@RequestMapping(value="/groups/addNewContact", method=RequestMethod.POST)
+	public String addNewContact(@Valid Contact contact, Long id) {				
+		BoardGroup b = repo.findOne(userSession.getUser(), id);		
+		if (b != null) {
+			Contact c = repoContacts.findOneByEmailAndDomain(contact.getEmail(),b.getDomain());
+			if (c == null) {
+				contact.setDomain(b.getDomain());
+				c = repoContacts.save(contact);				
+			} 			
+			Notification n = new Notification();
+			n.setBoardGroup(b);
+			n.setContact(c);
+			repoNotification.save(n);			
+		}										
+		return "redirect:/groups/" + id + "?tab=notifications";
+								
 	}
 	
 	

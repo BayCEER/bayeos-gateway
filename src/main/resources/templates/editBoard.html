@@ -61,6 +61,11 @@
 								<span th:text="#{e.virtualChannels}"></span> <span class="badge"
 								id="vcBadge" th:text="${board.getVirtualChannels().size()}">0</span>
 						</a></li>
+						<li role="presentation"><a href="#notifications"
+							aria-controls="notifications" role="tab" data-toggle="tab">
+								<span th:text="#{e.notifications} "></span>
+								<span class="badge" id="notBadge" th:text="${board.notifications.size()}"></span>
+						</a></li>
 
 					</ul>
 					<!-- Tab panes -->
@@ -158,6 +163,30 @@
 						</div>
 						<div role="tabpanel" class="tab-pane fade in" id="virtualChannels">						
 							<div th:replace="block::virtualChannels(${board})"></div>							
+						</div>
+						<div role="tabpanel" class="tab-pane fade" id="notifications">							
+								<table class="table table-striped">
+									<thead>
+										<tr>
+											<th th:text="#{contact.email}"></th>																						
+											<th>
+												<div class="btn-group pull-right">
+													<div th:replace="table::add(@{'/boards/selectContacts/' + ${board.id}})"></div>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="n : ${board.notifications}">
+											<td><a th:href="@{/contacts/{id}(id=${n.contact.id})}" th:text="${n.contact.email}"></a></td>
+											<td>
+												<div class="pull-right">
+													<div th:replace="table::delete(@{'/boards/removeNotification/' + ${n.id}},false)"></div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
 						</div>
 					</div>
 				</div>

@@ -27,8 +27,6 @@ public class Domain extends UniqueEntity {
 	@Pattern(regexp="^\\S*$", message="{validation.nonWhiteSpace}")
     String name;
 	
-	
-	
 	Integer dbFolderId;
 	
 	

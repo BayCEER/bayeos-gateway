@@ -13,5 +13,7 @@ public interface UserRepository extends DomainFilteredRepository<User>{
 	User findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalse(String string);
 
 	User findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalse(String string, String string2);
+	
+	
 
 }

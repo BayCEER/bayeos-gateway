@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{e.contact}">Contact</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.contact}">Contact</h3>
+		
+		<form method="post" action="#"
+			th:action="@{/contacts/save}"
+			th:object="${contact}">
+			
+			<input type="hidden" th:field="*{id}"/>																
+			<div th:replace="field::selectDomain"></div>		
+			<div class="form-group">			
+				<div th:replace="field::email(prop='email',label=#{contact.email},required=true)"></div>
+			</div>
+			<button th:text="#{action.save}" type="submit"	class="btn btn-default">Save</button>
+		</form>
+	</div>
+</body>
+</html>

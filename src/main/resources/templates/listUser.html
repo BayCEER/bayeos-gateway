@@ -21,11 +21,14 @@
 									<th><a class="sorted" sd:pagination-sort="lastName"
 										th:text="#{user.lastName}">Last Name</a></th>										
 									<th><a class="sorted" sd:pagination-sort="firstName"
-										th:text="#{user.firstName}">Last Name</a></th>										
+										th:text="#{user.firstName}">First Name</a></th>										
 									<th><a class="sorted" sd:pagination-sort="name"
 										th:text="#{user.name}">Name</a></th>
+									<th><a class="sorted" sd:pagination-sort="email"
+										th:text="#{contact.email}">E-mail</a></th>
 									<th><a class="sorted" sd:pagination-sort="role"
 										th:text="#{user.role}">Role</a></th>
+									
 									<th><a class="sorted" sd:pagination-sort="locked"
 										th:text="#{user.locked}">Locked</a></th>
 									<th>
@@ -57,10 +60,13 @@
 									<td>
 										<a th:href="@{/users/{id}(id=${u.id})}"	th:text="${u.name}">User A</a>
 									</td>
+									<td th:text="${u.contact?.email}">E-mail</td>
 									<td th:text="${u.role}">Role</td>
 									<td>
-										<div th:include="field::yesno (${u.locked})"></div></td>
-									<td>										
+										<div th:include="field::yesno (${u.locked})"></div>
+									</td>									
+									<td>
+																			
 										<div class="btn-group pull-right">
 											<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown"><span
 												th:text="#{e.user}"></span> <span class="caret"></span>

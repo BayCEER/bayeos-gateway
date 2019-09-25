@@ -32,6 +32,9 @@
 	 <script type="text/javascript" class="init" th:inline="javascript">
 	 /*<![CDATA[*/
  		$(document).ready(function(){
+ 			
+ 			
+ 			
  			var columns = []; 			
  			if (/*[[ ${#authentication.principal.inNullDomain()} ]]*/) { 				
  				columns.push(
@@ -197,6 +200,13 @@
  							,false);
  		   		}
  		   	}
+ 		   	
+ 		   $(window).unload(function(){
+			    if (socket != null){
+			    	console.log('Connection closed');
+			    	socket.close();
+			    }
+			});
 		});
 		/*]]>*/
 	</script>

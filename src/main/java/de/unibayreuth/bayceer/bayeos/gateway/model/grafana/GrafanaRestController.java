@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
-import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
 
 @RestController
 @RequestMapping("/grafana")

@@ -8,70 +8,122 @@
 <body>
 	<div layout:fragment="content">
 		<h3 th:text="#{e.boardGroup}">Board Group</h3>
-		<form method="post" action="#" th:action="@{/groups/save}" th:object="${group}">
-		 	<input type="hidden" th:field="*{id}"/>
-		 	
-			
-		 	<div class="block">
-		 		<div th:text="#{a.properties}" class="block-header">Main</div>
-		 		<div class="row">
-		 			<div class="col-sm-3">						
+		<form method="post" action="#" th:action="@{/groups/save}"
+			th:object="${group}">
+			<input type="hidden" th:field="*{id}" />
+			<div class="block">
+				<div th:text="#{a.properties}" class="block-header">Main</div>
+				<div class="row">
+					<div class="col-sm-3">
 						<div th:replace="field::selectDomain"></div>
-					</div>											
-		 		</div>
-				<div class="row">			
+					</div>
+				</div>
+				<div class="row">
 					<div class="col-sm-6">
-						<div th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>
+						<div
+							th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>
 					</div>
 					<div class="col-sm-6">
-						<div th:replace="field::number(prop='dbFolderId',label=#{a.dbId},step=1)"></div>
-					</div>				
-				</div>				 			 	
-		 	</div>
-		 							
-			<div class="block">
-				<div th:text="#{nav.boards}" class="block-header">Boards</div>
-				
-				<table class="table table-striped" >
-				<thead>
-					<tr>
-						<th class="min-tablet-1" th:text="#{board.origin}">Origin</th>						
-						<th class="min-tablet-1" th:text="#{board.name}">Name</th>
-						<th th:text="#{board.rssi}">RSSI</th>
-						<th th:text="#{board.lrt}">Last Result Time</th>
-						<th th:text="#{board.status}">Status</th>												
-						<th>
-							<div class="pull-right">
-								<div th:replace="table::add(@{'/groups/selectBoards/' + ${group.id}})"></div>								
-							</div>				
-						</th>
-					</tr>					
-				</thead>
-				<tbody>
-					<tr th:each="i : ${group.boards}">
-						<td><a th:href="@{'/boards/' + ${i.id}}" th:text="${i.origin}"></a></td>						
-						<td th:text="${i.name}">Name</td>													
-						<td>
-							<div th:replace="field :: rssi(${i.rssi}}">RSSI</div>
-						</td>
-						<td th:text="${{i.lastResultTime}}">2001</td>
-						<td>
-							<div th:replace="field::status(${i.status})"></div>
-						</td>
+						<div
+							th:replace="field::number(prop='dbFolderId',label=#{a.dbId},step=1)"></div>
+					</div>
+				</div>
+				<div role="tabpanel">
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs" role="tablist" id="myTab">
+						<li role="presentation">
+							<a href="#boards" aria-controls="boards" role="tab" data-toggle="tab">
+							<span th:text="#{e.boards}"></span> <span class="badge" id="boardBadge" th:text="${group.boards.size()}"></span>
+							</a>
+						</li>
+						<li role="presentation">
+							<a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">
+							<span th:text="#{e.notifications}"></span> <span class="badge" id="notBadge" th:text="${group.notifications.size()}"></span></a></li>
+					</ul>
+					<div class="tab-content">
+						<div role="tabpanel" class="tab-pane fade in" id="boards">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th class="min-tablet-1" th:text="#{board.origin}">Origin</th>
+										<th class="min-tablet-1" th:text="#{board.name}">Name</th>
+										<th th:text="#{board.rssi}">RSSI</th>
+										<th th:text="#{board.lrt}">Last Result Time</th>
+										<th th:text="#{board.status}">Status</th>
+										<th>
+											<div class="pull-right">
+												<div
+													th:replace="table::add(@{'/groups/selectBoards/' + ${group.id}})"></div>
+											</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="i : ${group.boards}">
+										<td><a th:href="@{'/boards/' + ${i.id}}"
+											th:text="${i.origin}"></a></td>
+										<td th:text="${i.name}">Name</td>
+										<td>
+											<div th:replace="field :: rssi(${i.rssi}}">RSSI</div>
+										</td>
+										<td th:text="${{i.lastResultTime}}">2001</td>
+										<td>
+											<div th:replace="field::status(${i.status})"></div>
+										</td>
 
-						<td class="pull-right">		
-							<div th:replace="table::edit(@{'/boards/' + ${i.id}},false)"></div>
-							<div th:replace="table::delete(@{'/groups/removeBoard/' + ${i.id}},false)"></div>														  								  								  							
-						</td>
-					</tr>
-				</tbody>
-			</table>			
-		 	</div>
-		 	
-			<div class="form-group block-action">								
-			<button th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
-			</div>
+										<td class="pull-right">
+											<div th:replace="table::edit(@{'/boards/' + ${i.id}},false)"></div>
+											<div
+												th:replace="table::delete(@{'/groups/removeBoard/' + ${i.id}},false)"></div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div role="tabpanel" class="tab-pane fade in" id="notifications">	
+								<table class="table table-striped">
+									<thead>
+										<tr>
+											<th th:text="#{contact.email}"></th>																					
+											<th>
+												<div class="btn-group pull-right">
+													<div th:replace="table::add(@{'/groups/selectContacts/' + ${group.id}})"></div>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="n : ${group.notifications}">
+											<td><a th:href="@{/contacts/{id}(id=${n.contact.id})}"	th:text="${n.contact.email}"></a></td>
+											<td>
+												<div class="pull-right">
+													<div th:replace="table::delete(@{'/groups/removeNotification/' + ${n.id}},false)"></div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+						</div>
+
+						
+					</div>
+
+
+				</div>
+
+
+				<div class="form-group block-action">
+					<button th:text="#{action.save}" type="submit"
+						class="btn btn-default">Save</button>
+				</div>
+				</div>
 		</form>
+		
+		<script th:inline="javascript" class="init">	     
+	    	// Default tab		   
+	   		var tab = [[ ${tab} ]];	   		   	   	
+	   		$('#myTab a[aria-controls="' + tab + '"]').tab('show');
+	   	</script>
 	</div>
 </body>
 </html>

@@ -24,5 +24,18 @@ public enum NagiosStatus  {
 		return null;
 	}
 	
+	public String toString() {
+		switch (code) {
+		case 0:
+			return "ok";
+		case 1:
+			return "warn";
+		case 2:
+			return "critical";
+		default:
+			return "unknown";
+		}
+	}
+	
 	
 }

@@ -19,6 +19,10 @@ public class BoardGroup extends NamedDomainEntity {
 
 	@Column(name="db_folder_id")
 	Integer dbFolderId;
+	
+	
+	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.REMOVE)
+	List<Notification> notifications;
 		
 	public List<Board> getBoards() {
 		return boards;
@@ -76,6 +80,14 @@ public class BoardGroup extends NamedDomainEntity {
 			}
 		}
 		return s;
+	}
+
+	public List<Notification> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(List<Notification> notifications) {
+		this.notifications = notifications;
 	};
 	
 }

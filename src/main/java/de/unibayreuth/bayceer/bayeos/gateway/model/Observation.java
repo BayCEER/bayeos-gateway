@@ -6,6 +6,8 @@ public class Observation {
 	Long channelId;
 	Long millis;
 	Float value;
+	
+	
 	public Long getRowId() {
 		return rowId;
 	}

@@ -27,8 +27,8 @@ public class NagiosRestController {
 	}
 	
 	@RequestMapping(path="/nagios/group/{id}", method=RequestMethod.GET)	
-	public NagiosMessage msgGroup(@PathVariable Integer id){		
-		return service.msgGroup(id);
+	public NagiosMessage msgBoardGroup(@PathVariable Integer id){		
+		return service.msgBoardGroup(id);
 	}
 	
 	@RequestMapping(path="/nagios/board/{id}", method=RequestMethod.GET)	

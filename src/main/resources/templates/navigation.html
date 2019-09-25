@@ -58,6 +58,9 @@
 									</li>
 									<li th:classappend="${controllerName == 'User'}? 'active'">
 										<a th:href="@{/users}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{nav.users}">Users</span></a></li>
+									<li th:classappend="${controllerName == 'Contact'}? 'active'">
+										<a th:href="@{/contacts}"><span class="glyphicon glyphicon-envelope"></span> <span th:text="#{nav.contacts}">Contacts</span></a></li>
+																			
 									<li class="divider" role="separator"></li>
 																		
 									<li th:classappend="${controllerName == 'Function'}? 'active'">
@@ -118,9 +121,20 @@
 									<button class="btn navbar-btn" type="submit" th:text="#{nav.logOut}">Logout</button>								
 								</form>
             					</li>            					
-            					<li><a th:href="@{/profile/edit}" th:text="#{nav.profile}">User Profile</a></li>            					
+            					<li><a th:href="@{/profile/edit}">
+            						<span class="glyphicon glyphicon-cog">
+									</span> <span th:text="#{nav.profile}"></span></a>
+            					</li>            					
+            					<li><a th:href="@{/notifications}">
+            						<span class="glyphicon glyphicon-info-sign">
+										</span> <span th:text="#{nav.notifications}"></span>
+            					</a>
+            					</li>
             					<li role="separator" class="divider"></li>
-            					<li><a th:href="#{nav.helpUrl}" th:text="#{nav.help}">Hilfe</a></li>
+            					<li><a th:href="#{nav.helpUrl}">
+            						<span class="glyphicon glyphicon-question-sign">
+										</span> <span th:text="#{nav.help}"></span>
+            					</a></li>
           						</ul>
         					</li>						
 						</ul>

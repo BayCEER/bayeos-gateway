@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="notifications.erd" time="201906271118">
+	<entities>
+		<data-source id="postgres-jdbc-166aa9622d3-60f345c3ce222990">
+			<entity id="1" name="board" fq-name="public.board" order="0" x="528" y="264">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="2" name="board_group" fq-name="public.board_group" order="1" x="548" y="81">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="3" name="contact" fq-name="public.contact" order="2" x="277" y="194">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="4" name="notification" fq-name="public.notification" order="3" x="267" y="372">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="5" name="service_state_log" fq-name="public.service_state_log" order="4" x="826" y="159">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="6" name="users" fq-name="public.users" order="5" x="47" y="127">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+		</data-source>
+	</entities>
+	<notes/>
+	<relations>
+		<relation name="fk_notification_board" fq-name="public.notification.fk_notification_board" type="fk" pk-ref="1" fk-ref="4"/>
+		<relation name="fk_service_state_log_board" fq-name="public.service_state_log.fk_service_state_log_board" type="fk" pk-ref="1" fk-ref="5"/>
+		<relation name="fk_board_board_group" fq-name="public.board.fk_board_board_group" type="fk" pk-ref="2" fk-ref="1"/>
+		<relation name="fk_notification_board_group" fq-name="public.notification.fk_notification_board_group" type="fk" pk-ref="2" fk-ref="4"/>
+		<relation name="fk_service_state_log_board_group" fq-name="public.service_state_log.fk_service_state_log_board_group" type="fk" pk-ref="2" fk-ref="5"/>
+		<relation name="fk_notification_contact" fq-name="public.notification.fk_notification_contact" type="fk" pk-ref="3" fk-ref="4"/>
+		<relation name="fk_users_contact" fq-name="public.users.fk_users_contact" type="fk" pk-ref="3" fk-ref="6"/>
+	</relations>
+</diagram>

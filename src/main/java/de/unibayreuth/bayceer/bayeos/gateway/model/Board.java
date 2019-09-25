@@ -7,8 +7,9 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -20,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 public class Board extends NamedDomainEntity {
-	
 	
 	// Completeness Check
 	@Column(name="sampling_interval")
@@ -52,9 +52,10 @@ public class Board extends NamedDomainEntity {
 	@JsonView(DataTablesOutput.View.class)	
 	/* Column is managed by import routines !! */
 	@Column(insertable=false,updatable=false)
-	
 	Date lastResultTime;
 	
+	@OneToMany(mappedBy="board")
+	List<Notification> notifications;
 	
 	Integer dbFolderId;
 	
@@ -69,8 +70,8 @@ public class Board extends NamedDomainEntity {
 	
 	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)
 	List<VirtualChannel> virtualChannels;
-		
-		
+			
+	
 	@JsonView(DataTablesOutput.View.class)	
 	@Formula("(select get_board_status(id))")
 	Integer channelStatus;
@@ -101,6 +102,7 @@ public class Board extends NamedDomainEntity {
 		channels.add(c);		
 		return c;
 	}
+	
 
 	
 	public List<String> getChannelNrs() {
@@ -230,8 +232,6 @@ public class Board extends NamedDomainEntity {
 		this.virtualChannels = virtualChannels;
 	}
 
-	
-
 	public Integer getChannelStatus() {
 		return channelStatus;
 	}
@@ -247,6 +247,16 @@ public class Board extends NamedDomainEntity {
 	public void setBoardGroup(BoardGroup boardGroup) {
 		this.boardGroup = boardGroup;
 	}
+
+	public List<Notification> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(List<Notification> notifications) {
+		this.notifications = notifications;
+	}
+
+	
 
 	
 }

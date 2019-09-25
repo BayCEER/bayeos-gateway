@@ -82,6 +82,14 @@
 					<label th:text="${r}">Property</label></li>
 				</ul>
 </div>
+
+<div th:fragment="email(prop,label)" th:with="disabled=!(${writeable}?:true), required=${required}?:false" th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
+				<label th:text="${label} + (${required} ? '*':'')" class="control-label">E-Mail:</label>				 
+				<input th:if="${disabled}" type="email" class="form-control" th:field="*{__${prop}__}" th:required="${required}" disabled="true"/>
+				<input th:if="${!disabled}" type="email" class="form-control" th:field="*{__${prop}__}" th:required="${required}"/>				
+				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
+</div>
+
 			
 
 <div th:fragment="select(prop,label,option)" th:with="disabled=!(${writeable}?:true),required=${required}?:false" class="form-group">

@@ -299,7 +299,8 @@ class ExportObsJob implements Runnable  {
 			while (true){
 				def row = 0
 				Set channelIds = []
-				db.eachRow("SELECT o.id, c.id as channel_id, c.db_series_id, o.result_time,o.result_value FROM observation_calc o join channel c on o.channel_id = c.id order by o.id asc limit ${expBulkSize};")
+				db.eachRow("""SELECT o.id, c.id as channel_id, c.db_series_id, o.result_time,o.result_value FROM 
+							observation_calc o join channel c on o.channel_id = c.id order by o.id asc limit ${expBulkSize};""")
 				{
 					id = it.id
 					channelIds.add([it.channel_id,it.db_series_id])
