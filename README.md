@@ -46,6 +46,9 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.5.1, Sep, 2019
+- Fixed wrong column name in view nagios_status
+
 ### Version 2.5.0, July, 2019
 - State calculation and alerting for devices and device groups
 - DelayedSecondFrame support 

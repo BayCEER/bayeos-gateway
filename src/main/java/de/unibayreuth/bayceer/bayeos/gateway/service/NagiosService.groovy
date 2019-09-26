@@ -47,7 +47,7 @@ class NagiosService {
 			db.close();
 			return new NagiosMessage(status:3,text:"Group ${id} not found");
 		} else {
-			List channels = db.rows("select * from nagios_status where board_group_id = ?",[id])
+			List channels = db.rows("select * from nagios_status where group_id = ?",[id])
 			db.close()
 			NagiosMessage m = getNagiosMsg(channels)
 			return m;
@@ -128,9 +128,9 @@ class NagiosService {
 			}
 			
 			// Group
-			if (it.board_group_name != boardGroupName){
-				out.append("Board Group[${it.board_group_name}]\n")
-				boardGroupName = it.board_group_name
+			if (it.group_name != boardGroupName){
+				out.append("Board Group[${it.group_name}]\n")
+				boardGroupName = it.group_name
 			}
 			// Board
 			if (it.board_origin != boardOrigin){
