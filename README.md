@@ -46,6 +46,11 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+
+### Version 2.5.2, Dec, 2019
+- Fixed: Default binding on localhost only 
+- Fixed: Grafana Board Path 
+
 ### Version 2.5.1, Sep, 2019
 - Fixed wrong column name in view nagios_status
 
