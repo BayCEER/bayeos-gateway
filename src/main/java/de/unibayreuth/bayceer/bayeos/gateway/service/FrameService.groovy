@@ -17,9 +17,9 @@ import bayeos.frame.FrameParserException
 import bayeos.frame.Parser
 import bayeos.frame.types.ByteFrame
 import bayeos.frame.types.MapUtils
-import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEvent
-import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEventProducer
-import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEventType
+import de.unibayreuth.bayceer.bayeos.gateway.event.Event
+import de.unibayreuth.bayceer.bayeos.gateway.event.EventProducer
+import de.unibayreuth.bayceer.bayeos.gateway.event.EventType
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewBoardEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewChannelEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewMessageEvent
@@ -44,7 +44,7 @@ class FrameService {
 	VirtualChannelRepository vcRepo
 
 	@Autowired
-	FrameEventProducer eventProducer
+	EventProducer eventProducer
 
 	@Autowired
 	BoardRepository boardRepo
@@ -60,6 +60,11 @@ class FrameService {
 		def vchannels = [:] // channel_id, vc
 		Integer lrssi
 		Long records = 0
+	}
+	
+	
+	def boolean saveFrame(Long domainId, String sender, byte[] frame) {
+		return saveFrames(domainId,sender,[Base64.encodeBase64String(frame)] as List<String>)
 	}
 	
 	def boolean saveFrame(String sender, ByteFrame frame) {

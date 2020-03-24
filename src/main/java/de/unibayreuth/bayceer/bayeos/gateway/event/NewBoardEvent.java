@@ -1,11 +1,11 @@
 package de.unibayreuth.bayceer.bayeos.gateway.event;
 
 
-public class NewBoardEvent extends FrameEvent {
+public class NewBoardEvent extends Event {
 	
 
 	public NewBoardEvent(Long id) {
-		super(id,FrameEventType.NEW_BOARD);
+		super(id,EventType.NEW_BOARD);
 	}
 	
 }

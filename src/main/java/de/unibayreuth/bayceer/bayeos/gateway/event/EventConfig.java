@@ -9,7 +9,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.redis.JedisListener;
 import de.unibayreuth.bayceer.bayeos.gateway.websocket.WebSocketListener;
 
 @Configuration
-public class FrameEventConfig {
+public class EventConfig {
 	
 	@Autowired
 	WebSocketListener ws;
@@ -21,8 +21,8 @@ public class FrameEventConfig {
 	private Boolean redis_events;
 	
 	@Bean 
-	public FrameEventProducer frameEventProducer() {		
-		FrameEventProducer p = new FrameEventProducer();		
+	public EventProducer eventProducer() {		
+		EventProducer p = new EventProducer();		
 		p.addListener(ws);
 		
 		if (redis_events) {

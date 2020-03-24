@@ -1,5 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.event;
 
-public enum FrameEventType {
+public enum EventType {
 	NEW_BOARD, NEW_CHANNEL, NEW_OBSERVATION, NEW_MESSAGE 
 }

@@ -23,7 +23,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapAuthenticationProvider;
@@ -111,7 +110,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			 http.authorizeRequests()
 			 .antMatchers("/resources/**").permitAll()
 			 .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**",
-					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**").hasRole("USER")             
+					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**").hasRole("USER")             
 			 .anyRequest().authenticated()
 			 .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)			 
 			 //.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)			 

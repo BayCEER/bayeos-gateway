@@ -2,7 +2,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.event;
 
 import java.io.IOException;
 
-public interface FrameEventListener {
+public interface EventListener {
 
-	void eventFired(FrameEvent e) throws IOException;
+	void eventFired(Event e) throws IOException;
 }

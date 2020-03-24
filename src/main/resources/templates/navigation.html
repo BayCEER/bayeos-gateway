@@ -88,7 +88,10 @@
 										<a th:href="@{/splines}">
 										<span class="glyphicon glyphicon-share-alt"></span> <span th:text="#{nav.splines}">Splines</span></a></li>
 									<li th:classappend="${controllerName == 'Unit'}? 'active'"><a th:href="@{/units}"><span class="glyphicon glyphicon-tag"></span> <span th:text="#{nav.units}">Units</span></a></li>
-								</ul>
+									<li class="divider" role="separator"></li>							
+									<li th:classappend="${controllerName == 'Upload'}? 'active'"><a th:href="@{/uploads}"><span class="glyphicon glyphicon-import"></span> <span th:text="#{nav.uploads}">Data Uploads</span></a></li>
+									
+									</ul>
 							</li>							
 						</ul>
 						
@@ -128,6 +131,12 @@
             					<li><a th:href="@{/notifications}">
             						<span class="glyphicon glyphicon-info-sign">
 										</span> <span th:text="#{nav.notifications}"></span>
+            					</a>
+            					</li>
+            					<li role="separator" class="divider"></li>
+            					<li><a th:href="@{/uploads/uploadFile}">
+            						<span class="glyphicon glyphicon-import">
+										</span> <span th:text="#{nav.upload}"></span>
             					</a>
             					</li>
             					<li role="separator" class="divider"></li>

@@ -1,6 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -8,6 +9,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.thymeleaf.dialect.springdata.SpringDataDialect;
+
+import de.unibayreuth.bayceer.bayeos.gateway.repo.UploadRepository;
 
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
@@ -34,8 +37,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 	public SpringDataDialect springDataDialect(){
 		return new SpringDataDialect();
 	}
-	
-	
+		
 		
 }
 

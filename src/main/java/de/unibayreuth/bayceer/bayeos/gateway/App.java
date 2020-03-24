@@ -21,7 +21,7 @@ public class App {
 	
 	@Value("${build.year}")
 	String year;
-		 
+	 
 	public static void main(String[] args) {
 		SpringApplication.run(App.class, args);
 	}

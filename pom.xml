@@ -3,7 +3,7 @@
   
   <groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.5.2</version>
+	<version>2.6.0</version>
 
 
 	<licenses>
@@ -59,7 +59,7 @@
 		
 	<profiles>
 	<profile>
-			<id>dev</id>					
+			<id>dev</id>				
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>		
@@ -77,12 +77,12 @@
 			</resources>
 			</build>
 			<dependencies>
-			<!--  
+			<!-- breaks web flows -->   
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-devtools</artifactId>				
 			</dependency>
-			 -->
+			
 			</dependencies>
 			
 	</profile>
@@ -125,175 +125,7 @@
 			</build>
 		</profile>
 
-	<profile>
-			<id>test</id>
-			<properties>
-				<docker.hostname>localhost</docker.hostname>
-				<db.url>jdbc:postgresql://db/xbee</db.url>				
-			</properties>
-			<build>
-			
-			<resources>
-			<resource>
-            	<directory>src/main/resources</directory>
-            	<filtering>true</filtering>            	            
-            	<includes>
-                	<include>**/*.properties</include>                	
-            	</includes>            	
-        	</resource>        
-			</resources>
-			<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.10</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
 
-					<plugin>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>2.17</version>
-						<executions>
-							<execution>
-								<id>integration-test</id>
-								<goals>
-									<goal>integration-test</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>verify</id>
-								<goals>
-									<goal>verify</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<systemPropertyVariables>
-								<server.url>http://${docker.hostname}:${server.port}${server.contextPath}</server.url>
-								<server.user>root</server.user>
-								<server.password>bayeos</server.password>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-						<extensions>true</extensions>
-						<version>0.27.2</version>
-						<configuration>
-							<verbose>true</verbose>
-							<useColor>true</useColor>
-							<images>								
-								<image>									
-									<name>bayeos-gateway-db:${project.version}</name>
-									<alias>db</alias>
-									<build>
-										<from>postgres:${pg.version}</from>
-										<runCmds>		
-											<runCmd>localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8</runCmd>																	
-											<runCmd>apt-get update &amp;&amp; apt-get install -y --no-install-recommends postgresql-plperl-${pg.version} libpq-dev libmath-spline-perl</runCmd>
-										</runCmds>
-										<env>																					
-											<POSTGRES_INITDB_ARGS>--locale de_DE.UTF-8</POSTGRES_INITDB_ARGS>
-											<POSTGRES_PASSWORD>${db.password}</POSTGRES_PASSWORD>
-											<POSTGRES_USER>${db.user}</POSTGRES_USER>
-										</env>
-										<assembly>
-											<targetDir>/docker-entrypoint-initdb.d</targetDir>
-											<inline>
-												<fileSets>
-													<fileSet>
-														<directory>${project.basedir}/target/deb/data/usr/share/bayeos-gateway/sql</directory>
-														<outputDirectory>.</outputDirectory>
-													</fileSet>
-												</fileSets>
-											</inline>
-										</assembly>	
-										<tags>
-											<tag>${project.version}</tag>
-											<tag>latest</tag>
-										</tags>								
-									</build>
-									<run>										
-										<wait>
-											<log>Datenbanksystem ist bereit, um Verbindungen anzunehmen</log>
-											<time>60000</time>
-										</wait>
-										<log>
-											<prefix>DB:</prefix>
-											<color>blue</color>
-										</log>
-									</run>
-								</image>
-
-								<image>									
-									<name>bayeos-gateway:${project.version}</name>
-									<alias>bayeos-gateway</alias>
-									<build>
-										<from>java:8</from>
-										<env>
-											<EXPORT_HOST>bayeos-server</EXPORT_HOST>
-										</env>
-										<assembly>
-											<descriptorRef>artifact</descriptorRef>
-										</assembly>
-										<cmd>
-											<shell>java -jar /maven/bayeos-gateway.jar</shell>
-										</cmd>									
-										<tags>
-											<tag>${project.version}</tag>
-											<tag>latest</tag>
-										</tags>								
-									</build>
-									<run>										
-										<labels>
-											<environment>development</environment>
-											<version>${project.version}</version>
-										</labels>
-										<ports>
-											<port>${server.port}:${server.port}</port>
-										</ports>									
-										<wait>
-											<http>
-												<url>http://${docker.hostname}:${server.port}${server.contextPath}</url>
-											</http>
-											<time>60000</time>
-										</wait>
-										<links>
-											<link>db:db</link>
-										</links>
-										<log>
-											<prefix>SERVER:</prefix>
-											<color>cyan</color>
-										</log>
-									</run>
-								</image>
-
-							</images>
-						</configuration>
-						<executions>
-							<execution>
-								<id>start</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>build</goal>
-									<goal>start</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>stop</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 	
 	
@@ -487,7 +319,7 @@
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-xmlrpc</artifactId>
-			<version>2.0.0</version>
+			<version>2.0.1</version>
 		</dependency>						
 		
 	</dependencies>

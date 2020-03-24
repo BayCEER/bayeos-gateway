@@ -1,4 +1,5 @@
 <configuration>
+ <springProfile name="prod,default">
   <appender name="A" class="ch.qos.logback.core.rolling.RollingFileAppender">    
     <File>${log.file}</File>
     <encoder>
@@ -15,4 +16,19 @@
   <root level="${log.level}">
     <appender-ref ref="A"/>
   </root>
+  </springProfile>
+  
+  <springProfile name="dev">
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type
+         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+    </encoder>
+  </appender>
+ 
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </root>
+  </springProfile>
 </configuration>

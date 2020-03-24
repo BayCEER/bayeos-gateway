@@ -1,10 +1,10 @@
 package de.unibayreuth.bayceer.bayeos.gateway.event;
 
 
-public class NewMessageEvent extends FrameEvent {
+public class NewMessageEvent extends Event {
 	
 	public NewMessageEvent(Long id) {
-		super(id,FrameEventType.NEW_CHANNEL);		
+		super(id,EventType.NEW_CHANNEL);		
 	}
 	
 }

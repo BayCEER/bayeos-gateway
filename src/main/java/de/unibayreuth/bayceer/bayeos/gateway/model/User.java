@@ -159,6 +159,10 @@ public class User extends NamedDomainEntity {
 	public boolean hasEmail() {
 		return this.contact != null && this.contact.getEmail() != null;
 	}
+	
+	public String displayName() {
+		return ((firstName==null)?"":firstName) + ((lastName==null)?"":" " + lastName);  
+	}
 
 		
 	

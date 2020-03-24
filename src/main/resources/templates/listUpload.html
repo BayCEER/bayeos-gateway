@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="main">
+<head>
+<title th:text="#{nav.uploads}">All uploads</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{nav.uploads}">Uploads</h3>
+						
+			<table class="table table-striped" >
+				<thead>
+					<tr>
+					<th th:if="${#authentication.principal.inNullDomain()}">
+						<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
+					</th>
+					<th>
+						<a class="sorted" sd:pagination-sort="userName"	th:text="#{user.name}">User Name</a>
+					</th>
+					<th>
+						<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a>
+					</th>
+					<th>
+						<a class="sorted" sd:pagination-sort="uploadTime"	th:text="#{upload.uploadTime}">Date of Upload</a>
+					</th>
+					<th>
+						<a class="sorted" sd:pagination-sort="size"	th:text="#{upload.size}">Size</a>
+					</th>
+
+					<th>
+						<div class="pull-right">
+								<a th:href="@{/uploads/uploadFile}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-upload"></span> <span th:text="#{action.upload}">Upload</span></a>								
+						</div>		
+					</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="f : ${uploads}">
+						<td th:if="${#authentication.principal.inNullDomain()}">
+								<a th:if="${f.domainId} != null" th:href="@{/domains/{id}(id=${f.domainId})}" th:text="${f.domainName}">Domain</a>
+						</td>
+						<td th:text="${f.userName}"></td>
+						<td th:text="${f.name}"></td>
+						<td th:text="${f.uploadTime}"></td>	
+						<td th:text="${f.size}"></td>
+						<td>
+							<div th:replace="table::delete(@{'/uploads/deleteFile/' + ${f.id}},false)"></div>
+							<div th:replace="table::export(@{'/uploads/exportFile/' + ${f.id}})"></div>	
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		<div th:replace="table::pagination"></div>		
+	</div>	
+</body>
+</html>

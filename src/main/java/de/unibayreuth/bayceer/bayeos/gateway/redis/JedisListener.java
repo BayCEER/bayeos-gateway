@@ -10,15 +10,15 @@ import java.time.ZonedDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEvent;
-import de.unibayreuth.bayceer.bayeos.gateway.event.FrameEventListener;
+import de.unibayreuth.bayceer.bayeos.gateway.event.Event;
+import de.unibayreuth.bayceer.bayeos.gateway.event.EventListener;
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewObservationEvent;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
 @Component
-public class JedisListener implements FrameEventListener {
+public class JedisListener implements EventListener {
 	
 	@Autowired
 	private JedisPool jedisPool;
@@ -55,7 +55,7 @@ public class JedisListener implements FrameEventListener {
 		
 	 
 	@Override
-	public void eventFired(FrameEvent e) throws IOException {
+	public void eventFired(Event e) throws IOException {
 		
 		switch (e.getType()) {
 		case NEW_OBSERVATION :		

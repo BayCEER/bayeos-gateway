@@ -12,30 +12,30 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FrameEventProducer implements Runnable {
+public class EventProducer implements Runnable {
 	
 	private boolean stopped = false;
 	private static final int QUEUE_SIZE = 200;	
-	private Logger log = Logger.getLogger(FrameEventProducer.class);	
-	private Set<FrameEventListener> listeners = Collections.synchronizedSet(new HashSet<FrameEventListener>());
-	private LinkedBlockingDeque<FrameEvent> queue;
+	private Logger log = Logger.getLogger(EventProducer.class);	
+	private Set<EventListener> listeners = Collections.synchronizedSet(new HashSet<EventListener>());
+	private LinkedBlockingDeque<Event> queue;
 	
-	public FrameEventProducer() {
+	public EventProducer() {
 		queue = new LinkedBlockingDeque<>(QUEUE_SIZE);
 	}
 	
 		
-	public void addFrameEvent(FrameEvent e){	
+	public void addFrameEvent(Event e){	
 		if (!queue.offer(e)){
 			log.debug("Failed to add event to queue.");
 		};
 	}
 	
-	public void addListener(FrameEventListener l) {
+	public void addListener(EventListener l) {
 		listeners.add(l);
 	}
 	
-	public void removeListener(FrameEventListener l) {
+	public void removeListener(EventListener l) {
 		listeners.remove(l);
 	}
 	
@@ -44,8 +44,8 @@ public class FrameEventProducer implements Runnable {
 	public void run() {
 		while(!stopped){
 			try {
-				FrameEvent e =queue.takeFirst();
-				for(FrameEventListener l:listeners) {					 
+				Event e =queue.takeFirst();
+				for(EventListener l:listeners) {					 
 					try {
 						l.eventFired(e);
 					} catch (IOException ex) {

@@ -1,13 +1,13 @@
 package de.unibayreuth.bayceer.bayeos.gateway.event;
 
 
-public class NewObservationEvent extends FrameEvent {
+public class NewObservationEvent extends Event {
 	
 	private Long counts;
 	private String origin;
 
 	public NewObservationEvent(Long id, String origin, Long counts) {
-		super(id,FrameEventType.NEW_OBSERVATION);		
+		super(id,EventType.NEW_OBSERVATION);		
 		this.counts = counts;
 		this.origin = origin;
 	}

@@ -47,6 +47,9 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.6.0, March, 2020
+- Binary Logger file uploads 
+
 ### Version 2.5.2, Dec, 2019
 - Fixed: Default binding on localhost only 
 - Fixed: Channel path view 

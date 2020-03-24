@@ -3,18 +3,18 @@ package de.unibayreuth.bayceer.bayeos.gateway.event;
 import java.util.Date;
 
 
-public class FrameEvent {
+public class Event {
 	
 	Long id;
 	Date time;
-	FrameEventType type;
+	EventType type;
 	
-	public FrameEvent() {
+	public Event() {
 	}
 	
 	
 	
-	public FrameEvent(Long id, Date time, FrameEventType type) {
+	public Event(Long id, Date time, EventType type) {
 		super();
 		this.id = id;	
 		this.time = time;
@@ -22,7 +22,7 @@ public class FrameEvent {
 	}
 
 
-	public FrameEvent(Long id, FrameEventType type) {
+	public Event(Long id, EventType type) {
 		this(id,new java.util.Date(),type);
 	}
 	
@@ -32,10 +32,10 @@ public class FrameEvent {
 	public void setTime(Date time) {
 		this.time = time;
 	}
-	public FrameEventType getType() {
+	public EventType getType() {
 		return type;
 	}
-	public void setType(FrameEventType type) {
+	public void setType(EventType type) {
 		this.type = type;
 	}
 
