@@ -51,7 +51,7 @@
 						</td>
 						<td th:text="${{f.uploadTime}}"></td>
 						<td th:text="${{f.importTime}}"></td>	
-						<td th:text="${f.size}"></td>
+						<td th:text="${f.sizeAsString}"></td>
 						<td>
 							<div th:replace="table::delete(@{'/uploads/deleteFile/' + ${f.id}},false)"></div>
 							<div th:replace="table::export(@{'/uploads/exportFile/' + ${f.id}})"></div>	

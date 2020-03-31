@@ -5,12 +5,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.SortDefault;
@@ -60,7 +62,12 @@ public class UploadController extends AbstractController {
 	
 	@GetMapping("/uploads")
 	public String list(Model model, @SortDefault(value = "uploadTime", direction = Direction.DESC) Pageable pageable){
-		model.addAttribute("uploads", repo.findAll(userSession.getUser(),domainFilter,pageable));
+		Page<Upload> uploads = repo.findAll(userSession.getUser(),domainFilter,pageable);
+		for (Upload d:uploads) {
+			d.setSizeAsString();
+			d.getUser().setFullName();
+		}
+		model.addAttribute("uploads", uploads);
 		return "listUpload";
 	}
 	

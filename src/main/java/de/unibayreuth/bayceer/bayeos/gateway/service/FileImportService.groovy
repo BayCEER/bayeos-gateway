@@ -113,6 +113,8 @@ class FileImportService implements Runnable {
 				MimeMessage msg = mailSender.createMimeMessage()
 				MimeMessageHelper mh = new MimeMessageHelper(msg, false, "utf-8")
 				Context c = new Context()
+				u.getUser().setFullName();
+				u.setSizeAsString();
 				c.setVariable("upload",u)
 				c.setVariable("host",notificationConfig.getNotification_host())
 				mh.setText(templateEngine.process("fileImportNotification",c), true)
@@ -127,7 +129,6 @@ class FileImportService implements Runnable {
 	}
 
 	private void importBDB(Upload u) {
-
 		log.info("Importing file: ${u.name}")
 		String bin = u.uuid.toString() + ".bin"
 		File file = localFilePath.resolve(bin).toFile()
@@ -160,12 +161,10 @@ class FileImportService implements Runnable {
 				}
 				frames.clear()
 			}
-
 			u.importTime = new Date()
 			u.importMessage = "${frameCount} frames imported."
-			u = repo.save(u)
-
-			sendNotification(u)
+			Upload pe = repo.save(u)
+			sendNotification(pe)
 		} catch (IOException e) {
 			log.error(e.getMessage())
 		} finally {

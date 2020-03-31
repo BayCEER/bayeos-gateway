@@ -40,6 +40,9 @@ public class User extends NamedDomainEntity {
 	
 	@OneToOne
 	private Contact contact;
+	
+	@Transient 
+	private String fullName;
 				
 		
 	public void encodeNewPassword() {
@@ -161,13 +164,20 @@ public class User extends NamedDomainEntity {
 		return this.contact != null && this.contact.getEmail() != null;
 	}
 	
-	public String displayName() {
+	
+		
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName() {	
 		if (firstName == null && lastName == null) {
-			return getUserName();
+			this.fullName = name;
 		} else {
-			return WordUtils.capitalizeFully(((firstName==null)?"":firstName) + ((lastName==null)?"":" " + lastName));	
+			this.fullName = WordUtils.capitalizeFully(((firstName==null)?"":firstName) + ((lastName==null)?"":" " + lastName));	
 		}
-		  
+	
+		
 	}
 
 		
