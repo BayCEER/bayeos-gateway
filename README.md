@@ -43,9 +43,13 @@ Let's send the cpu load of our pc to a local gateway:
  
 ## Authors 
 * **Dr. Stefan Holzheu** - *Project lead* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
-* **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
+* **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+
+### Version 2.6.1, March, 2020
+- Import feedback by e-mail 
+- Enhanced upload list display
 
 ### Version 2.6.0, March, 2020
 - Binary Logger file uploads 

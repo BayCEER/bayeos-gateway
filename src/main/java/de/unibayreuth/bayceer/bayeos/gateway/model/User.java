@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.AssertTrue;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
@@ -161,7 +162,12 @@ public class User extends NamedDomainEntity {
 	}
 	
 	public String displayName() {
-		return ((firstName==null)?"":firstName) + ((lastName==null)?"":" " + lastName);  
+		if (firstName == null && lastName == null) {
+			return getUserName();
+		} else {
+			return WordUtils.capitalizeFully(((firstName==null)?"":firstName) + ((lastName==null)?"":" " + lastName));	
+		}
+		  
 	}
 
 		

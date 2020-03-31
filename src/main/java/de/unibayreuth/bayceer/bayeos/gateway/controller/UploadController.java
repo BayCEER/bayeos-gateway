@@ -4,8 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.util.Locale;
 
@@ -14,24 +12,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.SortDefault;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import de.unibayreuth.bayceer.bayeos.gateway.marshaller.BoardTemplateMarshaller;
-import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Upload;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UploadRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.FileUploadService;
@@ -67,7 +59,7 @@ public class UploadController extends AbstractController {
 	}
 	
 	@GetMapping("/uploads")
-	public String list(Model model, @SortDefault("uploadTime") Pageable pageable){		
+	public String list(Model model, @SortDefault(value = "uploadTime", direction = Direction.DESC) Pageable pageable){
 		model.addAttribute("uploads", repo.findAll(userSession.getUser(),domainFilter,pageable));
 		return "listUpload";
 	}

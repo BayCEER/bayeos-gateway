@@ -4,50 +4,28 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Upload extends NamedDomainEntity {
 	
 	private UUID uuid;
 	private Date uploadTime;
+	private Date importTime;
+	private String importMessage;
 	private long size;
-	private String userName;
+	
+	@ManyToOne()
+	@JoinColumn(name="user_id")
+	private User user;
+
 		
 	public Upload() {
 		super();
 	}
 
-	public UUID getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(UUID uuid) {
-		this.uuid = uuid;
-	}
-
-	public long getSize() {
-		return size;
-	}
-
-	public void setSize(long size) {
-		this.size = size;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public Date getUploadTime() {
-		return uploadTime;
-	}
-
-	public void setUploadTime(Date uploadTime) {
-		this.uploadTime = uploadTime;
-	}
+	
 	
 	public String extension() {
 		if (this.name.contains(".")) {
@@ -56,5 +34,77 @@ public class Upload extends NamedDomainEntity {
 		} else {
 			return "";
 		}
+	}
+
+
+
+	public UUID getUuid() {
+		return uuid;
+	}
+
+
+
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
+	}
+
+
+
+	public Date getUploadTime() {
+		return uploadTime;
+	}
+
+
+
+	public void setUploadTime(Date uploadTime) {
+		this.uploadTime = uploadTime;
+	}
+
+
+
+	public Date getImportTime() {
+		return importTime;
+	}
+
+
+
+	public void setImportTime(Date importTime) {
+		this.importTime = importTime;
+	}
+
+
+
+	public String getImportMessage() {
+		return importMessage;
+	}
+
+
+
+	public void setImportMessage(String importMessage) {
+		this.importMessage = importMessage;
+	}
+
+
+
+	public long getSize() {
+		return size;
+	}
+
+
+
+	public void setSize(long size) {
+		this.size = size;
+	}
+
+
+
+	public User getUser() {
+		return user;
+	}
+
+
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

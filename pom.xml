@@ -3,7 +3,7 @@
   
   <groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.6.0</version>
+	<version>2.6.1</version>
 
 
 	<licenses>
@@ -77,7 +77,7 @@
 			</resources>
 			</build>
 			<dependencies>
-			<!-- breaks web flows -->   
+			<!-- breaks web flow -->   
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-devtools</artifactId>				

@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Your file upload on ${host}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+</head>
+<body style="margin: 10; padding: 20;">
+	<p><b>Dear ${upload.user.displayName()}</b></p>
+	<p>Your uploaded file: ${upload.name} on ${host} was imported successfully.</p>
+	<p>All frame data was parsed and stored in your board devices. New boards and channels are created if needed.</p>
+	<table>
+		<tr>
+			<td>Date of Upload:</td>
+			<td>${upload.uploadTime}</td>
+		</tr>
+		<tr>
+			<td>Date of Import:</td>
+			<td>${upload.importTime}</td>
+		</tr>
+		<tr>
+			<td>File Size:</td>
+			<td>${upload.size}</td>
+		</tr>
+		<tr>
+			<td>Import Message:</td>
+			<td>${upload.importMessage}</td>
+		</tr>
+	</table>
+	
+	<p>First time import only:</p>
+	<ul>
+		<li><a href="https://${host}/gateway">Configure your boards and channels</a></li>
+		<li>Turn the auto-export options of your boards on</li>
+	</ul>
+	<p>Please use the <a href="https://${host}/bayeosViewer">BayEOS Viewer</a> for charting and data exports.</p>
+	
+	<p>Thank you for using BayEOS</p>
+</body>
+</html>

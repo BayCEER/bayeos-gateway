@@ -46,7 +46,7 @@ class FileUploadService {
 		upload.uploadTime = new Date()
 		upload.size = file.size
 		upload.uuid = uuid
-		upload.userName = userSession.getUser().getName()
+		upload.user = userSession.getUser()
 		upload.domain = userSession.getDomain()
 						
 		String binFile = uuid.toString() + ".bin"	

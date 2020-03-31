@@ -16,14 +16,18 @@
 						<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
 					</th>
 					<th>
-						<a class="sorted" sd:pagination-sort="userName"	th:text="#{user.name}">User Name</a>
+						<a class="sorted" sd:pagination-sort="user.name" th:text="#{user.name}">User Name</a>
 					</th>
 					<th>
-						<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a>
+						<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">File Name</a>
 					</th>
 					<th>
 						<a class="sorted" sd:pagination-sort="uploadTime"	th:text="#{upload.uploadTime}">Date of Upload</a>
 					</th>
+					<th>
+						<a class="sorted" sd:pagination-sort="importTime"	th:text="#{upload.importTime}">Date of Import</a>
+					</th>
+				
 					<th>
 						<a class="sorted" sd:pagination-sort="size"	th:text="#{upload.size}">Size</a>
 					</th>
@@ -40,9 +44,13 @@
 						<td th:if="${#authentication.principal.inNullDomain()}">
 								<a th:if="${f.domainId} != null" th:href="@{/domains/{id}(id=${f.domainId})}" th:text="${f.domainName}">Domain</a>
 						</td>
-						<td th:text="${f.userName}"></td>
-						<td th:text="${f.name}"></td>
-						<td th:text="${f.uploadTime}"></td>	
+						<td th:text="${f.user.name}"></td>
+						<td>
+							<span th:class="${f.importTime == null}? 'glyphicon glyphicon-time':'glyphicon glyphicon-file'"></span>
+							<span th:text="${f.name}"></span>
+						</td>
+						<td th:text="${{f.uploadTime}}"></td>
+						<td th:text="${{f.importTime}}"></td>	
 						<td th:text="${f.size}"></td>
 						<td>
 							<div th:replace="table::delete(@{'/uploads/deleteFile/' + ${f.id}},false)"></div>

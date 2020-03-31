@@ -19,6 +19,7 @@ import org.thymeleaf.TemplateEngine
 import org.thymeleaf.spring4.SpringTemplateEngine
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
+import de.unibayreuth.bayceer.bayeos.gateway.NotificationConfig
 import de.unibayreuth.bayceer.bayeos.gateway.model.NagiosStatus
 import groovy.sql.Sql
 
@@ -33,38 +34,16 @@ public class NotificationService implements Runnable {
 	
 	@Autowired(required = false)
 	private MailSender mailSender
-	
-	
-
-	@Value('${NOTIFICATION:false}')
-	private Boolean notification;
-	
-	@Value('${NOTIFICATION_HOST:}')
-	private String notification_host;
-	
-	@Value('${NOTIFICATION_WAIT_SECS:60}')
-	private int waitSecs
-	
-	@Value('${NOTIFICATION_MAX_SOFT_STATES:4}')
-	private int maxSoftStates
-	
-	@Value('${NOTIFICATION_SENDER:}')
-	private String notification_sender;
+		
+	@Autowired
+	private NotificationConfig config
 
 	private Logger log = Logger.getLogger(NotificationService.class)
 	
 	
 	@PostConstruct
 	public void start(){		
-		if (notification_host.equals("")) {			
-			notification_host =  InetAddress.getLocalHost().getCanonicalHostName();		
-		} 	
-		log.info("Notification host:" + notification_host);
-		if (notification_sender.equals("")) {
-			notification_sender =  "admin@" + notification_host;
-		}
-		log.info("Notification sender:" + notification_sender);
-		if (notification && (mailSender != null)) {			
+		if (config.notification && (mailSender != null)) {			
 			new Thread(this).start()
 			log.info("Notification service started")
 		}		
@@ -74,7 +53,7 @@ public class NotificationService implements Runnable {
 	@Override
 	public void run() {
 		try {			
-			Thread.sleep(1000*waitSecs)
+			Thread.sleep(1000*config.notification_wait_secs)
 			while(true) {
 				log.debug("Notification service is running.")				
 				['board_group', 'board'].each{ service ->					
@@ -101,7 +80,7 @@ public class NotificationService implements Runnable {
 							if (lo == null) {
 								// First check
 								db.execute("insert into service_state_log (${service}_id,hard_state) values (?,?);",[row.id,state])
-								sendMail(service,row.id,row.name,state);
+								sendStatusMail(service,row.id,row.name,state);
 							} else {
 								// Successive check
 								if (state == lo.hard_state) {
@@ -109,11 +88,11 @@ public class NotificationService implements Runnable {
 										db.executeUpdate("update service_state_log set last_check_time=?, soft_state_count=0 where id = ?",[now,lo.id])
 									}
 								} else {
-									if (lo.soft_state_count < maxSoftStates) {
+									if (lo.soft_state_count < config.notification_max_soft_states) {
 										db.executeUpdate("update service_state_log set last_check_time=?, soft_state_count=? where id = ?",[now,++lo.soft_state_count, lo.id])
 									} else {																			
 										db.executeUpdate("update service_state_log set last_state_change=?, last_check_time=?, soft_state_count=0, hard_state=? where id = ?",[now,now,state,lo.id])																																																																							
-										sendMail(service,row.id,row.name,state);
+										sendStatusMail(service,row.id,row.name,state);
 									}
 								}
 							}				
@@ -125,7 +104,7 @@ public class NotificationService implements Runnable {
 					} 										
 				}
 				log.debug("Notification service finished.")
-				Thread.sleep(1000*waitSecs)
+				Thread.sleep(1000*config.notification_wait_secs)
 			}
 		} catch (InterruptedException e) {
 			log.error(e.getMessage())
@@ -171,16 +150,16 @@ public class NotificationService implements Runnable {
 				}
 				// Group
 				if (it.board_group_name != boardGroupName){					
-					body.append("<p>&nbsp;<a href=\"https://${notification_host}/gateway/groups/${it.board_group_id}\">Board Group ${it.board_group_name}</a><p>\n")
+					body.append("<p>&nbsp;<a href=\"https://${config.notification_host}/gateway/groups/${it.board_group_id}\">Board Group ${it.board_group_name}</a><p>\n")
 					boardGroupName = it.board_group_name
 				}
 				// Board
 				if (it.board_name != boardName){
-					body.append("<p>&nbsp;&nbsp;<a href=\"https://${notification_host}/gateway/boards/${it.board_id}\">Board ${it.board_name}</a><p>\n")
+					body.append("<p>&nbsp;&nbsp;<a href=\"https://${config.notification_host}/gateway/boards/${it.board_id}\">Board ${it.board_name}</a><p>\n")
 					boardName = it.board_name
 				}
 				// Channel
-				body.append("<p>&nbsp;&nbsp;&nbsp;<a href=\"https://${notification_host}/gateway/channels/${it.channel_id}\">Channel ${it.channel_name}</a>: ")	
+				body.append("<p>&nbsp;&nbsp;&nbsp;<a href=\"https://${config.notification_host}/gateway/channels/${it.channel_id}\">Channel ${it.channel_name}</a>: ")	
 				
 						
 				if (it.status_complete>0){
@@ -217,7 +196,7 @@ public class NotificationService implements Runnable {
 	}
 	
 
-	def sendMail(String device,Long id, String name,Integer state) {		
+	def sendStatusMail(String device,Long id, String name,Integer state) {		
 		def alert = (state>0)?"PROBLEM":"RECOVERY"
 		def stateText = NagiosStatus.get(state).toString()
 		def service =  device.replaceAll("_", " ").toUpperCase();
@@ -233,15 +212,15 @@ public class NotificationService implements Runnable {
 		def db = new Sql(dataSource)
 		try {			
 			db.eachRow("select distinct c.email from notification s join contact c on (c.id = s.contact_id) where s.${device}_id = ?",[id]){ it ->
-				MimeMessage msg = mailSender.createMimeMessage();
-				MimeMessageHelper mh = new MimeMessageHelper(msg, false, "utf-8");
-				mh.setText(m.body, true);
-				mh.setTo(it.email)								
-				mh.setSubject(subject)																
-				mh.setFrom(notification_sender)
 				try{
+					MimeMessage msg = mailSender.createMimeMessage();
+					MimeMessageHelper mh = new MimeMessageHelper(msg, false, "utf-8");
+					mh.setText(m.body, true);
+					mh.setTo(it.email)								
+					mh.setSubject(subject)																
+					mh.setFrom(config.getNotification_sender())
 					mailSender.send(msg)
-				} catch (MailException ex) {
+				} catch (Exception ex) {
 					log.error(ex.getMessage())
 				}
 			}

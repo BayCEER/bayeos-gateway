@@ -39,7 +39,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Value("${LDAP_DN:cn=%s}")
 	private String ldap_dn;
-	
 		
 	@Value("${LDAP_HOST:localhost}")
 	private String ldap_host;
