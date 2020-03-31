@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+
 @Entity
 public class Upload extends NamedDomainEntity {
 	
@@ -15,18 +16,21 @@ public class Upload extends NamedDomainEntity {
 	private static final long MB = kB * 1024;
 	private static final long GB = MB * 1024;
 		
-	private UUID uuid;
-	private Date uploadTime;
-	private Date importTime;
-	private String importMessage;
-	private long size;
+	UUID uuid;
+	
+	Date uploadTime;
+    
+    Date importTime;
+    
+	String importMessage;
+	long size;
 		
 	@ManyToOne()
 	@JoinColumn(name="user_id")
-	private User user;
+	User user;
 
 	@Transient
-	private String sizeAsString;
+	String sizeAsString;
 	
 	public void setSizeAsString() {
 		StringBuffer s = new StringBuffer();

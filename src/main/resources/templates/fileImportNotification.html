@@ -13,11 +13,12 @@
 	<table>
 		<tr>
 			<td>Date of Upload:</td>
-			<td th:text="${{upload.uploadTime}}"></td>
+			<td th:text="${#dates.format(upload.uploadTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+			
 		</tr>
 		<tr>
 			<td>Date of Import:</td>
-			<td th:text="${{upload.importTime}}"></td>
+			<td th:text="${#dates.format(upload.importTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
 		</tr>
 		<tr>
 			<td>File Size:</td>

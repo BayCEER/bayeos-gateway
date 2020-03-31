@@ -3,6 +3,8 @@ package de.unibayreuth.bayceer.bayeos.gateway.service
 
 import java.nio.file.Path
 import java.sql.SQLException
+import java.sql.Timestamp
+
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import javax.mail.MessagingException
@@ -161,7 +163,8 @@ class FileImportService implements Runnable {
 				}
 				frames.clear()
 			}
-			u.importTime = new Date()
+			Date now = new Date()
+			u.importTime = new Timestamp(now.time) 
 			u.importMessage = "${frameCount} frames imported."
 			Upload pe = repo.save(u)
 			sendNotification(pe)

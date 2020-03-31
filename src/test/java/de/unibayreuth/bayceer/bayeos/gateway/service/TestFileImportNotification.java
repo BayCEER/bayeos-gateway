@@ -1,9 +1,9 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import org.junit.Test;
@@ -29,8 +29,10 @@ public class TestFileImportNotification {
 		usr.setLastName("Archner");
 		usr.setFullName();
 		u.setUser(usr);
-		u.setImportTime(new Date());
-		u.setUploadTime(new Date());
+		Date now = new Date();
+		Timestamp ts = new Timestamp(now.getTime());
+		u.setImportTime(ts);
+		u.setUploadTime(ts);
 		u.setName("MyFile.dbd");
 		u.setSize(13970);
 		u.setSizeAsString();
@@ -46,6 +48,6 @@ public class TestFileImportNotification {
 		e.setTemplateResolver(r);;
 		e.initialize();
 		
-		Files.write(Paths.get("target","tests","fileImportNotificationEMail.html"), e.process("fileImportNotification",c).getBytes());
+		Files.write(Paths.get("target","fileImportNotificationEMail.html"), e.process("fileImportNotification",c).getBytes());
 	}
 }
