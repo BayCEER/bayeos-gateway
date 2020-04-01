@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -41,6 +42,10 @@ public class UploadController extends AbstractController {
 	
 	@Autowired
 	Path localFilePath;
+	
+	@Value("${LOCAL_FILE_EXPIRED_MONTH:3}")
+	private int localFileExpiredMonth;
+
 
 	private final static Logger log = Logger.getLogger(UploadController.class);
 	
@@ -68,6 +73,7 @@ public class UploadController extends AbstractController {
 			d.getUser().setFullName();
 		}
 		model.addAttribute("uploads", uploads);
+		model.addAttribute("localFileExpiredMonth", localFileExpiredMonth);
 		return "listUpload";
 	}
 	
