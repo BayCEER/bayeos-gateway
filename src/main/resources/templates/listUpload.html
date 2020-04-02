@@ -47,7 +47,7 @@
 				<tbody>
 					<tr th:each="f : ${uploads}">
 						<td th:if="${#authentication.principal.inNullDomain()}">
-								<a th:if="${f.domainId} != null" th:href="@{/domains/{id}(id=${f.domainId})}" th:text="${f.domainName}">Domain</a>
+								<a th:if="${f.domainId} != null" th:href="@{/domains/{id}(id=${f.domainId})}" th:text="${f.domain.name}">Domain</a>
 						</td>
 						<td th:text="${f.user.name}"></td>
 						<td>
