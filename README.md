@@ -47,6 +47,9 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.6.2, April, 2020
+- Default import file size limit 4GB
+
 ### Version 2.6.1, March, 2020
 - Import feedback by e-mail 
 - Enhanced upload list display
