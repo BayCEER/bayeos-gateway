@@ -13,9 +13,11 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Upload;
 @Repository
 public interface UploadRepository extends DomainFilteredRepository<Upload>{
 	
-	List<Upload> findByImportTimeIsNullOrderByIdAsc();
 	
-	@Query("select u from Upload u where u.importTime <= :importTime")
+	@Query("select u from Upload u where u.importStatus = 2 order by id asc")
+	List<Upload> findPending();
+	
+	@Query("select u from Upload u where u.importStatus = 0 and u.importTime <= :importTime")
 	List<Upload> findExpired( @Param("importTime") Date importTime);
 	
 	

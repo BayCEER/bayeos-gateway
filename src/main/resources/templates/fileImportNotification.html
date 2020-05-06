@@ -4,33 +4,31 @@
 <title>Your file upload on ${host}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
 </head>
 <body style="margin: 10; padding: 20;">
-	<p>Dear <span th:text="${upload.user.fullName}"></span></p>
-	<p>Your uploaded file: <strong><span th:text="${upload.name}"></span></strong> on host <span th:text="${host}"></span> was imported successfully.</p>
-	<p>All frame data was parsed and stored in your boards and channels.</p>
-	<table>
+	<p>Dear <span th:text="${user.fullName}"></span></p>
+	<p>Your uploaded files on host <a th:href="'https://' + ${host} + '/gateway'"><span th:text="${host}"></span></a> have been processed.</p>
+	<p>The following table shows the result. Please check the import status and reimport your files in case of any errors.</p>
+	<table border="1" cellpadding="5" cellspacing="5">
 		<tr>
-			<td>Date of Upload:</td>
-			<td th:text="${#dates.format(upload.uploadTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
-			
+			<th>Name</th>
+			<th>Upload</th>
+			<th>Size</th>
+			<th>Import</th>
+			<th>Status</th>
+			<th>Message</th>
 		</tr>
-		<tr>
-			<td>Date of Import:</td>
-			<td th:text="${#dates.format(upload.importTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
-		</tr>
-		<tr>
-			<td>File Size:</td>
+		<tr th:each="upload : ${uploads}" th:style="${#strings.equals(upload.importStatus,'FAILED')}?'background-color:#f4433659':''">
+			<td th:text="${upload.name}"></td>
+			<td th:text="${#dates.format(upload.uploadTime, 'yyyy-MM-dd HH:mm')}"></td>
 			<td th:text="${upload.sizeAsString}"></td>
-		</tr>
-		<tr>
-			<td>Import Message:</td>
+			<td th:text="${#dates.format(upload.importTime, 'yyyy-MM-dd HH:mm')}"></td>
+			<td th:text="${upload.importStatus}"></td>
 			<td th:text="${upload.importMessage}"></td>
 		</tr>
 	</table>
 	
-	<p>First time import only:</p>
+	<p>First time import only</p>
 	<ul>
 		<li><a th:href="'https://' + ${host} + '/gateway'">Configure your boards and channels</a></li>
 		<li>Turn the auto-export options of your boards on</li>

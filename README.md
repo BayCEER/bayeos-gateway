@@ -46,6 +46,8 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.6.3, May, 2020
+- Refined upload notifications 
 
 ### Version 2.6.2, April, 2020
 - Default import file size limit 4GB

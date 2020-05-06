@@ -14,7 +14,6 @@
 				</button>
 				<span th:text="#{msg.infoUploadList(${localFileExpiredMonth})}"></span>				  
 			</div>
-			<!-- <div class="table-responsive">  -->
 			<table class="table table-condensed" >
 				<thead>
 					<tr>
@@ -28,18 +27,16 @@
 						<a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">File Name</a>
 					</th>
 					<th>
+						<a class="sorted" sd:pagination-sort="importStatus"	th:text="#{upload.importStatus}">Status</a>
+					</th>
+					<th>
 						<a class="sorted" sd:pagination-sort="uploadTime"	th:text="#{upload.uploadTime}">Date of Upload</a>
 					</th>
 					<th>
-						<a class="sorted" sd:pagination-sort="importTime"	th:text="#{upload.importTime}">Date of Import</a>
-					</th>
-				
-					<th>
-						<a class="sorted" sd:pagination-sort="size"	th:text="#{upload.size}">Size</a>
-					</th>
-
-					<th>
-									
+						<div class="pull-right">
+							<a th:href="@{/uploads/uploadFile}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-upload"></span> <span th:text="#{action.upload}"></span>
+							</a>
+						</div>			
 					</th>
 					</tr>
 				</thead>
@@ -50,12 +47,12 @@
 						</td>
 						<td th:text="${f.user.fullName}"></td>
 						<td>
-							<span th:class="${f.importTime == null}? 'glyphicon glyphicon-time':'glyphicon glyphicon-file'"></span>
+							<span class="glyphicon glyphicon-file"></span>
 							<span th:text="${f.name}"></span>
 						</td>
+						
+						<td><span th:class="'label label-' + ${#strings.toLowerCase(f.importStatus)}" th:text="${f.importStatus}"></span></td>
 						<td th:text="${{f.uploadTime}}"></td>
-						<td th:text="${{f.importTime}}"></td>	
-						<td th:text="${f.sizeAsString}"></td>
 						<td>
 							<div th:replace="table::delete(@{'/uploads/deleteFile/' + ${f.id}},false)"></div>
 							<div th:replace="table::export(@{'/uploads/exportFile/' + ${f.id}})"></div>	
@@ -64,9 +61,9 @@
 					</tr>
 				</tbody>
 			</table>
-			<!-- </div>  -->			
+			
 			<div th:replace="table::pagination"></div>
-			<a th:href="@{/uploads/uploadFile}" th:text="#{action.upload}" class="btn btn-default" role="button">Upload</a>								
+											
 					
 		</div>		
 </body>

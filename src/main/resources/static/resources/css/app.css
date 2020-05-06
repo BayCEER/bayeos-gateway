@@ -86,7 +86,7 @@ body > .container {
 	background-color: rgb(224, 224, 224);
 }
 
-.label-ok {
+.label-ok  {
 	background-color: rgb(57, 132, 57);
 }
 
@@ -94,12 +94,20 @@ body > .container {
 	background-color: rgb(213, 133, 18);
 }
 
-.label-critical {
+.label-critical  {
 	background-color: rgb(217, 83, 79);
 }
 
 .label-unknown {
 	background-color: rgb(224, 224, 224);
+}
+
+.label-failed {
+	background-color: rgb(217, 83, 79);
+}
+
+.label-pending {
+	background-color: #777;
 }
 
 

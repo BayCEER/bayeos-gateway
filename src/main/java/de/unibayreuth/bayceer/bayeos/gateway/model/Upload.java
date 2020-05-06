@@ -4,9 +4,13 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+
+import ch.qos.logback.core.joran.spi.DefaultClass;
 
 
 @Entity
@@ -16,21 +20,26 @@ public class Upload extends NamedDomainEntity {
 	private static final long MB = kB * 1024;
 	private static final long GB = MB * 1024;
 		
-	UUID uuid;
 	
-	Date uploadTime;
+	private UUID uuid;
+	
+	private Date uploadTime;
     
-    Date importTime;
+    private Date importTime;
     
-	String importMessage;
-	long size;
-		
+	private String importMessage;
+	
+	private long size;
+	
+    @Enumerated(EnumType.ORDINAL)
+	private ImportStatus importStatus = ImportStatus.PENDING;
+	
 	@ManyToOne()
 	@JoinColumn(name="user_id")
-	User user;
+	private User user;
 
 	@Transient
-	String sizeAsString;
+	private String sizeAsString;
 	
 	public void setSizeAsString() {
 		StringBuffer s = new StringBuffer();
@@ -109,5 +118,14 @@ public class Upload extends NamedDomainEntity {
 
 	public String getSizeAsString() {
 		return sizeAsString;
+	}
+
+	
+	public ImportStatus getImportStatus() {
+		return importStatus;
+	}
+
+	public void setImportStatus(ImportStatus importStatus) {
+		this.importStatus = importStatus;
 	}
 }

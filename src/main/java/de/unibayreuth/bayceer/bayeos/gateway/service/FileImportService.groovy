@@ -2,13 +2,9 @@ package de.unibayreuth.bayceer.bayeos.gateway.service
 
 
 import java.nio.file.Path
-import java.sql.SQLException
 import java.sql.Timestamp
 
 import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
-import javax.mail.MessagingException
-import javax.mail.internet.AddressException
 import javax.mail.internet.MimeMessage
 import javax.sql.DataSource
 
@@ -16,23 +12,19 @@ import org.apache.commons.codec.binary.Base64
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-
-import org.springframework.data.web.SortDefault
-import org.springframework.mail.MailException
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Component
-import org.springframework.stereotype.Service
 import org.thymeleaf.context.Context
 import org.thymeleaf.spring4.SpringTemplateEngine
 
-import bayeos.frame.Parser
 import de.unibayreuth.bayceer.bayeos.gateway.NotificationConfig
-import de.unibayreuth.bayceer.bayeos.gateway.UserSession
+import de.unibayreuth.bayceer.bayeos.gateway.model.ImportStatus
 import de.unibayreuth.bayceer.bayeos.gateway.model.Upload
+import de.unibayreuth.bayceer.bayeos.gateway.model.User
 import de.unibayreuth.bayceer.bayeos.gateway.reader.BDBReader
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UploadRepository
-import groovy.sql.Sql
+import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository
 
 @Component
 class FileImportService implements Runnable {
@@ -45,6 +37,9 @@ class FileImportService implements Runnable {
 
 	@Autowired
 	UploadRepository repo
+	
+	@Autowired
+	UserRepository repoUser
 
 	@Autowired
 	FrameService frameService
@@ -78,21 +73,24 @@ class FileImportService implements Runnable {
 	public void run() {
 		while(true) {
 			Thread.sleep(1000*waitSecs)
-			log.debug("File import running ...")
-			repo.findByImportTimeIsNullOrderByIdAsc().each { u ->
-				try {
-					switch(u.extension()) {
-						case "bdb":
-							importBDB(u)
-							break
-						default:
-							log.warn("Unknown file extension:${u.extension()}")
-					}
-				} catch (IOException e) {
-					log.error(e.getMessage())
+			log.info("File import running ...")
+			
+			// Import and save results 
+			Map<Integer,List<Upload>> umap = new HashMap();
+			repo.findPending().each{ u ->			
+				if (umap[u.user.id] == null) {
+					umap[u.user.id] = new ArrayList<Upload>()
 				}
+				Upload e = repo.save(importFile(u))
+				umap[u.user.id].add(e)	 
 			}
-
+			
+			// Send email for each user
+			umap.each { id, files -> 
+				sendNotification(id, files)
+			}
+			
+			// Delete imported 
 			GregorianCalendar c = new GregorianCalendar()
 			c.add(GregorianCalendar.MONTH, expiredMonth * -1)
 			List<Upload> uploads = repo.findExpired(c.getTime())
@@ -103,24 +101,27 @@ class FileImportService implements Runnable {
 			if (uploads.size()>0) {
 				log.info("${uploads.size} expired upload files deleted.")
 			}
-
-
-			log.debug("File import finished.")
+			log.info("File import finished")
 		}
 	}
 
-	private void sendNotification(Upload u) {
-		if (u.user.contact?.email && notificationConfig.notification && mailSender != null) {
+	private void sendNotification(Long id, List<Upload> uploads) {
+		User usr = repoUser.findOne(id)
+		if (usr?.hasEmail() && notificationConfig.notification && mailSender != null) {
 			try{
+				log.info("Sending import notification to: " + usr.contact.email)
 				MimeMessage msg = mailSender.createMimeMessage()
 				MimeMessageHelper mh = new MimeMessageHelper(msg, false, "utf-8")
 				Context c = new Context()
-				u.getUser().setFullName();
-				u.setSizeAsString();
-				c.setVariable("upload",u)
+				usr.setFullName()
+				c.setVariable("user", usr)
+				uploads.each { ui -> 
+					ui.setSizeAsString()
+				}
+				c.setVariable("uploads",uploads)
 				c.setVariable("host",notificationConfig.getNotification_host())
 				mh.setText(templateEngine.process("fileImportNotification",c), true)
-				mh.setTo(u.user.contact.email)
+				mh.setTo(usr.contact.email)
 				mh.setSubject("BayEOS Gateway File Import")
 				mh.setFrom(notificationConfig.getNotification_sender())
 				mailSender.send(msg)
@@ -129,51 +130,61 @@ class FileImportService implements Runnable {
 			}
 		}
 	}
-
-	private void importBDB(Upload u) {
+	
+	private Upload importFile(Upload u) {
 		log.info("Importing file: ${u.name}")
+		
+		String ext = u.extension()
 		String bin = u.uuid.toString() + ".bin"
 		File file = localFilePath.resolve(bin).toFile()
 		FileInputStream fin
 		try {
-			fin = new FileInputStream(file)
-			BDBReader r = new BDBReader(fin)
-			r.readHeader()
-			String origin = r.readOrigin()
-
-			List<String> frames = new ArrayList<>(FRAMES_PER_POST)
-			long bytes = 0
-
-			long frameCount = 0
-			byte[] data = null
-			while ((data = r.readData())!=null){
-				bytes += data.length
-				frameCount++
-				frames.add(Base64.encodeBase64String(data))
-				if (frames.size() == FRAMES_PER_POST) {
-					if (!frameService.saveFrames(u.domainId,origin,frames)) {
-						throw new IOException("Failed to save frames")
+			fin = new FileInputStream(file)		
+			switch (ext) {
+				case "bdb":
+					BDBReader r = new BDBReader(fin)
+					r.readHeader()
+					String origin = r.readOrigin()
+					List<String> frames = new ArrayList<>(FRAMES_PER_POST)
+					long frameCount = 0
+					byte[] data = null
+					while ((data = r.readData())!=null){
+						frameCount++
+						frames.add(Base64.encodeBase64String(data))
+						if (frames.size() == FRAMES_PER_POST) {
+							if (!frameService.saveFrames(u.domainId,origin,frames)) {
+								throw new IOException("Failed to save frames")
+							}
+							frames.clear()
+						}
 					}
-					frames.clear()
-				}
+					if (!frames.isEmpty()) {
+						if (!frameService.saveFrames(u.domainId,origin,frames)) {
+							throw new IOException("Failed to save frames")
+						}
+						frames.clear()
+					}
+					Date now = new Date()
+					u.setImportMessage("${frameCount} frames imported.")
+					u.setImportStatus(ImportStatus.OK);
+					break;
+				default:
+					throw new IOException("Unknown file type:${ext}")
 			}
-			if (!frames.isEmpty()) {
-				if (!frameService.saveFrames(u.domainId,origin,frames)) {
-					throw new IOException("Failed to save frames")
-				}
-				frames.clear()
-			}
-			Date now = new Date()
-			u.importTime = new Timestamp(now.time) 
-			u.importMessage = "${frameCount} frames imported."
-			Upload pe = repo.save(u)
-			sendNotification(pe)
+				
 		} catch (IOException e) {
-			log.error(e.getMessage())
+				log.error(e.getMessage())
+				u.setImportMessage(e.getMessage())
+				u.setImportStatus(ImportStatus.FAILED)
 		} finally {
-			if (fin != null) {
-				fin.close()
-			}
+				if (fin != null) {
+					fin.close()
+				}
 		}
+		Date now = new Date()
+		u.importTime = new Timestamp(now.time)
+		return u;
 	}
+
+
 }
