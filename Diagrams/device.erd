@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="xbee.erd">
+	<entities>
+		<data-source id="postgres-jdbc-171a5e83c84-5ae9b34b7b670620">
+			<entity id="1" name="observation" fq-name="public.observation" order="0" x="20" y="216">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="2" name="observation_calc" fq-name="public.observation_calc" order="1" x="17" y="409">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="3" name="observation_exp" fq-name="public.observation_exp" order="2" x="17" y="551">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="4" name="channel" fq-name="public.channel" order="3" x="256" y="219">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="5" name="function" fq-name="public.&quot;function&quot;" order="4" x="572" y="389">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="6" name="interval" fq-name="public.&quot;interval&quot;" order="5" x="572" y="512">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="7" name="spline" fq-name="public.spline" order="6" x="572" y="635">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="8" name="board" fq-name="public.board" order="7" x="572" y="19">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="9" name="domain" fq-name="public.&quot;domain&quot;" order="8" x="868" y="463">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="10" name="board_group" fq-name="public.board_group" order="9" x="865" y="144">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="11" name="users" fq-name="public.users" order="10" x="1064" y="133">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+			<entity id="12" name="contact" fq-name="public.contact" order="11" x="1096" y="453">
+				<path name="public"/>
+				<path name="xbee"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="fk_obs_channel" fq-name="public.observation.fk_obs_channel" type="fk" pk-ref="4" fk-ref="1"/>
+		<relation name="fk_observation_calc_cha" fq-name="public.observation_calc.fk_observation_calc_cha" type="fk" pk-ref="4" fk-ref="2"/>
+		<relation name="fk_observation_exp_cha" fq-name="public.observation_exp.fk_observation_exp_cha" type="fk" pk-ref="4" fk-ref="3"/>
+		<relation name="fk2c0b7d03cc75d396" fq-name="public.channel.fk2c0b7d03cc75d396" type="fk" pk-ref="5" fk-ref="4"/>
+		<relation name="fk2c0b7d03a1cb9076" fq-name="public.channel.fk2c0b7d03a1cb9076" type="fk" pk-ref="6" fk-ref="4"/>
+		<relation name="fk2c0b7d037d458b24" fq-name="public.channel.fk2c0b7d037d458b24" type="fk" pk-ref="7" fk-ref="4"/>
+		<relation name="fk2c0b7d03b4ecbfb0" fq-name="public.channel.fk2c0b7d03b4ecbfb0" type="fk" pk-ref="8" fk-ref="4"/>
+		<relation name="fk_function_domain" fq-name="public.&quot;function&quot;.fk_function_domain" type="fk" pk-ref="9" fk-ref="5"/>
+		<relation name="fk_interval_domain" fq-name="public.&quot;interval&quot;.fk_interval_domain" type="fk" pk-ref="9" fk-ref="6"/>
+		<relation name="fk_spline_domain" fq-name="public.spline.fk_spline_domain" type="fk" pk-ref="9" fk-ref="7"/>
+		<relation name="fk_board_domain" fq-name="public.board.fk_board_domain" type="fk" pk-ref="9" fk-ref="8"/>
+		<relation name="fk_board_group_domain" fq-name="public.board_group.fk_board_group_domain" type="fk" pk-ref="9" fk-ref="10"/>
+		<relation name="fk_users_domain" fq-name="public.users.fk_users_domain" type="fk" pk-ref="9" fk-ref="11"/>
+		<relation name="fk_contact_domain" fq-name="public.contact.fk_contact_domain" type="fk" pk-ref="9" fk-ref="12"/>
+		<relation name="fk_board_board_group" fq-name="public.board.fk_board_board_group" type="fk" pk-ref="10" fk-ref="8"/>
+		<relation name="fk_users_contact" fq-name="public.users.fk_users_contact" type="fk" pk-ref="12" fk-ref="11"/>
+	</relations>
+</diagram>
