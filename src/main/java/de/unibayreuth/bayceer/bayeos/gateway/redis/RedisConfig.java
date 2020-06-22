@@ -4,12 +4,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import io.lettuce.core.RedisClient;
+
+
 
 
 @Configuration
-public class JedisConfig {
+public class RedisConfig {
 	
 	@Value("${REDIS_HOST:localhost}")
 	private String redis_host;
@@ -18,8 +19,8 @@ public class JedisConfig {
 	private Integer redis_port;
 	
 	@Bean	
-	public JedisPool jedisPool() {		
-		return new JedisPool(new JedisPoolConfig(),redis_host, redis_port);
+	public RedisClient redisClient() {	
+		return RedisClient.create(String.format("redis://%s:%d",redis_host,redis_port));
 	}
 	
 	

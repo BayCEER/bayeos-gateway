@@ -13,21 +13,22 @@ import org.springframework.stereotype.Component;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.exceptions.JedisException;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisException;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 
 @Component
-public class JedisStats implements Runnable {
+public class RedisStats implements Runnable {
 	
 	@Value("${REDIS_EVENTS:false}")
 	private Boolean redis_events;
 	
 	@Value("${REDIS_STATS_WAIT_SECS:120}")
-	private Integer redis_stats_wait_secs;
+	private Integer waitSecs;
 	
 	@Autowired
-	private JedisPool jedisPool;
+	private RedisClient redis;
 	
 	private String hostname;
 	
@@ -40,10 +41,10 @@ public class JedisStats implements Runnable {
 	@Autowired
 	private UserRepository repoUser;
 	
-	private Logger log = Logger.getLogger(JedisStats.class);
+	private Logger log = Logger.getLogger(RedisStats.class);
 	
 	
-	public JedisStats() {		
+	public RedisStats() {		
 		try {	
 			hostname = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
@@ -55,25 +56,19 @@ public class JedisStats implements Runnable {
 	public void run() {
 		
 		try {
-			
 			while(true){
-				Thread.sleep(1000*redis_stats_wait_secs);
+				Thread.sleep(1000*waitSecs);
 				log.info("Pushing stats to redis.");
-				
-				try (Jedis jedis = jedisPool.getResource()){	
-					jedis.sadd("hostnames", hostname);
-					jedis.hset(hostname + ":stats", "domains",String.valueOf(repoDomain.count()));
-					jedis.hset(hostname + ":stats", "boards",String.valueOf(repoBoard.count()));
-					jedis.hset(hostname + ":stats", "users",String.valueOf(repoUser.count()));
-				} catch (JedisException e) {
+				try (StatefulRedisConnection<String, String> con = redis.connect()){
+					RedisCommands<String, String> cmd = con.sync();
+					cmd.sadd("hostnames", hostname);
+					cmd.hset(hostname + ":stats", "domains",String.valueOf(repoDomain.count()));
+					cmd.hset(hostname + ":stats", "boards",String.valueOf(repoBoard.count()));
+					cmd.hset(hostname + ":stats", "users",String.valueOf(repoUser.count()));
+				} catch (RedisException e) {
 					log.error(e.getMessage());
 				}
-				
-			
-				
 			}
-			
-			
 		} catch (InterruptedException e){
 			log.error(e.getMessage());
 		}
