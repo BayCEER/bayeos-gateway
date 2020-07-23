@@ -23,7 +23,7 @@ public class SplineServiceImpl implements SplineService, Serializable {
 	public void persist(Spline s) {		
 		Domain d = s.getDomain();		
 		if (!d.getName().isEmpty()) {			
-			s.setDomain(repoDomain.findOne(Long.valueOf(d.getName())));
+			s.setDomain(repoDomain.findById(Long.valueOf(d.getName())).orElseThrow());
 		} else {
 			s.setDomain(null);
 		}

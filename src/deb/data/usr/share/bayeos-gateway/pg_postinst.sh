@@ -15,6 +15,11 @@ else
  psql -f $INSTALLDIR/sql/migrate-liquibase.sql xbee
 fi
 
+
 psql -c "ALTER ROLE xbee SUPERUSER" 2>&1
-java -Djava.security.egd=file:/dev/../dev/urandom -cp $INSTALLDIR/lib/*:$INSTALLDIR/drivers/* org.flywaydb.commandline.Main migrate
+
+FLYWAY_EDITION=community 
+CP="$INSTALLDIR/lib/*:$INSTALLDIR/lib/$FLYWAY_EDITION/*:$INSTALLDIR/drivers/*"
+EXTRA_ARGS=-Djava.security.egd=file:/dev/../dev/urandom 
+java $EXTRA_ARGS -cp "$CP" org.flywaydb.commandline.Main migrate
 psql -c "ALTER ROLE xbee NOSUPERUSER" 2>&1

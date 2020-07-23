@@ -13,14 +13,18 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @MappedSuperclass
 public abstract class UniqueEntity implements Serializable {
-	
+
 	public UniqueEntity() {
 		super();
 	}
-			
+
+	public UniqueEntity(Long id) {
+		this.id = id;
+	}
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)	
-	@JsonView(DataTablesOutput.View.class)	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonView(DataTablesOutput.View.class)
 	protected Long id;
 
 	public Long getId() {
@@ -30,10 +34,7 @@ public abstract class UniqueEntity implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	
-	
-	
-		
-		
-	
+
 }

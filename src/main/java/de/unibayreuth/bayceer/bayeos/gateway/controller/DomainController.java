@@ -64,7 +64,7 @@ public class DomainController extends AbstractController {
 		if (!userSession.getUser().inNullDomain()) {
 			throw new AccessDeniedException("Failed to edit domain");
 		}				
-		model.addAttribute("domain", repo.findOne(id));
+		model.addAttribute("domain", repo.findById(id).orElseThrow());
 		return "editDomain";
 	}
 	
@@ -73,7 +73,7 @@ public class DomainController extends AbstractController {
 		if (!userSession.getUser().inNullDomain()) {
 			throw new AccessDeniedException("Failed to delete domain");
 		}		
-		repo.delete(id);
+		repo.deleteById(id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/domains";
 	}

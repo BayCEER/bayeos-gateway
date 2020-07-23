@@ -48,7 +48,7 @@ public class KnotPointController extends AbstractController{
 		if (bindingResult.hasErrors()){
 			return "editKnotPoint";
 		}				
-		checkWrite(repoSpline.findOne(point.getSpline().getId()));
+		checkWrite(repoSpline.findById(point.getSpline().getId()).orElseThrow());
 		repo.save(point);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
 		return "redirect:/splines/" + point.getSpline().getId();
@@ -57,7 +57,7 @@ public class KnotPointController extends AbstractController{
 	
 	@RequestMapping(value="/knotpoints/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-		KnotPoint k = repo.findOne(id);				
+		KnotPoint k = repo.findById(id).orElseThrow();				
 		model.addAttribute("knotPoint",k);
 		model.addAttribute("writeable",isWriteable(k.getSpline()));
 		return "editKnotPoint";		
@@ -66,10 +66,10 @@ public class KnotPointController extends AbstractController{
 		
 	@RequestMapping(value="/knotpoints/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {		
-		KnotPoint k = repo.findOne(id);
+		KnotPoint k = repo.findById(id).orElseThrow();
 		if (k == null) throw new EntityNotFoundException("Entity not found");
 		checkWrite(k.getSpline());
-		repo.delete(id);
+		repo.deleteById(id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/splines/" + k.getSpline().getId();
 	}

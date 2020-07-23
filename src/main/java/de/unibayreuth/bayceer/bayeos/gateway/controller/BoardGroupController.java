@@ -142,10 +142,10 @@ public class BoardGroupController extends AbstractController {
 		
 	@RequestMapping(value="/groups/removeNotification/{id}", method = RequestMethod.GET)
 	public String removeNotification(@PathVariable("id") Long id) {		
-		Notification n = repoNotification.findOne(id);
+		Notification n = repoNotification.findById(id).orElseThrow();
 		checkWrite(n.getBoardGroup());
 		Long g = n.getBoardGroup().getId();		
-		repoNotification.delete(n.getId());	
+		repoNotification.deleteById(n.getId());	
 		return "redirect:/groups/" + g + "?tab=notifications";
 	}
 	

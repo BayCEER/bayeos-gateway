@@ -37,7 +37,7 @@ public class ProfileController extends AbstractController {
 			return "editProfile";
 		}						
 		
-		User s = repo.findOne(user.getId());		
+		User s = repo.findById(user.getId()).orElseThrow();		
 		user.setPassword(s.getPassword());
 		user.setDomain(s.getDomain());
 				
@@ -70,7 +70,7 @@ public class ProfileController extends AbstractController {
 	
 	@RequestMapping(value="/profile/edit", method=RequestMethod.GET)
 	public String edit(Model model){	
-		User u = repo.findOne(userSession.getUser().getId());					
+		User u = repo.findById(userSession.getUser().getId()).orElseThrow();					
 		model.addAttribute("user", u);		
 		return "editProfile";		
 	}

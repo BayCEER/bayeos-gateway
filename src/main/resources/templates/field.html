@@ -92,21 +92,7 @@
 
 			
 
-<div th:fragment="select(prop,label,option)" th:with="disabled=!(${writeable}?:true),required=${required}?:false" class="form-group">
-		<label th:text="${label}" class="control-label">Select:</label>
-		<th:block th:if="${disabled}">
-			<select class="form-control" th:field="*{__${prop}__}" disabled="true">
-				<option th:value="NULL" th:unless="${required}"></option>
-				<option th:each="o : ${option}" th:text="${o}" th:value="${o.id}"></option>													
-			</select>				
-		</th:block>		
-		<th:block th:if="${!disabled}">
-			<select class="form-control" th:field="*{__${prop}__}">
-				<option th:value="NULL" th:unless="${required}"></option>
-				<option th:each="o : ${option}" th:text="${o}" th:value="${o.id}"></option>													
-			</select>						
-		</th:block>
-</div>
+
 
 
 <div th:fragment="status(code)">
@@ -131,21 +117,36 @@
 </div>
 
 
-<div th:fragment="selectDomain">
-	
-	<th:block th:if="${domainFilter.domains.size() == 0}">		 	
-		<input type="hidden" name="domain" th:value="null"/>		
-	</th:block>
-	
-	<th:block th:if="${domainFilter.domains.size()>0 and #authentication.principal.domain == null}">						
-		<div th:replace="field::select('domain',#{e.domain},${domainFilter.domains})"></div>
-	</th:block>				
-				
-	<th:block th:if="${domainFilter.domains.size()>0 and #authentication.principal.domain != null}">					
-		<input th:if="*{domain}!=null" type="hidden" name="domain" th:value="*{domain.id}"/>					
-		<input th:if="*{domain}==null" type="hidden" name="domain" th:value="null"/>
-	</th:block>				
-	 		
+
+<div th:fragment="select(prop,label,option)" th:with="disabled=!(${writeable}?:true),required=${required}?:false" class="form-group">
+		<label th:text="${label}" class="control-label">Select:</label>
+		<th:block th:if="${disabled}">
+			<select class="form-control" th:field="*{__${prop}__}" disabled="true">
+				<option th:value="null" th:unless="${required}"></option>
+				<option th:each="o : ${option}" th:text="${o}" th:value="${o.id}"></option>													
+			</select>				
+		</th:block>		
+		<th:block th:if="${!disabled}">
+			<select class="form-control" th:field="*{__${prop}__}">
+				<option th:value="null" th:unless="${required}"></option>
+				<option th:each="o : ${option}" th:text="${o}" th:value="${o.id}"></option>													
+			</select>						
+		</th:block>
 </div>
+
+<div th:fragment="selectDomain">
+	<div th:with="currentUser=${#httpServletRequest.userPrincipal?.principal}">
+	<th:block th:if="${domainFilter.domains.size()>0}">
+		<th:block th:if="${currentUser.inNullDomain()}">
+			<div th:replace="field::select('domain.id',#{e.domain},${domainFilter.domains})"></div>
+		</th:block>
+		<th:block th:if="${!currentUser.inNullDomain()}">
+			<input type="hidden" th:field="*{domain.id}"/>
+		</th:block>
+	</th:block>
+	</div>
+</div>
+
+
 </body>
 </html>

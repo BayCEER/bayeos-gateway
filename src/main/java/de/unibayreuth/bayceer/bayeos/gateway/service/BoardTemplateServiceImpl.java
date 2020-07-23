@@ -106,7 +106,7 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 		
 		Domain d = bt.getDomain();		
 		if (!d.getName().isEmpty()) {			
-			bt.setDomain(repoDomain.findOne(Long.valueOf(d.getName())));
+			bt.setDomain(repoDomain.findById(Long.valueOf(d.getName())).orElseThrow());
 		} else {
 			bt.setDomain(null);
 		}
@@ -116,25 +116,25 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 			if (u.getName().isEmpty()){
 				t.setUnit(null);
 			} else {
-				t.setUnit(repoUnit.findOne(Long.valueOf(u.getName())));
+				t.setUnit(repoUnit.findById(Long.valueOf(u.getName())).orElseThrow());
 			}						
 			Spline s = t.getSpline();
 			if (s.getName().isEmpty()){
 				t.setSpline(null);
 			} else {
-				t.setSpline(repoSpline.findOne(Long.valueOf(s.getName())));
+				t.setSpline(repoSpline.findById(Long.valueOf(s.getName())).orElseThrow());
 			}			
 			Interval i = t.getAggrInterval();			
 			if (i.getName().isEmpty()){
 				t.setAggrInterval(null);
 			} else {
-				t.setAggrInterval(repoInt.findOne(Long.valueOf(i.getName())));
+				t.setAggrInterval(repoInt.findById(Long.valueOf(i.getName())).orElseThrow());
 			}			
 			Function f = t.getAggrFunction();
 			if (f.getName().isEmpty()){
 				t.setAggrFunction(null); 				
 			} else {
-				t.setAggrFunction(repoFunc.findOne(Long.valueOf(f.getName())));
+				t.setAggrFunction(repoFunc.findById(Long.valueOf(f.getName())).orElseThrow());
 			}									
 		}	
 		repoTemplate.save(userSession.getUser(),bt);		
@@ -142,7 +142,7 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 
 	@Override
 	public BoardTemplate saveAsTemplate(Long boardId) {		
-		Board b = repoBoard.findOne(boardId);						
+		Board b = repoBoard.findById(boardId).orElseThrow();						
 		BoardTemplate t = new BoardTemplate();
 		t.setName("New Template");
 		t.setDescription("");
@@ -161,8 +161,8 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 
 	@Override
 	public void applyTemplate(Long boardId, Long templateId) {		
-		Board b = repoBoard.findOne(boardId);		
-		BoardTemplate t = repoTemplate.findOne(templateId);
+		Board b = repoBoard.findById(boardId).orElseThrow();		
+		BoardTemplate t = repoTemplate.findById(templateId).orElseThrow();
 		BeanUtils.copyProperties(t, b, new String[]{"id","name","domain"});		
 		for(ChannelTemplate ct:t.getTemplates()){					
 			Channel c = b.findOrCreateChannel(ct.getNr());			

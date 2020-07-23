@@ -40,7 +40,7 @@ public class UnitController extends AbstractController{
 			return "editUser";
 		}				
 		repo.save(userSession.getUser(),unit);		
-		redirect.addFlashAttribute("globalMessage",getActionMsg("created", locale));
+		redirect.addFlashAttribute("globalMessage",getActionMsg("saved", locale));
 		return "redirect:/units";
 	}
 		

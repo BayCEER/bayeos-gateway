@@ -4,8 +4,8 @@ import groovy.sql.Sql
 import java.sql.SQLException
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
-
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
@@ -30,18 +30,13 @@ class DeleteJob implements Runnable {
 	@Autowired
 	private FrameService frameService
 	
-	private Logger log = Logger.getLogger(DeleteJob.class)
+	private Logger log = LoggerFactory.getLogger(DeleteJob.class)
 
 	@Override
 	public void run() {
 		Thread.sleep(1000*waitSecs);
 		while(true){
-			def exit = -1
-			def start = new Date()
-			def obs = 0
-			def obs_exported = 0
-			def msg = 0			 
-						
+			def exit = -1					
 			try {
 				log.info("DeleteJob running")
 				def db = new Sql(dataSource)
@@ -49,15 +44,12 @@ class DeleteJob implements Runnable {
 				try {
 					log.info("Deleting observations older than ${retention}.")
 					db.execute("delete from observation where insert_time < now() - ?::interval",[retention])
-					obs = db.updateCount
 
 					log.info("Deleting exported observations older than ${retention}.")
 					db.execute("delete from observation_exp where insert_time < now() - ?::interval",[retention])
-					obs_exported = db.updateCount
-
+					
 					log.info("Deleting messages older than ${retention}.")
 					db.execute("delete from message where insert_time < now() - ?::interval",[retention])
-					msg = db.updateCount					 
 					exit = 0
 				} catch (SQLException e){
 					log.error(e.getMessage())
@@ -66,8 +58,6 @@ class DeleteJob implements Runnable {
 					db.close()
 					log.info("DeleteJob finished")
 				}
-				def millis = (new Date()).getTime() - start.getTime()
-				frameService.saveFrame("\$SYS/DeleteJob",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'obs':${obs},'obs_exported':${obs_exported},'msg':${msg},'millis':${millis}}".toString()))
 				Thread.sleep(1000*waitSecs)
 			} catch (InterruptedException e){
 				break;

@@ -6,10 +6,11 @@ import io.lettuce.core.RedisException
 import io.lettuce.core.api.StatefulRedisConnection
 import io.lettuce.core.api.sync.RedisCommands
 import javax.annotation.PostConstruct
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import org.apache.log4j.Logger
 import javax.sql.DataSource
 import groovy.sql.Sql
 import org.springframework.beans.factory.annotation.Value
@@ -20,16 +21,16 @@ import bayeos.frame.types.NumberType
 @Component
 class PublishObsJob implements Runnable  {
 
-	private Logger log = Logger.getLogger(PublishObsJob.class)
+	private Logger log = LoggerFactory.getLogger(PublishObsJob.class)
 
 	@Autowired(required = false)
-	private RedisClient redis;
-
-	@Autowired
-	FrameService frameService
+	private RedisClient redis
 
 	@Autowired
 	private DataSource dataSource
+	
+	@Autowired
+	private FrameService frameService
 
 	private String hostname
 	private String streamKey
@@ -46,7 +47,7 @@ class PublishObsJob implements Runnable  {
 		} catch (UnknownHostException e) {
 			hostname = "localhost";
 		}
-		streamKey = hostname + ":calc"
+		streamKey = hostname + ":obs"
 		
 	}
 
@@ -92,11 +93,9 @@ class PublishObsJob implements Runnable  {
 					log.error(e.getMessage())
 					exit = -1
 				}  finally {
-					db.close()
-					recon.close()
+					db?.close()
+					recon?.close()
 				}
-				def millis = (new Date()).getTime() - start.getTime()
-				frameService.saveFrame("\$SYS/PublishObsJob",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'recPublished':${recPublished},'recCached':${recCached},'millis':${millis}}".toString()))
 				log.info("PublishObsJob finished")
 				Thread.sleep(1000*waitSecs)
 			}

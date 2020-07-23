@@ -17,10 +17,7 @@ public class Domain extends UniqueEntity {
 		super();
 	}
 	
-	public Domain(String name) {
-		this.name = name;
-	}
-				
+	
 	@Column(unique=true,nullable=false)
 	@JsonView(DataTablesOutput.View.class)
 	@NotNull
@@ -50,6 +47,7 @@ public class Domain extends UniqueEntity {
 	public void setDbFolderId(Integer dbFolderId) {
 		this.dbFolderId = dbFolderId;
 	}
+	
 		
 		
 }

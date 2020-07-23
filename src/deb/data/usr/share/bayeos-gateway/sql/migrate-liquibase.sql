@@ -3,10 +3,11 @@
 --
 DO
 $do$
+DECLARE
+r record;
 BEGIN
-	BEGIN	
-	CREATE TABLE schema_version (
-		installed_rank integer NOT NULL,
+	CREATE TABLE IF NOT EXISTS schema_version (
+		installed_rank integer PRIMARY KEY,
 		version character varying(50),
 		description character varying(200) NOT NULL,
 		type character varying(20) NOT NULL,
@@ -18,13 +19,9 @@ BEGIN
 		success boolean NOT NULL
 	);
 	ALTER TABLE schema_version OWNER TO xbee;
-	ALTER TABLE ONLY schema_version ADD CONSTRAINT schema_version_pk PRIMARY KEY (installed_rank);
-	INSERT INTO schema_version VALUES (1, '1.99', 'xbee', 'SQL', 'V1.99__xbee.sql', -596518527, 'xbee', now(), 1667, true);
-	CREATE INDEX schema_version_s_idx ON schema_version USING btree (success);
+	UPDATE schema_version set checksum = 1861378496 where script like 'V1.99__xbee.sql';
+	CREATE INDEX IF NOT EXISTS schema_version_s_idx ON schema_version USING btree (success);
 	DROP TABLE IF EXISTS databasechangelog;
 	DROP TABLE IF EXISTS databasechangeloglock;
-	EXCEPTION
-		WHEN duplicate_table THEN RAISE NOTICE 'Table schema_version already exists';
-	END;
 END
 $do$;

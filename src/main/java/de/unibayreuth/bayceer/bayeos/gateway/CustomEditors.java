@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.context.request.WebRequest;
 
+import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
+
 @ControllerAdvice
 public class CustomEditors {	
 	@InitBinder

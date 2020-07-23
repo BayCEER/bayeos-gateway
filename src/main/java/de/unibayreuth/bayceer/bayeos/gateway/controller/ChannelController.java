@@ -44,7 +44,7 @@ public class ChannelController extends AbstractController {
 	@RequestMapping(path ="/channels/toggleNagios/{id}", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	public void toggleNagios(@PathVariable Long id, @RequestParam Boolean enabled){				
-		Channel c = repo.findOne(id);
+		Channel c = repo.findById(id).orElseThrow();
 		if (c == null) throw new EntityNotFoundException("Entity not found");
 		checkWrite(c.getBoard());		
 		c.setNagios(enabled);		
@@ -56,7 +56,7 @@ public class ChannelController extends AbstractController {
 		if (bindingResult.hasErrors()){
 			return "editUser";
 		}						
-		checkWrite(repoBoard.findOne(channel.getBoard().getId()));
+		checkWrite(repoBoard.findById(channel.getBoard().getId()).orElseThrow());
 		Channel c = repo.save(channel);		
 		redirect.addFlashAttribute("globalMessage",getActionMsg("saved", locale));
 		return "redirect:/boards/" + c.getBoard().getId();			
@@ -64,7 +64,7 @@ public class ChannelController extends AbstractController {
 	
 	@RequestMapping(path ="/channels/{id}", method = RequestMethod.GET)		
 	public String edit(@PathVariable Long id, Model model){		
-		Channel c = repo.findOne(id);
+		Channel c = repo.findById(id).orElseThrow();
 		if (c == null) throw new EntityNotFoundException("Entity not found");
 		checkWrite(c.getBoard());
 		model.addAttribute("channel",c);
@@ -78,7 +78,7 @@ public class ChannelController extends AbstractController {
 	
 	@RequestMapping(path ="/channels/delete/{id}", method = RequestMethod.GET)
 	public String delete(@PathVariable Long id, RedirectAttributes redirect, Locale locale){		
-		Channel c = repo.findOne(id);
+		Channel c = repo.findById(id).orElseThrow();
 		if (c == null) throw new EntityNotFoundException("Entity not found");
 		checkWrite(c.getBoard());
 		repo.delete(c);

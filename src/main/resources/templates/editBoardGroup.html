@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
+	layout:decorate="~{main}">
 <head>
 <title th:text="#{e.boardGroup}">Group</title>
 </head>
 <body>
 	<div layout:fragment="content">
 		<h3 th:text="#{e.boardGroup}">Board Group</h3>
-		<form method="post" action="#" th:action="@{/groups/save}"
-			th:object="${group}">
+		<form method="post" action="#" th:action="@{/groups/save}" th:object="${group}">
 			<input type="hidden" th:field="*{id}" />
 			<div class="block">
 				<div th:text="#{a.properties}" class="block-header">Main</div>
@@ -33,12 +32,12 @@
 					<ul class="nav nav-tabs" role="tablist" id="myTab">
 						<li role="presentation">
 							<a href="#boards" aria-controls="boards" role="tab" data-toggle="tab">
-							<span th:text="#{e.boards}"></span> <span class="badge" id="boardBadge" th:text="${group.boards.size()}"></span>
+							<span th:text="#{e.boards}"></span> <span class="badge" id="boardBadge" th:text="${group.boards?.size()}"></span>
 							</a>
 						</li>
 						<li role="presentation">
 							<a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">
-							<span th:text="#{e.notifications}"></span> <span class="badge" id="notBadge" th:text="${group.notifications.size()}"></span></a></li>
+							<span th:text="#{e.notifications}"></span> <span class="badge" id="notBadge" th:text="${group.notifications?.size()}"></span></a></li>
 					</ul>
 					<div class="tab-content">
 						<div role="tabpanel" class="tab-pane fade in" id="boards">

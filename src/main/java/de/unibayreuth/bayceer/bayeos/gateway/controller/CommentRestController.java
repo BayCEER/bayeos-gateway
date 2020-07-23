@@ -1,6 +1,6 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
-import static org.springframework.data.jpa.domain.Specifications.where;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -65,10 +65,10 @@ public class CommentRestController extends AbstractController {
 	@Transactional
 	public void delete(@PathVariable Long id){
 		if (userSession.getUser().inNullDomain()) {
-			repo.delete(id);	
+			repo.deleteById(id);	
 		} else {
 			if (repo.findOne(where(id(id)).and(domainId(userSession.getUser().getDomainId())))!=null) {
-				repo.delete(id);
+				repo.deleteById(id);
 			} else {
 				throw new AccessDeniedException("Failed to delete comment.");
 			};

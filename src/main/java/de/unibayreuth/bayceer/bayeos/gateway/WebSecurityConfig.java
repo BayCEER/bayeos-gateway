@@ -13,14 +13,13 @@ import org.springframework.security.access.vote.RoleHierarchyVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authentication.encoding.BasePasswordEncoder;
-import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -83,20 +82,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		protected void configure(HttpSecurity http) throws Exception {			
 			 http.csrf().disable();			 
 			 http.authorizeRequests()			 	
-			 	.anyRequest().authenticated()
-			 	.antMatchers("/**").hasAnyRole("USER","IMPORT")
+			 .antMatchers("/**").hasAnyRole("USER","IMPORT")
 			 	.and()			 
 			 .requestMatchers().antMatchers("/frame/**","/nagios/**","/grafana/**","/rest/**")
-			 	.and()			 			 	
-			 .httpBasic();			 
+			 	.and()
+			 .httpBasic()
+			 ;			 
 		}
 		
 		@Override
 		protected AuthenticationManager authenticationManager() throws Exception {		
 			return WebSecurityConfig.this.authenticationManager();
 		}
-		
-		
 	}
 		
 	
@@ -112,7 +109,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**").hasRole("USER")             
 			 .anyRequest().authenticated()
 			 .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)			 
-			 //.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)			 
 			 .formLogin().loginPage("/login").successHandler(customSuccessHandler())
 			 .permitAll().and().logout().permitAll();
 		}
@@ -123,8 +119,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		}
 	}
 	
-	public BasePasswordEncoder basePasswordEncoder() {
-		MessageDigestPasswordEncoder pwe = new ShaPasswordEncoder();
+	public PasswordEncoder basePasswordEncoder() {
+		MessageDigestPasswordEncoder pwe = new MessageDigestPasswordEncoder("SHA");
 		pwe.setEncodeHashAsBase64(true);	
 		return pwe;
 	}
