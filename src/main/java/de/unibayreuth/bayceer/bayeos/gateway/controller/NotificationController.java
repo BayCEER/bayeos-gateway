@@ -3,6 +3,8 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,7 +57,7 @@ private Specification<Notification> contactId(Long id) {
 
 @RequestMapping(value="/notifications", method=RequestMethod.GET)
 public String list(Model model, Pageable pageable){	
-	User u = repoUser.findOne(userSession.getUser().getId());	
+	User u = repoUser.findById(userSession.getUser().getId()).orElseThrow(() -> new EntityNotFoundException());	
 	Contact c = u.getContact();
 	if (c != null) {
 		Page<Notification> n = repoNotification.findAll(contactId(c.getId()),pageable);
@@ -67,13 +69,13 @@ public String list(Model model, Pageable pageable){
 
 @RequestMapping(value="/notifications/remove/{id}", method=RequestMethod.GET)
 public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {	
-	Notification n = repoNotification.findOne(id);	
+	Notification n = repoNotification.findById(id).orElseThrow(() -> new EntityNotFoundException());	
 	if (n.getBoard()!=null) {		
 		checkWrite(n.getBoard());	
 	} else if (n.getBoardGroup()!=null) {
 		checkWrite(n.getBoardGroup());
 	}	
-	repoNotification.delete(id);
+	repoNotification.deleteById(id);
 	redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 	return "redirect:/notifications";
 }
@@ -81,7 +83,7 @@ public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale
 
 @RequestMapping(value="/notifications/selectBoards", method=RequestMethod.GET)
 public String selectBoards(Model model) {
-	model.addAttribute("parent",repoUser.findOne(userSession.getUser().getId()));
+	model.addAttribute("parent",repoUser.findById(userSession.getUser().getId()));
 	model.addAttribute("controller","notifications");
 	model.addAttribute("boards", repoBoard.findAll(userSession.getUser(),domainFilter));
 	return "selectBoards";
@@ -89,7 +91,7 @@ public String selectBoards(Model model) {
 
 @RequestMapping(value="/notifications/selectGroups", method=RequestMethod.GET)
 public String selectGroups(Model model) {
-	model.addAttribute("parent",repoUser.findOne(userSession.getUser().getId()));
+	model.addAttribute("parent",repoUser.findById(userSession.getUser().getId()));
 	model.addAttribute("controller","notifications");
 	model.addAttribute("groups", repoGroups.findAll(userSession.getUser(),domainFilter));
 	return "selectGroups";

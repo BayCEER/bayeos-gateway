@@ -9,9 +9,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
-@Component
 public class EventProducer implements Runnable {
 	
 	private boolean stopped = false;

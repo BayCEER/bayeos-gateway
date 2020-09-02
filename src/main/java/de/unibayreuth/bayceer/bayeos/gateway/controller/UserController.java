@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +106,7 @@ public class UserController extends AbstractController {
 	
 	@RequestMapping(value="/users/editPassword/{id}", method=RequestMethod.GET)
 	public String editPassword(@PathVariable Long id , Model model) {
-		User u = repo.findOne(id);				 
+		User u = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());				 
 		u.setPassword(null);
 		model.addAttribute("user",u);
 		return "editPassword";
@@ -132,7 +133,7 @@ public class UserController extends AbstractController {
 	
 	@RequestMapping(value="/users/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-		User u = repo.findOne(id);				 
+		User u = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());				 
 		u.setPassword(null);
 		model.addAttribute("user",u);		
 		return "editUser";		

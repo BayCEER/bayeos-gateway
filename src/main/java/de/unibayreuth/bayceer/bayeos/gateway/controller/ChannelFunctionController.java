@@ -66,7 +66,7 @@ public class ChannelFunctionController extends AbstractController{
 	public String removeParam(Model model, ChannelFunction cf, @RequestParam Integer removeParam){		
 		ChannelFunctionParameter cfp = cf.getParameters().get(removeParam.intValue());		
 		if (cfp.getId() != null){			
-			repoParam.delete(cfp.getId());			
+			repoParam.deleteById(cfp.getId());			
 		}	
 		cf.getParameters().remove(removeParam.intValue());
 		model.addAttribute("channelFunction",cf);

@@ -40,9 +40,8 @@ public class CommentController extends AbstractController {
 	
 	@RequestMapping(value="/comments/edit/{id}")
 	public String edit(@PathVariable Long id, Model model){
-		Comment c = repo.findOne(id);
-		if (c == null) throw new EntityNotFoundException("Entity not found");
-		checkWrite(repoBoard.findOne(c.getBoard().getId()));		
+		Comment c = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());
+		checkWrite(repoBoard.findById(c.getBoard().getId()).orElseThrow(() -> new EntityNotFoundException()));		
 		model.addAttribute("comment",c);
 		model.addAttribute("board",c.getBoard().getId());
 		return "editComment";
@@ -52,8 +51,7 @@ public class CommentController extends AbstractController {
 	@RequestMapping(value="/comments/save", method=RequestMethod.POST)
 	@Transactional
 	public String save(@Valid Comment com, @ModelAttribute("board") Long id, RedirectAttributes redirect, Locale locale){
-		Board b = repoBoard.findOne(id);
-		if (b == null) throw new EntityNotFoundException("Entity not found");
+		Board b = repoBoard.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(b);
 		com.setBoard(b);		
 		com.setUser(userSession.getUser());		

@@ -4,7 +4,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -31,7 +32,7 @@ class FileUploadService {
 	@Autowired
 	Path localFilePath
 
-	private Logger log = Logger.getLogger(FileUploadService.class)
+	private Logger log = LoggerFactory.getLogger(FileUploadService.class)
 
 	public boolean save(MultipartFile file) throws IOException {
 		

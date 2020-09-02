@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelRepository;
@@ -44,8 +45,7 @@ public class ChannelController extends AbstractController {
 	@RequestMapping(path ="/channels/toggleNagios/{id}", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	public void toggleNagios(@PathVariable Long id, @RequestParam Boolean enabled){				
-		Channel c = repo.findOne(id);
-		if (c == null) throw new EntityNotFoundException("Entity not found");
+		Channel c = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(c.getBoard());		
 		c.setNagios(enabled);		
 		repo.save(c);		
@@ -55,8 +55,9 @@ public class ChannelController extends AbstractController {
 	public String save(@Valid Channel channel, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
 			return "editUser";
-		}						
-		checkWrite(repoBoard.findOne(channel.getBoard().getId()));
+		}
+		Board b = repoBoard.findById(channel.getBoard().getId()).orElseThrow(() -> new EntityNotFoundException());
+		checkWrite(b);
 		Channel c = repo.save(channel);		
 		redirect.addFlashAttribute("globalMessage",getActionMsg("saved", locale));
 		return "redirect:/boards/" + c.getBoard().getId();			
@@ -64,8 +65,7 @@ public class ChannelController extends AbstractController {
 	
 	@RequestMapping(path ="/channels/{id}", method = RequestMethod.GET)		
 	public String edit(@PathVariable Long id, Model model){		
-		Channel c = repo.findOne(id);
-		if (c == null) throw new EntityNotFoundException("Entity not found");
+		Channel c = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(c.getBoard());
 		model.addAttribute("channel",c);
 		model.addAttribute("intervals",repoInterval.findAll(userSession.getUser(),null));
@@ -78,8 +78,7 @@ public class ChannelController extends AbstractController {
 	
 	@RequestMapping(path ="/channels/delete/{id}", method = RequestMethod.GET)
 	public String delete(@PathVariable Long id, RedirectAttributes redirect, Locale locale){		
-		Channel c = repo.findOne(id);
-		if (c == null) throw new EntityNotFoundException("Entity not found");
+		Channel c = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(c.getBoard());
 		repo.delete(c);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));

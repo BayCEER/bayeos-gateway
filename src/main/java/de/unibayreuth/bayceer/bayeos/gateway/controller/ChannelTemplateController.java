@@ -66,7 +66,7 @@ public class ChannelTemplateController extends AbstractController {
 		if (bindingResult.hasErrors()){
 			return "editChannelTemplate";
 		}	
-		checkWrite(repoBoard.findOne(cha.getBoardTemplate().getId()));
+		checkWrite(repoBoard.findById(cha.getBoardTemplate().getId()).orElseThrow(() -> new EntityNotFoundException()));
 		repoChannel.save(cha);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/boardTemplates/" + cha.getBoardTemplate().getId();
@@ -74,8 +74,7 @@ public class ChannelTemplateController extends AbstractController {
 	
 	@RequestMapping(path="/channelTemplates/{id}",method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-			ChannelTemplate t = repoChannel.findOne(id);
-			if (t == null) throw new EntityNotFoundException("Entity not found");
+			ChannelTemplate t = repoChannel.findById(id).orElseThrow(()->new EntityNotFoundException());
 			checkRead(t.getBoardTemplate());
 			model.addAttribute("channelTemplate", t);
 			model.addAttribute("intervals",repoInterval.findAll(userSession.getUser(),null));
@@ -89,10 +88,9 @@ public class ChannelTemplateController extends AbstractController {
 	
 	@RequestMapping(path="/channelTemplates/delete/{id}")
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {		
-		ChannelTemplate t = repoChannel.findOne(id);
-		if (t == null) throw new EntityNotFoundException("Entity not found");
+		ChannelTemplate t = repoChannel.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(t.getBoardTemplate());
-		repoChannel.delete(id);
+		repoChannel.deleteById(id);
 		redirect.addFlashAttribute("globalMessage",getActionMsg("deleted", locale)) ;		
 		return "redirect:/boardTemplates/" + t.getBoardTemplate().getId();
 	}

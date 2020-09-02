@@ -52,7 +52,7 @@ public class VirtualChannelController extends AbstractController {
 		if (bindingResult.hasErrors()) {
 			return "editVirtualChannel";
 		}
-		checkWrite(repoBoard.findOne(vc.getBoard().getId()));
+		checkWrite(repoBoard.findById(vc.getBoard().getId()).orElseThrow(() -> new EntityNotFoundException()));
 		repo.save(vc);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/boards/" + vc.getBoard().getId() + "?tab=virtualChannels";
@@ -62,8 +62,7 @@ public class VirtualChannelController extends AbstractController {
 	
 	@RequestMapping(path="/virtualChannels/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-		 VirtualChannel vc = repo.findOne(id);
-		 if (vc == null) throw new EntityNotFoundException("Entity not found");
+		 VirtualChannel vc = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		 checkWrite(vc.getBoard());		 
 		 model.addAttribute(vc);
 		 model.addAttribute("channelFunctions",repoFunction.findAll(userSession.getUser(),null));
@@ -72,8 +71,7 @@ public class VirtualChannelController extends AbstractController {
 	
 	@RequestMapping(value = "/virtualChannels/delete/{id}", method = RequestMethod.GET)
 	public String delete(@PathVariable Long id, RedirectAttributes redirect, Locale locale) {
-		VirtualChannel vc = repo.findOne(id);
-		if (vc == null) throw new EntityNotFoundException("Entity not found");
+		VirtualChannel vc = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(vc.getBoard());
 		repo.delete(vc);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));

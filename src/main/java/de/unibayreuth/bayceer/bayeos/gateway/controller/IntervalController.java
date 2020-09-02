@@ -51,7 +51,8 @@ public class IntervalController extends AbstractController {
 	@RequestMapping(value="/intervals", method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){
 		// Map name sort order to epoch (derived property) 
-		PageRequest r = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().getOrderFor("name").getDirection(), "epoch", "name");
+		
+		PageRequest r = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().getOrderFor("name").getDirection(), "epoch", "name");
 		model.addAttribute("intervals", repo.findAll(userSession.getUser(),domainFilter,r));
 		return "listInterval";
 	}

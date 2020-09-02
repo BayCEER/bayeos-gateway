@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class BoardController extends AbstractController {
 			Collections.sort(b.getChannels());
 		}
 		model.addAttribute("board", b);
-		model.addAttribute("groups", repoGroup.findAll(userSession.getUser(), null));
+		model.addAttribute("groups", repoGroup.findAllSortedByName(userSession.getUser(), domainFilter));
 		model.addAttribute("tab", tab);
 		return "editBoard";
 	}
@@ -184,10 +185,10 @@ public class BoardController extends AbstractController {
 		
 	@RequestMapping(value="/boards/removeNotification/{id}", method = RequestMethod.GET)
 	public String removeNotification(@PathVariable("id") Long id) {				
-		Notification n = repoNotification.findOne(id);		
+		Notification n = repoNotification.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(n.getBoard());
 		Long b = n.getBoard().getId();		
-		repoNotification.delete(n.getId());	
+		repoNotification.deleteById(n.getId());	
 		return "redirect:/boards/" + b + "?tab=notifications";
 	}
 	

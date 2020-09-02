@@ -10,17 +10,23 @@ Main characteristics:
 
 ## Getting Started
 ### Prerequisites
-- Debian Linux with a minimum of 2GB RAM
-- Raspian on a Raspberry Pi (Model >=3) is working
-
-### Installing
+- Debian 9|10 Linux Server 
+- Root login
+## Installation
+1. Debian Repository
+- Login as root
+- Install basic tools for installation  
+`apt-get update`  
+`apt-get install wget gnupg`
 - Import the repository key  
-`wget -O - http://www.bayceer.uni-bayreuth.de/repos/apt/conf/bayceer_repo.gpg.key |apt-key add -`
-- Add the following repository to /etc/apt/sources.list  
-`deb http://www.bayceer.uni-bayreuth.de/repos/apt/debian stretch main`
+`wget -O - http://www.bayceer.uni-bayreuth.de/repos/apt/conf/bayceer_repo.gpg.key | apt-key add -`
+- Add this repository on Debian 9/Stretch  
+`echo "deb http://www.bayceer.uni-bayreuth.de/repos/apt/debian stretch main" | tee /etc/apt/sources.list.d/bayceer-stretch.list`  
+- Add this repository on Debian 10/Buster  
+`echo "deb http://www.bayceer.uni-bayreuth.de/repos/apt/debian buster main" | tee /etc/apt/sources.list.d/bayceer-buster.list`  
 - Update your repository cache  
 `apt-get update`
-- Install the package  
+2. Gateway   
 `apt-get install bayeos-gateway`
 
 ### Configuration
@@ -46,6 +52,11 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.7.0, Aug, 2020
+- Spring Boot 2.3 
+- Thymlead 3
+- JRE 8-11 support
+
 ### Version 2.6.3, May, 2020
 - Refined upload notifications 
 

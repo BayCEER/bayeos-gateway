@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
+	xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorate="~{main}">
 <head>
 <title th:text="#{e.board}">Board</title>
 </head>
@@ -59,12 +59,12 @@
 						<li role="presentation"><a href="#virtualChannels"
 							aria-controls="virtualChannels" role="tab" data-toggle="tab">
 								<span th:text="#{e.virtualChannels}"></span> <span class="badge"
-								id="vcBadge" th:text="${board.getVirtualChannels().size()}">0</span>
+								id="vcBadge" th:text="${board.getVirtualChannels()?.size()}">0</span>
 						</a></li>
 						<li role="presentation"><a href="#notifications"
 							aria-controls="notifications" role="tab" data-toggle="tab">
 								<span th:text="#{e.notifications} "></span>
-								<span class="badge" id="notBadge" th:text="${board.notifications.size()}"></span>
+								<span class="badge" id="notBadge" th:text="${board.notifications?.size()}"></span>
 						</a></li>
 
 					</ul>
@@ -233,11 +233,10 @@
 
 		</form>
 
-		<script th:inline="javascript" class="init">
-	     
+		<script type="text/javascript" th:inline="javascript" class="init">
+	    /*<![CDATA[*/
 	    // Default: channels 			   
-	   	var tab = [[ ${tab} ]];
-	   		   	   	
+	   	var tab = /*[[ ${tab} ]]*/;
 	   	$('#myTab a[aria-controls="' + tab + '"]').tab('show');
 	   	
 	   	var language = {
@@ -297,7 +296,7 @@
                     	 return row.content;
                      } 
                     }],
-             "order": [[ 0, "desc" ]],      
+             "order": [,[ 0, "desc" ],],      
              "ajax": {
                 	'contentType': 'application/json',
                 	'url': [[ @{/rest/messages} + '/' + ${board.id} ]],
@@ -354,7 +353,7 @@
             			    return ret += '</td>';
                      }
                     }],
-             "order": [[ 0, "desc" ]],  
+             "order": [,[0,"desc"],],  
              "ajax": {
                 	'contentType': 'application/json',
                 	'url': [[ @{/rest/comments} + '/' + ${board.id} ]],
@@ -387,7 +386,8 @@
                
              
   
-		 });					
+		 });
+	/*]]>*/					
 	</script>
 
 	</div>

@@ -6,12 +6,14 @@ import java.text.SimpleDateFormat
 import javax.script.ScriptEngine
 import javax.sql.DataSource
 
-import org.apache.log4j.Logger
+
 import org.postgresql.PGConnection
 import org.postgresql.copy.CopyIn
 import org.postgresql.copy.CopyManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import bayeos.frame.FrameParserException
 import bayeos.frame.Parser
@@ -49,7 +51,7 @@ class FrameService {
 	@Autowired
 	BoardRepository boardRepo
 
-	private Logger log = Logger.getLogger(FrameService.class)
+	private Logger log = LoggerFactory.getLogger(FrameService.class)
 
 	class Board {
 		Integer domainId

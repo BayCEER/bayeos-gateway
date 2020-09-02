@@ -4,6 +4,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,10 +143,10 @@ public class BoardGroupController extends AbstractController {
 		
 	@RequestMapping(value="/groups/removeNotification/{id}", method = RequestMethod.GET)
 	public String removeNotification(@PathVariable("id") Long id) {		
-		Notification n = repoNotification.findOne(id);
+		Notification n = repoNotification.findById(id).orElseThrow(() -> new EntityNotFoundException());
 		checkWrite(n.getBoardGroup());
 		Long g = n.getBoardGroup().getId();		
-		repoNotification.delete(n.getId());	
+		repoNotification.deleteById(n.getId());	
 		return "redirect:/groups/" + g + "?tab=notifications";
 	}
 	

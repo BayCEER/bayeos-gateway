@@ -1,11 +1,7 @@
 #!/bin/bash
 set -e
-
-cd /usr/share/bayeos-gateway
-chmod +x *.sh
-
-# PostgreSQL
 service postgresql start 
+chmod +x /usr/share/bayeos-gateway/*.sh
 su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
 
 # Gateway 
@@ -17,7 +13,7 @@ update-rc.d bayeos-gateway defaults
 service bayeos-gateway start  
 
 # Apache integration 
-a2enmod proxy proxy_http
+a2enmod proxy proxy_http ssl remoteip
 a2enconf bayeos-gateway.conf
 service apache2 restart
 

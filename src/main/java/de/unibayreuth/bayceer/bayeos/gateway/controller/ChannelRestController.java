@@ -41,8 +41,7 @@ public class ChannelRestController extends AbstractController{
 	
 	@RequestMapping(path="/rest/channel", method = RequestMethod.GET)	
 	public List<ObsRow> getData(@RequestParam final Long id, @RequestParam(required = false) final Long startTime, @RequestParam(required = false) final Long endTime, @RequestParam(required = false) final Long lastRowId ){		
-		Channel c = repo.findOne(id);		
-		if (c == null) throw new EntityNotFoundException("Entity not found");
+		Channel c = repo.findById(id).orElseThrow(() -> new EntityNotFoundException());		
 		checkWrite(c.getBoard());								
 		if (lastRowId == null) {			
 			Date endDate = (endTime==null)?new Date():new Date(endTime);

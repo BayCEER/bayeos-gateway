@@ -1,8 +1,9 @@
 package de.unibayreuth.bayceer.bayeos.gateway.repo;
 
-import static org.springframework.data.jpa.domain.Specifications.where;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
@@ -12,29 +13,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.datatables.SpecificationBuilder;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
-import org.springframework.data.jpa.datatables.repository.DataTablesRepositoryImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.security.access.AccessDeniedException;
 
 import de.unibayreuth.bayceer.bayeos.gateway.DomainFilter;
 import de.unibayreuth.bayceer.bayeos.gateway.model.DomainEntity;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 
-public class DomainFilteredRepositoryImpl<T extends DomainEntity> 
-extends DataTablesRepositoryImpl<T, Long>
-implements DomainFilteredRepository<T> {
+public class DomainFilteredRepositoryImpl<T extends DomainEntity> extends SimpleJpaRepository<T, Long> implements DomainFilteredRepository<T> {
 				
 	private Boolean nullDomainReadAble;
 	
-	private static final Sort domainAsc = new Sort(Direction.ASC,"domain.id");
-	private static final Sort domainDesc = new Sort(Direction.DESC,"domain.id");
+	private static final Sort domainAsc = Sort.by(Direction.ASC,"domain.id");
+	private static final Sort domainDesc = Sort.by(Direction.DESC,"domain.id");
 			
-	public DomainFilteredRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+	DomainFilteredRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager);				 
-	
 		// This represents hard coded rights !
 		if (entityInformation.getEntityName().matches(DomainFilteredRepository.nullDomainReadAble)){
 			nullDomainReadAble = true;			
@@ -85,7 +84,7 @@ implements DomainFilteredRepository<T> {
 	
 	@Override
 	public List<T> findAllSortedByName(User user, DomainFilter domainFilter) {
-		return findAllSorted(user,domainFilter,new Sort("name","domain.name"));
+		return findAllSorted(user,domainFilter, Sort.by("name","domain.name"));
 	}
 	
 	
@@ -97,6 +96,7 @@ implements DomainFilteredRepository<T> {
 	}	
 			
 	private List<T> findAllSorted(User user, DomainFilter domainFilter, Sort sort) {
+		sort = (sort == null)?Sort.unsorted():sort;
 		if (user.inNullDomain()) {
 			// Filter
 			if (domainFilter == null || domainFilter.getId() == null) {
@@ -118,11 +118,11 @@ implements DomainFilteredRepository<T> {
 	@Override
 	public T findOne(User user, Long id) {
 		if (user.inNullDomain()) {	 	// all domain matches		
-			return super.findOne(id);		  
+			return super.findById(id).orElse(null);		  
 		} else if (nullDomainReadAble) {// coalesce user domain, null domain  			
-			return super.findOne(where(domainOrNull(user.getDomainId())).and(id(id)));
+			return super.findOne(where(domainOrNull(user.getDomainId())).and(id(id))).orElse(null);
 		} else { 						// user domain only  			
-			return super.findOne(where(domain(user.getDomainId())).and(id(id)));
+			return super.findOne(where(domain(user.getDomainId())).and(id(id))).orElse(null);
 		}
 	}
 	
@@ -146,7 +146,7 @@ implements DomainFilteredRepository<T> {
 			}			
 	
 		} else { // user domain only 
-			return super.findOne(where(domain(user.getDomainId())).and(name(name)));
+			return super.findOne(where(domain(user.getDomainId())).and(name(name))).orElse(null);
 		}
 	}
 
@@ -168,6 +168,10 @@ implements DomainFilteredRepository<T> {
 
 	@Override
 	public <S extends T> S save(User user, S entity) {
+		// Fixes transient instance problem
+		if (entity.getDomainId()==null) {
+			entity.setDomain(null);
+		}
 		if (user.inNullDomain() || user.getDomainId().equals(entity.getDomainId())) {
 			return super.save(entity);
 		} else {
@@ -199,22 +203,83 @@ implements DomainFilteredRepository<T> {
 		if (user.inNullDomain()) {
 			// Filter
 			if (domainFilter == null || domainFilter.getId() == null) {
-				return super.findAll(input);
+				return findAll(input);
 			} else {
-				return super.findAll(input,null, domain(domainFilter.getId()));
+				return findAll(input,null, domain(domainFilter.getId()));
 			}
 		} else {
 			// Domain User
 			if (nullDomainReadAble) {
-				return super.findAll(input, null,domainOrNull(user.getDomain().getId()));
+				return findAll(input, null,domainOrNull(user.getDomain().getId()));
 			} else {
-				return super.findAll(input, null,domain(user.getDomain().getId()));
+				return findAll(input, null,domain(user.getDomain().getId()));
 			}
 		}
 
 	}
 
 
+	@Override
+	  public DataTablesOutput<T> findAll(DataTablesInput input) {
+	    return findAll(input, null, null, null);
+	  }
+
+	  @Override
+	  public DataTablesOutput<T> findAll(DataTablesInput input,
+	      Specification<T> additionalSpecification) {
+	    return findAll(input, additionalSpecification, null, null);
+	  }
+
+	  @Override
+	  public DataTablesOutput<T> findAll(DataTablesInput input,
+	      Specification<T> additionalSpecification, Specification<T> preFilteringSpecification) {
+	    return findAll(input, additionalSpecification, preFilteringSpecification, null);
+	  }
+
+	  @Override
+	  public <R> DataTablesOutput<R> findAll(DataTablesInput input, Function<T, R> converter) {
+	    return findAll(input, null, null, converter);
+	  }
+
+	  @Override
+	  public <R> DataTablesOutput<R> findAll(DataTablesInput input,
+	      Specification<T> additionalSpecification, Specification<T> preFilteringSpecification,
+	      Function<T, R> converter) {
+	    DataTablesOutput<R> output = new DataTablesOutput<>();
+	    output.setDraw(input.getDraw());
+	    if (input.getLength() == 0) {
+	      return output;
+	    }
+
+	    try {
+	      long recordsTotal =
+	          preFilteringSpecification == null ? count() : count(preFilteringSpecification);
+	      if (recordsTotal == 0) {
+	        return output;
+	      }
+	      output.setRecordsTotal(recordsTotal);
+
+	      SpecificationBuilder<T> specificationBuilder = new SpecificationBuilder<>(input);
+	      Page<T> data = findAll(
+	              Specification.where(specificationBuilder.build())
+	                      .and(additionalSpecification)
+	                      .and(preFilteringSpecification),
+	              specificationBuilder.createPageable());
+
+	      @SuppressWarnings("unchecked")
+	      List<R> content =
+	          converter == null ? (List<R>) data.getContent() : data.map(converter).getContent();
+	      output.setData(content);
+	      output.setRecordsFiltered(data.getTotalElements());
+
+	    } catch (Exception e) {
+	      output.setError(e.toString());
+	    }
+
+	    return output;
+	  }
+
+	
 
 
 
