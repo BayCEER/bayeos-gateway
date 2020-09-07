@@ -1,0 +1,11 @@
+[Unit]
+Description=bayeos-gateway
+After=postgresql.service
+
+[Service]
+User=bayeos
+ExecStart=/var/lib/bayeos-gateway/bayeos-gateway.jar
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

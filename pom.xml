@@ -27,7 +27,7 @@
 
 	<properties>
 
-		<log.file>/var/log/bayeos-gateway.log</log.file>
+		<log.file>/var/log/bayeos/bayeos-gateway.log</log.file>
 		<log.level>INFO</log.level>
 		
 		<java.version>1.8</java.version>
@@ -194,6 +194,9 @@
 	<profiles>
 		<profile>
 			<id>dev</id>
+			<properties>
+				<db.url>jdbc:postgresql://debian/xbee</db.url>
+			</properties>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
