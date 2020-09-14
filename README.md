@@ -10,14 +10,13 @@ Main characteristics:
 
 ## Getting Started
 ### Prerequisites
-- Debian Linux with a minimum of 2GB RAM
-- Raspian on a Raspberry Pi (Model >=3) is working
+- Debian 9 (stretch) 
 
 ### Installing
 - Import the repository key  
 `wget -O - http://www.bayceer.uni-bayreuth.de/repos/apt/conf/bayceer_repo.gpg.key |apt-key add -`
-- Add the following repository to /etc/apt/sources.list  
-`deb http://www.bayceer.uni-bayreuth.de/repos/apt/debian stretch main`
+- Add the BayCEER Debian repository  
+echo "deb http://www.bayceer.uni-bayreuth.de/repos/apt/ $(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/bayceer.list
 - Update your repository cache  
 `apt-get update`
 - Install the package  
@@ -46,6 +45,9 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.6.5, Sep 2020
+- Fixed bug: accept-language header detection 
+
 ### Version 2.6.4, July, 2020
 - Keep all channel observations until channel is synched   
 
