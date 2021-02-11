@@ -45,8 +45,6 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
-### Version 2.6.5, Sep 2020
-- Fixed bug: accept-language header detection 
 
 ### Version 2.6.4, July, 2020
 - Keep all channel observations until channel is synched   
