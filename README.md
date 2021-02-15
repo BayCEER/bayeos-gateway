@@ -46,6 +46,12 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.6.6, Feb, 2021
+- [Comment REST API enhancement](docs/board_comment_rest_api.md)
+
+### Version 2.6.5, Sep, 2020
+- Fixed locale problems 
+
 ### Version 2.6.4, July, 2020
 - Keep all channel observations until channel is synched   
 

@@ -357,7 +357,7 @@
              "order": [[ 0, "desc" ]],  
              "ajax": {
                 	'contentType': 'application/json',
-                	'url': [[ @{/rest/comments} + '/' + ${board.id} ]],
+                	'url': [[ @{/rest/comments/board/} + ${board.id} ]],
                 	'type': 'POST',
                     'data': function(d) {
                             return JSON.stringify(d);
@@ -373,7 +373,8 @@
         	if (confirm( [[#{msg.confirm}]] )) {            
            		var id = $(this).parent().parent().attr('id');
             	$.ajax({
-				 url: [[ @{/rest/comments/delete} ]] + '/' + id,          
+				 url: [[ @{/rest/comments/} ]] + id, 
+				 method: 'DELETE',
 		         success: function(){
 		        	 comments.row(id).remove().draw(true);		        	 
 		        	 var n = parseInt($('#comBadge').text(),10) - 1 ;		        	 
