@@ -2,7 +2,7 @@
 __2021-02-15, Oliver Archner, Basic POST,PUT,DELETE,GET request support__
 
 All example requests use an authorization header with default credentials on localhost. 
-Please adapt these setting according to your BayEOS Gateway situation.
+Please adapt these settings according to your BayEOS Gateway situation.
 
 ## Create Board Comment
 ```javascript
