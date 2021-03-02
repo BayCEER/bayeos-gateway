@@ -16,7 +16,7 @@ Main characteristics:
 - Import the repository key  
 `wget -O - http://www.bayceer.uni-bayreuth.de/repos/apt/conf/bayceer_repo.gpg.key |apt-key add -`
 - Add the BayCEER Debian repository  
-echo "deb http://www.bayceer.uni-bayreuth.de/repos/apt/ $(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/bayceer.list
+echo "deb http://www.bayceer.uni-bayreuth.de/repos/apt/debian $(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/bayceer.list
 - Update your repository cache  
 `apt-get update`
 - Install the package  
@@ -45,6 +45,8 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.6.8, Mar, 2021
+- JRE definition openjdk-8-jre-headless
 
 ### Version 2.6.7, Mar, 2021
 - Better channel read performance
