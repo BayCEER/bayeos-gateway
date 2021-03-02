@@ -3,7 +3,7 @@ Version: [[version]]
 Section: server
 Priority: optional
 Architecture: all
-Pre-Depends: default-jre-headless (>= 2:1.8) | java8-runtime-headless
+Pre-Depends: openjdk-8-jre-headless
 Depends: postgresql (>= 9.5), postgresql-contrib, postgresql-plperl, apache2, libpq-dev, libmath-spline-perl
 Recommends: ssl-cert
 Description: BayEOS Gateway
