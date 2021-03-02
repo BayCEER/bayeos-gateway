@@ -12,8 +12,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Upload;
 
 @Repository
 public interface UploadRepository extends DomainFilteredRepository<Upload>{
-	
-	
+		
 	@Query("select u from Upload u where u.importStatus = 2 order by id asc")
 	List<Upload> findPending();
 	

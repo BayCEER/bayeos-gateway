@@ -72,8 +72,12 @@ public class UserController extends AbstractController {
 		if (bindingResult.hasErrors()){			
 			return "editUser";
 		}
-				
-		if (user.getNewPassword()!=null) user.encodeNewPassword();		
+		
+		if (user.getNewPassword()!=null) {
+			user.encodeNewPassword();		
+		} else {
+			user.setPassword(repo.findOne(user.getId()).getPassword());
+		}
 														
 		if (user.getContact().getEmail() == null) {						 
 			user.setContact(null);									

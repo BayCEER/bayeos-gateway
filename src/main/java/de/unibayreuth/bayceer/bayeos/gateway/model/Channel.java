@@ -93,7 +93,6 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 	Function aggrFunction = new Function();	
 		
 	
-			
 	
 	private boolean isNr(String s){
 		return s != null && s.matches("[0-9]+");
@@ -148,6 +147,10 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 
 	public Boolean getAutoExport(){
 		return !this.dbExcludeAutoExport;
+	}
+	
+	public void setAutoExport(Boolean autoExport) {
+		this.setDbExcludeAutoExport(!autoExport);
 	}
 
 	

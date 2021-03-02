@@ -46,6 +46,12 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.6.7, Mar, 2021
+- Better channel read performance
+- Fixed Bug: Edit User Dialog: Save sets password to null
+- Fixed Bug: Edit Channel Dialog: Set auto export flag on channel not saved
+- Fixed Bug: CommentRestController: Get response date without time information 
+
 ### Version 2.6.6, Feb, 2021
 - [Comment REST API enhancement](docs/board_comment_rest_api.md)
 

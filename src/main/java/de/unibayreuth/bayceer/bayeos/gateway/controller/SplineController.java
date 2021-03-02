@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.marshaller.SplineMarshaller;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
 
 @Controller
@@ -35,6 +37,10 @@ public class SplineController extends AbstractController{
 	
 	@Autowired
 	SplineRepository repo;
+	
+	@Autowired
+	ChannelRepository repoChannel;
+	
 					
 	@RequestMapping(value="/splines/save", method=RequestMethod.POST)
 	public String save(@Valid Spline spline, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
@@ -48,16 +54,21 @@ public class SplineController extends AbstractController{
 	
 	
 	@RequestMapping(value="/splines", method=RequestMethod.GET)
-	public String list(Model model, @SortDefault("name") Pageable pageable){
-		model.addAttribute("splines", repo.findAll(userSession.getUser(),domainFilter,pageable));
+	public String list(Model model, @SortDefault("name") Pageable pageable){		
+		Page<Spline> splines = repo.findAll(userSession.getUser(),domainFilter,pageable);		
+		for(Spline e:splines) {			
+			e.setLocked(repoChannel.existsBySpline(e));
+		}				
+		model.addAttribute("splines", splines);
 		return "listSpline";
 	}
 	
 	@RequestMapping(value="/splines/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){	
 		Spline s = repo.findOne(userSession.getUser(),id);
+		s.setLocked(repoChannel.existsBySpline(s));
 		model.addAttribute("spline",s);
-		model.addAttribute("writeable",isWriteable(s));
+		model.addAttribute("writeable",isWriteable(s) && !s.getLocked());
 		return "editSpline";		
 	}
 	

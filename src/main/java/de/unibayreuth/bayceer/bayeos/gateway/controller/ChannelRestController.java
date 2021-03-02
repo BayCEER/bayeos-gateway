@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
 import de.unibayreuth.bayceer.bayeos.gateway.model.ObsRow;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelRepository;
 
 @RestController

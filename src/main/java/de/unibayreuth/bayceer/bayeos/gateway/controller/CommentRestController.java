@@ -130,7 +130,7 @@ public class CommentRestController extends AbstractController {
 				+ "join board_comment bc on b.id = bc.board_comments_id \r\n"
 				+ "join \"comment\" c on c.id = bc.comment_id where b.id = ? order by c.id;";
 		List<CommentDTO> coms = jdbcTemplate.query(sql, new Object[] { id },
-				(rs, rowNum) -> new CommentDTO(rs.getLong(1), rs.getLong(2), rs.getLong(3),rs.getDate(4).getTime(),rs.getString(5)));
+				(rs, rowNum) -> new CommentDTO(rs.getLong(1), rs.getLong(2), rs.getLong(3),rs.getTimestamp(4).getTime(),rs.getString(5)));
 		return new ResponseEntity<>(coms, HttpStatus.OK);
 
 	}

@@ -64,10 +64,9 @@ public class Board extends NamedDomainEntity {
 	Boolean denyNewChannels = false;
 	
 	
-	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)	
 	List<Channel> channels;
-	
-	
+		
 	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)
 	List<VirtualChannel> virtualChannels;
 			

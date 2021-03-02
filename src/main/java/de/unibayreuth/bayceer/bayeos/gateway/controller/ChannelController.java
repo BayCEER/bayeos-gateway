@@ -1,5 +1,6 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.persistence.EntityNotFoundException;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.FunctionRepository;
@@ -67,10 +69,11 @@ public class ChannelController extends AbstractController {
 		Channel c = repo.findOne(id);
 		if (c == null) throw new EntityNotFoundException("Entity not found");
 		checkWrite(c.getBoard());
-		model.addAttribute("channel",c);
-		model.addAttribute("intervals",repoInterval.findAll(userSession.getUser(),null));
-		model.addAttribute("functions",repoFunction.findAllSortedByName(userSession.getUser(),null));
-		model.addAttribute("splines",repoSpline.findAllSortedByName(userSession.getUser(),null));
+		model.addAttribute("channel",c);		
+		model.addAttribute("intervals",repoInterval.findAll(userSession.getUser(),null));		
+		model.addAttribute("functions",repoFunction.findAllSortedByName(userSession.getUser(),null));		
+		List<Spline> splines = (userSession.getDomain() == null)?repoSpline.findAllSplines():repoSpline.findSplines(userSession.getDomain().getId()); 
+		model.addAttribute("splines",splines);		
 		model.addAttribute("units",repoUnit.findAllSortedByName(userSession.getUser(),null));
 		return "editChannel";	
 	}

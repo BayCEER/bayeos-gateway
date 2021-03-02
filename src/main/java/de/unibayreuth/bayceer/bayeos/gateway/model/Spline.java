@@ -7,29 +7,23 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.validation.groups.Default;
-
-import org.hibernate.annotations.Formula;
 
 @Entity
 public class Spline extends NamedDomainEntity {
 	
-	
-	
-		
-
+			
 	@OneToMany(mappedBy="spline", cascade=CascadeType.ALL)
 	@OrderBy("x ASC")
 	@NotNull()
 	@Size(min=1)
 	List<KnotPoint> knotPoints;	
+	
+	@Transient
+	Boolean locked = false;
 			
-	@Formula("(select count(c.id) > 0  from channel c where c.spline_id = id)")
-	Boolean locked;
-			
-		
 	public Spline(String string) {
 		super(string);
 	}
