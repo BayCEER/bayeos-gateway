@@ -1,9 +1,12 @@
 # Gateway REST API 
-__2021-02-15, Oliver Archner, Comment API POST,PUT,DELETE,GET request support__
-__2021-03-18, Oliver Archner, User API GET request support__
 
-All example requests use an authorization header with default credentials on localhost. 
-Please adapt these settings according to your BayEOS Gateway situation.
+## Document History 
+|Date|User|Note|
+|----|----|----|
+|2021-02-15|Oliver Archner|Comment API POST,PUT,DELETE,GET request support|
+|2021-03-18|Oliver Archner|User API GET request support|
+
+All example requests use an authorization header with default credentials on localhost. Please adapt these settings according to your BayEOS Gateway situation.
 
 ## Create board comment
 ```javascript
