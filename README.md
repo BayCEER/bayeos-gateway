@@ -45,6 +45,9 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.6.9, Mar, 2021
+- Add User Rest API 
+
 ### Version 2.6.8, Mar, 2021
 - JRE definition openjdk-8-jre-headless
 
