@@ -6,6 +6,7 @@
 |2021-02-15|Oliver Archner|Comment API POST,PUT,DELETE,GET request support|
 |2021-03-18|Oliver Archner|User API GET request support|
 
+## General Notes 
 All example requests use an authorization header with default credentials on localhost. Please adapt these settings according to your BayEOS Gateway situation.
 
 ## Create board comment
