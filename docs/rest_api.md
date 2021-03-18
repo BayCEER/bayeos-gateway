@@ -1,11 +1,11 @@
-# CREST API 
-__2021-02-15, Oliver Archner, Comment Basic POST,PUT,DELETE,GET request support__
-__2021-03-18, Oliver Archner, User GET request support__
+# Gateway REST API 
+__2021-02-15, Oliver Archner, Comment API POST,PUT,DELETE,GET request support__
+__2021-03-18, Oliver Archner, User API GET request support__
 
 All example requests use an authorization header with default credentials on localhost. 
 Please adapt these settings according to your BayEOS Gateway situation.
 
-## Create Board Comment
+## Create board comment
 ```javascript
 POST /gateway/rest/comments HTTP/1.1
 Host: localhost:5533
@@ -19,7 +19,6 @@ Content-Type: application/json
     "content":"This is my 26 board comment"    
 }
 
-
 Response Body:
 {
     "id": 52,
@@ -30,7 +29,7 @@ Response Body:
 }
 ```
 
-## Update Board Comment
+## Update board comment
 ```javascript
 PUT /gateway/rest/comments HTTP/1.1
 Host: localhost:5533
@@ -55,7 +54,7 @@ Response Body:
 }
 ```
 
-## Delete Comment
+## Delete comment
 ```javascript
 DELETE /gateway/rest/comments/52 HTTP/1.1
 Host: localhost:5533
@@ -63,7 +62,7 @@ Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
 ```
 
-## Get All Board Comments
+## Get all board comments
 ```javascript
 GET /gateway/rest/comments/board/26 HTTP/1.1
 Host: localhost:5533
@@ -89,11 +88,12 @@ Response Body:
 ]
 ```
 
-## Get User By ID
+## Get user by ID
 ```javascript
 GET /gateway/rest/users/4 HTTP/1.1
 Host: localhost:5533
 Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
 
 Response Body:
 {
@@ -104,11 +104,13 @@ Response Body:
 }
 ```
 
-## Get All Users Sorted by Name
+## Get all users sorted by name
 ```javascript
 GET /gateway/rest/users HTTP/1.1
 Host: localhost:5533
 Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+
 Response Body:
 [
     {
@@ -138,14 +140,55 @@ Response Body:
 ]
 ```
 
+## Get all domain users sorted by name
+```javascript
+GET /gateway/rest/users?domainName=REZ HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+
+Response Body:
+[
+    {
+        "id": 4,
+        "name": "oliver",
+        "fullName": "Oliver Archner",
+        "domain": "REZ"
+    }
+]
+```
+
 ## Get channel values during the last 24h sorted by time ascending
-curl -i -X GET -H "Authorization:Basic cm9vdDpiYXllb3M=" 'http://localhost:5533/gateway/rest/channel/?id=4'
-[{"id": 635,"millis": 1562678971850,"value": 0.59041363},{"id": 640,"millis": 1562678992717,"value": 0.57821494},{"id": 645,"millis": 1562679012765,"value": 0.84613395}]
+```javascript
+GET /gateway/rest/channel?id=4 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+
+Response Body:
+[{"id": 635,"millis": 1562678971850,"value": 0.59041363},
+{"id": 640,"millis": 1562678992717,"value": 0.57821494},
+{"id": 645,"millis": 1562679012765,"value": 0.84613395}]
+```
 
 ## Get channel values > lastRowId sorted by time ascending
-curl -i -X GET -H "Authorization:Basic cm9vdDpiYXllb3M=" 'http://localhost:5533/gateway/rest/channel/?id=4&lastRowId=587'
-[{"id": 588, "mill's": 1562588481171, "value": 0.1756716},…]
+```javascript
+GET /gateway/rest/channel?id=4&lastRowId=587 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+
+Response Body:
+[{"id": 588, "millis": 1562588481171, "value": 0.1756716},…]
+``` 
 
 ## Get channel values during a time period sorted by time ascending
-curl -i -X GET -H "Authorization:Basic cm9vdDpiYXllb3M=" 'http://localhost:5533/gateway/rest/channel/?id=4&startTime=1552588481171&endTime=1562588481171'
-[{"id": 576, "millis": 1562066857108, "value": 0.49066883},…]
+```javascript
+GET /gateway/rest/channel/?id=4&startTime=1552588481171&endTime=1562588481171 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+
+Response Body:
+[{"id": 588, "mill's": 1562588481171, "value": 0.1756716},…]
+``` 
