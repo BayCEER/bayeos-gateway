@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
+import de.unibayreuth.bayceer.bayeos.gateway.model.KnotPoint;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Point;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
+import de.unibayreuth.bayceer.bayeos.gateway.model.SplineWebFlow;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
 
@@ -20,15 +23,20 @@ public class SplineServiceImpl implements SplineService, Serializable {
 	
 	private static final long serialVersionUID = -2186894760876637871L;
 	
-	public void persist(Spline s) {		
+	public void persist(SplineWebFlow s) {		
 		Domain d = s.getDomain();		
 		if (!d.getName().isEmpty()) {			
 			s.setDomain(repoDomain.findOne(Long.valueOf(d.getName())));
 		} else {
 			s.setDomain(null);
-		}
-				
-		repoSpline.save(s);
+		}		
+		Spline sp = new Spline();
+		sp.setName(s.getName());
+		
+		for (Point p : s.getPoints()) {		
+			sp.addKnotPoint(new KnotPoint(p.getX(), p.getY()));
+		}		
+		repoSpline.save(sp);
 	}
 
 }

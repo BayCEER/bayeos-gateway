@@ -17,8 +17,6 @@ public class Spline extends NamedDomainEntity {
 			
 	@OneToMany(mappedBy="spline", cascade=CascadeType.ALL)
 	@OrderBy("x ASC")
-	@NotNull()
-	@Size(min=1)
 	List<KnotPoint> knotPoints;	
 	
 	@Transient

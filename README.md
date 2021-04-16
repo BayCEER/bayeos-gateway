@@ -45,6 +45,10 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.6.10, Apr, 2021
+- Fixed Bug: Editing flow spline
+- Fixed Bug: Missing save button on new channel template dialog
+
 ### Version 2.6.9, Mar, 2021
 - Add User Rest API 
 

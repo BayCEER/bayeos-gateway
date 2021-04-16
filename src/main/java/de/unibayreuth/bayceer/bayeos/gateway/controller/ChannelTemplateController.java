@@ -58,6 +58,7 @@ public class ChannelTemplateController extends AbstractController {
 		model.addAttribute("functions",repoFunction.findAll(userSession.getUser(),null));
 		model.addAttribute("splines",repoSpline.findAll(userSession.getUser(),null));
 		model.addAttribute("units",repoUnit.findAll(userSession.getUser(),null));
+		model.addAttribute("writeable",true);
 		return "editChannelTemplate";
 	}
 	

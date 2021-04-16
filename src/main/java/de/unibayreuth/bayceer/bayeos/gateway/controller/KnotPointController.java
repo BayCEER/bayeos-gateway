@@ -44,8 +44,10 @@ public class KnotPointController extends AbstractController{
 	
 				
 	@RequestMapping(value="/knotpoints/save", method=RequestMethod.POST)
-	public String save(@Valid KnotPoint point, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
+	public String save(Model model, @Valid KnotPoint point, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
+			model.addAttribute("knotPoint", point);		
+			model.addAttribute("writeable",isWriteable(point.getSpline()));
 			return "editKnotPoint";
 		}				
 		checkWrite(repoSpline.findOne(point.getSpline().getId()));
