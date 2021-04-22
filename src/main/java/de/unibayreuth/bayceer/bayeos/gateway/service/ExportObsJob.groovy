@@ -213,7 +213,7 @@ class ExportObsJob implements Runnable  {
 
 	private def createNewSeriesForChannels(){
 		db.eachRow("""select c.id from channel c join board b on b.id = c.board_id where b.db_folder_id is not null and c.name is not null and c.db_series_id is null and 
-			(c.db_exclude_auto_export is null or c.db_exclude_auto_export is false)"""){ it ->
+			c.db_exclude_auto_export is false"""){ it ->
 			createSeriesForChannel(it.id)
 		}
 	}
