@@ -46,6 +46,10 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 ### Version 2.6.10, Apr, 2021
+- Enhancement: Ignore auto-export flag of boards in CalculateJob
+- Enhancement: Removed needless query on channel flag in ExportJob
+
+### Version 2.6.10, Apr, 2021
 - Fixed Bug: Editing flow spline
 - Fixed Bug: Missing save button on new channel template dialog
 
