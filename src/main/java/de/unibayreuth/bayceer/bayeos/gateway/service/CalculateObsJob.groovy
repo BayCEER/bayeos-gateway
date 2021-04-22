@@ -57,9 +57,7 @@ public class CalculateObsJob implements Runnable {
 									FROM channel c 
 									LEFT JOIN function f ON f.id = c.aggr_function_id 
 									LEFT JOIN "interval" i ON i.id = c.aggr_interval_id 
-									JOIN board b on b.id = c.board_id 
-									where b.db_auto_export and b.db_folder_id is not null 
-									and c.db_series_id is not null and c.db_exclude_auto_export = false"""){ cha ->
+									where c.db_series_id is not null and c.db_exclude_auto_export = false"""){ cha ->
 
 									// Fill table for ExportJopb
 									rowCalculated = rowCalculated + db.executeUpdate("""
