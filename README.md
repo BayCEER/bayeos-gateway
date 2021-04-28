@@ -45,7 +45,10 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
-### Version 2.6.10, Apr, 2021
+### Version 2.6.12, Apr, 2021
+- BugFix: Edit channel if user domain is not null
+
+### Version 2.6.11, Apr, 2021
 - Enhancement: Ignore auto-export flag of boards in CalculateJob
 - Enhancement: Removed needless query on channel flag in ExportJob
 

@@ -3,7 +3,7 @@
   
   <groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.6.11</version>
+	<version>2.6.12</version>
 
 
 	<licenses>
@@ -23,29 +23,22 @@
 	<name>bayeos-gateway</name>
 	<description>BayEOS Gateway</description>
 
-	<properties>
-	
+	<properties>	
 		<log.file>/var/log/bayeos-gateway.log</log.file>
-		<log.level>INFO</log.level>
-		
+		<log.level>INFO</log.level>		
 		<release>stretch</release>
 		<java.version>1.8</java.version>
 		<tomcat.version>8.0.37</tomcat.version>		
 		<pg.version>9.6</pg.version>
-
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-
 		<db.user>xbee</db.user>
 		<db.password>0b64debf8fae4239a7ca845f39878a3d</db.password>
 		<db.url>jdbc:postgresql://localhost/xbee</db.url>
-
 		<server.port>5533</server.port>
-		<server.contextPath>/gateway</server.contextPath>
-		
+		<server.contextPath>/gateway</server.contextPath>		
 		<build.year>${maven.build.timestamp}</build.year>
    		<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>	   		   		
 	</properties>
@@ -59,7 +52,8 @@
 		
 	<profiles>
 	<profile>
-			<id>dev</id>				
+			<id>dev</id>
+
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>		
@@ -89,7 +83,7 @@
 	<profile>
 			<id>prod</id>
 			<properties>				
-				<skipTests>true</skipTests>								
+				<skipTests>true</skipTests>												
 			</properties>
 			<build>			
 				<plugins>
@@ -193,10 +187,12 @@
 			
 			
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
+				<artifactId>maven-compiler-plugin</artifactId>				
 				<configuration>
-					<compilerId>groovy-eclipse-compiler</compilerId>
-					<version>3.0</version>								
+					<compilerId>groovy-eclipse-compiler</compilerId>					
+					<compilerArgs>
+		    			<arg>-parameters</arg>
+		    		</compilerArgs>							
 				</configuration>
 				<dependencies>
 					<dependency>
