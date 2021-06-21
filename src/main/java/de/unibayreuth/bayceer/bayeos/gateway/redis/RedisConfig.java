@@ -9,7 +9,7 @@ import redis.clients.jedis.JedisPoolConfig;
 
 
 @Configuration
-public class JedisConfig {
+public class RedisConfig {
 	
 	@Value("${REDIS_HOST:localhost}")
 	private String redis_host;

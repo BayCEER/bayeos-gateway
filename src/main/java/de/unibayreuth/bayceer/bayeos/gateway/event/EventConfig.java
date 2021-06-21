@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import de.unibayreuth.bayceer.bayeos.gateway.redis.JedisListener;
+import de.unibayreuth.bayceer.bayeos.gateway.redis.RedisListener;
 import de.unibayreuth.bayceer.bayeos.gateway.websocket.WebSocketListener;
 
 @Configuration
@@ -15,7 +15,7 @@ public class EventConfig {
 	WebSocketListener ws;
 	
 	@Autowired
-	JedisListener js;	
+	RedisListener js;	
 	
 	@Value("${REDIS_EVENTS:false}")
 	private Boolean redis_events;

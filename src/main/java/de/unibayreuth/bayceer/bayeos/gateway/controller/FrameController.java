@@ -24,11 +24,6 @@ public class FrameController extends AbstractController {
 	@Autowired
 	FrameService frameService;
 	
-//	@Autowired
-//	FrameImporterService frameImporter;
-	
-	
-		
 	private Logger log = Logger.getLogger(FrameController.class);
 
 	@RequestMapping(path = "/frame/saveFlat", method = RequestMethod.POST, headers = "Content-Type=application/x-www-form-urlencoded")
@@ -72,23 +67,6 @@ public class FrameController extends AbstractController {
 		return frames;
 	}
 
-
-//	@RequestMapping(path = "/frame", method = RequestMethod.POST, headers = "Content-Type=application/x-www-form-urlencoded")
-//	public ResponseEntity save(@RequestParam MultiValueMap<String,String> params, HttpServletRequest request){						
-//			String sender = getSender(params);
-//			List<String> frames = getFrames(params);
-//			log.info("Received " + frames.size() + " frames from " + sender);			
-//			if (frameImporter.save(sender, frames)){
-//				return new ResponseEntity(HttpStatus.OK);	
-//			} else {
-//				log.warn("Failed to save frames.");
-//				return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);	
-//			}
-//	}
-	
-
-	
-	
 
 
 }

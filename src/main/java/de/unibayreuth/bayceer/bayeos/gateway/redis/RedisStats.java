@@ -18,7 +18,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
 @Component
-public class JedisStats implements Runnable {
+public class RedisStats implements Runnable {
 	
 	@Value("${REDIS_EVENTS:false}")
 	private Boolean redis_events;
@@ -40,10 +40,10 @@ public class JedisStats implements Runnable {
 	@Autowired
 	private UserRepository repoUser;
 	
-	private Logger log = Logger.getLogger(JedisStats.class);
+	private Logger log = Logger.getLogger(RedisStats.class);
 	
 	
-	public JedisStats() {		
+	public RedisStats() {		
 		try {	
 			hostname = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {

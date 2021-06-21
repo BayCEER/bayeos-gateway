@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class EventProducer implements Runnable {
 	
 	private boolean stopped = false;
-	private static final int QUEUE_SIZE = 200;	
+	private static final int QUEUE_SIZE = 10000;	
 	private Logger log = Logger.getLogger(EventProducer.class);	
 	private Set<EventListener> listeners = Collections.synchronizedSet(new HashSet<EventListener>());
 	private LinkedBlockingDeque<Event> queue;
@@ -23,8 +23,7 @@ public class EventProducer implements Runnable {
 	public EventProducer() {
 		queue = new LinkedBlockingDeque<>(QUEUE_SIZE);
 	}
-	
-		
+			
 	public void addFrameEvent(Event e){	
 		if (!queue.offer(e)){
 			log.debug("Failed to add event to queue.");

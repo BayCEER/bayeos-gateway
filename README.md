@@ -45,6 +45,9 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.6.13, June, 2021
+- BugFix: Create LDAP users without password
+
 ### Version 2.6.12, Apr, 2021
 - BugFix: Edit channel if user domain is not null
 

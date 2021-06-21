@@ -18,14 +18,15 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
 @Component
-public class JedisListener implements EventListener {
+public class RedisListener implements EventListener {
+	
 	
 	@Autowired
 	private JedisPool jedisPool;
 	
 	private String hostname;
 	
-	public JedisListener() {		
+	public RedisListener() {		
 		try {	
 			hostname = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
@@ -35,8 +36,6 @@ public class JedisListener implements EventListener {
 	
 	
 		
-	
-	
 	private Integer calcRate(Jedis jedis, String key, Integer score) throws JedisException {	
 		// Update cached values 
 		// z-ordered set: score: ts , value: counts:ts as string 
@@ -71,11 +70,11 @@ public class JedisListener implements EventListener {
 			break;
 
 		case NEW_BOARD:			
-			break;
-		
+			break;		
 		case NEW_MESSAGE:			
 			break;
-
+		case NEW_FRAME:
+			break;
 		default:
 			break;
 		}

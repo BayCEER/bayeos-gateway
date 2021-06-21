@@ -75,7 +75,7 @@ public class UserController extends AbstractController {
 		
 		if (user.getNewPassword()!=null) {
 			user.encodeNewPassword();		
-		} else {
+		}  else if (user.getId() != null) {				
 			user.setPassword(repo.findOne(user.getId()).getPassword());
 		}
 														
