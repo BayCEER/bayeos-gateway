@@ -216,9 +216,9 @@ class FrameService {
 	private Long findOrSaveBoard(Sql db, Long domainId, String origin) throws SQLException {
 		def b;	
 		if (domainId == null) {
-			b = db.firstRow("select id from board where origin like ? and (domain_id is null or domain_id_created is null);",[origin])
+			b = db.firstRow("select id from board where origin = ? and (domain_id is null or domain_id_created is null);",[origin])
 		} else {
-			b = db.firstRow("select id from board where origin like ? and domain_id = ?;",[origin, domainId])			
+			b = db.firstRow("select id from board where origin = ? and domain_id = ?;",[origin, domainId])			
 		}
 					
 		if (b==null) {
