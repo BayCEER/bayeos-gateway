@@ -342,16 +342,18 @@
                     },
                     {data: 'content',
                      render: function(data,type,row) {
-                    	 return row.content;
+                    	 return row.content.replace(/(?:\\[rn]|[\r\n])/g,"<br></br>");
                      } 
                     }, {
                      searchable: false, sortable: false,
                      render: function ( data, type, row ) {
-                        	var ret = '<td class="link">';
-                    	    var del = /*[[ #{action.delete} ]]*/;
-                    	    var confirm =  [[ #{dialog.confirm} ]];
-            		        ret += '<a class="btn btn-xs btn-default deleteComment"><span class="glyphicon glyphicon-remove"></span> ' + del + '</a>';
-            			    return ret += '</td>';
+                    	 	var url = "url";
+                        	var ret = '<td class="link">';                    	                        	     
+                        	var url = /*[[ @{/comments/edit/}]]*/;                        	
+            		        ret += '<a class="btn btn-xs btn-default" href="' + url + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + [[ #{action.edit} ]] + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default deleteComment"><span class="glyphicon glyphicon-remove"></span> ' + [[ #{action.delete} ]] + '</a>';
+            		        ret += '</td>';            		        
+            			    return ret;
                      }
                     }],
              "order": [[ 0, "desc" ]],  

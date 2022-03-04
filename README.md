@@ -45,6 +45,11 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+
+### Version 2.6.15, June, 2021
+- Enhancement: Show multi line board comments
+- Enhancement: Edit board comments 
+
 ### Version 2.6.14, June, 2021
 - BugFix: Wrong like operator in query to identify boards by origin
 
