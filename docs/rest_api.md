@@ -1,15 +1,48 @@
-# Gateway REST API 
+# Gateway REST API
 
-## Document History 
-|Date|User|Note|
-|----|----|----|
-|2021-02-15|Oliver Archner|Comment API POST,PUT,DELETE,GET request support|
-|2021-03-18|Oliver Archner|User API GET request support|
+## Table of Contents
 
-## General Notes 
+- [Gateway REST API](#gateway-rest-api)
+  - [Table of Contents](#table-of-contents)
+  - [Document History](#document-history)
+  - [General Notes](#general-notes)
+  - [Board Comment](#board-comment)
+    - [Create board comment](#create-board-comment)
+    - [Update board comment](#update-board-comment)
+    - [Delete comment](#delete-comment)
+    - [Get all board comments](#get-all-board-comments)
+  - [User](#user)
+    - [Get user by ID](#get-user-by-id)
+    - [Get all users sorted by name](#get-all-users-sorted-by-name)
+    - [Get all domain users sorted by name](#get-all-domain-users-sorted-by-name)
+  - [Channel](#channel)
+    - [Get channel values during the last 24h sorted by time ascending](#get-channel-values-during-the-last-24h-sorted-by-time-ascending)
+    - [Get channel values > lastRowId sorted by time ascending](#get-channel-values--lastrowid-sorted-by-time-ascending)
+    - [Get channel values during a time period sorted by time ascending](#get-channel-values-during-a-time-period-sorted-by-time-ascending)
+  - [Board command](#board-command)
+    - [New board command](#new-board-command)
+    - [Get first pending board command by origin](#get-first-pending-board-command-by-origin)
+    - [Get board command by id](#get-board-command-by-id)
+    - [Update board command response](#update-board-command-response)
+
+<!-- pagebreak -->
+
+## Document History
+
+| Date       | User           | Note                                            |
+| ---------- | -------------- | ----------------------------------------------- |
+| 2021-02-15 | Oliver Archner | Comment API POST,PUT,DELETE,GET request support |
+| 2021-03-18 | Oliver Archner | User API GET request support                    |
+| 2022-05-10 | Oliver Archner | Board command API added                         |
+
+## General Notes
+
 All example requests use an authorization header with default credentials on localhost. Please adapt these settings according to your BayEOS Gateway situation.
 
-## Create board comment
+## Board Comment
+
+### Create board comment
+
 ```javascript
 POST /gateway/rest/comments HTTP/1.1
 Host: localhost:5533
@@ -20,7 +53,7 @@ Content-Type: application/json
     "boardID":26,
     "userID": 3,
     "insertTime": 1613396534237,
-    "content":"This is my 26 board comment"    
+    "content":"This is my 26 board comment"
 }
 
 Response Body:
@@ -33,14 +66,15 @@ Response Body:
 }
 ```
 
-## Update board comment
+### Update board comment
+
 ```javascript
 PUT /gateway/rest/comments HTTP/1.1
 Host: localhost:5533
 Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
 Content-Type: application/json
-{    
+{
     "id":52,
     "boardID": 26,
     "userID": 3,
@@ -58,7 +92,8 @@ Response Body:
 }
 ```
 
-## Delete comment
+### Delete comment
+
 ```javascript
 DELETE /gateway/rest/comments/52 HTTP/1.1
 Host: localhost:5533
@@ -66,7 +101,8 @@ Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
 ```
 
-## Get all board comments
+### Get all board comments
+
 ```javascript
 GET /gateway/rest/comments/board/26 HTTP/1.1
 Host: localhost:5533
@@ -92,7 +128,10 @@ Response Body:
 ]
 ```
 
-## Get user by ID
+## User
+
+### Get user by ID
+
 ```javascript
 GET /gateway/rest/users/4 HTTP/1.1
 Host: localhost:5533
@@ -108,7 +147,8 @@ Response Body:
 }
 ```
 
-## Get all users sorted by name
+### Get all users sorted by name
+
 ```javascript
 GET /gateway/rest/users HTTP/1.1
 Host: localhost:5533
@@ -144,7 +184,8 @@ Response Body:
 ]
 ```
 
-## Get all domain users sorted by name
+### Get all domain users sorted by name
+
 ```javascript
 GET /gateway/rest/users?domainName=REZ HTTP/1.1
 Host: localhost:5533
@@ -162,7 +203,10 @@ Response Body:
 ]
 ```
 
-## Get channel values during the last 24h sorted by time ascending
+## Channel
+
+### Get channel values during the last 24h sorted by time ascending
+
 ```javascript
 GET /gateway/rest/channel?id=4 HTTP/1.1
 Host: localhost:5533
@@ -175,7 +219,8 @@ Response Body:
 {"id": 645,"millis": 1562679012765,"value": 0.84613395}]
 ```
 
-## Get channel values > lastRowId sorted by time ascending
+### Get channel values > lastRowId sorted by time ascending
+
 ```javascript
 GET /gateway/rest/channel?id=4&lastRowId=587 HTTP/1.1
 Host: localhost:5533
@@ -184,9 +229,10 @@ Authorization: Basic cm9vdDpiYXllb3M=
 
 Response Body:
 [{"id": 588, "millis": 1562588481171, "value": 0.1756716},…]
-``` 
+```
 
-## Get channel values during a time period sorted by time ascending
+### Get channel values during a time period sorted by time ascending
+
 ```javascript
 GET /gateway/rest/channel/?id=4&startTime=1552588481171&endTime=1562588481171 HTTP/1.1
 Host: localhost:5533
@@ -195,4 +241,95 @@ Authorization: Basic cm9vdDpiYXllb3M=
 
 Response Body:
 [{"id": 588, "mill's": 1562588481171, "value": 0.1756716},…]
-``` 
+```
+
+## Board command
+
+### New board command
+
+```javascript
+POST /gateway/rest/boardcommand HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+Content-Type: application/json
+{
+    "origin": "pi-vpn01",
+    "value": "c3dpdGNoIGxpZ2h0IG9uLg=="
+}
+Response Code: 200
+Response Body:
+{
+    "id": 13,
+    "origin": "pi-vpn01",
+    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "insertTime":1562678971850,
+    "response":null,
+    "responseTime":null
+}
+```
+
+### Get first pending board command by origin
+
+```javascript
+GET /gateway/rest/boardcommand?origin=pi-vpn01 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+Content-Type: application/json
+
+Response Code: 200
+Response Body:
+{
+    "id": 13,
+    "origin": "pi-vpn01",
+    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "insertTime":1562678971850,
+    "response":null,
+    "responseTime":null
+}
+```
+
+### Get board command by id
+
+```javascript
+GET /gateway/rest/boardcommand/13 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+Content-Type: application/json
+
+Response Code: 200
+Response Body:
+{
+    "id": 13,
+    "origin": "pi-vpn01",
+    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "response": "",
+    "insertTime":  1562678971850,
+    "responseTime": null
+
+}
+```
+
+### Update board command response
+
+```javascript
+PATCH /gateway/rest/boardcommand/13/response HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+Content-Type: application/json
+{
+    "response":"Switch toggled"
+}
+Response Code: 200
+Response Body: {
+    "id": 13,
+    "origin": "pi-vpn01",
+    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "response": "Switch toggled",
+    "insertTime":  1562678971850,
+    "responseTime": 1562678971890
+}
+```

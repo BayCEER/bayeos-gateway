@@ -1,13 +1,13 @@
 <configuration>
  <springProfile name="prod,default">
   <appender name="A" class="ch.qos.logback.core.rolling.RollingFileAppender">    
-    <File>${log.file}</File>
+    <File>/var/log/bayeos-gateway.log</File>
     <encoder>
       <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <maxIndex>10</maxIndex>
-      <FileNamePattern>${log.file}.%i</FileNamePattern>
+      <FileNamePattern>/var/log/bayeos-gateway.log.%i</FileNamePattern>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <MaxFileSize>5MB</MaxFileSize>

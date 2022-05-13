@@ -13,6 +13,8 @@ public interface BoardRepository extends DomainFilteredRepository<Board>{
 	public List<Board> findByBoardGroupIsNullAndDomain(Domain domain);
 
 	public Board findByOriginAndDomain(String origin, Domain domain);
+	
+	public Board findByIdAndDomain(Long id, Domain domain);
 			
 		
 }

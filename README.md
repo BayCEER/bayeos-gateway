@@ -45,6 +45,9 @@ Let's send the cpu load of our pc to a local gateway:
 * **Oliver Archner** - *Developer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.7.0, May, 2022
+- Enhancement: Board command REST API
+- Enhancement: Set channel name = channel number
 
 ### Version 2.6.15, June, 2021
 - Enhancement: Show multi line board comments
