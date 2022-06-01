@@ -1,4 +1,4 @@
-package de.unibayreuth.bayceer.bayeos.gateway.repo;
+package de.unibayreuth.bayceer.bayeos.gateway.repo.domain;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
 
-public interface SplineRepository extends DomainFilteredRepository<Spline> {
+public interface SplineRepository extends DomainEntityRepository<Spline> {
 		
 	Spline findFirstByName(String name);
 	

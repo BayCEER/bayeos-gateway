@@ -1,8 +1,8 @@
-package de.unibayreuth.bayceer.bayeos.gateway.repo;
+package de.unibayreuth.bayceer.bayeos.gateway.repo.domain;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 
-public interface UserRepository extends DomainFilteredRepository<User>{
+public interface UserRepository extends DomainEntityRepository<User>{
 
 			
 

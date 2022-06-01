@@ -1,4 +1,4 @@
-package de.unibayreuth.bayceer.bayeos.gateway.repo;
+package de.unibayreuth.bayceer.bayeos.gateway.repo.domain;
 
 import java.util.Date;
 import java.util.List;
@@ -11,7 +11,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Upload;
 
 
 @Repository
-public interface UploadRepository extends DomainFilteredRepository<Upload>{
+public interface UploadRepository extends DomainEntityRepository<Upload>{
 		
 	@Query("select u from Upload u where u.importStatus = 2 order by id asc")
 	List<Upload> findPending();
