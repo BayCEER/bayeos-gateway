@@ -3,6 +3,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 import java.nio.file.AccessDeniedException;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
 
 @Controller
 public class DomainController extends AbstractController {
@@ -64,7 +65,7 @@ public class DomainController extends AbstractController {
 		if (!userSession.getUser().inNullDomain()) {
 			throw new AccessDeniedException("Failed to edit domain");
 		}				
-		model.addAttribute("domain", repo.findOne(id));
+		model.addAttribute("domain", repo.findById(id).orElseThrow(()->new EntityNotFoundException()));
 		return "editDomain";
 	}
 	
@@ -73,7 +74,7 @@ public class DomainController extends AbstractController {
 		if (!userSession.getUser().inNullDomain()) {
 			throw new AccessDeniedException("Failed to delete domain");
 		}		
-		repo.delete(id);
+		repo.deleteById(id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/domains";
 	}

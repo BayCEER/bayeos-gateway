@@ -1,23 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{e.upload}">Upload</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<h3 th:text="#{action.upload}">Upload Files</h3>
-		<h4 th:text="#{msg.selectFile}">Please select one or more files.</h4>
-		<form method="POST" action="#" th:action="@{/uploads}" role="form" enctype="multipart/form-data">
-		 	<div class="form-group">		 	
-				<input type="file" id="files" name="files" multiple=""/>							
-			</div>					
-			<div class="form-group">
-				<button th:text="#{action.upload}" type="submit" class="btn btn-primary">Upload</button>
-			</div>		
-			
-		</form>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{e.upload}">Upload</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{action.upload}">Upload Files</h3>
+      <h4 th:text="#{msg.selectFile}">Please select one or more files.</h4>
+      <form
+        method="POST"
+        action="#"
+        th:action="@{/uploads}"
+        role="form"
+        enctype="multipart/form-data"
+      >
+        <div class="form-group">
+          <input type="file" id="files" name="files" multiple="" />
+        </div>
+        <div class="form-group">
+          <button
+            th:text="#{action.upload}"
+            type="submit"
+            class="btn btn-primary"
+          >
+            Upload
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
 </html>

@@ -3,28 +3,23 @@ package de.unibayreuth.bayceer.bayeos.gateway.service
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
+
+import org.apache.xmlrpc.XmlRpcException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-
 import bayeos.frame.types.LabeledFrame
-import de.unibayreuth.bayceer.bayeos.objekt.ObjektArt
+import bayeos.frame.types.NumberType
 import de.unibayreuth.bayceer.bayeos.client.Client
-import de.unibayreuth.bayceer.bayeos.xmlrpc.types.XmlRpcType
-
-import org.apache.xmlrpc.XmlRpcException;
-import bayeos.frame.types.NumberType;
-
 import groovy.sql.Sql
-import java.sql.SQLException
 
 
 @Component
 class ExportObsJob implements Runnable  {
 	
-	private Logger log = Logger.getLogger(ExportObsJob.class)
+	private Logger log = LoggerFactory.getLogger(ExportObsJob.class)
 	
 	@Autowired
 	FrameService frameService	

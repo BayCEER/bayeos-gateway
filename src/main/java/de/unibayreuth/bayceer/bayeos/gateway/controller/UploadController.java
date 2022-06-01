@@ -5,12 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Upload;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UploadRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UploadRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.FileUploadService;
 
 @Controller
@@ -47,7 +48,7 @@ public class UploadController extends AbstractController {
 	private int localFileExpiredMonth;
 
 
-	private final static Logger log = Logger.getLogger(UploadController.class);
+	private final static Logger log = LoggerFactory.getLogger(UploadController.class);
 	
 	@PostMapping("/uploads")
 	public String upload(@RequestParam("files") MultipartFile[] files, RedirectAttributes redirect) {

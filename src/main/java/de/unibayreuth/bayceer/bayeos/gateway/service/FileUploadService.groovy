@@ -1,20 +1,19 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import java.nio.file.Files
 import java.nio.file.Path
-import javax.annotation.PostConstruct
+
 import javax.sql.DataSource
-import org.apache.log4j.Logger
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession
 import de.unibayreuth.bayceer.bayeos.gateway.model.Upload
-import de.unibayreuth.bayceer.bayeos.gateway.model.User
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UploadRepository
-import java.nio.file.Paths;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UploadRepository
 
 @Service
 class FileUploadService {
@@ -31,7 +30,7 @@ class FileUploadService {
 	@Autowired
 	Path localFilePath
 
-	private Logger log = Logger.getLogger(FileUploadService.class)
+	private Logger log = LoggerFactory.getLogger(FileUploadService.class)
 
 	public boolean save(MultipartFile file) throws IOException {
 		

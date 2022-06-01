@@ -4,9 +4,11 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
@@ -22,10 +24,10 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardGroup;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Notification;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardGroupRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ContactRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.NotificationRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.NotificationRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardGroupRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.ContactRepository;
 
 @Controller
 public class BoardGroupController extends AbstractController {
@@ -70,7 +72,7 @@ public class BoardGroupController extends AbstractController {
 	
 	
 	@RequestMapping(value="/groups/{id}", method=RequestMethod.GET)
-	public String edit(@PathVariable Long id, Model model,@RequestParam(defaultValue = "boards") String tab){	
+	public String edit(@PathVariable Long id, Model model,@RequestParam(defaultValue = "boards") String tab, @Qualifier("boards") Pageable boardPage){	
 		model.addAttribute("group",repo.findOne(userSession.getUser(),id));
 		model.addAttribute("tab", tab);
 		return "editBoardGroup";		
@@ -87,7 +89,8 @@ public class BoardGroupController extends AbstractController {
 	public String selectBoards(@PathVariable Long id, Model model){		
 		BoardGroup g = repo.findOne(userSession.getUser(),id);
 		model.addAttribute("parent",g);
-		model.addAttribute("controller","groups");				
+		model.addAttribute("controller","groups");	
+	
 		List<Board> boards = repoBoard.findByBoardGroupIsNullAndDomain(g.getDomain());
 		model.addAttribute("boards", boards);		
 		return "selectBoards";
@@ -142,10 +145,10 @@ public class BoardGroupController extends AbstractController {
 		
 	@RequestMapping(value="/groups/removeNotification/{id}", method = RequestMethod.GET)
 	public String removeNotification(@PathVariable("id") Long id) {		
-		Notification n = repoNotification.findOne(id);
+		Notification n = repoNotification.findById(id).orElseThrow(()-> new EntityNotFoundException());
 		checkWrite(n.getBoardGroup());
 		Long g = n.getBoardGroup().getId();		
-		repoNotification.delete(n.getId());	
+		repoNotification.deleteById(n.getId());	
 		return "redirect:/groups/" + g + "?tab=notifications";
 	}
 	

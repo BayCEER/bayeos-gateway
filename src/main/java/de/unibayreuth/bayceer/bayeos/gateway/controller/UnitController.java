@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Unit;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UnitRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UnitRepository;
 
 @Controller
 public class UnitController extends AbstractController{

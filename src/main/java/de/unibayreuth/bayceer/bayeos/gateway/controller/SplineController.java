@@ -7,7 +7,10 @@ import java.util.Locale;
 
 import javax.validation.Valid;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,13 +30,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.marshaller.SplineMarshaller;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.ChannelRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.SplineRepository;
 
 @Controller
 public class SplineController extends AbstractController{
 	
-	private final static Logger log = Logger.getLogger(SplineController.class);
+	private final static Logger log = LoggerFactory.getLogger(SplineController.class);
 	
 	@Autowired
 	SplineRepository repo;

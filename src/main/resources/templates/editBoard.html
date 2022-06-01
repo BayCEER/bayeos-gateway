@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorator="main">
+	xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorate="~{main}">
 <head>
 <title th:text="#{e.board}">Board</title>
 </head>
@@ -237,7 +237,10 @@
 	     
 	    // Default: channels 			   
 	   	var tab = [[ ${tab} ]];
-	   		   	   	
+	   	
+	   	var oc1 = [0, 'desc'];
+	   	var order = [oc1];
+	   		   		   	   	
 	   	$('#myTab a[aria-controls="' + tab + '"]').tab('show');
 	   	
 	   	var language = {
@@ -297,7 +300,7 @@
                     	 return row.content;
                      } 
                     }],
-             "order": [[ 0, "desc" ]],      
+             "order": order,              
              "ajax": {
                 	'contentType': 'application/json',
                 	'url': [[ @{/rest/messages} + '/' + ${board.id} ]],
@@ -356,7 +359,7 @@
             			    return ret;
                      }
                     }],
-             "order": [[ 0, "desc" ]],  
+             "order": order,           
              "ajax": {
                 	'contentType': 'application/json',
                 	'url': [[ @{/rest/comments/board/} + ${board.id} ]],
@@ -392,7 +395,7 @@
   
 		 });					
 	</script>
-
+		
 	</div>
 
 

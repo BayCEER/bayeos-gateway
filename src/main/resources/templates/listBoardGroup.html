@@ -1,55 +1,76 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{nav.groups}">All groups</title>
-</head>
-<body>
-	<div layout:fragment="content">					
-			<table class="table table-striped" >
-				<thead>
-					<tr>
-						<th th:if="${#authentication.principal.inNullDomain()}">
-							<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
-						</th>
-						<th><a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a></th>												
-						<th th:text="#{nav.boards}"></th>
-						<th th:text="#{board.lrt}"></th>
-						<th th:text="#{board.status}"></th>
-						<th>
-							<div class="pull-right">
-								<div th:replace="table::add(@{'/groups/create'})"></div>					
-							</div>				
-						</th>
-					</tr>					
-			
-				</thead>
-				<tbody>
-					<tr th:each="i : ${groups}">
-						<td th:if="${#authentication.principal.inNullDomain()}">
-							<a th:if="${i.domain} != null" th:href="@{/domains/{id}(id=${i.domain.id})}" th:text="${i.domain.name}">Domain</a>
-						</td>
-						<td>																	
-							<a th:href="@{/groups/{id}(id=${i.id})}" th:text="${i.name}">Name A</a>
-						</td>
-						<td th:text="${i.boardCount}">2</td>
-						<td th:text="${{i.lastResultTime}}">2017-01-01 12:00:00</td>
-						<td>
-							<div th:replace="field::status(${i.groupStatus})">OK</div>
-						</td>							
-						<td>		
-							<div class="pull-right">
-								<div th:replace="table::edit(@{'/groups/' + ${i.id}},false)"></div>
-							</div>
-							<div class="pull-right">
-								<div th:replace="table::delete(@{'/groups/delete/' + ${i.id}},false)"></div>
-							</div>														  								  								  								
-						</td>
-					</tr>
-				</tbody>
-			</table>			
-		<div th:replace="table::pagination"></div>		
-	</div>	
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{nav.groups}">All groups</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th th:if="${#authentication.principal.inNullDomain()}">
+              <a
+                class="sorted"
+                sd:pagination-sort="domainName"
+                th:text="#{e.domain}"
+                >Domain</a
+              >
+            </th>
+            <th>
+              <a class="sorted" sd:pagination-sort="name" th:text="#{a.name}"
+                >Name</a
+              >
+            </th>
+            <th th:text="#{nav.boards}"></th>
+            <th th:text="#{board.lrt}"></th>
+            <th th:text="#{board.status}"></th>
+            <th>
+              <div class="pull-right">
+                <div th:replace="table::add(@{'/groups/create'})"></div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="i : ${groups}">
+            <td th:if="${#authentication.principal.inNullDomain()}">
+              <a
+                th:if="${i.domain} != null"
+                th:href="@{/domains/{id}(id=${i.domain.id})}"
+                th:text="${i.domain.name}"
+                >Domain</a
+              >
+            </td>
+            <td>
+              <a th:href="@{/groups/{id}(id=${i.id})}" th:text="${i.name}"
+                >Name A</a
+              >
+            </td>
+            <td th:text="${i.boardCount}">2</td>
+            <td th:text="${{i.lastResultTime}}">2017-01-01 12:00:00</td>
+            <td>
+              <div th:replace="field::status(${i.groupStatus})">OK</div>
+            </td>
+            <td>
+              <div class="pull-right">
+                <div
+                  th:replace="table::edit(@{'/groups/' + ${i.id}},false)"
+                ></div>
+              </div>
+              <div class="pull-right">
+                <div
+                  th:replace="table::delete(@{'/groups/delete/' + ${i.id}},false)"
+                ></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div th:replace="table::pagination"></div>
+    </div>
+  </body>
 </html>

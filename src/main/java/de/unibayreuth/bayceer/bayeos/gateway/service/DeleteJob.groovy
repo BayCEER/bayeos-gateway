@@ -1,17 +1,18 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
+import bayeos.frame.types.LabeledFrame
 import groovy.sql.Sql
 import java.sql.SQLException
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
-import org.apache.log4j.Logger
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import bayeos.frame.types.NumberType
-import bayeos.frame.types.LabeledFrame
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
 
 
 @Component
@@ -30,7 +31,7 @@ class DeleteJob implements Runnable {
 	@Autowired
 	private FrameService frameService
 	
-	private Logger log = Logger.getLogger(DeleteJob.class)
+	private Logger log = LoggerFactory.getLogger(DeleteJob.class)
 
 	@Override
 	public void run() {

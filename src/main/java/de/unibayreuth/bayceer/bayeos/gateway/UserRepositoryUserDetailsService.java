@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 
 
 @Service

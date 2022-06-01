@@ -15,9 +15,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ContactRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.NotificationRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.NotificationRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.ContactRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 
 @Controller
 public class ProfileController extends AbstractController {
@@ -37,7 +37,7 @@ public class ProfileController extends AbstractController {
 			return "editProfile";
 		}						
 		
-		User s = repo.findOne(user.getId());		
+		User s = repo.findOne(userSession.getUser(), user.getId());		
 		user.setPassword(s.getPassword());
 		user.setDomain(s.getDomain());
 				
@@ -70,7 +70,7 @@ public class ProfileController extends AbstractController {
 	
 	@RequestMapping(value="/profile/edit", method=RequestMethod.GET)
 	public String edit(Model model){	
-		User u = repo.findOne(userSession.getUser().getId());					
+		User u = repo.findOne(userSession.getUser(), userSession.getUser().getId());					
 		model.addAttribute("user", u);		
 		return "editProfile";		
 	}

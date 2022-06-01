@@ -1,52 +1,80 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{nav.channelFunctions}">All functions</title>
-</head>
-<body>
-	<div layout:fragment="content">
-			<h3 th:text="#{nav.channelFunctions}">Units</h3>			
-			<table class="table table-striped" >
-				<thead>
-					<tr>
-						<th th:if="${#authentication.principal.inNullDomain()}">
-							<a class="sorted" sd:pagination-sort="domainName" th:text="#{e.domain}">Domain</a>
-						</th>
-						<th>
-							<a class="sorted" sd:pagination-sort="name" th:text="#{a.name}">Name</a>
-						</th>										
-						<th>
-							<div class="pull-right">
-								<div th:replace="table::add(@{'/channelFunctions/create'})">
-								</div>				
-							</div>
-						</th>
-					</tr>					
-			
-				</thead>
-				<tbody>
-					<tr th:each="f : ${channelFunctions}">
-						<td th:if="${#authentication.principal.inNullDomain()}">
-								<a th:if="${f.domain} != null" th:href="@{/domains/{id}(id=${f.domain.id})}" th:text="${f.domain.name}">Domain</a>
-						</td>
-						<td>
-						<span th:if="${f.domain == null}" class="glyphicon glyphicon-share" th:title="#{tt.publicObject}"></span>
-						<a th:href="@{/channelFunctions/{id}(id=${f.id})}"	th:text="${f.getFunctionHead()}">Name A</a>
-						</td>											
-						<td>
-							<div class="pull-right">	
-							<th:block th:if="${(#authentication.principal.domainId eq f.domainId) or #authentication.principal.inNullDomain()}">																			
-								<div th:replace="table::edit(@{'/channelFunctions/' + ${f.id}},false)"></div>
-								<div th:replace="table::delete(@{'/channelFunctions/delete/' + ${f.id}},false)"></div>
-							</th:block>
-							</div>  								  								  								
-						</td>
-					</tr>
-				</tbody>
-			</table>			
-		<div th:replace="table::pagination"></div>		
-	</div>	
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{nav.channelFunctions}">All functions</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{nav.channelFunctions}">Units</h3>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th th:if="${#authentication.principal.inNullDomain()}">
+              <a
+                class="sorted"
+                sd:pagination-sort="domainName"
+                th:text="#{e.domain}"
+                >Domain</a
+              >
+            </th>
+            <th>
+              <a class="sorted" sd:pagination-sort="name" th:text="#{a.name}"
+                >Name</a
+              >
+            </th>
+            <th>
+              <div class="pull-right">
+                <div
+                  th:replace="table::add(@{'/channelFunctions/create'})"
+                ></div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="f : ${channelFunctions}">
+            <td th:if="${#authentication.principal.inNullDomain()}">
+              <a
+                th:if="${f.domain} != null"
+                th:href="@{/domains/{id}(id=${f.domain.id})}"
+                th:text="${f.domain.name}"
+                >Domain</a
+              >
+            </td>
+            <td>
+              <span
+                th:if="${f.domain == null}"
+                class="glyphicon glyphicon-share"
+                th:title="#{tt.publicObject}"
+              ></span>
+              <a
+                th:href="@{/channelFunctions/{id}(id=${f.id})}"
+                th:text="${f.getFunctionHead()}"
+                >Name A</a
+              >
+            </td>
+            <td>
+              <div class="pull-right">
+                <th:block
+                  th:if="${(#authentication.principal.domainId eq f.domainId) or #authentication.principal.inNullDomain()}"
+                >
+                  <div
+                    th:replace="table::edit(@{'/channelFunctions/' + ${f.id}},false)"
+                  ></div>
+                  <div
+                    th:replace="table::delete(@{'/channelFunctions/delete/' + ${f.id}},false)"
+                  ></div>
+                </th:block>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div th:replace="table::pagination"></div>
+    </div>
+  </body>
 </html>

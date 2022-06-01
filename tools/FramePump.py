@@ -9,7 +9,7 @@ from os import path
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(message)s")                
 
 NAME = 'FramePump'
-URL = 'http://localhost:5533/gateway/frame/saveFlat'
+URL = 'http://localhost:5533/frame/saveFlat'
 USER= 'root'
 PASSWORD = 'bayeos'
 PATH = path.join(tempfile.gettempdir(),'bayeos-device')

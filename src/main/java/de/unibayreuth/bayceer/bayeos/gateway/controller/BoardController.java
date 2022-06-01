@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Notification;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardGroupRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardTemplateRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ContactRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.NotificationRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.NotificationRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardGroupRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardTemplateRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.ContactRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.BoardTemplateService;
 
 @Controller
@@ -103,7 +104,7 @@ public class BoardController extends AbstractController {
 
 	@RequestMapping(value = "/boards/selectTemplate/{id}", method = RequestMethod.GET)
 	public String selectBoardTemplate(@PathVariable Long id, Model model) {
-		model.addAttribute("boardTemplates", repoBoardTemplate.findAllSortedByName(userSession.getUser(), null));
+		model.addAttribute("boardTemplates", repoBoardTemplate.findAll(userSession.getUser(), null));
 		model.addAttribute("boardId", id);
 		return "selectBoardTemplate";
 	}
@@ -184,10 +185,10 @@ public class BoardController extends AbstractController {
 		
 	@RequestMapping(value="/boards/removeNotification/{id}", method = RequestMethod.GET)
 	public String removeNotification(@PathVariable("id") Long id) {				
-		Notification n = repoNotification.findOne(id);		
+		Notification n = repoNotification.findById(id).orElseThrow(()-> new EntityNotFoundException());		
 		checkWrite(n.getBoard());
 		Long b = n.getBoard().getId();		
-		repoNotification.delete(n.getId());	
+		repoNotification.deleteById(n.getId());	
 		return "redirect:/boards/" + b + "?tab=notifications";
 	}
 	

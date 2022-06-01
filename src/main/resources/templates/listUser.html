@@ -1,94 +1,179 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{nav.users}">All Users</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<h3 th:text="#{nav.users}">Users</h3>
-		<div class="row">
-			<div class="col-xs-12">				
-				<div class="row">
-					<div class="col-xs-12">
-						<table class="table table-striped">
-							<thead>
-								<tr>
-									<th th:if="${#authentication.principal.inNullDomain()}"><a
-										class="sorted" sd:pagination-sort="domainName"
-										th:text="#{e.domain}">Domain</a></th>
-									<th><a class="sorted" sd:pagination-sort="lastName"
-										th:text="#{user.lastName}">Last Name</a></th>										
-									<th><a class="sorted" sd:pagination-sort="firstName"
-										th:text="#{user.firstName}">First Name</a></th>										
-									<th><a class="sorted" sd:pagination-sort="name"
-										th:text="#{user.name}">Name</a></th>
-									<th><a class="sorted" sd:pagination-sort="email"
-										th:text="#{contact.email}">E-mail</a></th>
-									<th><a class="sorted" sd:pagination-sort="role"
-										th:text="#{user.role}">Role</a></th>
-									
-									<th><a class="sorted" sd:pagination-sort="locked"
-										th:text="#{user.locked}">Locked</a></th>
-									<th>
-										<div class="btn-group pull-right">
-										<button class="btn btn-default dropdown-toggle" type="button"
-											data-toggle="dropdown">
-										<span class="glyphicon glyphicon-plus"> </span> <span
-											th:text="#{e.user}"></span> <span class="caret"></span>
-										</button>
-											<ul class="dropdown-menu">
-												<li>
-													<a th:href="@{'/users/create'}" th:text="#{user.local}"></a> 	
-												</li>																					
-												<li th:if="${@ldapRestController.ldap_search}">
-													<a th:href="@{'/ldap/selectUser'}" th:text="#{user.ldap}">LDAP User</a>
-												</li>
-											</ul>
-										</div>
-									</th>									
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:each="u : ${users}">
-									<td th:if="${#authentication.principal.inNullDomain()}">
-										<a th:if="${u.domain} != null" th:href="@{/domains/{id}(id=${u.domain.id})}" th:text="${u.domain.name}">Domain</a>
-									</td>
-									<td th:text="${u.lastName}">Last Name</td>
-									<td th:text="${u.firstName}">First Name</td>
-									<td>
-										<a th:href="@{/users/{id}(id=${u.id})}"	th:text="${u.name}">User A</a>
-									</td>
-									<td th:text="${u.contact?.email}">E-mail</td>
-									<td th:text="${u.role}">Role</td>
-									<td>
-										<div th:include="field::yesno (${u.locked})"></div>
-									</td>									
-									<td>
-																			
-										<div class="btn-group pull-right">
-											<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown"><span
-												th:text="#{e.user}"></span> <span class="caret"></span>
-											</button>
-											<ul class="dropdown-menu">
-												<li><a th:href="@{'/users/' + ${u.id}}"><span class="glyphicon glyphicon-edit"></span> <span th:text="#{action.edit}"></span></a></li>
-												<li><a th:href="@{'/users/editPassword/' + ${u.id}}"><span class="glyphicon glyphicon-lock"></span> <span th:text="#{action.editPassword}"></span></a></li>												
-												<th:block th:if="${u.id} != ${#authentication.principal.id}">
-													<li><a th:href="@{'/users/delete/' + ${u.id}}"><span class="glyphicon glyphicon-remove"></span> <span th:text="#{action.delete}"></span></a></li>
-												</th:block>												
-											</ul>
-										</div>											
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<div th:replace="table::pagination"></div>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{nav.users}">All Users</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{nav.users}">Users</h3>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="row">
+            <div class="col-xs-12">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th th:if="${#authentication.principal.inNullDomain()}">
+                      <a
+                        class="sorted"
+                        sd:pagination-sort="domainName"
+                        th:text="#{e.domain}"
+                        >Domain</a
+                      >
+                    </th>
+                    <th>
+                      <a
+                        class="sorted"
+                        sd:pagination-sort="lastName"
+                        th:text="#{user.lastName}"
+                        >Last Name</a
+                      >
+                    </th>
+                    <th>
+                      <a
+                        class="sorted"
+                        sd:pagination-sort="firstName"
+                        th:text="#{user.firstName}"
+                        >First Name</a
+                      >
+                    </th>
+                    <th>
+                      <a
+                        class="sorted"
+                        sd:pagination-sort="name"
+                        th:text="#{user.name}"
+                        >Name</a
+                      >
+                    </th>
+                    <th>
+                      <a
+                        class="sorted"
+                        sd:pagination-sort="email"
+                        th:text="#{contact.email}"
+                        >E-mail</a
+                      >
+                    </th>
+                    <th>
+                      <a
+                        class="sorted"
+                        sd:pagination-sort="role"
+                        th:text="#{user.role}"
+                        >Role</a
+                      >
+                    </th>
 
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</body>
+                    <th>
+                      <a
+                        class="sorted"
+                        sd:pagination-sort="locked"
+                        th:text="#{user.locked}"
+                        >Locked</a
+                      >
+                    </th>
+                    <th>
+                      <div class="btn-group pull-right">
+                        <button
+                          class="btn btn-default dropdown-toggle"
+                          type="button"
+                          data-toggle="dropdown"
+                        >
+                          <span class="glyphicon glyphicon-plus"> </span>
+                          <span th:text="#{e.user}"></span>
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li>
+                            <a
+                              th:href="@{'/users/create'}"
+                              th:text="#{user.local}"
+                            ></a>
+                          </li>
+                          <li th:if="${@ldapRestController.ldap_search}">
+                            <a
+                              th:href="@{'/ldap/selectUser'}"
+                              th:text="#{user.ldap}"
+                              >LDAP User</a
+                            >
+                          </li>
+                        </ul>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="u : ${users}">
+                    <td th:if="${#authentication.principal.inNullDomain()}">
+                      <a
+                        th:if="${u.domain} != null"
+                        th:href="@{/domains/{id}(id=${u.domain.id})}"
+                        th:text="${u.domain.name}"
+                        >Domain</a
+                      >
+                    </td>
+                    <td th:text="${u.lastName}">Last Name</td>
+                    <td th:text="${u.firstName}">First Name</td>
+                    <td>
+                      <a
+                        th:href="@{/users/{id}(id=${u.id})}"
+                        th:text="${u.name}"
+                        >User A</a
+                      >
+                    </td>
+                    <td th:text="${u.contact?.email}">E-mail</td>
+                    <td th:text="${u.role}">Role</td>
+                    <td>
+                      <div th:include="field::yesno (${u.locked})"></div>
+                    </td>
+                    <td>
+                      <div class="btn-group pull-right">
+                        <button
+                          class="btn btn-default btn-xs dropdown-toggle"
+                          type="button"
+                          data-toggle="dropdown"
+                        >
+                          <span th:text="#{e.user}"></span>
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li>
+                            <a th:href="@{'/users/' + ${u.id}}"
+                              ><span class="glyphicon glyphicon-edit"></span>
+                              <span th:text="#{action.edit}"></span
+                            ></a>
+                          </li>
+                          <li>
+                            <a th:href="@{'/users/editPassword/' + ${u.id}}"
+                              ><span class="glyphicon glyphicon-lock"></span>
+                              <span th:text="#{action.editPassword}"></span
+                            ></a>
+                          </li>
+                          <th:block
+                            th:if="${u.id} != ${#authentication.principal.id}"
+                          >
+                            <li>
+                              <a th:href="@{'/users/delete/' + ${u.id}}"
+                                ><span
+                                  class="glyphicon glyphicon-remove"
+                                ></span>
+                                <span th:text="#{action.delete}"></span
+                              ></a>
+                            </li>
+                          </th:block>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div th:replace="table::pagination"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

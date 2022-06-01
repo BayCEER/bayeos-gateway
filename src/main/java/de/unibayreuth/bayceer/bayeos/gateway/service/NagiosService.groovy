@@ -2,21 +2,22 @@ package de.unibayreuth.bayceer.bayeos.gateway.service
 
 import javax.sql.DataSource
 
-import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.NagiosMessage
 import groovy.sql.Sql
 import java.sql.SQLException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 
 @Service
 class NagiosService {
 
 	@Autowired
 	DataSource dataSource
-	Logger log = Logger.getLogger(NagiosService.class)
+	Logger log = LoggerFactory.getLogger(NagiosService.class)
 	
 	NagiosMessage msgGateway() {
 		log.info("Query status of gateway")

@@ -10,8 +10,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.AssertTrue;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
+
 
 @SuppressWarnings("deprecation")
 @Entity
@@ -46,9 +46,9 @@ public class User extends NamedDomainEntity {
 				
 		
 	public void encodeNewPassword() {
-		MessageDigestPasswordEncoder pwe = new ShaPasswordEncoder();
+		MessageDigestPasswordEncoder pwe = new MessageDigestPasswordEncoder("SHA");
 		pwe.setEncodeHashAsBase64(true);
-		this.password = pwe.encodePassword(newPassword,null);						
+		this.password = pwe.encode(newPassword);						
 	}
 	
 	@AssertTrue

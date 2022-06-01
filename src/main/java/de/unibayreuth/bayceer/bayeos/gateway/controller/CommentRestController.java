@@ -1,10 +1,11 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
-import static org.springframework.data.jpa.domain.Specifications.where;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -26,9 +27,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Comment;
 import de.unibayreuth.bayceer.bayeos.gateway.model.CommentDTO;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.CommentRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.CommentRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
+
 
 @RestController
 public class CommentRestController extends AbstractController {
@@ -69,7 +71,7 @@ public class CommentRestController extends AbstractController {
 	@RequestMapping(path = "/rest/comments", method = RequestMethod.POST)
 	public ResponseEntity create(@RequestBody CommentDTO co) {		
 		Comment cs = cAdapter.toEntity(co);
-		checkWrite(repoBoard.findOne(cs.getBoard().getId()));
+		checkWrite(repoBoard.findById(cs.getBoard().getId()).orElseThrow(()-> new EntityNotFoundException()));
 		cs = repo.save(cs);				
 		return new ResponseEntity<CommentDTO>(cAdapter.fromEntity(cs), HttpStatus.CREATED);
 	}
@@ -78,7 +80,7 @@ public class CommentRestController extends AbstractController {
 	@RequestMapping(path="/rest/comments",method=RequestMethod.PUT)
 	public ResponseEntity update(@RequestBody CommentDTO co) {		
 		Comment cs = cAdapter.toEntity(co);	
-		checkWrite(repoBoard.findOne(cs.getBoard().getId()));
+		checkWrite(repoBoard.findById(cs.getBoard().getId()).orElseThrow(()-> new EntityNotFoundException()));
 		cs = repo.save(cs);				
 		return new ResponseEntity<CommentDTO>(cAdapter.fromEntity(cs), HttpStatus.OK);			
 	}
@@ -87,12 +89,12 @@ public class CommentRestController extends AbstractController {
 	@RequestMapping(path = "/rest/comments/{id}", method = RequestMethod.DELETE)
 	@Transactional
 	public ResponseEntity delete(@PathVariable Long id) {
-		if (repo.exists(id)) {
+		if (repo.existsById(id)) {
 			if (userSession.getUser().inNullDomain()) {
-				repo.delete(id);
+				repo.deleteById(id);
 			} else {
-				if (repo.findOne(where(id(id)).and(domainId(userSession.getUser().getDomainId()))) != null) {
-					repo.delete(id);
+				if (repo.findOne(where(id(id)).and(domainId(userSession.getUser().getDomainId()))).orElseThrow(()-> new EntityNotFoundException()) != null) {
+					repo.deleteById(id);
 				} else {
 					return new ResponseEntity<String>("Comment not found", HttpStatus.BAD_REQUEST);
 				}
@@ -155,12 +157,12 @@ public class CommentRestController extends AbstractController {
 			} else {				
 				// ID			
 				if (co.getId()!=null) {
-					c.setBoard(repo.findOne(co.getId()).getBoard());					
+					c.setBoard(repo.findById(co.getId()).orElseThrow(()-> new EntityNotFoundException()).getBoard());					
 				} 				
 			}
 			// User
 			if (co.getUserID() != null) {
-				c.setUser(repoUser.findOne(co.getUserID()));				
+				c.setUser(repoUser.findById(co.getUserID()).orElseThrow(()->new EntityNotFoundException()));				
 			} else {
 				c.setUser(userSession.getUser());
 			}			

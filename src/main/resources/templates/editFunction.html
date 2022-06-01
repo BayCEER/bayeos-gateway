@@ -1,19 +1,35 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{e.function}">Function</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<h3 th:text="#{e.function}">Function</h3>
-		<form method="post" action="#" th:action="@{/functions/save}" th:object="${function}">
-		 	<input type="hidden" th:field="*{id}"/>		 			 	
-		 	<div th:replace="field::selectDomain"></div>
-			<div th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>			
-			<button th:if="${writeable}" th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
-		</form>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{e.function}">Function</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{e.function}">Function</h3>
+      <form
+        method="post"
+        action="#"
+        th:action="@{/functions/save}"
+        th:object="${function}"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <div th:replace="field::selectDomain"></div>
+        <div
+          th:replace="field::text(prop='name',label=#{a.name},required=true)"
+        ></div>
+        <button
+          th:if="${writeable}"
+          th:text="#{action.save}"
+          type="submit"
+          class="btn btn-default"
+        >
+          Save
+        </button>
+      </form>
+    </div>
+  </body>
 </html>

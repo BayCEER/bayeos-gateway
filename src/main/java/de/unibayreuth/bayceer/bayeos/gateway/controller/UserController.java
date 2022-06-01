@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapRestController;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Role;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ContactRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.ContactRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 
 @Controller
 public class UserController extends AbstractController {
@@ -76,7 +77,7 @@ public class UserController extends AbstractController {
 		if (user.getNewPassword()!=null) {
 			user.encodeNewPassword();		
 		}  else if (user.getId() != null) {				
-			user.setPassword(repo.findOne(user.getId()).getPassword());
+			user.setPassword(repo.findById(user.getId()).orElseThrow(()-> new EntityNotFoundException()).getPassword());
 		}
 														
 		if (user.getContact().getEmail() == null) {						 
@@ -109,7 +110,7 @@ public class UserController extends AbstractController {
 	
 	@RequestMapping(value="/users/editPassword/{id}", method=RequestMethod.GET)
 	public String editPassword(@PathVariable Long id , Model model) {
-		User u = repo.findOne(id);				 
+		User u = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());				 
 		u.setPassword(null);
 		model.addAttribute("user",u);
 		return "editPassword";
@@ -136,7 +137,7 @@ public class UserController extends AbstractController {
 	
 	@RequestMapping(value="/users/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-		User u = repo.findOne(id);				 
+		User u = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());				 
 		u.setPassword(null);
 		model.addAttribute("user",u);		
 		return "editUser";		

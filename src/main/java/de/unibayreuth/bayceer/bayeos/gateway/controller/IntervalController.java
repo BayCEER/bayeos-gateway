@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Interval;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.IntervalRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.IntervalRepository;
 
 @Controller
 public class IntervalController extends AbstractController {
@@ -51,7 +51,7 @@ public class IntervalController extends AbstractController {
 	@RequestMapping(value="/intervals", method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){
 		// Map name sort order to epoch (derived property) 
-		PageRequest r = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().getOrderFor("name").getDirection(), "epoch", "name");
+		PageRequest r = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().getOrderFor("name").getDirection(), "epoch", "name");
 		model.addAttribute("intervals", repo.findAll(userSession.getUser(),domainFilter,r));
 		return "listInterval";
 	}

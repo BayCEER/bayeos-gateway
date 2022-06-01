@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
 
 
 

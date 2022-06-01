@@ -1,38 +1,52 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{nav.domains}">All Domains</title>
-</head>
-<body>
-	<div layout:fragment="content">	
-		<h3 th:text="#{nav.domains}">Domains</h3>
-		 	
-		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th><a class="sorted" sd:pagination-sort="name"	th:text="#{a.name}">Name</a></th>
-					<th>
-						<div class="btn-group pull-right">
-							<div th:replace="table::add(@{'/domains/create'})"></div>									
-						</div>
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="d : ${domains}">
-					<td><a th:href="@{/domains/{id}(id=${d.id})}" th:text="${d.name}">Domain A</a></td>															
-					<td>
-						<div class="pull-right">
-							<div th:replace="table::edit(@{'/domains/' + ${d.id}},false)"></div>													
-							<div th:replace="table::delete(@{'/domain/delete/' + ${d.id}},false)"></div>							
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>				
-		<div th:replace="table::pagination"></div>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{nav.domains}">All Domains</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{nav.domains}">Domains</h3>
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>
+              <a class="sorted" sd:pagination-sort="name" th:text="#{a.name}"
+                >Name</a
+              >
+            </th>
+            <th>
+              <div class="btn-group pull-right">
+                <div th:replace="table::add(@{'/domains/create'})"></div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="d : ${domains}">
+            <td>
+              <a th:href="@{/domains/{id}(id=${d.id})}" th:text="${d.name}"
+                >Domain A</a
+              >
+            </td>
+            <td>
+              <div class="pull-right">
+                <div
+                  th:replace="table::edit(@{'/domains/' + ${d.id}},false)"
+                ></div>
+                <div
+                  th:replace="table::delete(@{'/domain/delete/' + ${d.id}},false)"
+                ></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div th:replace="table::pagination"></div>
+    </div>
+  </body>
 </html>

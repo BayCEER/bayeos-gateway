@@ -17,8 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelFunction;
 import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelFunctionParameter;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelFunctionParameterRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ChannelFunctionRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.ChannelFunctionParameterRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.ChannelFunctionRepository;
 
 @Controller
 public class ChannelFunctionController extends AbstractController{
@@ -66,7 +66,7 @@ public class ChannelFunctionController extends AbstractController{
 	public String removeParam(Model model, ChannelFunction cf, @RequestParam Integer removeParam){		
 		ChannelFunctionParameter cfp = cf.getParameters().get(removeParam.intValue());		
 		if (cfp.getId() != null){			
-			repoParam.delete(cfp.getId());			
+			repoParam.deleteById(cfp.getId());			
 		}	
 		cf.getParameters().remove(removeParam.intValue());
 		model.addAttribute("channelFunction",cf);

@@ -17,8 +17,8 @@ import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 import de.unibayreuth.bayceer.bayeos.gateway.model.UserDTO;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 
 @RestController
 public class UserRestController {
@@ -36,13 +36,13 @@ public class UserRestController {
 	public ResponseEntity findAll(@RequestParam(required = false) String domainName) {		
 		List<User> users = null;
 		if (domainName == null || domainName.isEmpty()) {			
-			users = repo.findAllSortedByName(userSession.getUser(),null);				
+			users = repo.findAll(userSession.getUser(),null);				
 		} else {			
 			Domain d = repoDom.findOneByName(domainName);			
 			if (d != null) {
 				DomainFilter f = new DomainFilter();
 				f.setId(d.getId());			
-				users = repo.findAllSortedByName(userSession.getUser(), f);	
+				users = repo.findAll(userSession.getUser(), f);	
 			} else {
 				return new ResponseEntity<String>("Domain not found", HttpStatus.NOT_FOUND);
 			}

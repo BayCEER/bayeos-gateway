@@ -6,29 +6,27 @@ import java.text.SimpleDateFormat
 import javax.script.ScriptEngine
 import javax.sql.DataSource
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 import org.postgresql.PGConnection
 import org.postgresql.copy.CopyIn
 import org.postgresql.copy.CopyManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-
 import bayeos.frame.FrameParserException
 import bayeos.frame.Parser
 import bayeos.frame.types.ByteFrame
 import bayeos.frame.types.MapUtils
-import de.unibayreuth.bayceer.bayeos.gateway.event.Event
 import de.unibayreuth.bayceer.bayeos.gateway.event.EventProducer
-import de.unibayreuth.bayceer.bayeos.gateway.event.EventType
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewBoardEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewChannelEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewMessageEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewObservationEvent
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository
-import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.VirtualChannelRepository
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository
 import groovy.sql.Sql
-import org.apache.commons.codec.binary.Base64
 
 
 @Service
@@ -49,7 +47,7 @@ class FrameService {
 	@Autowired
 	BoardRepository boardRepo
 
-	private Logger log = Logger.getLogger(FrameService.class)
+	private Logger log = LoggerFactory.getLogger(FrameService.class)
 
 	class Board {
 		Integer domainId
@@ -64,11 +62,11 @@ class FrameService {
 	
 	
 	def boolean saveFrame(Long domainId, String sender, byte[] frame) {
-		return saveFrames(domainId,sender,[Base64.encodeBase64String(frame)] as List<String>)
+		return saveFrames(domainId,sender,[Base64.getEncoder().encodeToString(frame)] as List<String>)
 	}
 	
 	def boolean saveFrame(String sender, ByteFrame frame) {
-		return saveFrames(null,sender,[Base64.encodeBase64String(frame.getBytes())] as List<String>)
+		return saveFrames(null,sender,[Base64.getEncoder().encodeToString(frame.getBytes())] as List<String>)
 	}
 
 	def boolean saveFrames(Long domainId, String sender, List<String> frames) {

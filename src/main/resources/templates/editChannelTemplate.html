@@ -1,54 +1,84 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{e.channelTemplate}">Channel Template</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<h3 th:text="#{e.channelTemplate}">Channel Template</h3>		
-		<form id="channelTemplate" method="post" action="#" th:action="@{/channelTemplates/save}" th:object="${channelTemplate}">
-			<input type="hidden" th:field="*{id}"/>		
-			<input type="hidden" th:field="*{boardTemplate.id}"/>			
-			<div id="props" class="block">
-				<div th:text="#{a.properties}" class="block-header">Main</div>
-				<div class="row">
-					<div class="col-sm-6">
-						<div th:replace="field::text(prop='nr',label=#{chaTemplate.nr},required=true)"></div>
-					</div>
-					<div class="col-sm-6">
-						<div th:replace="field::text(prop='name',label=#{chaTemplate.name},required=true)"></div>
-					</div>				
-				</div>				
-				<div class="row">
-					<div class="col-sm-6">
-						<div th:replace="field::text('phenomena',#{chaTemplate.phenomena})"></div>
-					</div>
-					<div class="col-sm-6">
-						<div th:replace="field::select('unit',#{e.unit},${units})"></div>
-					</div>								
-				</div>
-				
-				<div class="row">
-						<div class="col-sm-4">
-							<div th:replace="field::select('aggrInterval',#{e.interval},${intervals})"></div>							
-						</div>
-						<div class="col-sm-4">
-							<div th:replace="field::select('aggrFunction',#{e.function},${functions})"></div>							
-						</div>
-						<div class="col-sm-4">
-							<div th:replace="field::select('spline',#{e.spline},${splines})"></div>							
-						</div>
-				</div>				
-			</div>
-			
-			<div id="defaults" th:replace="block::channelSettings(#{chk.header})"></div>
-						
-			<div class="form-group block-action">
-				<button type="submit" th:if="${writeable}" class="btn btn-default" th:text="#{action.save}">Save</button>				
-			</div>	
-		</form>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{e.channelTemplate}">Channel Template</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{e.channelTemplate}">Channel Template</h3>
+      <form
+        id="channelTemplate"
+        method="post"
+        action="#"
+        th:action="@{/channelTemplates/save}"
+        th:object="${channelTemplate}"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{boardTemplate.id}" />
+        <div id="props" class="block">
+          <div th:text="#{a.properties}" class="block-header">Main</div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div
+                th:replace="field::text(prop='nr',label=#{chaTemplate.nr},required=true)"
+              ></div>
+            </div>
+            <div class="col-sm-6">
+              <div
+                th:replace="field::text(prop='name',label=#{chaTemplate.name},required=true)"
+              ></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div
+                th:replace="field::text('phenomena',#{chaTemplate.phenomena})"
+              ></div>
+            </div>
+            <div class="col-sm-6">
+              <div th:replace="field::select('unit',#{e.unit},${units})"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-4">
+              <div
+                th:replace="field::select('aggrInterval',#{e.interval},${intervals})"
+              ></div>
+            </div>
+            <div class="col-sm-4">
+              <div
+                th:replace="field::select('aggrFunction',#{e.function},${functions})"
+              ></div>
+            </div>
+            <div class="col-sm-4">
+              <div
+                th:replace="field::select('spline',#{e.spline},${splines})"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="defaults"
+          th:replace="block::channelSettings(#{chk.header})"
+        ></div>
+
+        <div class="form-group block-action">
+          <button
+            type="submit"
+            th:if="${writeable}"
+            class="btn btn-default"
+            th:text="#{action.save}"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
 </html>

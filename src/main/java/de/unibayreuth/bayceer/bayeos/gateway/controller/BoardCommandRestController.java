@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,8 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardCommand;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardCommandDTO;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardCommandRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.BoardCommandRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
 
 
 
@@ -62,7 +64,7 @@ public class BoardCommandRestController extends AbstractController {
 		if (!user.inNullDomain()) {
 			checkRead(board);	
 		}				
-		BoardCommand bc = repoCommand.findOnePendingByOrigin(origin);		
+		BoardCommand bc = repoCommand.findFirstPendingByOrigin(origin);		
 		if (bc == null) {
 			return new ResponseEntity<String>("No command found", HttpStatus.OK);
 		}
@@ -96,7 +98,7 @@ public class BoardCommandRestController extends AbstractController {
 	// Find board command by id 
 	@RequestMapping(path = "/rest/boardcommand/{id}", method = RequestMethod.GET)
 	public ResponseEntity get(@PathVariable Long id) {
-		BoardCommand bc = repoCommand.findOne(id);		
+		BoardCommand bc = repoCommand.findById(id).orElseThrow(()-> new EntityNotFoundException());		
 		if (bc == null) {
 			return new ResponseEntity<String>("No command found", HttpStatus.OK);
 		}
@@ -110,7 +112,7 @@ public class BoardCommandRestController extends AbstractController {
 	// Update board command response 
 	@RequestMapping(path="/rest/boardcommand/{id}/response",method = RequestMethod.PATCH)
 	public ResponseEntity setResponse(@PathVariable Long id, @RequestBody BoardCommandDTO cmd) {
-		BoardCommand bc = repoCommand.findOne(id);		
+		BoardCommand bc = repoCommand.findById(id).orElseThrow(()-> new EntityNotFoundException());		
 		if (bc == null) {
 			return new ResponseEntity<String>("No command found", HttpStatus.OK);
 		}
@@ -128,7 +130,7 @@ public class BoardCommandRestController extends AbstractController {
 	@RequestMapping(path="/rest/boardcommand/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity deleteCommandById(@PathVariable Long id) {
 		
-		BoardCommand bc = repoCommand.findOne(id);		
+		BoardCommand bc = repoCommand.findById(id).orElseThrow(()-> new EntityNotFoundException());		
 		if (bc == null) {
 			return new ResponseEntity<String>("No command found", HttpStatus.OK);
 		}

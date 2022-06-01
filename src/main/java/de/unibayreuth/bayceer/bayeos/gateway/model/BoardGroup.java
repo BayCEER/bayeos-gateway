@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 
@@ -15,6 +16,7 @@ public class BoardGroup extends NamedDomainEntity {
 		
 	
 	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.PERSIST)
+	@OrderBy("name")
 	List<Board> boards;
 
 	@Column(name="db_folder_id")

@@ -1,17 +1,16 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service;
 
+import bayeos.frame.types.LabeledFrame
+import bayeos.frame.types.NumberType
 import groovy.sql.Sql
 import java.sql.SQLException
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
-
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import bayeos.frame.types.NumberType
-import bayeos.frame.types.LabeledFrame
 
 
 @Component
@@ -26,7 +25,7 @@ public class CalculateObsJob implements Runnable {
 	@Value('${CALC_WAIT_SECS:120}')
 	private int waitSecs
 
-	private Logger log = Logger.getLogger(CalculateObsJob.class)
+	private Logger log = LoggerFactory.getLogger(CalculateObsJob.class)
 
 	@PostConstruct
 	public void start(){
@@ -93,8 +92,7 @@ public class CalculateObsJob implements Runnable {
 				frameService.saveFrame("\$SYS/CalculateJob",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'calculated':${rowCalculated},'archived':${rowArchived},'millis':${millis}}".toString()))
 				Thread.sleep(1000*waitSecs);
 			} catch (InterruptedException e){
-				break;
-			}
+				break			}
 		}
 	}
 

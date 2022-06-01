@@ -17,8 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.KnotPoint;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Spline;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.KnotPointRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.SplineRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.KnotPointRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.SplineRepository;
 
 @Controller
 public class KnotPointController extends AbstractController{
@@ -50,7 +50,7 @@ public class KnotPointController extends AbstractController{
 			model.addAttribute("writeable",isWriteable(point.getSpline()));
 			return "editKnotPoint";
 		}				
-		checkWrite(repoSpline.findOne(point.getSpline().getId()));
+		checkWrite(repoSpline.findById(point.getSpline().getId()).orElseThrow(()-> new EntityNotFoundException()));
 		repo.save(point);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
 		return "redirect:/splines/" + point.getSpline().getId();
@@ -59,7 +59,7 @@ public class KnotPointController extends AbstractController{
 	
 	@RequestMapping(value="/knotpoints/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-		KnotPoint k = repo.findOne(id);				
+		KnotPoint k = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());				
 		model.addAttribute("knotPoint",k);
 		model.addAttribute("writeable",isWriteable(k.getSpline()));
 		return "editKnotPoint";		
@@ -68,10 +68,9 @@ public class KnotPointController extends AbstractController{
 		
 	@RequestMapping(value="/knotpoints/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) {		
-		KnotPoint k = repo.findOne(id);
-		if (k == null) throw new EntityNotFoundException("Entity not found");
+		KnotPoint k = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());		
 		checkWrite(k.getSpline());
-		repo.delete(id);
+		repo.deleteById(id);
 		redirect.addFlashAttribute("globalMessage", getActionMsg("deleted", locale));
 		return "redirect:/splines/" + k.getSpline().getId();
 	}

@@ -10,8 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import ch.qos.logback.core.joran.spi.DefaultClass;
-
 
 @Entity
 public class Upload extends NamedDomainEntity {

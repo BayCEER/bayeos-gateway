@@ -1,96 +1,128 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{e.boardTemplate}">BoardTemplate</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<h3 th:text="#{e.boardTemplate}">Edit board template</h3>
-		<form method="post" action="#" th:action="@{/boardTemplates/save}" th:object="${boardTemplate}">
-		 	<input type="hidden" th:field="*{id}"/>	
-		 			 	
-		 				
-		 	<div id="props" class="block">
-		 		<div class="block-header" th:text="#{a.properties}">Board Template</div>
-		 		
-		 		<div class="row">
-		 			<div class="col-sm-3">
-		 				<div th:replace="field::selectDomain"></div>
-		 			</div>
-		 		</div>
-		 				 	
-		 		<div class="row">
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>
-		 			</div>
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::text('description',#{boardTemplate.desc})"></div>
-		 			</div>
-		 		</div>
-		 		<div class="row">
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::text('revision',#{boardTemplate.revision})"></div>
-		 			</div>
-		 			<div class="col-sm-6">
-		 				<div th:replace="field::url('dataSheet',#{boardTemplate.dataSheet})"></div>
-		 			</div>
-		 		</div>
-		 	</div>
-		 	
-		 	<div id="defaults" th:replace="block::boardSettings(#{a.defaultValues})"></div>
-		 			 	
-		 	
-		 	<div id="channels" class="block">
-		 		<div class="block-header" th:text="#{e.channels}">Channels</div>	
-		 		<table class="table table-striped">
-		 			<thead>
-		 				<tr>
-		 					<th>
-		 						<span th:text="#{chaTemplate.nr}">Number</span>
-							</th>
-							<th>
-		 						<span th:text="#{chaTemplate.name}">Name</span>
-							</th>
-							<th>
-		 						<span th:text="#{chaTemplate.phenomena}">Phenomena</span>
-							</th>
-							<th>
-		 						<span th:text="#{e.unit}">Unit</span>
-							</th>
-							<th>
-							<div class="pull-right" th:if="${writeable}">
-								<div th:replace="table::add(@{'/channelTemplates/create/' + ${boardTemplate.id}})">
-								</div>				
-							</div>
-							</th>
-		 				</tr>
-		 			</thead>
-		 			<tbody>
-		 				<tr th:each="t : ${boardTemplate.templates}">
-						<td><a th:href="@{/channelTemplates/{id}(id=${t.id})}"
-							th:text="${t.nr}">Nr</a>
-						</td>					
-						<td th:text="${t.name}">Name</td>
-						<td th:text="${t.phenomena}">Phenomena</td>
-						<td th:text="${t.unit}">Unit</td>
-						<td>
-							<div class="pull-right" th:if="${writeable}">
-								<div th:replace="table::edit(@{'/channelTemplates/' + ${t.id}},false)"></div>
-								<div th:replace="table::delete(@{'/channelTemplates/delete/' + ${t.id}},false)"></div>																																				
-							</div>  								  								  								
-						</td>
-					</tr>
-		 			</tbody>		 			
-		 			
-		 		</table>	 		
-		 	</div>	
-		 	<div class="form-group block-action">
-		 		<button th:if="${writeable}" th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
-		 	</div>	 						
-			
-		</form>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{e.boardTemplate}">BoardTemplate</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{e.boardTemplate}">Edit board template</h3>
+      <form
+        method="post"
+        action="#"
+        th:action="@{/boardTemplates/save}"
+        th:object="${boardTemplate}"
+      >
+        <input type="hidden" th:field="*{id}" />
+
+        <div id="props" class="block">
+          <div class="block-header" th:text="#{a.properties}">
+            Board Template
+          </div>
+
+          <div class="row">
+            <div class="col-sm-3">
+              <div th:replace="field::selectDomain"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div
+                th:replace="field::text(prop='name',label=#{a.name},required=true)"
+              ></div>
+            </div>
+            <div class="col-sm-6">
+              <div
+                th:replace="field::text('description',#{boardTemplate.desc})"
+              ></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div
+                th:replace="field::text('revision',#{boardTemplate.revision})"
+              ></div>
+            </div>
+            <div class="col-sm-6">
+              <div
+                th:replace="field::url('dataSheet',#{boardTemplate.dataSheet})"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="defaults"
+          th:replace="block::boardSettings(#{a.defaultValues})"
+        ></div>
+
+        <div id="channels" class="block">
+          <div class="block-header" th:text="#{e.channels}">Channels</div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>
+                  <span th:text="#{chaTemplate.nr}">Number</span>
+                </th>
+                <th>
+                  <span th:text="#{chaTemplate.name}">Name</span>
+                </th>
+                <th>
+                  <span th:text="#{chaTemplate.phenomena}">Phenomena</span>
+                </th>
+                <th>
+                  <span th:text="#{e.unit}">Unit</span>
+                </th>
+                <th>
+                  <div class="pull-right" th:if="${writeable}">
+                    <div
+                      th:replace="table::add(@{'/channelTemplates/create/' + ${boardTemplate.id}})"
+                    ></div>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="t : ${boardTemplate.templates}">
+                <td>
+                  <a
+                    th:href="@{/channelTemplates/{id}(id=${t.id})}"
+                    th:text="${t.nr}"
+                    >Nr</a
+                  >
+                </td>
+                <td th:text="${t.name}">Name</td>
+                <td th:text="${t.phenomena}">Phenomena</td>
+                <td th:text="${t.unit}">Unit</td>
+                <td>
+                  <div class="pull-right" th:if="${writeable}">
+                    <div
+                      th:replace="table::edit(@{'/channelTemplates/' + ${t.id}},false)"
+                    ></div>
+                    <div
+                      th:replace="table::delete(@{'/channelTemplates/delete/' + ${t.id}},false)"
+                    ></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="form-group block-action">
+          <button
+            th:if="${writeable}"
+            th:text="#{action.save}"
+            type="submit"
+            class="btn btn-default"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
 </html>

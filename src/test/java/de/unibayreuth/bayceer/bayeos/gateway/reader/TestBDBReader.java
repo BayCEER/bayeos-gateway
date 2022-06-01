@@ -1,6 +1,6 @@
 package de.unibayreuth.bayceer.bayeos.gateway.reader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

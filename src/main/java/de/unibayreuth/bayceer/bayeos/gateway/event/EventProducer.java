@@ -8,15 +8,15 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Component
+
 public class EventProducer implements Runnable {
 	
 	private boolean stopped = false;
 	private static final int QUEUE_SIZE = 10000;	
-	private Logger log = Logger.getLogger(EventProducer.class);	
+	private Logger log = LoggerFactory.getLogger(EventProducer.class);	
 	private Set<EventListener> listeners = Collections.synchronizedSet(new HashSet<EventListener>());
 	private LinkedBlockingDeque<Event> queue;
 	

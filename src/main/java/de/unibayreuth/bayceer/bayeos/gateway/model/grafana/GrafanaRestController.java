@@ -10,7 +10,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +26,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 @RequestMapping("/grafana")
 public class GrafanaRestController {
 	
-	private final Logger log = Logger.getLogger(GrafanaRestController.class);
+	private final Logger log = LoggerFactory.getLogger(GrafanaRestController.class);
 	private DataSource dataSource;
 	
     @Autowired

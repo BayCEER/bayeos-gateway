@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Function;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.FunctionRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.FunctionRepository;
 
 @Controller
 public class FunctionController extends AbstractController{

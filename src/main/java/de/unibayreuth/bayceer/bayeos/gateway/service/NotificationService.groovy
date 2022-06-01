@@ -1,27 +1,20 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service;
 
-import java.sql.SQLException
-
 import javax.annotation.PostConstruct
 import javax.mail.internet.MimeMessage
-import javax.servlet.ServletContext
 import javax.sql.DataSource
 
-import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.ApplicationContext
-import org.springframework.mail.MailException
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Component
-import org.thymeleaf.TemplateEngine
-import org.thymeleaf.spring4.SpringTemplateEngine
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 import de.unibayreuth.bayceer.bayeos.gateway.NotificationConfig
-import de.unibayreuth.bayceer.bayeos.gateway.model.NagiosStatus
 import groovy.sql.Sql
+import java.sql.SQLException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 
 @Component
 public class NotificationService implements Runnable {
@@ -38,7 +31,7 @@ public class NotificationService implements Runnable {
 	@Autowired
 	private NotificationConfig config
 
-	private Logger log = Logger.getLogger(NotificationService.class)
+	private Logger log = LoggerFactory.getLogger(NotificationService.class)
 	
 	
 	@PostConstruct

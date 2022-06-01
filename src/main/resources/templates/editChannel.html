@@ -1,65 +1,98 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{e.channel}">Channel</title>
-</head>
-<body>
-	<div layout:fragment="content">				
-		<form id="channel" method="post" action="#" th:action="@{/channels/save}" th:object="${channel}">
-			<input type="hidden" th:field="*{id}"/>		
-			<input type="hidden" th:field="*{board.id}"/>
-			
-									
-			<div id="props" class="block">
-				<div th:text="#{a.properties}" class="block-header">Main</div>				
-				<div class="row">
-					<div class="col-sm-4">
-						<div th:replace="field::text(prop='nr',label=#{chaTemplate.nr},required=true)"></div>
-					</div>
-					<div class="col-sm-4">
-						<div th:replace="field::text('name',#{chaTemplate.name})"></div>
-					</div>														
-					<div class="col-sm-4">						
-							<div th:replace="field::checkbox('nagios',#{chkDev.nagios})"></div>															
-							<div th:replace="field::checkbox('autoExport',#{board.autoExport})"></div>											
-					</div>			
-				</div>				
-				<div class="row">
-					<div class="col-sm-6">
-						<div th:replace="field::text('phenomena',#{chaTemplate.phenomena})"></div>
-					</div>
-					<div class="col-sm-6">
-						<div th:replace="field::select('unit',#{e.unit},${units})"></div>
-					</div>								
-				</div>
-				
-				<div class="row">
-						<div class="col-sm-4">
-							<div th:replace="field::select('aggrInterval',#{e.interval},${intervals})"></div>							
-						</div>
-						<div class="col-sm-4">
-							<div th:replace="field::select('aggrFunction',#{e.function},${functions})"></div>							
-						</div>
-						<div class="col-sm-4">
-							<div th:replace="field::select('spline',#{e.spline},${splines})"></div>							
-						</div>
-				</div>				
-			</div>
-						
-			
-			<div id="defaults" th:replace="block::channelSettings(#{chk.header})"></div>
-			<div th:replace="block::export"></div>
-										
-			<div class="form-group block-action">
-				<button type="submit" class="btn btn-primary" th:text="#{action.save}">Save</button>
-				<a class="btn btn-default" th:href="@{/channels/delete/} + ${channel.id}" th:onclick="#{dialog.confirm}"> <span
-					class="glyphicon glyphicon-remove"></span> <span
-					th:text="#{action.delete}"></span>
-				</a>				
-			</div>	
-		</form>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{e.channel}">Channel</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <form
+        id="channel"
+        method="post"
+        action="#"
+        th:action="@{/channels/save}"
+        th:object="${channel}"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{board.id}" />
+
+        <div id="props" class="block">
+          <div th:text="#{a.properties}" class="block-header">Main</div>
+          <div class="row">
+            <div class="col-sm-4">
+              <div
+                th:replace="field::text(prop='nr',label=#{chaTemplate.nr},required=true)"
+              ></div>
+            </div>
+            <div class="col-sm-4">
+              <div th:replace="field::text('name',#{chaTemplate.name})"></div>
+            </div>
+            <div class="col-sm-4">
+              <div
+                th:replace="field::checkbox('nagios',#{chkDev.nagios})"
+              ></div>
+              <div
+                th:replace="field::checkbox('autoExport',#{board.autoExport})"
+              ></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div
+                th:replace="field::text('phenomena',#{chaTemplate.phenomena})"
+              ></div>
+            </div>
+            <div class="col-sm-6">
+              <div th:replace="field::select('unit',#{e.unit},${units})"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-4">
+              <div
+                th:replace="field::select('aggrInterval',#{e.interval},${intervals})"
+              ></div>
+            </div>
+            <div class="col-sm-4">
+              <div
+                th:replace="field::select('aggrFunction',#{e.function},${functions})"
+              ></div>
+            </div>
+            <div class="col-sm-4">
+              <div
+                th:replace="field::select('spline',#{e.spline},${splines})"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="defaults"
+          th:replace="block::channelSettings(#{chk.header})"
+        ></div>
+        <div th:replace="block::export"></div>
+
+        <div class="form-group block-action">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            th:text="#{action.save}"
+          >
+            Save
+          </button>
+          <a
+            class="btn btn-default"
+            th:href="@{/channels/delete/} + ${channel.id}"
+            th:onclick="#{dialog.confirm}"
+          >
+            <span class="glyphicon glyphicon-remove"></span>
+            <span th:text="#{action.delete}"></span>
+          </a>
+        </div>
+      </form>
+    </div>
+  </body>
 </html>

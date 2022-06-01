@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
 
 @Controller
 public class LoginController {

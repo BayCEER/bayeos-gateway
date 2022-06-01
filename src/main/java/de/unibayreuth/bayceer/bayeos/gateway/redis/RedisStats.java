@@ -5,14 +5,16 @@ import java.net.UnknownHostException;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.DomainRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
@@ -40,7 +42,7 @@ public class RedisStats implements Runnable {
 	@Autowired
 	private UserRepository repoUser;
 	
-	private Logger log = Logger.getLogger(RedisStats.class);
+	private Logger log = LoggerFactory.getLogger(RedisStats.class);
 	
 	
 	public RedisStats() {		

@@ -119,17 +119,9 @@
 </div>
 
 
-<div th:fragment="rssi(value)">
-<div th:switch="${value}">
-  	<img th:case="value &lt; -85" th:src="@{/resources/img/level_1.gif}"/>
-  	<img th:case="value &ge; -85 and value &lt; -75" th:src="@{/resources/img/level_2.gif}"/>
-  	<img th:case="value &ge; -75 and value &lt; -65"  th:src="@{/resources/img/level_3.gif}"/>
-  	<img th:case="value &ge; -65 and value &lt; -45"  th:src="@{/resources/img/level_4.gif}"/>
-  	<img th:case="value &ge; -45" th:src="@{/resources/img/level_5.gif}"/>   	
-  	<span th:case="*"></span>  										
+<div th:fragment="rssi(level)">
+  	<img  th:if="${level!=null}" th:src="@{/resources/img/level_} + ${level} + '.gif'"/>  	   	  									  	
 </div>
-</div>
-
 
 <div th:fragment="selectDomain">
 	

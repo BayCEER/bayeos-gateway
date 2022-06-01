@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
-import org.thymeleaf.templateresolver.TemplateResolver;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.ImportStatus;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Upload;
@@ -56,13 +55,12 @@ public class TestFileImportNotification {
 		
 		c.setVariable("uploads", uploads);
 		
-		TemplateResolver r = new FileTemplateResolver();
+		FileTemplateResolver r = new FileTemplateResolver();
 		r.setPrefix(templateBaseFolder);
 		r.setSuffix(".html");
 	
 		TemplateEngine e = new TemplateEngine();
 		e.setTemplateResolver(r);;
-		e.initialize();
 		
 		Files.write(Paths.get("target","fileImportNotificationEMail.html"), e.process("fileImportNotification",c).getBytes());
 	}

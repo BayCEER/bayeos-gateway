@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{e.boardTemplate}">Select Template</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<form method="post" th:action="@{/boards/applyTemplate}">
-			<input type="hidden" th:value="${boardId}" name="boardId"/>			
-			<div class="form-group">
-				<label th:text="#{e.boardTemplate} + ':'">Template:</label>
-				<select class="form-control" name="templateId">
-					<option th:each="o : ${boardTemplates}" th:text="|${o.name} ${o.revision}|" th:value="${o.id}"></option>													
-				</select>					
-			</div>			
-			<button th:text="#{action.apply}" type="submit" class="btn btn-default">Apply</button>
-		</form>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{e.boardTemplate}">Select Template</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <form method="post" th:action="@{/boards/applyTemplate}">
+        <input type="hidden" th:value="${boardId}" name="boardId" />
+        <div class="form-group">
+          <label th:text="#{e.boardTemplate} + ':'">Template:</label>
+          <select class="form-control" name="templateId">
+            <option
+              th:each="o : ${boardTemplates}"
+              th:text="|${o.name} ${o.revision}|"
+              th:value="${o.id}"
+            ></option>
+          </select>
+        </div>
+        <button th:text="#{action.apply}" type="submit" class="btn btn-default">
+          Apply
+        </button>
+      </form>
+    </div>
+  </body>
 </html>
-	

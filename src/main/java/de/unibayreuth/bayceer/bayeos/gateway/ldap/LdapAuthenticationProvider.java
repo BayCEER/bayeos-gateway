@@ -2,7 +2,8 @@ package de.unibayreuth.bayceer.bayeos.gateway.ldap;
 
 import java.io.UnsupportedEncodingException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,7 +19,7 @@ import com.novell.ldap.LDAPJSSESecureSocketFactory;
 
 import de.unibayreuth.bayceer.bayeos.gateway.CustomUserDetails;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.UserRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 
 
 
@@ -35,7 +36,7 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	private int version;
 	private UserRepository userRepo;	
 	private LDAPConnection con;	
-	private Logger log = Logger.getLogger(LdapAuthenticationProvider.class);
+	private Logger log = LoggerFactory.getLogger(LdapAuthenticationProvider.class);
 	private Boolean refineUser;	
 	private User user;
 	

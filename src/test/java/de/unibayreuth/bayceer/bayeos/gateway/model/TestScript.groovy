@@ -1,15 +1,9 @@
 package de.unibayreuth.bayceer.bayeos.gateway.model;
 
-import static org.junit.Assert.*
-
-import javax.script.Invocable
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
-
 import org.junit.Before
 import org.junit.Test
-
-import bayeos.frame.types.MapUtils
 
 class TestScript {
 

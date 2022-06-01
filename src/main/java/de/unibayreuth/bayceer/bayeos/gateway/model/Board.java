@@ -8,8 +8,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -181,6 +179,26 @@ public class Board extends NamedDomainEntity {
 
 	public void setLastRssi(Short lastRssi) {
 		this.lastRssi = lastRssi;
+	}
+	
+	public Short getRssiLevel() {
+		
+		if (lastRssi == null) {
+			return null;			
+		}		
+		if (lastRssi < -85) {
+			return 1;
+		} else if (lastRssi >= -85 && lastRssi < -75) {
+			return 2;			
+		} else if (lastRssi >= -75 && lastRssi < -65) {
+			return 3;			
+		} else if (lastRssi >= -65 && lastRssi < -45) {			
+			return 4;			
+		} else if (lastRssi >= -45) {			
+			return 5;
+		} else {
+			return 0;
+		}
 	}
 
 	public Date getLastResultTime() {

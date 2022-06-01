@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
-import org.springframework.data.jpa.datatables.parameter.OrderParameter;
+import org.springframework.data.jpa.datatables.mapping.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -42,7 +42,7 @@ public class DataTableSearch {
 	public List<Object[]> getOrder(){
 		List<Object[]> r = new ArrayList<Object[]>();
 		if (input!=null && input.getOrder()!=null) {						
-			for (OrderParameter p:input.getOrder()) {
+			for (Order p:input.getOrder()) {
 				Object[] o = new Object[2];
 				o[0] = p.getColumn(); 
 				o[1] = p.getDir();

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.ContactRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.ContactRepository;
 
 @Controller
 public class ContactController extends AbstractController {

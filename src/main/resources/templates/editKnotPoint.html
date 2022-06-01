@@ -1,20 +1,34 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{e.knotPoint}">Knot Point</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<h3 th:text="#{e.knotPoint}">Knot Point</h3>
-		<form method="post" action="#" th:action="@{/knotpoints/save}" th:object="${knotPoint}">
-		 	<input type="hidden" th:field="*{id}"/>		
-		 	<input type="hidden" th:field="*{spline.id}"/>								 				
-			<div th:replace="field::text(prop='x',label='X',required=true)"></div>			
-			<div th:replace="field::text(prop='y',label='Y',required=true)"></div>
-			<button th:if="${writeable}" th:text="#{action.save}" type="submit" class="btn btn-default">Save</button>
-		</form>
-	</div>
-</body>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{e.knotPoint}">Knot Point</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{e.knotPoint}">Knot Point</h3>
+      <form
+        method="post"
+        action="#"
+        th:action="@{/knotpoints/save}"
+        th:object="${knotPoint}"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{spline.id}" />
+        <div th:replace="field::text(prop='x',label='X',required=true)"></div>
+        <div th:replace="field::text(prop='y',label='Y',required=true)"></div>
+        <button
+          th:if="${writeable}"
+          th:text="#{action.save}"
+          type="submit"
+          class="btn btn-default"
+        >
+          Save
+        </button>
+      </form>
+    </div>
+  </body>
 </html>

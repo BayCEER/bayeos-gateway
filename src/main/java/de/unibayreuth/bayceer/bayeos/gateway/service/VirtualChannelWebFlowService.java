@@ -15,8 +15,8 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelFunctionParameter;
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel;
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannelWebFlow;
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannelWebFlow.Binding;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardRepository;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.VirtualChannelRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.VirtualChannelRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
 
 @Service
 public class VirtualChannelWebFlowService {

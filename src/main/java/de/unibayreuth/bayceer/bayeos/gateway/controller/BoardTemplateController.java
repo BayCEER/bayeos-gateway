@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.Locale;
 
 import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.SortDefault;
@@ -27,13 +29,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.marshaller.BoardTemplateMarshaller;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.BoardTemplateRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardTemplateRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.BoardTemplateService;
 
 @Controller
 public class BoardTemplateController extends AbstractController {
 	
-	private final static Logger log = Logger.getLogger(BoardTemplateController.class);
+	private final static Logger log = LoggerFactory.getLogger(BoardTemplateController.class);
 	
 		
 	@Autowired

@@ -1,162 +1,186 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="main">
-<head>
-<title th:text="#{nav.users}">Users</title>
-</head>
-<body>
-	
-	<div layout:fragment="content">
-	
-	<form id="form" method="post" action="#" th:action="@{/users/create}" class="form-horizontal">
-	  	
-  	<input type="hidden" name="firstName" id="firstName"/>
-  	<input type="hidden" name="lastName" id="lastName"/>
-  	<input type="hidden" name="userName" id="userName"/>
-  	
-  	<div class="panel panel-default">
-  	<div class="panel-heading" th:text="#{msg.searchinfo}">Info ....</div>  	
-  	<div class="panel-body">  		    	
-  			<div class="form-group">
-    			<label for="sfirstName" class="col-sm-3 control-label" th:text="#{user.firstName}">First Name</label>
-    			<div class="col-sm-9">
-    			<input type="text" class="form-control" id="sfirstName"/>
-    			</div>
-  			</div>
-  			<div class="form-group">
-    			<label for="slastName" class="col-sm-3 control-label" th:text="#{user.lastName}">Last Name</label>
-    			<div class="col-sm-9">
-    			<input type="text" class="form-control" id="slastName"/>
-    			</div>
-  			</div>
-  			<div class="form-group">  			
-    			<label for="suserName" class="col-sm-3 control-label" th:text="#{user.name}">User Name</label>
-    			<div class="col-sm-9">
-    				<input type="text" class="form-control" id="suserName"/>
-    			</div>    			
-  			</div>	 
-  			
-  			<div class="form-group">
-  				<div class="col-sm-offset-3 col-sm-9">
-        			<a class="btn btn-default" th:text="#{action.search}" id="searchButton">Search</a>
-        		</div>        			
-      		</div>			         		    	
- 	 </div>
- 	 </div>
-				 			 							 			
-		<table id="table" class="table">
-		 		<thead>
-		 			<tr>		 				
-		 				<th th:text="#{user.firstName}">First Name</th>
-						<th th:text="#{user.lastName}">Last Name</th>						
-						<th th:text="#{user.name}">Name</th>											
-		 			</tr>
-		 		</thead>
-		 		<tbody>		 		
-		 		</tbody>		 				 			
-		 	</table>
-		 	<button type="submit" th:text="#{action.apply}" id="apply" class="btn btn-default" disabled="disabled">Apply</button>
-			</form>		 					 				
-		
-					
-		<script type="text/javascript" class="init" th:inline="javascript">
-		
-				
-		var language = {
-					"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
-					"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ , 					
-					"info": /*[[#{datatable.info}]]*/, 
-					"infoEmpty": /*[[#{datatable.infoEmpty}]]*/,
-					"infoFiltered": /*[[#{datatable.infoFiltered}]]*/,
-					"loadingRecords": /*[[#{datatable.loadingRecords}]]*/,
-					"search": /*[[#{datatable.search}]]*/,
-					"paginate" : {
-						"first" : /*[[#{datatable.first}]]*/,
-						"last" : /*[[#{datatable.last}]]*/,
-						"next" : /*[[#{datatable.next}]]*/,
-						"previous" : /*[[#{datatable.previous}]]*/,
-				}
-		 };
-   	
-		
-		$(document).ready(function() {
-	        var table = $('#table').DataTable( {
-	        	language: language,
-	            data: [],	            
-	            searching: false,
-	            info: false,
-	            responsive: true,
-			 	autoWidth: false,
-			 	lengthChange: false,
-			 	columns: [
-			        { data: [[${@ldapAuthenticationProvider.givenName}]] },
-			        { data: [[${@ldapAuthenticationProvider.sn}]] },
-			        { data: 'cn' },			        
-			    ]
-	        } );
-	        
-	        $('#searchButton').click(function(){				 				
- 				$.ajax({
-		          url: [[ @{'/rest/ldap/searchUser'} ]] ,          
-		          dataType: "json",					          			         		          
-		          data: {firstName:($("#sfirstName").val())?$("#sfirstName").val():'*', lastName:($("#slastName").val())?$("#slastName").val():'*', userName:($("#suserName").val())?$("#suserName").val():'*'},
-		          success: function(data){	
-		        	  	table.rows().remove();
-		        	 	table.rows.add(data).draw();
-		          },
-		          error: function(xhr){
-		        	  $("#alert").addClass("alert-warning");
-		              $("#alertMessage").text([[ #{msg.searchwarning} ]]);            	
-		              $("#alert").removeClass("hidden");
-		              console.log(xhr);
-		          }
-		        }
- 				);					          								
-			});
-	        
-	    	
-	    	$('#table tbody').on('click', 'tr', function() {					
-				 if ( $(this).hasClass('selected') ) {
-			          $(this).removeClass('selected');
-			          $("#apply").attr('disabled','disabled');
-			     } else {
-			          table.$('tr.selected').removeClass('selected');
-			          $(this).addClass('selected');
-			          $("#apply").removeAttr('disabled');
-			     }
-			});
-	    	
-	    	
-	    		    				
-			
-			
-			$("form").submit(function(e){
-				var row = table.row('.selected').data();
-				if (row){
-					$('#firstName').val(row["givenName"]);
-					$('#lastName').val(row["sn"]);
-					$('#userName').val(row["cn"]);
-					$("#form").submit();				
-				} else {
-					// Message please select a user first.
-					e.preventDefault();	
-				}
-				
-				
-	            
-	        });
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{nav.users}">Users</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <form
+        id="form"
+        method="post"
+        action="#"
+        th:action="@{/users/create}"
+        class="form-horizontal"
+      >
+        <input type="hidden" name="firstName" id="firstName" />
+        <input type="hidden" name="lastName" id="lastName" />
+        <input type="hidden" name="userName" id="userName" />
 
-	        
-	    } );
-					
-		
-		
-	
-	</script> 
-		
-		
-	</div>	
-	
-</body>
+        <div class="panel panel-default">
+          <div class="panel-heading" th:text="#{msg.searchinfo}">Info ....</div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label
+                for="sfirstName"
+                class="col-sm-3 control-label"
+                th:text="#{user.firstName}"
+                >First Name</label
+              >
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="sfirstName" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label
+                for="slastName"
+                class="col-sm-3 control-label"
+                th:text="#{user.lastName}"
+                >Last Name</label
+              >
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="slastName" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label
+                for="suserName"
+                class="col-sm-3 control-label"
+                th:text="#{user.name}"
+                >User Name</label
+              >
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="suserName" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-offset-3 col-sm-9">
+                <a
+                  class="btn btn-default"
+                  th:text="#{action.search}"
+                  id="searchButton"
+                  >Search</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <table id="table" class="table">
+          <thead>
+            <tr>
+              <th th:text="#{user.firstName}">First Name</th>
+              <th th:text="#{user.lastName}">Last Name</th>
+              <th th:text="#{user.name}">Name</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button
+          type="submit"
+          th:text="#{action.apply}"
+          id="apply"
+          class="btn btn-default"
+          disabled="disabled"
+        >
+          Apply
+        </button>
+      </form>
+
+      <script type="text/javascript" class="init" th:inline="javascript">
+
+
+        var language = {
+        			"lengthMenu" : 	/*[[#{datatable.lengthMenu}]]*/ ,
+        			"zeroRecords" : /*[[#{datatable.zeroRecords}]]*/ ,
+        			"info": /*[[#{datatable.info}]]*/,
+        			"infoEmpty": /*[[#{datatable.infoEmpty}]]*/,
+        			"infoFiltered": /*[[#{datatable.infoFiltered}]]*/,
+        			"loadingRecords": /*[[#{datatable.loadingRecords}]]*/,
+        			"search": /*[[#{datatable.search}]]*/,
+        			"paginate" : {
+        				"first" : /*[[#{datatable.first}]]*/,
+        				"last" : /*[[#{datatable.last}]]*/,
+        				"next" : /*[[#{datatable.next}]]*/,
+        				"previous" : /*[[#{datatable.previous}]]*/,
+        		}
+         };
+
+
+        $(document).ready(function() {
+               var table = $('#table').DataTable( {
+               	language: language,
+                   data: [],
+                   searching: false,
+                   info: false,
+                   responsive: true,
+        	 	autoWidth: false,
+        	 	lengthChange: false,
+        	 	columns: [
+        	        { data: [[${@ldapAuthenticationProvider.givenName}]] },
+        	        { data: [[${@ldapAuthenticationProvider.sn}]] },
+        	        { data: 'cn' },
+        	    ]
+               } );
+
+               $('#searchButton').click(function(){
+        			$.ajax({
+                  url: [[ @{'/rest/ldap/searchUser'} ]] ,
+                  dataType: "json",
+                  data: {firstName:($("#sfirstName").val())?$("#sfirstName").val():'*', lastName:($("#slastName").val())?$("#slastName").val():'*', userName:($("#suserName").val())?$("#suserName").val():'*'},
+                  success: function(data){
+                	  	table.rows().remove();
+                	 	table.rows.add(data).draw();
+                  },
+                  error: function(xhr){
+                	  $("#alert").addClass("alert-warning");
+                      $("#alertMessage").text([[ #{msg.searchwarning} ]]);
+                      $("#alert").removeClass("hidden");
+                      console.log(xhr);
+                  }
+                }
+        			);
+        	});
+
+
+           	$('#table tbody').on('click', 'tr', function() {
+        		 if ( $(this).hasClass('selected') ) {
+        	          $(this).removeClass('selected');
+        	          $("#apply").attr('disabled','disabled');
+        	     } else {
+        	          table.$('tr.selected').removeClass('selected');
+        	          $(this).addClass('selected');
+        	          $("#apply").removeAttr('disabled');
+        	     }
+        	});
+
+
+
+
+
+        	$("form").submit(function(e){
+        		var row = table.row('.selected').data();
+        		if (row){
+        			$('#firstName').val(row["givenName"]);
+        			$('#lastName').val(row["sn"]);
+        			$('#userName').val(row["cn"]);
+        			$("#form").submit();
+        		} else {
+        			// Message please select a user first.
+        			e.preventDefault();
+        		}
+
+
+
+               });
+
+
+           } );
+      </script>
+    </div>
+  </body>
 </html>
