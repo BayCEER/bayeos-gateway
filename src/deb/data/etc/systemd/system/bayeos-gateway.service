@@ -1,0 +1,9 @@
+[Unit]
+Description=bayeos-gateway
+
+[Service]
+User=bayeos
+ExecStart=/var/lib/bayeos-gateway/bayeos-gateway.jar
+
+[Install]
+WantedBy=multi-user.target

@@ -1,23 +1,24 @@
 #!/bin/bash
 set -e
+if ! id bayeos > /dev/null 2>&1 
+then	
+	useradd bayeos
+fi
 
-cd /usr/share/bayeos-gateway
-chmod +x *.sh
+systemctl start postgresql.service
 
-# PostgreSQL
-service postgresql start 
+chmod +x /usr/share/bayeos-gateway/*.sh
 su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
 
-# Gateway 
-chmod +x /var/lib/bayeos-gateway/bayeos-gateway.jar
-ln -sf /var/lib/bayeos-gateway/bayeos-gateway.jar /etc/init.d/bayeos-gateway
+mkdir -p /var/log/bayeos
+chown -R bayeos:bayeos /var/lib/bayeos-gateway /var/log/bayeos
+
+chmod 700 /var/lib/bayeos-gateway/bayeos-gateway.jar
 ln -sf /etc/bayeos-gateway/application.properties /var/lib/bayeos-gateway/application.properties
 
-update-rc.d bayeos-gateway defaults
-service bayeos-gateway start  
+systemctl enable bayeos-gateway.service
+systemctl start bayeos-gateway.service
 
-# Apache integration 
-a2enmod proxy proxy_http
+a2enmod proxy proxy_http ssl remoteip
 a2enconf bayeos-gateway.conf
-service apache2 restart
-
+systemctl try-reload-or-restart apache2.service
