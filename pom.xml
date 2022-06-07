@@ -59,7 +59,7 @@
 									<goal>jdeb</goal>
 								</goals>
 								<configuration>
-									<deb>${project.build.directory}/bayeos-gateway-${project.version}.deb</deb>
+									<deb>${project.build.directory}/bayeos-gateway-${project.version}+${release}.deb</deb>
 									<verbose>false</verbose>
 									<dataSet>
 										<data>
