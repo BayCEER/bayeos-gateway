@@ -248,7 +248,7 @@ Response Body:
 
 ## Board command
 
-### Create a new board command 
+### Create a new board command
 
 ```javascript
 POST /gateway/rest/boardcommand HTTP/1.1
@@ -294,6 +294,7 @@ Response Body:
 ```
 
 ### Find all board commands by board origin
+
 ```javascript
 GET /gateway/rest/boardcommands?origin=pi-vpn01 HTTP/1.1
 Host: localhost:5533
@@ -360,13 +361,11 @@ Response Body: {
 ```
 
 ### Delete board command by id
+
 ```javascript
 DELETE /gateway/rest/boardcommand/13 HTTP/1.1
 Host: localhost:5533
 Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
-```
 Response Code: 200
-
-
-
+```
