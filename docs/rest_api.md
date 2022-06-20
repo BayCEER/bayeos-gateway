@@ -20,10 +20,12 @@
     - [Get channel values > lastRowId sorted by time ascending](#get-channel-values--lastrowid-sorted-by-time-ascending)
     - [Get channel values during a time period sorted by time ascending](#get-channel-values-during-a-time-period-sorted-by-time-ascending)
   - [Board command](#board-command)
-    - [New board command](#new-board-command)
-    - [Get first pending board command by origin](#get-first-pending-board-command-by-origin)
-    - [Get board command by id](#get-board-command-by-id)
+    - [Create a new board command](#create-a-new-board-command)
+    - [Find first pending board command by board origin](#find-first-pending-board-command-by-board-origin)
+    - [Find all board commands by board origin](#find-all-board-commands-by-board-origin)
+    - [Find board command by id](#find-board-command-by-id)
     - [Update board command response](#update-board-command-response)
+    - [Delete board command by id](#delete-board-command-by-id)
 
 <!-- pagebreak -->
 
@@ -34,6 +36,7 @@
 | 2021-02-15 | Oliver Archner | Comment API POST,PUT,DELETE,GET request support |
 | 2021-03-18 | Oliver Archner | User API GET request support                    |
 | 2022-05-10 | Oliver Archner | Board command API added                         |
+| 2022-06-19 | Oliver Archner | Missing BoardCommand methods documented         |
 
 ## General Notes
 
@@ -245,7 +248,7 @@ Response Body:
 
 ## Board command
 
-### New board command
+### Create a new board command 
 
 ```javascript
 POST /gateway/rest/boardcommand HTTP/1.1
@@ -269,7 +272,7 @@ Response Body:
 }
 ```
 
-### Get first pending board command by origin
+### Find first pending board command by board origin
 
 ```javascript
 GET /gateway/rest/boardcommand?origin=pi-vpn01 HTTP/1.1
@@ -290,7 +293,29 @@ Response Body:
 }
 ```
 
-### Get board command by id
+### Find all board commands by board origin
+```javascript
+GET /gateway/rest/boardcommands?origin=pi-vpn01 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+Content-Type: application/json
+
+Response Code: 200
+Response Body:
+[
+{
+    "id": 13,
+    "origin": "pi-vpn01",
+    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "insertTime":1562678971850,
+    "response":null,
+    "responseTime":null
+}
+]
+```
+
+### Find board command by id
 
 ```javascript
 GET /gateway/rest/boardcommand/13 HTTP/1.1
@@ -333,3 +358,15 @@ Response Body: {
     "responseTime": 1562678971890
 }
 ```
+
+### Delete board command by id
+```javascript
+DELETE /gateway/rest/boardcommand/13 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+```
+Response Code: 200
+
+
+
