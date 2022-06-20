@@ -67,7 +67,7 @@ Let's send the cpu load of our pc to a local gateway:
 - Enhancement: UI Rename origin
 - Enhancement: Virtual Export Function
 - Enhancement: Board command REST API V2
-- Enhancement: UI Board command display
+- Enhancement: Board command UI display
 
 ### Version 2.7.0, June, 2022
 
