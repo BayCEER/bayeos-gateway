@@ -2,6 +2,8 @@ package de.unibayreuth.bayceer.bayeos.gateway;
 
 
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 import de.unibayreuth.bayceer.bayeos.gateway.ldap.LdapAuthenticationProvider;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
@@ -61,12 +65,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private String ldap_givenName;
 	
 				
+	@Value("${COOKIE_MAX_AGE:1209600}")
+	private int cookieMaxAge;
 	 	
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
 	@Autowired
 	private UserRepository userRepo;
+	
+	@Autowired
+	private DataSource dataSource;
 	
 	
 	@Override
@@ -110,9 +119,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**").hasRole("USER")             
 			 .anyRequest().authenticated()
 			 .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)			 
-			 //.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)			 
 			 .formLogin().loginPage("/login").successHandler(customSuccessHandler())
-			 .permitAll().and().logout().permitAll();
+			 .permitAll()			 			
+			 .and()
+			 .rememberMe().tokenRepository(persistentTokenRepository()).userDetailsService(userDetailsService).tokenValiditySeconds(cookieMaxAge)
+			 .and()
+			 .logout().deleteCookies("JSESSIONID").permitAll();
+			 
 		}
 		
 		@Override
@@ -127,12 +140,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return pwe;
 	}
 	
-//	public DomainAuthenticationFilter authenticationFilter() throws Exception {
-//        DomainAuthenticationFilter filter = new DomainAuthenticationFilter();
-//        filter.setAuthenticationManager(authenticationManagerBean());
-//        filter.setAuthenticationFailureHandler(failureHandler());
-//        return filter;
-//    }
 	
 	@Bean
     public SimpleUrlAuthenticationFailureHandler failureHandler() {
@@ -186,7 +193,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return ldap_auth;
 	}
     
-    
+	@Bean
+	 public PersistentTokenRepository persistentTokenRepository() {
+	     JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
+	     db.setDataSource(dataSource);
+	     return db;
+	}
     	
     	
     
