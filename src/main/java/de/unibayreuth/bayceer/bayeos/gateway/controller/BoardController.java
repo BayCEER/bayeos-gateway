@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Notification;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
@@ -114,6 +115,19 @@ public class BoardController extends AbstractController {
 		BoardTemplate t = serviceBoardTemplate.saveAsTemplate(id);
 		return "redirect:/boardTemplates/" + t.getId();
 	}
+	
+	@RequestMapping(value = "/boards/setChannelNamebyNumber/{id}", method = RequestMethod.GET)
+	public String setChannelNamebyNumber(@PathVariable Long id,RedirectAttributes redirect, Locale locale) {		
+		Board b = repo.findOne(userSession.getUser(), id);		
+		for(Channel c:b.getChannels()) {
+			c.setName(c.getNr());
+		}
+		repo.save(b);			
+		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
+		return "redirect:/boards/" + id;
+		
+	}
+	
 
 	@RequestMapping(value = "/boards/chart/{id}")
 	public String chartBoard(@PathVariable Long id, Model model) {

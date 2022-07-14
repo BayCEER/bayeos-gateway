@@ -8,27 +8,29 @@
 <body>
 	<div layout:fragment="content">
 		<form method="post" action="#" th:action="@{/boards}" th:object="${board}">
-			<input type="hidden" name="id" th:field="*{id}" />
-			<input type="hidden" name="origin" th:field="*{origin}" />
+			<input type="hidden" name="id" th:field="*{id}" />			
 			
-			<div id="props" class="block">
-				<div class="block-header" th:text="'ORIGIN:' + *{origin}"></div>
-				
+			<div id="props" class="block">		
+				<div class="block-header" th:text="BOARD"></div>
+									
 				<div class="row">
 					<div class="col-sm-3">
 		 				<div th:replace="field::selectDomain"></div>
 		 			</div>		 		
 				</div>
 						 						
-				<div class="row">																	
-					<div class="col-sm-4">
+				<div class="row">			
+					<div class="col-sm-3">
+						<div th:replace="field::text(prop='origin',label=#{board.origin},required=true)"></div>
+					</div>														
+					<div class="col-sm-3">
 						<div th:replace="field::text('name',#{board.name})"></div>
 					</div>
-					<div class="col-sm-4">
+					<div class="col-sm-3">
 						<div
 							th:replace="field::select('boardGroup',#{e.boardGroup},${groups})"></div>
 					</div>
-					<div class="col-sm-4">
+					<div class="col-sm-3">
 						<div th:replace="field::checkbox('nagios',#{chkDev.nagios})"></div>
 						<div
 							th:replace="field::checkbox('denyNewChannels',#{board.denyNewChannels})"></div>
@@ -71,17 +73,26 @@
 					<!-- Tab panes -->
 					<div class="tab-content">
 						<div role="tabpanel" class="tab-pane fade in" id="channels">
+						
+
+							<a th:if="${board.hasEmptyChannelNames()}" th:href="@{/boards/setChannelNamebyNumber/} + ${board.id}" class="btn btn-xs" th:onclick="#{dialog.confirm}"
+							th:text="#{channel.applyNrAsName}">Update all channel names to channel number values</a>
+		
+												
 							<table class="table table-striped">
 								<thead>
 									<tr>
+									
+									
 										<th th:text="#{e.channel}">Channel</th>
 										<th th:text="#{channel.lastResultValue}">Last Value</th>
-										<th th:text="#{channel.name} + '[' + #{e.unit} +  ']'">Name
-											[Unit]</th>
+										<th th:text="#{channel.name} + '[' + #{e.unit} +  ']'">Name	[Unit]</th>
+										
 										<th class="hidden-xs hidden-sm"
 											th:text="#{channel.lastResultTime}">Last Result Time</th>
 										<th class="hidden-xs hidden-sm">Nagios</th>
-										<th class="hidden-xs hidden-sm"></th>
+										<th class="hidden-xs hidden-sm">						
+										</th>
 									</tr>
 								</thead>
 								<tbody>

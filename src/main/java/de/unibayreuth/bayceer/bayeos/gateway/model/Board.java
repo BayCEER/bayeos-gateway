@@ -272,6 +272,15 @@ public class Board extends NamedDomainEntity {
 	public void setNotifications(List<Notification> notifications) {
 		this.notifications = notifications;
 	}
+	
+	public boolean hasEmptyChannelNames() {
+		for(Channel c: channels) {
+			if (c.getName() != null) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	
 
