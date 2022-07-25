@@ -1,9 +1,12 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
 import java.nio.file.Path
+import java.nio.file.Files
 
+import javax.persistence.EntityNotFoundException
 import javax.sql.DataSource
 
+import org.apache.tomcat.util.http.fileupload.FileUpload
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +62,12 @@ class FileUploadService {
 	public boolean delete(Long id) {
 		Upload u = repo.findOne(userSession.getUser(),id);
 		if (u!=null) {
-			repo.delete(id);
+			repo.delete(userSession.getUser(),id);
 			File f = localFilePath.resolve(u.getUuid().toString() + ".bin").toFile();
 			return f.delete();
 		} else {
 			return false;
-		}
+		}	
 	}
 	
 	

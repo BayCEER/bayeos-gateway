@@ -21,15 +21,19 @@ public class BoardCommand extends UniqueEntity{
 		
 	}
 	
-	public BoardCommand(User user, Date insertTime, Date responseTime, String value, String response, Board board) {
+	public BoardCommand(User user, Date insertTime, Date responseTime, Short kind, String value, String description, String response, Board board) {
 		super();
 		this.user = user;
 		this.insertTime = insertTime;
 		this.responseTime = responseTime;
 		this.value = value;
+		this.description = description;
 		this.response = response;
 		this.board = board;
+		this.kind = kind;
+		
 	}
+	
 
 	@ManyToOne
 	@JoinColumn(name="user_id",nullable=false)
@@ -50,6 +54,12 @@ public class BoardCommand extends UniqueEntity{
 	
 	@JsonView(DataTablesOutput.View.class)
 	String response;
+	
+	@JsonView(DataTablesOutput.View.class)
+	String description;
+	
+	@JsonView(DataTablesOutput.View.class)
+	Short kind;
 	
 	
 	@ManyToOne(fetch=FetchType.EAGER)
@@ -104,7 +114,22 @@ public class BoardCommand extends UniqueEntity{
 		this.board = board;
 	}
 
-	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Short getKind() {
+		return kind;
+	}
+
+	public void setKind(Short kind) {
+		this.kind = kind;
+	}
+
 	
 	
 	

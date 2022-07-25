@@ -19,7 +19,10 @@ BACKUP_PATH =  path.join(tempfile.gettempdir(),'bayeos-device-backup')
 writer = BayEOSWriter(PATH,max_time=5,log_level=logging.INFO)
 writer.save_msg('Writer was started.')
 
-sender = BayEOSSender(PATH, NAME, URL,backup_path=BACKUP_PATH,log_level=logging.INFO,user=USER,password=PASSWORD)
+async def cb(frame):
+    print("Execute {}".format(frame))
+
+sender = BayEOSSender(PATH, NAME, URL,backup_path=BACKUP_PATH,log_level=logging.INFO,user=USER,password=PASSWORD,callback=cb)
 sender.start()
 
 nr=0

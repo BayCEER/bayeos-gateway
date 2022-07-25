@@ -61,19 +61,19 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
-### Version 2.8.0, TBA
+### Version 2.8.0, July, 2022
 
-- Enhancement: UI Button channel name = channel number
-- Enhancement: UI Rename origin
-- Enhancement: Virtual Export Function
-- Enhancement: Board command REST API V2
-- Enhancement: Board command UI display
+- Enhancement: Set channel names from channel nr
+- Enhancement: Rename board origin
+- Enhancement: Remember-me token
+- Enhancement: Frame save callback
+- Enhancement: Post Frame dialog 
+- Enhancement: Board command UI
+- Enhancement: Board command REST API
 
-### Version 2.7.0, June, 2022
-
-- JRE 11
-- SL4J with Logback
-- Enhancement: Board command REST API V1
+- Upgrade: JRE 11
+- Upgrade: Spring 2.6
+- Upgrade: SL4J with Logback
 
 ### Version 2.6.15, June, 2021
 

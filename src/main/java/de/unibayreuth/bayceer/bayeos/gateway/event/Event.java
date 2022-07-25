@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Event {
 	
-	Long id;
+	Long id; // Board ID 
 	Date time;
 	EventType type;
 	
@@ -16,7 +16,7 @@ public class Event {
 	
 	public Event(Long id, Date time, EventType type) {
 		super();
-		this.id = id;	
+		this.id = id;			
 		this.time = time;
 		this.type = type;
 	}
@@ -35,21 +35,20 @@ public class Event {
 	public EventType getType() {
 		return type;
 	}
+
 	public void setType(EventType type) {
 		this.type = type;
 	}
-
-
 
 	public Long getId() {
 		return id;
 	}
 
-
-
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+
 }
 
 

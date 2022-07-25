@@ -17,7 +17,7 @@
     - [Get all domain users sorted by name](#get-all-domain-users-sorted-by-name)
   - [Channel](#channel)
     - [Get channel values during the last 24h sorted by time ascending](#get-channel-values-during-the-last-24h-sorted-by-time-ascending)
-    - [Get channel values > lastRowId sorted by time ascending](#get-channel-values--lastrowid-sorted-by-time-ascending)
+    - [Get channel values > lastRowId sorted by time ascending](#get-channel-values-gt-lastrowid-sorted-by-time-ascending)
     - [Get channel values during a time period sorted by time ascending](#get-channel-values-during-a-time-period-sorted-by-time-ascending)
   - [Board command](#board-command)
     - [Create a new board command](#create-a-new-board-command)
@@ -222,7 +222,7 @@ Response Body:
 {"id": 645,"millis": 1562679012765,"value": 0.84613395}]
 ```
 
-### Get channel values > lastRowId sorted by time ascending
+### Get channel values gt lastRowId sorted by time ascending
 
 ```javascript
 GET /gateway/rest/channel?id=4&lastRowId=587 HTTP/1.1
@@ -258,7 +258,8 @@ Authorization: Basic cm9vdDpiYXllb3M=
 Content-Type: application/json
 {
     "origin": "pi-vpn01",
-    "value": "c3dpdGNoIGxpZ2h0IG9uLg=="
+    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "description": "Toggle Switch A"
 }
 Response Code: 200
 Response Body:
@@ -266,6 +267,7 @@ Response Body:
     "id": 13,
     "origin": "pi-vpn01",
     "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "description": "Toggle Switch A",
     "insertTime":1562678971850,
     "response":null,
     "responseTime":null
@@ -287,6 +289,7 @@ Response Body:
     "id": 13,
     "origin": "pi-vpn01",
     "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "description": "Toggle Switch A",
     "insertTime":1562678971850,
     "response":null,
     "responseTime":null
@@ -309,6 +312,7 @@ Response Body:
     "id": 13,
     "origin": "pi-vpn01",
     "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "description": "Toggle Switch A",
     "insertTime":1562678971850,
     "response":null,
     "responseTime":null
@@ -331,6 +335,7 @@ Response Body:
     "id": 13,
     "origin": "pi-vpn01",
     "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "description": "Toggle Switch A",
     "response": "",
     "insertTime":  1562678971850,
     "responseTime": null
@@ -354,6 +359,7 @@ Response Body: {
     "id": 13,
     "origin": "pi-vpn01",
     "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
+    "description": "Toggle Switch A",
     "response": "Switch toggled",
     "insertTime":  1562678971850,
     "responseTime": 1562678971890

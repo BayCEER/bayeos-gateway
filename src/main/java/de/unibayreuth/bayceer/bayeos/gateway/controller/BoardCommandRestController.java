@@ -5,8 +5,12 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardCommand;
@@ -47,7 +53,7 @@ public class BoardCommandRestController extends AbstractController {
 		if (!user.inNullDomain()) {
 			checkWrite(board);	
 		}						
-		BoardCommand c = repoCommand.save(new BoardCommand(user,new Date(),null,cmd.value,null,board));		
+		BoardCommand c = repoCommand.save(new BoardCommand(user,new Date(),null,cmd.kind,cmd.value,cmd.description,null,board));		
 		return new ResponseEntity<BoardCommandDTO>(
 				new BoardCommandDTO(c),HttpStatus.CREATED);
 			
@@ -86,11 +92,8 @@ public class BoardCommandRestController extends AbstractController {
 		List<BoardCommandDTO> r = new ArrayList<BoardCommandDTO>();
 		for (BoardCommand b : bcs) {			
 			r.add(new BoardCommandDTO(b));
-		}
-		
-		return new ResponseEntity<List<BoardCommandDTO>>(r,HttpStatus.OK);	
-		
-		
+		}		
+		return new ResponseEntity<List<BoardCommandDTO>>(r,HttpStatus.OK);					
 	}
 	
 	
@@ -140,6 +143,27 @@ public class BoardCommandRestController extends AbstractController {
 		}		
 		repoCommand.delete(bc);
 		return new ResponseEntity<String>("Command deleted", HttpStatus.OK);
+	}
+	
+	
+	@JsonView(DataTablesOutput.View.class)
+	@RequestMapping(path = "/rest/boardcommands/{id}", method = RequestMethod.POST)
+	public DataTablesOutput<BoardCommand> findComments(@Valid @RequestBody DataTablesInput input,
+			@PathVariable final Long id) {
+		
+		Board board = repoBoard.findById(id).orElseThrow(()-> new EntityNotFoundException());	;		
+		User user = userSession.getUser();
+		if (!user.inNullDomain()) {
+			checkRead(board);	
+		}									
+		return repoCommand.findAll(input, null, boardId(id));
+					
+	}
+	
+	private Specification<BoardCommand> boardId(Long id) {
+		return (root, query, cb) -> {
+			return cb.equal(root.get("board").get("id"), id);
+		};
 	}
 
 }

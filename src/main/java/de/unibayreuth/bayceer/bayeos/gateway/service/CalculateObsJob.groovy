@@ -93,6 +93,7 @@ public class CalculateObsJob implements Runnable {
 				Thread.sleep(1000*waitSecs);
 			} catch (InterruptedException e){
 				break			}
+			
 		}
 	}
 

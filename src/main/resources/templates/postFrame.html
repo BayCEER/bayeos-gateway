@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{main}"
+>
+  <head>
+    <title th:text="#{action.post} + ' ' + #{e.frame}">Post Frame</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h3 th:text="#{action.post} + ' ' + #{e.frame}">Post Frame</h3>
+      
+      <div class="form-group">
+      	 <label  for="sender" th:text="#{frame.sender}">Sender</label>      	
+         <input id="sender" name="sender" type="text" required="true" value="ME" class="form-control"/>         
+      </div>
+      
+      <div class="form-group">
+      <label  for="payload" th:text="#{frame.payload}">Payload</label>
+      <div class="input-group">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Type <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+          <li><a id=href="#">Sequential Byte</a></li>
+          <li><a id=href="#">Offset Byte</a></li>          
+          <li role="separator" class="divider"></li>
+          <li><a href="#">Message</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#">Command</a></li>
+          <li><a href="#">Response</a></li>          
+        </ul>
+      </div><!-- /btn-group -->
+      <input id="payload" name="payload" required="true" type="text" class="form-control" aria-label="...">
+    </div><!-- /input-group -->
+    </div>
+      
+<!--       <div class="form-group"> -->
+<!--       	 <label  for="payload" th:text="#{frame.payload}">Payload</label>      	 -->
+<!--          <input id="payload" name="payload" type="text" required="true" class="form-control"/>          -->
+<!--       </div> -->
+      
+      <div class="form-group">
+      <button class="btn btn-primary" id="post" type="submit" th:text="#{action.post}" value="post">Post</button>
+      <button class="btn btn-secondary" id="reset" th:text="#{action.reset}">Reset</button>
+      </div>
+      
+      <div class="form-group">
+      	 <label  for="responseList" th:text="#{frame.response}">Response</label>
+      	 <ul class="list-group" id="responseList">
+		 </ul>
+      </div>
+      
+           
+                 
+      
+                    
+      <script type="text/javascript" class="init" th:inline="javascript">     
+	 	/*<![CDATA[*/
+	 	
+	 	var responses = [];
+	 	
+ 		$(document).ready(function(){
+ 		 
+ 		 	$('#payload').val("01 24 01 02 03 04");
+ 						
+ 			function hex_to_string(hex) {
+    			const b = hex.split(" ");
+    			let r = "";
+    			for (var i = 0; i < b.length; i++) {
+      				r += String.fromCharCode(parseInt(b[i], 16));
+    			}
+    			return r;
+  			}
+  			
+  			function string_to_hex(s){
+  				ret = '';
+				for (var i=0;i<s.length;i++){
+					var c = char_to_hex(s[i]);					
+					if (i > 0) {
+						ret += ' ';
+					} 
+					ret += c;					
+				}
+				return ret;
+  			}
+  			
+  			function char_to_hex(c) {
+  				var r = c.codePointAt(undefined).toString(16);
+  				if (r.length > 1) {
+  					return r;
+  				} else {
+  					return '0' + r; 
+  				}
+  			}
+  			
+  			function b64_to_utf8( str ) {
+ 			 	return decodeURIComponent(escape(window.atob( str )));
+			} 
+			
+			function utf8_to_b64( str ) {
+ 				 return window.btoa(unescape(encodeURIComponent( str )));
+			}
+			
+			$('#reset').click(function(){
+				$("#responseList").empty();
+			});
+			
+			function addResponse(r) {
+				labelClass = (r.s=='success')?'ok':'failed';
+				$("#responseList").append(`<li class="list-group-item"><span class="label label-${labelClass}">${r.s}</span> ${r.t}</li>`);
+			}
+ 					 		 			 						  
+ 			$('#post').click(function(){
+ 			 	var sender = encodeURIComponent($("#sender").val()); 			
+ 				var frame = utf8_to_b64(hex_to_string($("#payload").val())); 				 			 			 			 				 			 		 				 			 	 			
+ 				$.ajax(
+                {
+                  url: [[ @{'/frame/saveFlat'} ]] ,                                    
+                  data: "sender=" + sender + "&bayeosframes[]=" + frame,
+                  method: 'POST',	
+                  timeout: 5000,
+                  success: function(data,status){
+                    // console.log(`Status:${status} Data:${data}`);    
+                  	var vars = decodeURIComponent(data).split('&');                  	
+                  	var frames = [];
+                  	for (var i = 0; i < vars.length; i++) {
+        				var pair = vars[i].split('=');
+        				if (pair[0]=='bayeosframe'){
+        					frames.push(string_to_hex(b64_to_utf8(pair[1])));      			
+        				}     
+        			}         	        	                  	
+                  	addResponse({s:status,t:frames});                                 
+                  },
+                  error: function(xhr,status,error){ 
+                  		// console.log(`Status:${status} Error:${error}`);  
+                  		addResponse({s:status,t:error});
+                  		                		                      	                  	
+                  }
+                 }); 
+ 			}); 		 			
+ 		});
+		/*]]>*/
+     </script>        
+    </div>     
+  </body>
+</html>

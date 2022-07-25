@@ -116,7 +116,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			 http.authorizeRequests()
 			 .antMatchers("/resources/**").permitAll()
 			 .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**",
-					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**").hasRole("USER")             
+					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**","/boardCommands/**").hasRole("USER")             
 			 .anyRequest().authenticated()
 			 .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)			 
 			 .formLogin().loginPage("/login").successHandler(customSuccessHandler())

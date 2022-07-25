@@ -186,7 +186,15 @@
                       >
                         <a th:href="@{/uploads}"
                           ><span class="glyphicon glyphicon-import"></span>
-                          <span th:text="#{nav.uploads}">Data Uploads</span></a
+                          <span th:text="#{nav.uploads}">File Uploads</span></a
+                        >
+                      </li>
+                      <li
+                        th:classappend="${controllerName == 'Frame'}? 'active'"
+                      >
+                        <a th:href="@{/postFrame}"
+                          ><span class="glyphicon glyphicon-import"></span>
+                          <span th:text="#{nav.postFrame}">Post Frame</span></a
                         >
                       </li>
                     </ul>

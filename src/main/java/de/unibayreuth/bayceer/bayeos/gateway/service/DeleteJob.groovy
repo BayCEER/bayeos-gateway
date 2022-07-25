@@ -5,6 +5,7 @@ import groovy.sql.Sql
 import java.sql.SQLException
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
+import bayeos.frame.types.NumberType
 
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 
 @Component
-@Profile("default")
 class DeleteJob implements Runnable {
 
 	@Autowired
@@ -41,7 +41,8 @@ class DeleteJob implements Runnable {
 			def start = new Date()
 			def obs = 0
 			def obs_exported = 0
-			def msg = 0			 
+			def msg = 0		
+				 
 						
 			try {
 				log.info("DeleteJob running")
@@ -55,10 +56,12 @@ class DeleteJob implements Runnable {
 					log.info("Deleting exported observations older than ${retention}.")
 					db.execute("delete from observation_exp where insert_time < now() - ?::interval",[retention])
 					obs_exported = db.updateCount
-
+										
 					log.info("Deleting messages older than ${retention}.")
 					db.execute("delete from message where insert_time < now() - ?::interval",[retention])
-					msg = db.updateCount					 
+					msg = db.updateCount
+					
+										 
 					exit = 0
 				} catch (SQLException e){
 					log.error(e.getMessage())

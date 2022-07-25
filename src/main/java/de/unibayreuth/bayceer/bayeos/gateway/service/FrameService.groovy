@@ -21,6 +21,7 @@ import bayeos.frame.types.MapUtils
 import de.unibayreuth.bayceer.bayeos.gateway.event.EventProducer
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewBoardEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewChannelEvent
+import de.unibayreuth.bayceer.bayeos.gateway.event.NewCommandResponseEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewMessageEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewObservationEvent
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
@@ -159,8 +160,7 @@ class FrameService {
 												sb = null
 												b.records++
 											}
-									}
-									
+									}									
 								} catch (Exception e){
 									log.warn("Failed to calculate virtual channel value:${vc.nr}")
 									log.error(e.getMessage())
@@ -174,6 +174,13 @@ class FrameService {
 							eventProducer.addFrameEvent(new NewMessageEvent(b.id))
 							log.debug("Message saved")
 							break
+						case "CommandResponse":						
+							 Short rkind = (Short)res['value']['cmd']
+							 String rvalue = (String)res['value']['value']
+							 db.executeUpdate("update board_command set response = ?, response_time = ? where board_id = ? and kind = ? and response_time is null",rvalue,ts.toTimestamp(),b.id,rkind)							 
+							 eventProducer.addFrameEvent(new NewCommandResponseEvent(b.id, rkind, rvalue))
+							 log.debug("CommandResponse saved")							 
+							 break
 						case "ErrorMessage":
 							db.executeInsert("insert into message (board_id, content, result_time, type) values (?,?,?,?);",[b.id, res['value'], ts.toTimestamp(), "ERROR"])							
 							eventProducer.addFrameEvent(new NewMessageEvent(b.id))
@@ -201,7 +208,9 @@ class FrameService {
 			return false
 		} finally {
 			try {
-				con.close()
+				if (con != null) {
+					con.close()
+				}
 			} catch (SQLException e){
 				log.error(e.getMessage())
 			}

@@ -1,1 +1,0 @@
-create table persistent_logins (username text not null, series text primary key, token text not null, last_used timestamp not null);
