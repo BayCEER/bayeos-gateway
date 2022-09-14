@@ -61,6 +61,9 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.8.1, Sept., 2022
+- Fixed: Missing import in FileExport and 
+
 ### Version 2.8.0, July, 2022
 
 - Enhancement: Set channel names from channel nr
