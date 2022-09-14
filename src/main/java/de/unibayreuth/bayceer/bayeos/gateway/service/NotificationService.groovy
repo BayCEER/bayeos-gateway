@@ -14,6 +14,7 @@ import groovy.sql.Sql
 import java.sql.SQLException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import de.unibayreuth.bayceer.bayeos.gateway.model.NagiosStatus
 
 
 @Component

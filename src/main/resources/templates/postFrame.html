@@ -21,24 +21,13 @@
       <div class="input-group">
       <div class="input-group-btn">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Type <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-          <li><a id=href="#">Sequential Byte</a></li>
-          <li><a id=href="#">Offset Byte</a></li>          
-          <li role="separator" class="divider"></li>
-          <li><a href="#">Message</a></li>
-          <li role="separator" class="divider"></li>
-          <li><a href="#">Command</a></li>
-          <li><a href="#">Response</a></li>          
+        <ul id="frames" class="dropdown-menu">                    
         </ul>
       </div><!-- /btn-group -->
       <input id="payload" name="payload" required="true" type="text" class="form-control" aria-label="...">
     </div><!-- /input-group -->
     </div>
       
-<!--       <div class="form-group"> -->
-<!--       	 <label  for="payload" th:text="#{frame.payload}">Payload</label>      	 -->
-<!--          <input id="payload" name="payload" type="text" required="true" class="form-control"/>          -->
-<!--       </div> -->
       
       <div class="form-group">
       <button class="btn btn-primary" id="post" type="submit" th:text="#{action.post}" value="post">Post</button>
@@ -52,17 +41,31 @@
       </div>
       
            
-                 
-      
                     
       <script type="text/javascript" class="init" th:inline="javascript">     
 	 	/*<![CDATA[*/
 	 	
 	 	var responses = [];
 	 	
+	 	var frames = [
+	 		{t:'Data Binary',p:'01 24 01 02 03 04'},
+	 		{t:'Command',p:'02 01 01'},
+	 		{t:'Response',p:'03 01 01'}
+	 	];
+	 	
  		$(document).ready(function(){
  		 
- 		 	$('#payload').val("01 24 01 02 03 04");
+ 		 	// $('#payload').val("01 24 01 02 03 04");
+ 		 	
+ 		 	for (var i=0;i<frames.length;i++){ 		 		
+ 		 		$("#frames").append('<li id="f_' + i + '"><a href="#">'+ frames[i].t + '</a></li>'); 		 		
+ 		 	}
+ 		 	
+ 		 	$("#frames li").click(function () {
+ 		 		var f = $('#'+ this.id).index();
+ 		 		console.log(f);
+ 		 		$('#payload').val(frames[f].p);
+ 		 	});
  						
  			function hex_to_string(hex) {
     			const b = hex.split(" ");

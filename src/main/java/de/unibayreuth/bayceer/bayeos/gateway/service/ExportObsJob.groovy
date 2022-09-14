@@ -4,7 +4,7 @@ import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory
 
 import org.apache.xmlrpc.XmlRpcException
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +14,7 @@ import bayeos.frame.types.LabeledFrame
 import bayeos.frame.types.NumberType
 import de.unibayreuth.bayceer.bayeos.client.Client
 import groovy.sql.Sql
+import de.unibayreuth.bayceer.bayeos.objekt.ObjektArt
 
 
 @Component

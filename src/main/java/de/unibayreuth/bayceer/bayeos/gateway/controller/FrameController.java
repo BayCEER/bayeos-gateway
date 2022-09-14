@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -47,8 +48,11 @@ public class FrameController extends AbstractController {
 				List<String> frames = getFrames(params);
 				log.info("Received " + frames.size() + " frames from " + sender);															
 				if (frameService.saveFrames(userSession.getUser().getDomainId(), sender,frames)) {
-					log.debug("Frames saved.");
-					return ResponseEntity.ok(getCallback(sender));					
+					log.debug("Frames saved.");					
+					HttpHeaders responseHeaders = new HttpHeaders();
+					responseHeaders.set("Content-Type", "application/x-www-form-urlencoded");
+					return new ResponseEntity<String>(getCallback(sender), responseHeaders, HttpStatus.OK);
+															
 				} else {
 					log.warn("Failed to save frames.");
 					return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
