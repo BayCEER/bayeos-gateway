@@ -10,15 +10,13 @@ systemctl start postgresql.service
 chmod +x /usr/share/bayeos-gateway/*.sh
 su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
 
-mkdir -p /var/log/bayeos
-chown -R bayeos:bayeos /var/lib/bayeos-gateway /var/log/bayeos
-
+chown -R bayeos:bayeos /var/lib/bayeos-gateway 
 chmod 700 /var/lib/bayeos-gateway/bayeos-gateway.jar
 ln -sf /etc/bayeos-gateway/application.properties /var/lib/bayeos-gateway/application.properties
 
 systemctl enable bayeos-gateway.service
 systemctl start bayeos-gateway.service
 
-a2enmod proxy proxy_http ssl remoteip
+a2enmod proxy proxy_http ssl remoteip rewrite 
 a2enconf bayeos-gateway.conf
 systemctl try-reload-or-restart apache2.service
