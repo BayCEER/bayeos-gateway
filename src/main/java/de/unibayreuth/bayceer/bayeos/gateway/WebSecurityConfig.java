@@ -89,8 +89,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public class HttpBasicConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {			
-			 http.csrf().disable();			 
-			 http.authorizeRequests()			 	
+			 http.csrf().disable()			 
+			 .authorizeRequests()			 	
 			 	.antMatchers("/**").hasAnyRole("USER","IMPORT")
 			 	.and()			 
 			 .requestMatchers().antMatchers("/frame/**","/nagios/**","/grafana/**","/rest/**")
@@ -112,8 +112,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public class FormConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			 http.csrf().disable();	 
-			 http.authorizeRequests()
+			 http.csrf().disable()			
+			 .authorizeRequests()
 			 .antMatchers("/resources/**").permitAll()
 			 .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**",
 					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**","/boardCommands/**").hasRole("USER")             
