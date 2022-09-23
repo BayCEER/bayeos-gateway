@@ -69,7 +69,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private int cookieMaxAge;
 	 	
 	@Autowired
-	private UserDetailsService userDetailsService;
+	private UserRepositoryUserDetailsService userDetailsService;
+	
+	@Autowired
+	private RememberMeUserDetailsService rememberMeDetailsService;
+	
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -122,7 +126,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			 .formLogin().loginPage("/login").successHandler(customSuccessHandler())
 			 .permitAll()			 			
 			 .and()
-			 .rememberMe().tokenRepository(persistentTokenRepository()).userDetailsService(userDetailsService).tokenValiditySeconds(cookieMaxAge)
+			 .rememberMe().tokenRepository(persistentTokenRepository()).userDetailsService(rememberMeDetailsService).tokenValiditySeconds(cookieMaxAge)
 			 .and()
 			 .logout().deleteCookies("JSESSIONID").permitAll();
 			 
