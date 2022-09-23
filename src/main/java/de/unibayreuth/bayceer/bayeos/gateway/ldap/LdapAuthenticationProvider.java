@@ -10,8 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.thymeleaf.util.StringUtils;
-
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;
@@ -44,16 +42,18 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 	@Override
 	public Authentication authenticate(Authentication auth) throws AuthenticationException {
 		log.debug("Authenticate:" + auth.getName());
-		String[] context = StringUtils.split(auth.getName(), "@");        
+		
+		String[] context = auth.getName().split("@");        
     	if (context.length < 2) {
     		user = userRepo.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalse(context[0]);
     	} else {
     		user = userRepo.findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalse(context[0],context[1]);
-    	}    		               
-        if (user == null) {
+    	}    
+				        
+    	    		    	    		               
+        if(user == null) {
             throw new UsernameNotFoundException("Invalid credentials");
-        } 
-							
+        } 							
         
 		if (con == null) {
 			if (ssl) {
@@ -66,7 +66,7 @@ public class LdapAuthenticationProvider implements AuthenticationProvider{
 		UserDetails ud = new CustomUserDetails(user);
 		try {
 			con.connect(host, port);
-			String dname  = String.format(dn,ud.getUsername());
+			String dname  = String.format(dn,user.getName());
 			con.bind(version, dname, auth.getCredentials().toString().getBytes("UTF-8"));			
 			if (con.isBound()) {				
 				if (refineUser) {
