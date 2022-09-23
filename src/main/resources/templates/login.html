@@ -7,8 +7,7 @@
   <body>
     <div layout:fragment="content">
       	<form class="form-signin" id="form" th:action="@{/login}" method='post' autocomplete='off'>
-      		<input type="hidden" name="tz" id="tz"></input>
-      		<input type="hidden" name="username" id="username"></input>
+      		<input type="hidden" name="tz" id="tz"></input>      		
             <input type="hidden" name="remember-me" value="true"/>
       		
 			<p class="lead strong" th:text="#{login.msg}">Please log in</p>			
@@ -21,19 +20,10 @@
             <div th:if="${param.logout}" class="alert alert-info alert-dismissible" role="alert">
             	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><span th:text="#{login.logOutMsg}">Logged out</span>
             </div>
-            
-            
-            <div class="form-group" th:if="${domains.size()>0}">
-             	<label  for="domain" th:text="#{e.domain}">Domain</label>
-             	<select id="domain" name="domain" class="form-control">
-				<option value="NULL" th:selected="${domain=='NULL'}">NULL</option>
-				<option th:each="d : ${domains}" th:value="${d.name}" th:text="${d.name}" th:selected="${domain==d.name}">></option>													
-				</select>                         	
-            </div>
-            
+                                              
             <div class="form-group">
             	<label  for="name" th:text="#{login.user}">Username</label>
-            	<input  id="name" name="name" type="text" required="true" class="form-control" th:attr="placeholder=#{login.userPlaceholder}" placeholder="Username"/>
+            	<input  id="name" name="username" type="text" required="true" class="form-control" th:attr="placeholder=#{login.userPlaceholder}" placeholder="Username"/>
             </div>
             
             <div class="form-group">
@@ -41,10 +31,7 @@
             	<input id="password" name="password" type="password" required="true" class="form-control" th:attr="placeholder=#{login.password}" placeholder="Password"/>
             </div>
             
-            
-            
-            
-                            				
+                                        			
 			<button class="btn btn-lg btn-primary btn-block" id="submit" type="submit" th:text="#{login.btn}" value="Login">Log in</button>				
 		</form>		
 		
@@ -52,13 +39,6 @@
 		/*<![CDATA[*/
 	 	 $(document).ready(function(){	 		 	
 	 		 	$('#tz').val(jstz.determine().name());
-	 		 	$('#submit').click(function(){	 		 		
-	 		 		if ([[${domains.size()>0}]] && ($('#domain').val() != 'NULL')) {		 		 			
-	 		 			$('#username').val($('#name').val() + '@' + $('#domain').val());
-	 		 		} else {
-	 		 			$('#username').val($('#name').val());
-	 		 		}
-	 		 	});
 	 	 });
 	 	/*]]>*/	
 	 	 </script> 	
