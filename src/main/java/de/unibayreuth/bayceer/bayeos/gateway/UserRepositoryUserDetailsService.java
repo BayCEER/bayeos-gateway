@@ -7,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.util.StringUtils;
-
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 
@@ -23,14 +21,15 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
 
     
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {    
-    	log.debug("Load user:" + name);
-    	String[] context = StringUtils.split(name, "@");
+    	log.debug("Load user:" + name);    	
+    	String[] context = name.split("@");
         User user;
     	if (context.length < 2) {
-    		user = userRepository.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalseAndPasswordIsNotNull(context[0]);
+    		user = userRepository.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalse(context[0]);
     	} else {
-    		user = userRepository.findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalseAndPasswordIsNotNull(context[0],context[1]);
-    	}    		               
+    		user = userRepository.findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalse(context[0],context[1]);
+    	}    		          
+    	            	    		    	    		              
         if(user == null) {
             throw new UsernameNotFoundException("Invalid credentials");
         } 

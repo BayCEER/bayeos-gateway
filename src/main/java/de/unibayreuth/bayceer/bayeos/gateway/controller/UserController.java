@@ -55,12 +55,12 @@ public class UserController extends AbstractController {
 	
 	
 	@RequestMapping(value="/users/create", method=RequestMethod.POST)
-	public String createWithName(String firstName, String lastName, String userName, Model model){
+	public String createWithName(String firstName, String lastName, String name, Model model){
 		User u = new User();
 		u.setDomain(userSession.getUser().getDomain());
 		u.setFirstName(firstName);
 		u.setLastName(lastName);
-		u.setUserName(userName);		
+		u.setName(name);		
 		model.addAttribute("user",u);			
 		return "editUser";		
 	}
@@ -93,7 +93,8 @@ public class UserController extends AbstractController {
 				} else {
 					user.setContact(c);
 				}					
-		}																
+		}
+		
 		repo.save(userSession.getUser(),user);		
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));
 		return "redirect:/users";

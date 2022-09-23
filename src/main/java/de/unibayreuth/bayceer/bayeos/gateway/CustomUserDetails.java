@@ -44,9 +44,10 @@ public class CustomUserDetails extends User implements UserDetails {
 
 		@Override
 		public String getUsername() {
-			return name;			
+			if (!inNullDomain()) {
+				return name + "@" + getDomain().getName();
+			} else {
+				return name;
+			}			
 		}
-		
-				
-		
     }

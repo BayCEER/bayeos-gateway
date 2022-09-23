@@ -42,7 +42,7 @@ public class UserDTO {
 
 	public UserDTO(User u) {
 		this.id = u.getId();		
-		this.name = u.getUserName();
+		this.name = u.getName();
 		u.setFullName();
 		this.fullName = u.getFullName();
 		if (!u.inNullDomain()) {

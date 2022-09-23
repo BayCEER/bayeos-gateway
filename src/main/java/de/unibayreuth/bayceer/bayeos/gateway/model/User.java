@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.AssertTrue;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 
@@ -127,14 +128,7 @@ public class User extends NamedDomainEntity {
 	public void setNewPasswordRepetition(String newPasswordRepetition) {
 		this.newPasswordRepetition = newPasswordRepetition;
 	}
-	
-	public String getUserName() {
-		return name;
-	}
-	
-	public void setUserName(String name) {
-		this.name = name;
-	}
+		
 
 	public String getFirstName() {
 		return firstName;
@@ -175,11 +169,10 @@ public class User extends NamedDomainEntity {
 			this.fullName = name;
 		} else {
 			this.fullName = WordUtils.capitalizeFully(((firstName==null)?"":firstName) + ((lastName==null)?"":" " + lastName));	
-		}
-	
-		
+		}			
 	}
-
 		
+	
+	
 	
 }
