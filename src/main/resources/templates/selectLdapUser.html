@@ -18,7 +18,7 @@
       >
         <input type="hidden" name="firstName" id="firstName" />
         <input type="hidden" name="lastName" id="lastName" />
-        <input type="hidden" name="userName" id="userName" />
+        <input type="hidden" name="name" id="name" />
 
         <div class="panel panel-default">
           <div class="panel-heading" th:text="#{msg.searchinfo}">Info ....</div>
@@ -167,7 +167,7 @@
         		if (row){
         			$('#firstName').val(row["givenName"]);
         			$('#lastName').val(row["sn"]);
-        			$('#userName').val(row["cn"]);
+        			$('#name').val(row["cn"]);
         			$("#form").submit();
         		} else {
         			// Message please select a user first.
