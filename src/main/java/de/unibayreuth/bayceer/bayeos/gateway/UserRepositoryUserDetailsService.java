@@ -25,11 +25,10 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
     	String[] context = name.split("@");
         User user;
     	if (context.length < 2) {
-    		user = userRepository.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalse(context[0]);
+    		user = userRepository.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalseAndPasswordIsNotNull(context[0]);
     	} else {
-    		user = userRepository.findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalse(context[0],context[1]);
-    	}    		          
-    	            	    		    	    		              
+    		user = userRepository.findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalseAndPasswordIsNotNull(context[0],context[1]);
+    	}    		               
         if(user == null) {
             throw new UsernameNotFoundException("Invalid credentials");
         } 
