@@ -17,13 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import bayeos.frame.types.Command;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardCommand;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.BoardCommandRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.FrameService;
@@ -74,21 +72,17 @@ public class FrameController extends AbstractController {
 		return sender;
 	}
 	
-	private String getCallback(String sender) {							
+	private String getCallback(String sender) {						
+
 		StringBuffer bf = new StringBuffer();		
 		BoardCommand cmd = repoCommand.findFirstPendingByOrigin(sender);		
 		if (cmd !=null) {
 			bf.append("bayeosframe=");				
-			Command fc = new Command(cmd.getKind().byteValue(),cmd.getValue());																		
+			bayeos.frame.types.BoardCommand fc = new bayeos.frame.types.BoardCommand(cmd.getKind().byteValue(),cmd.getValue());					
 			bf.append(Base64.getEncoder().encodeToString(fc.getBytes()));
-		}
-							
-   	    try {
-			return URLEncoder.encode(bf.toString(),"UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			log.error(e.getMessage());
-			return "";
-		} 					
+		}					
+		return bf.toString();
+		 					
 	}
 	
 	private List<String> getFrames(MultiValueMap<String,String> params){

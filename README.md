@@ -61,6 +61,12 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.8.3, Sept., 2022
+- FrameParser updated to 1.4.0
+- BoardCommand responseStatus property
+- Fixed: Dropped encoding in frame callbacks 
+- Updated: BoardCommandRestController and docs
+
 ### Version 2.8.2, Sept., 2022
 - Changes: Login with full username (user@domain)
 - Fixed: Websocket connect error
@@ -69,7 +75,7 @@ Let's send the cpu load of our pc to a local gateway:
 - Fixed: Server logging format simplified
 
 ### Version 2.8.1, Sept., 2022
-- Fixed: Missing import in FileExport and 
+- Fixed: Missing import in FileExport class
 
 ### Version 2.8.0, July, 2022
 

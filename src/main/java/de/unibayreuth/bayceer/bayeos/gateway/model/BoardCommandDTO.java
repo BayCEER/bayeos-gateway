@@ -11,6 +11,7 @@ public class BoardCommandDTO {
 	public Short kind;
 	public String description;
 	public String response;
+	public Short responseStatus;
 	public Date insertTime;
 	public Date responseTime;	
 	
@@ -26,13 +27,14 @@ public class BoardCommandDTO {
 		this.kind =  c.getKind();
 		this.description = c.getDescription();
 		this.response = c.getResponse();
+		this.responseStatus = c.getResponseStatus();
 		this.insertTime = c.getInsertTime();
 		this.responseTime = c.getResponseTime();
 	}
 
 
 	public BoardCommandDTO(long id, String origin, String value, Short kind, String description, String response,
-			Date insertTime, Date responseTime) {
+			Short responseStatus,Date insertTime, Date responseTime) {
 		super();
 		this.id = id;
 		this.origin = origin;
@@ -40,6 +42,7 @@ public class BoardCommandDTO {
 		this.kind = kind;
 		this.description = description;
 		this.response = response;
+		this.responseStatus = responseStatus;
 		this.insertTime = insertTime;
 		this.responseTime = responseTime;
 	}
@@ -122,6 +125,14 @@ public class BoardCommandDTO {
 
 	public void setResponseTime(Date responseTime) {
 		this.responseTime = responseTime;
+	}
+
+	public Short getResponseStatus() {
+		return responseStatus;
+	}
+
+	public void setResponseStatus(Short responseStatus) {
+		this.responseStatus = responseStatus;
 	}
 	
 	

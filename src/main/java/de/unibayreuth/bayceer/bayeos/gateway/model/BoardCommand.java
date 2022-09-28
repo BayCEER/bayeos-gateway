@@ -17,22 +17,31 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class BoardCommand extends UniqueEntity{
 	
 	
+	
 	public BoardCommand() {
 		
 	}
 	
-	public BoardCommand(User user, Date insertTime, Date responseTime, Short kind, String value, String description, String response, Board board) {
+	
+
+	public BoardCommand(User user, Date insertTime, 
+			Date responseTime, Short kind, String value, 
+			String description, Short responseStatus, 
+			String response, 
+			Board board) {
 		super();
 		this.user = user;
 		this.insertTime = insertTime;
 		this.responseTime = responseTime;
+		this.responseStatus = responseStatus;
 		this.value = value;
 		this.description = description;
 		this.response = response;
 		this.board = board;
 		this.kind = kind;
-		
+				
 	}
+	
 	
 
 	@ManyToOne
@@ -61,7 +70,10 @@ public class BoardCommand extends UniqueEntity{
 	@JsonView(DataTablesOutput.View.class)
 	Short kind;
 	
-	
+	@JsonView(DataTablesOutput.View.class)
+	Short responseStatus;
+
+		
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="board_id", nullable = false)
 	Board board;
@@ -128,6 +140,14 @@ public class BoardCommand extends UniqueEntity{
 
 	public void setKind(Short kind) {
 		this.kind = kind;
+	}
+	
+	public Short getResponseStatus() {
+		return responseStatus;
+	}
+
+	public void setResponseStatus(Short responseStatus) {
+		this.responseStatus = responseStatus;
 	}
 
 	

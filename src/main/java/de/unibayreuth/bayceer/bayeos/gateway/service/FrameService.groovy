@@ -174,12 +174,14 @@ class FrameService {
 							eventProducer.addFrameEvent(new NewMessageEvent(b.id))
 							log.debug("Message saved")
 							break
-						case "CommandResponse":						
-							 Short rkind = (Short)res['value']['cmd']
+						case "BoardCommandResponse":						
+							 Short rkind = (Short)res['value']['kind']
+							 Short rstatus = (Short)res['value']['status']
 							 String rvalue = (String)res['value']['value']
-							 db.executeUpdate("update board_command set response = ?, response_time = ? where board_id = ? and kind = ? and response_time is null",rvalue,ts.toTimestamp(),b.id,rkind)							 
-							 eventProducer.addFrameEvent(new NewCommandResponseEvent(b.id, rkind, rvalue))
-							 log.debug("CommandResponse saved")							 
+							 db.executeUpdate("update board_command set response = ?, response_time = ?, response_status = ? where board_id = ? and kind = ? and response_time is null",
+								 rvalue,ts.toTimestamp(),rstatus,b.id,rkind)							 
+							 eventProducer.addFrameEvent(new NewCommandResponseEvent(b.id, rkind, rstatus, rvalue))
+							 log.debug("BoardCommandResponse saved")							 
 							 break
 						case "ErrorMessage":
 							db.executeInsert("insert into message (board_id, content, result_time, type) values (?,?,?,?);",[b.id, res['value'], ts.toTimestamp(), "ERROR"])							

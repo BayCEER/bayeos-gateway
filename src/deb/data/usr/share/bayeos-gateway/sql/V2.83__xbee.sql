@@ -1,0 +1,1 @@
+alter table board_command add column response_status int4;

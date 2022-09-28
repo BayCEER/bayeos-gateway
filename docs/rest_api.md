@@ -257,27 +257,30 @@ Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
 Content-Type: application/json
 {
-    "origin": "pi-vpn01",
-    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
-    "description": "Toggle Switch A"
+    "origin": "ME",
+    "value": "adfasdfasf",
+    "description": "Toggle A",
+    "kind": 2
 }
 Response Code: 200
 Response Body:
 {
-    "id": 13,
-    "origin": "pi-vpn01",
-    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
-    "description": "Toggle Switch A",
-    "insertTime":1562678971850,
-    "response":null,
-    "responseTime":null
+    "id": 4,
+    "origin": "ME",
+    "value": "adfasdfasf",
+    "kind": 2,
+    "description": "Toggle A",
+    "response": null,
+    "responseStatus": null,
+    "insertTime": "2022-09-28T13:20:15.176+00:00",
+    "responseTime": null
 }
 ```
 
 ### Find first pending board command by board origin
 
 ```javascript
-GET /gateway/rest/boardcommand?origin=pi-vpn01 HTTP/1.1
+GET /gateway/rest/boardcommand?origin=ME HTTP/1.1
 Host: localhost:5533
 Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
@@ -286,20 +289,22 @@ Content-Type: application/json
 Response Code: 200
 Response Body:
 {
-    "id": 13,
-    "origin": "pi-vpn01",
-    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
-    "description": "Toggle Switch A",
-    "insertTime":1562678971850,
-    "response":null,
-    "responseTime":null
+    "id": 4,
+    "origin": "ME",
+    "value": "adfasdfasf",
+    "kind": 2,
+    "description": "Toggle A",
+    "response": null,
+    "responseStatus": null,
+    "insertTime": "2022-09-28T13:20:15.176+00:00",
+    "responseTime": null
 }
 ```
 
 ### Find all board commands by board origin
 
 ```javascript
-GET /gateway/rest/boardcommands?origin=pi-vpn01 HTTP/1.1
+GET /gateway/rest/boardcommands?origin=ME HTTP/1.1
 Host: localhost:5533
 Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
@@ -308,22 +313,35 @@ Content-Type: application/json
 Response Code: 200
 Response Body:
 [
-{
-    "id": 13,
-    "origin": "pi-vpn01",
-    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
-    "description": "Toggle Switch A",
-    "insertTime":1562678971850,
-    "response":null,
-    "responseTime":null
-}
+    {
+        "id": 2,
+        "origin": "ME",
+        "value": "1",
+        "kind": 1,
+        "description": "PIN 1 HIGH",
+        "response": "[]",
+        "responseStatus": 1,
+        "insertTime": "2022-09-28T13:08:53.657+00:00",
+        "responseTime": "2022-09-28T13:08:56.118+00:00"
+    },
+    {
+        "id": 4,
+        "origin": "ME",
+        "value": "adfasdfasf",
+        "kind": 2,
+        "description": "Toggle A",
+        "response": null,
+        "responseStatus": null,
+        "insertTime": "2022-09-28T13:20:15.176+00:00",
+        "responseTime": null
+    }
 ]
 ```
 
 ### Find board command by id
 
 ```javascript
-GET /gateway/rest/boardcommand/13 HTTP/1.1
+GET /gateway/rest/boardcommand/1 HTTP/1.1
 Host: localhost:5533
 Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
@@ -332,37 +350,41 @@ Content-Type: application/json
 Response Code: 200
 Response Body:
 {
-    "id": 13,
-    "origin": "pi-vpn01",
-    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
-    "description": "Toggle Switch A",
-    "response": "",
-    "insertTime":  1562678971850,
+    "id": 1,
+    "origin": "DESKTOP-VC82HHI",
+    "value": "1",
+    "kind": 4,
+    "description": "PIN 4 HIGH",
+    "response": null,
+    "responseStatus": null,
+    "insertTime": "2022-09-27T15:21:58.886+00:00",
     "responseTime": null
-
 }
 ```
 
 ### Update board command response
 
 ```javascript
-PATCH /gateway/rest/boardcommand/13/response HTTP/1.1
+PATCH /gateway/rest/boardcommand/1/response HTTP/1.1
 Host: localhost:5533
 Accept: application/json
 Authorization: Basic cm9vdDpiYXllb3M=
 Content-Type: application/json
 {
-    "response":"Switch toggled"
+    "response": "asjfklfsdjiofjids",
+    "responseStatus" : 0    
 }
 Response Code: 200
 Response Body: {
-    "id": 13,
-    "origin": "pi-vpn01",
-    "value": "c3dpdGNoIGxpZ2h0IG9uLg==",
-    "description": "Toggle Switch A",
-    "response": "Switch toggled",
-    "insertTime":  1562678971850,
-    "responseTime": 1562678971890
+    "id": 1,
+    "origin": "DESKTOP-VC82HHI",
+    "value": "1",
+    "kind": 4,
+    "description": "PIN 4 HIGH",
+    "response": "asjfklfsdjiofjids",
+    "responseStatus": 0,
+    "insertTime": "2022-09-27T15:21:58.886+00:00",
+    "responseTime": "2022-09-28T13:39:43.858+00:00"
 }
 ```
 

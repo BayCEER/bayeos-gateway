@@ -53,7 +53,7 @@ public class BoardCommandRestController extends AbstractController {
 		if (!user.inNullDomain()) {
 			checkWrite(board);	
 		}						
-		BoardCommand c = repoCommand.save(new BoardCommand(user,new Date(),null,cmd.kind,cmd.value,cmd.description,null,board));		
+		BoardCommand c = repoCommand.save(new BoardCommand(user,new Date(),null,cmd.kind,cmd.value,cmd.description,null,null,board));		
 		return new ResponseEntity<BoardCommandDTO>(
 				new BoardCommandDTO(c),HttpStatus.CREATED);
 			
@@ -125,6 +125,7 @@ public class BoardCommandRestController extends AbstractController {
 		}
 		bc.setResponse(cmd.response);
 		bc.setResponseTime(new Date());
+		bc.setResponseStatus(cmd.getResponseStatus());
 		bc = repoCommand.save(bc);
 		return new ResponseEntity<BoardCommandDTO>(new BoardCommandDTO(bc),HttpStatus.OK);
 	}

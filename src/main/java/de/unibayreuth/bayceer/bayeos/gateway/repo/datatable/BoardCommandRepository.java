@@ -17,7 +17,7 @@ public interface BoardCommandRepository extends DataTablesRepository<BoardComman
 	List<BoardCommand> findPendingByOrigin(String origin);
 	
 	
-	@Query(nativeQuery = true, value = "select * from board_command bc where bc.board_id = ?1 order by bc.insert_time limit 1")
+	@Query(nativeQuery = true, value = "select * from board_command bc where bc.board_id = ? order by bc.insert_time")
 	List<BoardCommand> findAllByBoardId(Long id);
 	
 }

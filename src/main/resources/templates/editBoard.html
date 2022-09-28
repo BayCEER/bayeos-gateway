@@ -399,16 +399,17 @@
                      } 
                     },
                     
-                    {data: 'responseTime', render: function(data,type,row) {
-                    	 if (row.responseTime == null){
-                    	 	return '<span class="label label-pending">' + [[ #{cmd.pending} ]] + '</span>';                    	 	
-                    	 } else {
+                    {data: 'responseStatus', 
+                    	render: function(data,type,row) {                    	
+                    	if (row.responseStatus == 0){
                     	 	return '<span class="label label-ok">' + [[#{cmd.executed}]] + '</span>';                    	 	
-                     	 }
-                     	} 
+                     	 } else if (row.responseStatus == 1) {
+                     		return '<span class="label label-failed">' + [[#{cmd.failed}]] + '</span>';
+                     	 } else {
+                     		return '<span class="label label-pending">' + [[ #{cmd.pending} ]] + '</span>'; 
+                     	 } 
+                    }
                     },
-                    
-                     
                     
                     {
                      searchable: false, sortable: false,
