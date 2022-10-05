@@ -3,24 +3,17 @@ package de.unibayreuth.bayceer.bayeos.gateway.event;
 public class NewCommandResponseEvent extends Event {
 	private Short key;
 	private Short status;
-	private String value;
+	private byte[] payload;
 	
-	public NewCommandResponseEvent(Long id,Short key, Short status, String value) {
+	public NewCommandResponseEvent(Long id,Short key, Short status, byte[] payload) {
 		super(id,EventType.NEW_COMMAND_RESPONSE);
 		this.key = key;
 		this.status = status;
-		this.value = value;
+		this.payload = payload;
 	}
 
 	
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
+	
 
 	public Short getKey() {
 		return key;
@@ -40,6 +33,20 @@ public class NewCommandResponseEvent extends Event {
 	public void setStatus(Short status) {
 		this.status = status;
 	}
+
+
+
+
+    public byte[] getPayload() {
+        return payload;
+    }
+
+
+
+
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
+    }
 	
 	
 

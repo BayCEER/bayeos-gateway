@@ -40,7 +40,7 @@ public class BoardCommandController extends AbstractController {
 	
 	@RequestMapping(value="/boardCommands/edit/{id}")
 	public String edit(@PathVariable Long id, Model model){
-		BoardCommand c = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());
+		BoardCommand c = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());								   				
 		if (c == null) throw new EntityNotFoundException("Entity not found");
 		checkWrite(repoBoard.findById(c.getBoard().getId()).orElseThrow(() -> new EntityNotFoundException()));		
 		model.addAttribute("command",c);
@@ -61,6 +61,8 @@ public class BoardCommandController extends AbstractController {
 		redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));		
 		return "redirect:/boards/" + id + "?tab=commands";
 	}
+	
+	
 	
 	
 		

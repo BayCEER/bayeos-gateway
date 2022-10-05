@@ -1,7 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -78,11 +76,10 @@ public class FrameController extends AbstractController {
 		BoardCommand cmd = repoCommand.findFirstPendingByOrigin(sender);		
 		if (cmd !=null) {
 			bf.append("bayeosframe=");				
-			bayeos.frame.types.BoardCommand fc = new bayeos.frame.types.BoardCommand(cmd.getKind().byteValue(),cmd.getValue());					
+			bayeos.frame.types.BoardCommand fc = new bayeos.frame.types.BoardCommand(cmd.getKind().byteValue(),cmd.getPayload().getBytes());			
 			bf.append(Base64.getEncoder().encodeToString(fc.getBytes()));
 		}					
-		return bf.toString();
-		 					
+		return bf.toString();		 				
 	}
 	
 	private List<String> getFrames(MultiValueMap<String,String> params){

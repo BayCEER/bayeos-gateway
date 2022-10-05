@@ -2,6 +2,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.model;
 
 import java.util.Date;
 
+import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,18 +26,17 @@ public class BoardCommand extends UniqueEntity{
 	
 
 	public BoardCommand(User user, Date insertTime, 
-			Date responseTime, Short kind, String value, 
-			String description, Short responseStatus, 
-			String response, 
+			Date responseTime, Short kind, Payload payload, 
+			String description, Short status, 
+			Payload response, 
 			Board board) {
 		super();
 		this.user = user;
 		this.insertTime = insertTime;
 		this.responseTime = responseTime;
-		this.responseStatus = responseStatus;
-		this.value = value;
-		this.description = description;
-		this.response = response;
+		this.status = status;
+		this.payload = payload;
+		this.description = description;		
 		this.board = board;
 		this.kind = kind;
 				
@@ -57,12 +57,14 @@ public class BoardCommand extends UniqueEntity{
 	@Column(name="response_time")	
 	@JsonView(DataTablesOutput.View.class)
 	Date responseTime;
-		
-	@JsonView(DataTablesOutput.View.class)
-	String value;
 	
-	@JsonView(DataTablesOutput.View.class)
-	String response;
+	 
+	@AttributeOverride(name="payload",column= @Column(name="payload"))
+	Payload payload;
+	
+	@AttributeOverride(name="payload",column= @Column(name="response"))
+	Payload response;
+	    
 	
 	@JsonView(DataTablesOutput.View.class)
 	String description;
@@ -71,12 +73,14 @@ public class BoardCommand extends UniqueEntity{
 	Short kind;
 	
 	@JsonView(DataTablesOutput.View.class)
-	Short responseStatus;
+	Short status;
 
 		
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="board_id", nullable = false)
 	Board board;
+	
+	
 
 	public User getUser() {
 		return user;
@@ -102,22 +106,7 @@ public class BoardCommand extends UniqueEntity{
 		this.responseTime = responseTime;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String getResponse() {
-		return response;
-	}
-
-	public void setResponse(String response) {
-		this.response = response;
-	}
-
+	
 	public Board getBoard() {
 		return board;
 	}
@@ -142,15 +131,42 @@ public class BoardCommand extends UniqueEntity{
 		this.kind = kind;
 	}
 	
-	public Short getResponseStatus() {
-		return responseStatus;
-	}
 
-	public void setResponseStatus(Short responseStatus) {
-		this.responseStatus = responseStatus;
-	}
 
-	
-	
+    public Short getStatus() {
+        return status;
+    }
+
+
+
+    public void setStatus(Short status) {
+        this.status = status;
+    }
+
+
+
+    public Payload getPayload() {
+        return payload;
+    }
+
+
+
+    public void setPayload(Payload payload) {
+        this.payload = payload;
+    }
+
+
+
+    public Payload getResponse() {
+        return response;
+    }
+
+
+
+    public void setResponse(Payload response) {
+        this.response = response;
+    }
+
+
 	
 }

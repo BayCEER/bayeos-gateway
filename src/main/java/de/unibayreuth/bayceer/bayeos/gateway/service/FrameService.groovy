@@ -175,12 +175,12 @@ class FrameService {
 							log.debug("Message saved")
 							break
 						case "BoardCommandResponse":						
-							 Short rkind = (Short)res['value']['kind']
-							 Short rstatus = (Short)res['value']['status']
-							 String rvalue = (String)res['value']['value']
-							 db.executeUpdate("update board_command set response = ?, response_time = ?, response_status = ? where board_id = ? and kind = ? and response_time is null",
-								 rvalue,ts.toTimestamp(),rstatus,b.id,rkind)							 
-							 eventProducer.addFrameEvent(new NewCommandResponseEvent(b.id, rkind, rstatus, rvalue))
+							 Short kind = (Short)res['value']['kind']
+							 Short status = (Short)res['value']['status']
+							 byte[] payload = res['value']['payload']
+							 db.executeUpdate("update board_command set response = ?, response_time = ?, status = ? where board_id = ? and kind = ? and response_time is null",
+								 payload,ts.toTimestamp(),status,b.id,kind)							 
+							 eventProducer.addFrameEvent(new NewCommandResponseEvent(b.id, kind, status, payload))
 							 log.debug("BoardCommandResponse saved")							 
 							 break
 						case "ErrorMessage":

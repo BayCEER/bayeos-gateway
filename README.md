@@ -60,6 +60,8 @@ Let's send the cpu load of our pc to a local gateway:
 - **Oliver Archner** - _Developer_ - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.8.4, Oct., 2022
+- Fixed: Redirect to login page on Restful APIs
 
 ### Version 2.8.3, Sept., 2022
 - FrameParser updated to 1.4.0

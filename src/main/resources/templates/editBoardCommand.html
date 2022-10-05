@@ -11,18 +11,18 @@
     <div layout:fragment="content">
       <h3 th:text="#{e.boardCommand}">Command</h3>
       <form
+      	id="form"
         method="post"
         action="#"
         th:action="@{/boardCommands/save}"
-        th:object="${command}"
+        th:object="${command}"        
       >
         <input type="hidden" th:field="*{id}" />
         <input type="hidden" th:value="${board}" name="board" />
         
         <div th:replace="field::number(prop='kind',label=#{cmd.kind},required=true)"></div>
-        <div th:replace="field::text(prop='value',label=#{cmd.value},required=true)"></div>
-        <div th:replace="field::text(prop='description',label=#{cmd.description},required=true)"></div>
-        
+        <div th:replace="field::text(prop='payload',label=#{cmd.payload},required=true)"></div>       
+        <div th:replace="field::text(prop='description',label=#{cmd.description},required=true)"></div>        
         <div class="block-action">
           <button
             th:text="#{action.save}"
@@ -33,6 +33,8 @@
           </button>
         </div>
       </form>
-    </div>
+    </div>     
+       		
+	 		
   </body>
 </html>

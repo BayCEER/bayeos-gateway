@@ -19,7 +19,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -88,19 +87,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		if (ldap_auth) auth.authenticationProvider(ldapAuthenticationProvider());
 	}
 									
-	@Configuration 
+	@Configuration
 	@Order(1)
-	public class HttpBasicConfig extends WebSecurityConfigurerAdapter {
+	public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {			
-			 http.csrf().disable()			 
-			 .authorizeRequests()			 	
-			 	.antMatchers("/**").hasAnyRole("USER","IMPORT")
-			 	.and()			 
-			 .requestMatchers().antMatchers("/frame/**","/nagios/**","/grafana/**","/rest/**")
-			 	.and()			 	
-			 .httpBasic();			 
-		}
+			 http.csrf().disable()
+			 .authorizeRequests().antMatchers("/resources/**").permitAll()
+			 .antMatchers("/frame/**","/nagios/**","/grafana/**","/rest/**").hasAnyRole("USER","IMPORT","CHECK").and().httpBasic()
+			 .and()
+			 .authorizeRequests()             
+             .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**",
+                     "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**","/boardCommands/**").hasRole("USER")             
+             .anyRequest().authenticated()
+             .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)            
+             .formLogin().loginPage("/login").successHandler(customSuccessHandler())
+             .permitAll()                       
+             .and()
+             .rememberMe().tokenRepository(persistentTokenRepository()).userDetailsService(rememberMeDetailsService).tokenValiditySeconds(cookieMaxAge)
+             .and()
+             .logout().deleteCookies("JSESSIONID").permitAll();
+	    }
 		
 		@Override
 		protected AuthenticationManager authenticationManager() throws Exception {		
@@ -109,34 +116,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		
 	}
-		
 	
-	@Configuration 
-	@Order(2)
-	public class FormConfig extends WebSecurityConfigurerAdapter {
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			 http.csrf().disable()			
-			 .authorizeRequests()
-			 .antMatchers("/resources/**").permitAll()
-			 .antMatchers("/boardTemplates/**","/channelTemplates/**","/users/**","/functions/**","/invervals/**",
-					 "/splines/**","/units/**","/knotpoints/**", "/domains/**", "/contacts/**", "/uploads/**","/boardCommands/**").hasRole("USER")             
-			 .anyRequest().authenticated()
-			 .and().addFilterBefore(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class)			 
-			 .formLogin().loginPage("/login").successHandler(customSuccessHandler())
-			 .permitAll()			 			
-			 .and()
-			 .rememberMe().tokenRepository(persistentTokenRepository()).userDetailsService(rememberMeDetailsService).tokenValiditySeconds(cookieMaxAge)
-			 .and()
-			 .logout().deleteCookies("JSESSIONID").permitAll();
-			 
-		}
-		
-		@Override
-		protected AuthenticationManager authenticationManager() throws Exception {		
-			return WebSecurityConfig.this.authenticationManager();
-		}
-	}
+ 
+	
 	
 	public PasswordEncoder basePasswordEncoder() {
 		MessageDigestPasswordEncoder pwe = new MessageDigestPasswordEncoder("SHA");
