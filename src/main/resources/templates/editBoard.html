@@ -173,7 +173,7 @@
 											<th th:text="#{cmd.user}">User</th>
 											<th th:text="#{cmd.kind}">Kind</th>
 											<th th:text="#{cmd.description}">Description</th>
-											<th th:text="#{cmd.state}">State</th>
+											<th th:text="#{cmd.status}">Status</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -399,9 +399,9 @@
                      } 
                     },
                     
-                    {data: 'responseStatus', 
+                    {data: 'status', 
                     	render: function(data,type,row) {                    	
-                    	if (row.responseStatus == 0){
+                    	if (row.status == 0){
                     	 	return '<span class="label label-ok">' + [[#{cmd.executed}]] + '</span>';                    	 	
                      	 } else if (row.responseStatus == 1) {
                      		return '<span class="label label-failed">' + [[#{cmd.failed}]] + '</span>';
