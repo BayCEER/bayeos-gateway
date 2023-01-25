@@ -94,7 +94,7 @@ class FileImportService implements Runnable {
 			List<Upload> uploads = repo.findExpired(c.getTime())
 			uploads.each { u ->
 				localFilePath.resolve(u.name).toFile().delete()
-				repo.delete(u.id)
+				repo.deleteById(u.id)
 			}
 			if (uploads.size()>0) {
 				log.info("${uploads.size} expired upload files deleted.")
