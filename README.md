@@ -61,7 +61,7 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
-### Version 2.8.6, Feb, 2023
+### Version 2.8.6, Mar., 2023
 - Fixed: File import job fails on base64 encoding 
 
 ### Version 2.8.5, Oct., 2022
