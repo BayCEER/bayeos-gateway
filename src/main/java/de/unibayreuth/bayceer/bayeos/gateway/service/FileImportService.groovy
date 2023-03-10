@@ -5,10 +5,13 @@ import java.nio.file.Path
 import java.sql.Timestamp
 import javax.annotation.PostConstruct
 import javax.mail.internet.MimeMessage
+import javax.persistence.EntityNotFoundException
 import javax.sql.DataSource
+import java.util.Base64
+import de.unibayreuth.bayceer.bayeos.gateway.model.ImportStatus
 
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.MailSender
@@ -104,29 +107,34 @@ class FileImportService implements Runnable {
 	}
 
 	private void sendNotification(Long id, List<Upload> uploads) {
-		User usr = repoUser.findOne(id)
-		if (usr?.hasEmail() && notificationConfig.notification && mailSender != null) {
-			try{
-				log.info("Sending import notification to: " + usr.contact.email)
-				MimeMessage msg = mailSender.createMimeMessage()
-				MimeMessageHelper mh = new MimeMessageHelper(msg, false, "utf-8")
-				Context c = new Context()
-				usr.setFullName()
-				c.setVariable("user", usr)
-				uploads.each { ui -> 
-					ui.setSizeAsString()
-				}
-				c.setVariable("uploads",uploads)
-				c.setVariable("host",notificationConfig.getNotification_host())
-				mh.setText(templateEngine.process("fileImportNotification",c), true)
-				mh.setTo(usr.contact.email)
-				mh.setSubject("BayEOS Gateway File Import")
-				mh.setFrom(notificationConfig.getNotification_sender())
-				mailSender.send(msg)
-			} catch (Exception ex) {
-				log.error(ex.getMessage())
-			}
-		}
+       Optional<User> usrOptional = repoUser.findById(id)                
+       if (usrOptional.isPresent()) {
+            User usr = usrOptional.get()           
+            if (usr?.hasEmail() && notificationConfig.notification && mailSender != null) {
+                try{
+                    log.info("Sending import notification to: " + usr.contact.email)
+                    MimeMessage msg = mailSender.createMimeMessage()
+                    MimeMessageHelper mh = new MimeMessageHelper(msg, false, "utf-8")
+                    Context c = new Context()
+                    usr.setFullName()
+                    c.setVariable("user", usr)
+                    uploads.each { ui ->
+                        ui.setSizeAsString()
+                    }
+                    c.setVariable("uploads",uploads)
+                    c.setVariable("host",notificationConfig.getNotification_host())
+                    mh.setText(templateEngine.process("fileImportNotification",c), true)
+                    mh.setTo(usr.contact.email)
+                    mh.setSubject("BayEOS Gateway File Import")
+                    mh.setFrom(notificationConfig.getNotification_sender())
+                    mailSender.send(msg)
+                } catch (Exception ex) {
+                    log.error(ex.getMessage())
+                }
+            }                        
+        } else {
+           log.warn("User:"+id+" not found.") 
+        }		
 	}
 	
 	private Upload importFile(Upload u) {
@@ -148,7 +156,7 @@ class FileImportService implements Runnable {
 					byte[] data = null
 					while ((data = r.readData())!=null){
 						frameCount++
-						frames.add(Base64.encodeBase64String(data))
+						frames.add(Base64.encoder.encodeToString(data))
 						if (frames.size() == FRAMES_PER_POST) {
 							if (!frameService.saveFrames(u.domainId,origin,frames)) {
 								throw new IOException("Failed to save frames")

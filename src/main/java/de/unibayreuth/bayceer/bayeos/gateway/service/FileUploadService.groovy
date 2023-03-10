@@ -60,7 +60,7 @@ class FileUploadService {
 	}
 
 	public boolean delete(Long id) {
-		Upload u = repo.findOne(userSession.getUser(),id);
+		Upload u = repo.getById(id);
 		if (u!=null) {
 			repo.delete(userSession.getUser(),id);
 			File f = localFilePath.resolve(u.getUuid().toString() + ".bin").toFile();
