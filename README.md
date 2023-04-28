@@ -61,6 +61,12 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.9.0, April  2023
+- New: Virtual channel calculation types onInsert and onCalculate
+- Fixed: Resize window event changes chart size on board chart page 
+- New: Virtual channel definition on board creates channel on board immediately 
+- New: Last in wins on channel observation values at the same time
+
 ### Version 2.8.6, Mar., 2023
 - Fixed: File import job fails on base64 encoding 
 

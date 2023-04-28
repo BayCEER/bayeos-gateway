@@ -16,6 +16,9 @@ public class VirtualChannelWebFlow implements Serializable {
 	public Integer index;
 
 	public ChannelFunction function;
+	
+	public VirtualChannelEvent event;
+	
 
 	// Parameter binding
 	public Map<String, Binding> binding;
@@ -84,4 +87,12 @@ public class VirtualChannelWebFlow implements Serializable {
 			this.value = value;
 		}
 	}
+
+    public VirtualChannelEvent getEvent() {
+        return event;
+    }
+
+    public void setEvent(VirtualChannelEvent event) {
+        this.event = event;
+    }
 }

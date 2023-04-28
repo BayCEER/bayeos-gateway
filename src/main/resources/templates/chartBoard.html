@@ -77,10 +77,11 @@
             <td th:id="|ct${channel.id}|" />
           </tr>
         </table>
+         
+        <div id="chart" style="height: 300px"></div>
+      	
       </div>
-      <div class="row">
-        <div id="chart" class="col-sm-12" style="height: 300px"></div>
-      </div>
+     
 
       <script type="text/javascript" th:inline="javascript">
           	/*<![CDATA[*/
@@ -162,6 +163,13 @@
 
                  }) // ajax end
            } // fetch Data end
+           
+         
+          $(window).resize(function() {
+        	    // erase the flot graph, allowing the div to shrink correctly
+        	    $('#chart').text(''); 
+        	    drawChart();
+          });
 
 
          $(document).ready(function(){

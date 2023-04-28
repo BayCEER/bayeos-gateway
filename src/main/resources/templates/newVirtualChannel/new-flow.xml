@@ -28,13 +28,13 @@
     <view-state id="func" model="vc" view="newVirtualChannel/function">
     	<binder>            	
             <binding property="index"></binding>
+            <binding property="event"></binding>
          </binder>
     	<transition on="back" to="nr">
     	</transition>    	
         <transition on="next" to="binding">
-        	<evaluate expression="vc.init(channelFunctions[vc.index])"/>        				
-        </transition>
-        
+        	<evaluate expression="vc.init(channelFunctions[vc.index])"/>        	
+        </transition>        
     </view-state>
                
     <view-state id="binding" model="vc" view="newVirtualChannel/binding">    						

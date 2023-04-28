@@ -11,13 +11,13 @@ import bayeos.frame.types.NumberType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Component
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 
-@Component
-class DeleteJob implements Runnable {
+@Service
+class DeleteThread implements Runnable {
 
 	@Autowired
 	private DataSource dataSource
@@ -31,21 +31,19 @@ class DeleteJob implements Runnable {
 	@Autowired
 	private FrameService frameService
 	
-	private Logger log = LoggerFactory.getLogger(DeleteJob.class)
+	private Logger log = LoggerFactory.getLogger(DeleteThread.class)
 
 	@Override
 	public void run() {
-		Thread.sleep(1000*waitSecs);
+        Thread.sleep(1000*waitSecs);        
 		while(true){
 			def exit = -1
 			def start = new Date()
 			def obs = 0
 			def obs_exported = 0
-			def msg = 0		
-				 
-						
+			def msg = 0						 						
 			try {
-				log.info("DeleteJob running")
+				log.info("DeleteThread running")
 				def db = new Sql(dataSource)
 				
 				try {
@@ -53,25 +51,24 @@ class DeleteJob implements Runnable {
 					db.execute("delete from observation where insert_time < now() - ?::interval",[retention])
 					obs = db.updateCount
 
-					log.info("Deleting exported observations older than ${retention}.")
+					log.info("Deleting cached observations older than ${retention}.")
 					db.execute("delete from observation_exp where insert_time < now() - ?::interval",[retention])
 					obs_exported = db.updateCount
 										
 					log.info("Deleting messages older than ${retention}.")
 					db.execute("delete from message where insert_time < now() - ?::interval",[retention])
 					msg = db.updateCount
-					
-										 
+															
 					exit = 0
 				} catch (SQLException e){
 					log.error(e.getMessage())
 					exit = -1
 				} finally {
 					db.close()
-					log.info("DeleteJob finished")
+					log.info("DeleteThread finished")
 				}
 				def millis = (new Date()).getTime() - start.getTime()
-				frameService.saveFrame("\$SYS/DeleteJob",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'obs':${obs},'obs_exported':${obs_exported},'msg':${msg},'millis':${millis}}".toString()))
+				frameService.saveFrame("\$SYS/DeleteThread",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'obs':${obs},'obs_exported':${obs_exported},'msg':${msg},'millis':${millis}}".toString()))
 				Thread.sleep(1000*waitSecs)
 			} catch (InterruptedException e){
 				break;

@@ -37,8 +37,10 @@ public class VirtualChannelWebFlowService {
 		if (b == null) throw new EntityNotFoundException("Failed to load board data."); 		
 		VirtualChannel c = new VirtualChannel();		
 		c.setChannelFunction(wf.getFunction());
+		c.setEvent(wf.getEvent());
 		c.setNr(wf.getNr());
 		c.setBoard(b);	
+		
 		List<ChannelBinding> bindings = new ArrayList<ChannelBinding>(wf.getFunction().getParameters().size());
 		for (ChannelFunctionParameter cp:wf.getFunction().getParameters()) {
 			ChannelBinding cb = new ChannelBinding();						

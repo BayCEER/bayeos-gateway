@@ -24,9 +24,12 @@ import de.unibayreuth.bayceer.bayeos.gateway.event.NewChannelEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewCommandResponseEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewMessageEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewObservationEvent
+import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelBinding
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.VirtualChannelRepository
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository
+import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannelEvent
+
 import groovy.sql.Sql
 
 
@@ -69,6 +72,14 @@ class FrameService {
 	def boolean saveFrame(String sender, ByteFrame frame) {
 		return saveFrames(null,sender,[Base64.getEncoder().encodeToString(frame.getBytes())] as List<String>)
 	}
+    
+    def boolean saveByteFrames(Long domainID, String sender, List<ByteFrame> frames) {
+        List<String> fs = new ArrayList(frames.size());
+        for (ByteFrame f:frames) {
+             fs.add(Base64.getEncoder().encodeToString(f.getBytes()))           
+        }
+        return saveFrames(domainID,sender,fs);                
+    }
 
 	def boolean saveFrames(Long domainId, String sender, List<String> frames) {
 		if ((frames == null) || (sender == null)) return
@@ -104,7 +115,7 @@ class FrameService {
 					if (b == null) {																								
 						Long id = findOrSaveBoard(db,domainId,res['origin'])
 						b = new Board(id:id, domainId: domainId, origin:res['origin'], lrt:ts,lrssi:res['rssi'], channels:[:],
-							 vchannels: vcRepo.findByBoardId(id))
+							 vchannels: vcRepo.findByBoardIdAndEvent(id,VirtualChannelEvent.insert))
 						boards[res['origin']] = b
 					} else {
 						b.lrt = ts
@@ -119,7 +130,6 @@ class FrameService {
 									b.channels[key] = findOrSaveChannel(db,b,key)
 								}
 							}
-
 							// Create virtual channels
 							for (VirtualChannel vc: b.vchannels){
 								b.channels[vc.getNr()] = findOrSaveChannel(db,b,vc.getNr())
@@ -144,11 +154,13 @@ class FrameService {
 																															
 							}
 
-
-							// Write calculated values out
-							for (VirtualChannel vc: b.vchannels){
-								try {									
-									def chaId = b.channels[vc.getNr()]
+							// Write calculated values out                                              
+							for (VirtualChannel vc: b.vchannels){                                
+								try {	                                    
+                                    if (!vc.allParamsExisting(res['value'].keySet())){
+                                        continue
+                                    }								                                                                      
+									def chaId = b.channels[vc.getNr()]                                                                       
 									def vcValue = vc.eval(scriptEngine, res['value'])									
 									if (chaId != null && vcValue != null){																														
 										Float value = (Float)vcValue;
@@ -222,7 +234,7 @@ class FrameService {
 
 
 
-	private Long findOrSaveBoard(Sql db, Long domainId, String origin) throws SQLException {
+	public Long findOrSaveBoard(Sql db, Long domainId, String origin) throws SQLException {
 		def b;	
 		if (domainId == null) {
 			b = db.firstRow("select id from board where origin = ? and (domain_id is null or domain_id_created is null);",[origin])
@@ -241,7 +253,7 @@ class FrameService {
 		}
 	}
 
-	private Long findOrSaveChannel(Sql db, Board board, String channelNr) throws SQLException {		
+	public Long findOrSaveChannel(Sql db, Board board, String channelNr) throws SQLException {		
 		def c = db.firstRow("select id from channel c where board_id = ? and nr = ?;",[board.id, channelNr])
 		if (c==null){
 			def b = db.firstRow("select deny_new_channels from board where id=?",[board.id])
@@ -261,7 +273,7 @@ class FrameService {
 	}
 
 
-	private void updateMetaInfo(Sql db, Board board) throws SQLException {
+	public void updateMetaInfo(Sql db, Board board) throws SQLException {
 
 		def channels = board.channels
 		db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 

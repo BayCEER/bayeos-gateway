@@ -76,7 +76,7 @@
 		<table class="table table-striped">
 			<thead>
 				<tr>
-					<th th:text="#{e.channel}"></th>
+					<th th:text="#{e.channel}"></th>					
 					<th>
 						<div class="btn-group pull-right">
 							<div
@@ -87,8 +87,11 @@
 			</thead>
 			<tbody>
 				<tr th:each="vc : ${board.getVirtualChannels()}">
-					<td><a th:href="@{/virtualChannels/{id}(id=${vc.id})}"
-						th:text="${vc.getDeclaration()}">x=fa(p=nr)</a></td>
+					<td>
+					<span th:if="${vc.event.name() == 'insert'}" class="glyphicon glyphicon-save"  data-toggle="tooltip" th:title="#{vc.onInsert.note}"></span> 
+					<span th:if="${vc.event.name() == 'calculate'}" class="glyphicon glyphicon-flash" data-toggle="tooltip" th:title="#{vc.onCalculate.note}"></span>
+					<a th:href="@{/virtualChannels/{id}(id=${vc.id})}"
+						th:text="${vc.getDeclaration()}">Channel Name</a></td>					
 					<td>
 						<div class="pull-right">
 							<div

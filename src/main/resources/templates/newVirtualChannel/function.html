@@ -23,7 +23,22 @@
               th:selected="${vc.index}"
             ></option>
           </select>
+          
+          
         </div>
+        
+        <div class="form-group">
+        	<label th:text="|#{vc.event}:|" class="control-label">Event:</label>
+        	<select name="event" class="form-control">        	
+        		<option 
+        			th:each="event : ${T(de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannelEvent).values()}" 
+        			th:value="${event}"
+        			th:text="${event}" 
+        			th:selected="${vc.event}">
+        		</option>
+        	</select>
+        </div>
+        
         <div class="form-group">
           <a
             th:href="${flowExecutionUrl}+'&amp;_eventId=back'"
