@@ -174,7 +174,7 @@ class FrameService {
 											}
 									}									
 								} catch (Exception e){
-									log.warn("Failed to calculate virtual channel value:${vc.nr} on board: ${vc.board.origin}")
+									log.warn("Failed to calculate vc:${vc.nr} on board_origin: ${vc.board.origin} board_id:${vc.board.id}")
 									log.error(e.getMessage())
 								}
 							}
