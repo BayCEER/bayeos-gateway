@@ -91,7 +91,7 @@ public class VirtualChannel extends UniqueEntity {
             } else {
                 first = false;
             }            
-            b.append(cb.getParameter().getName());
+            b.append((cb.getValue()!=null)?cb.getParameter().getName().toUpperCase():cb.getParameter().getName());
             b.append("=").append((cb.getValue() != null) ? cb.getValue() : cb.getNr());
         }
         b.append(")");
