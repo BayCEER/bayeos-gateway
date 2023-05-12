@@ -19,6 +19,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import org.apache.logging.log4j.util.Strings;
+
 /**
  * Entity implementation class for Entity: VirtualChannel
  *
@@ -47,15 +49,25 @@ public class VirtualChannel extends UniqueEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
-
-    public boolean allParamsExisting(Set<String> params) {
-        for (ChannelBinding b : channelBindings) {
-            if (!params.contains(b.getNr())) {
+    
+    public boolean evaluable(Map<String, Object> values) {
+        for (ChannelBinding b : channelBindings) {            
+            if (b.getValue()!=null) {
+                // Constant 
+                continue;
+            }            
+            if (!values.containsKey(b.getNr())) {
+                // Missing parameter in frame   
                 return false;
-            }
+            }            
+            if (values.get(b.getNr())==null) {
+                // Parameter value is null
+                return false;
+            }                                    
         }
         return true;
     }
+   
 
     public Object eval(ScriptEngine engine, Map<String, Object> values) throws ScriptException {
         Map<String, Object> params = new HashMap<>(channelBindings.size());
@@ -78,9 +90,9 @@ public class VirtualChannel extends UniqueEntity {
                 b.append(",");
             } else {
                 first = false;
-            }
-            b.append(cb.getParameter().getName()).append("=")
-                    .append((cb.getValue() != null) ? cb.getValue() : cb.getNr());
+            }            
+            b.append(cb.getParameter().getName());
+            b.append("=").append((cb.getValue() != null) ? cb.getValue() : cb.getNr());
         }
         b.append(")");
         return b.toString();

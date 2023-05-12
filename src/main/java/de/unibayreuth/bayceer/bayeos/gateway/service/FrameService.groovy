@@ -155,9 +155,11 @@ class FrameService {
 							}
 
 							// Write calculated values out                                              
-							for (VirtualChannel vc: b.vchannels){                                
+							for (VirtualChannel vc: b.vchannels){
+                                log.debug("Calculating vc:${vc} on board:${vc.board.origin}")                                
 								try {	                                    
-                                    if (!vc.allParamsExisting(res['value'].keySet())){
+                                    if (!vc.evaluable(res['value'])){
+                                        log.debug("Virtual function vc:${vc} not evaluable")
                                         continue
                                     }								                                                                      
 									def chaId = b.channels[vc.getNr()]                                                                       
@@ -173,7 +175,7 @@ class FrameService {
 												b.records++
 											}
 									}									
-								} catch (Exception e){
+								} catch (ScriptException e){
 									log.warn("Failed to calculate vc:${vc.nr} on board_origin: ${vc.board.origin} board_id:${vc.board.id}")
 									log.error(e.getMessage())
 								}

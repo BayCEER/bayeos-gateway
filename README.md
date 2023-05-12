@@ -60,6 +60,9 @@ Let's send the cpu load of our pc to a local gateway:
 - **Oliver Archner** - _Developer_ - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.9.3, May  2023
+- Fixed: Wrong data type in obs_insert trigger
+- Fixed: Virtual function evaluable check
 
 ### Version 2.9.0, April  2023
 - New: Virtual channel calculation types onInsert and onCalculate

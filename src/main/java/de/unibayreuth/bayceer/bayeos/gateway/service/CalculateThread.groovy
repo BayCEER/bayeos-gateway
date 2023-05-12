@@ -108,22 +108,26 @@ public class CalculateThread implements Runnable {
                                             log.warn("Virtual channel:${rec.id} not found.")
                                             return
                                         }                                        
-                                        log.info("Calculate virtual channel:${vc.nr} on board:${vc.board.origin}")
+                                        log.debug("Calculate vc:${vc} on board:${vc.board.origin}")
                                         def values  = [:]
                                         for (b in vc.channelBindings) {
-                                            if (b.parameter != null) {
+                                            if (b.value == null && b.nr != null) {
                                                 def val = db.firstRow("""select oc.result_value from observation_calc oc join channel c on oc.channel_id = c.id
                                                   where oc.result_time = ${rec.result_time} and c.nr = ${b.nr}""")
                                                 if (val == null) {
-                                                    log.warn("Incomplete function values.")
+                                                    log.debug("Function value not found.")
                                                     return
                                                 }
                                                 values[b.nr] = val.result_value
                                             }
                                         }
+                                        if (!vc.evaluable(values)) {
+                                            log.debug("Virtual function vc:${vc} not evaluable")
+                                            return
+                                        }
                                         def result = [:]
                                         result[vc.nr] = vc.eval(scriptEngine, values)
-                                        log.debug("Input:${MapUtils.toString(values)} Time:${rec.result_time} Result:${MapUtils.toString(result)})")
+                                        // log.debug("Input:${MapUtils.toString(values)} Time:${rec.result_time} Result:${MapUtils.toString(result)})")
                                         def frame = new TimestampFrame(rec.result_time,new LabeledFrame(NumberType.Float32,result))
                                         frameService.saveFrame(vc.board.getDomainId(),vc.board.origin,frame.getBytes())
                                         rowVC++
