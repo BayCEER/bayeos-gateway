@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.Formula;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 
 @Entity
 public class Channel extends UniqueEntity implements Comparable<Channel>{
@@ -74,6 +76,7 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="board_id", nullable = false)
+	@JsonBackReference
 	private Board board;
 
 	@ManyToOne(fetch=FetchType.LAZY)

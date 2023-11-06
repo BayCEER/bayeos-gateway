@@ -6,6 +6,8 @@
   - [Table of Contents](#table-of-contents)
   - [Document History](#document-history)
   - [General Notes](#general-notes)
+  - [Board](#board)
+  	 - [Get board by ID](#get-board-by-id)
   - [Board Comment](#board-comment)
     - [Create board comment](#create-board-comment)
     - [Update board comment](#update-board-comment)
@@ -32,10 +34,118 @@
 | 2021-03-18 | Oliver Archner | User API GET request support                    |
 | 2022-05-10 | Oliver Archner | Board command API added                         |
 | 2022-06-19 | Oliver Archner | Missing BoardCommand methods documented         |
+| 2023-10-06 | Oliver Archner | New BoardRestController.getBoard method added   |
 
 ## General Notes
 
 All example requests use an authorization header with default credentials on localhost. Please adapt these settings according to your BayEOS Gateway situation.
+
+## Board 
+
+### Get board by id 
+```javascript
+GET /gateway/rest/board/4 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+
+Response Body:
+{
+    "id": 4,
+    "domain": null,
+    "name": "Wind Vane",
+    "samplingInterval": null,
+    "checkDelay": null,
+    "excludeFromNagios": false,
+    "filterCriticalValues": false,
+    "domainIdCreated": null,
+    "origin": "ME",
+    "lastRssi": null,
+    "lastResultTime": "2023-11-06T14:20:36.652+00:00",
+    "notifications": [],
+    "dbFolderId": null,
+    "dbAutoExport": false,
+    "denyNewChannels": false,
+    "channels": [
+        {
+            "id": 17,
+            "nr": "1",
+            "name": "Speed",
+            "phenomena": null,
+            "criticalMax": null,
+            "criticalMin": null,
+            "warningMax": null,
+            "warningMin": null,
+            "samplingInterval": null,
+            "checkDelay": null,
+            "excludeFromNagios": false,
+            "filterCriticalValues": false,
+            "statusValid": "ok",
+            "statusValidMsg": "Value Ok",
+            "channelCounts": null,
+            "lastResultTime": "2023-11-06T14:20:36.652+00:00",
+            "lastResultValue": 1.0,
+            "dbSeriesId": null,
+            "dbExcludeAutoExport": false,
+            "unit": null,
+            "spline": null,
+            "aggrInterval": null,
+            "aggrFunction": null,
+            "status": null,
+            "nagios": true,
+            "autoExport": true,
+            "statusComplete": null,
+            "quantity": "Speed"
+        },
+        {
+            "id": 16,
+            "nr": "2",
+            "name": "Direction",
+            "phenomena": null,
+            "criticalMax": null,
+            "criticalMin": null,
+            "warningMax": null,
+            "warningMin": null,
+            "samplingInterval": null,
+            "checkDelay": null,
+            "excludeFromNagios": false,
+            "filterCriticalValues": false,
+            "statusValid": "ok",
+            "statusValidMsg": "Value Ok",
+            "channelCounts": null,
+            "lastResultTime": "2023-11-06T14:20:36.652+00:00",
+            "lastResultValue": 2.0,
+            "dbSeriesId": null,
+            "dbExcludeAutoExport": false,
+            "unit": null,
+            "spline": null,
+            "aggrInterval": null,
+            "aggrFunction": null,
+            "status": null,
+            "nagios": true,
+            "autoExport": true,
+            "statusComplete": null,
+            "quantity": "Direction"
+        }
+    ],
+    "virtualChannels": [],
+    "channelStatus": 0,
+    "boardGroup": null,
+    "status": 0,
+    "nagios": true,
+    "channelNrs": [
+        "1",
+        "2"
+    ],
+    "rssiLevel": null,
+    "channelIds": [
+        17,
+        16
+    ],
+    "domainId": null
+}
+```
+
 
 ## Board Comment
 

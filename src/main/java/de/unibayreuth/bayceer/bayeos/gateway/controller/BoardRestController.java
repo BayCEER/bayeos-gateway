@@ -13,8 +13,11 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,10 +30,11 @@ import de.unibayreuth.bayceer.bayeos.gateway.DomainFilter;
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Observation;
+import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
 
 @RestController
-public class BoardRestController {
+public class BoardRestController extends AbstractController {
 		
 	
 	@Autowired
@@ -62,6 +66,17 @@ public class BoardRestController {
 	public DataTablesOutput<Board> findBoards(@Valid @RequestBody DataTablesInput input) {				
 		boardSearch.setInput(input);				
 		return repo.findAll(userSession.getUser(),domainFilter,input);	
+	}
+	
+	
+	@RequestMapping(path ="/rest/board/{id}", method = RequestMethod.GET)
+	public ResponseEntity getBoard(@PathVariable Long id) {
+	    Board board = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());  ;       
+        User user = userSession.getUser();
+        if (!user.inNullDomain()) {
+            checkRead(board);   
+        }           
+        return new ResponseEntity<Board>(board,HttpStatus.OK);
 	}
 	
  
