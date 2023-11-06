@@ -70,7 +70,7 @@ class FrameService {
 	}
 	
 	def boolean saveFrame(String sender, ByteFrame frame) {
-		return saveFrames(null,sender,[Base64.getEncoder().encodeToString(frame.getBytes())] as List<String>)
+		return saveFrames(1,sender,[Base64.getEncoder().encodeToString(frame.getBytes())] as List<String>)
 	}
     
     def boolean saveByteFrames(Long domainID, String sender, List<ByteFrame> frames) {
@@ -246,8 +246,10 @@ class FrameService {
 					
 		if (b==null) {
 			log.info("Creating new board:${origin}")
+            def ic = db.firstRow("select id from influx_connection where domain_id = ? and is_default = true;",[domainId])
+            def icId = ic ? ic.id:null            
 			def seq = db.firstRow("select nextval('board_id_seq') as id;")
-			db.execute """insert into board (id,domain_id,domain_id_created, origin) values (${seq.id},${domainId},${domainId},${origin});"""
+			db.execute """insert into board (id,domain_id,domain_id_created, origin, influx_connection_id) values (${seq.id},${domainId},${domainId},${origin},${icId});"""
 			eventProducer.addFrameEvent(new NewBoardEvent(seq.id))
 			return seq.id
 		} else {
@@ -292,7 +294,7 @@ class FrameService {
 						//	Get values
 						def obs = db.firstRow("""select real_value(result_value,?) result_value, result_time from
 								(select * from (select * from observation  where channel_id = ? order by result_time desc limit 1) a
-								union select * from (select * from observation_exp where channel_id = ? order by result_time desc limit 1) b)
+								union select * from (select * from observation_cache where channel_id = ? order by result_time desc limit 1) b)
 								c order by result_time desc limit 1;""",[cha.spline_id, cha.id, cha.id])
 
 						if (obs!=null){
@@ -320,7 +322,7 @@ class FrameService {
 												(select count(*) as n from observation where channel_id = :channel_id and result_time between
 												(now() - ( (10*:sampling_interval+:check_delay) || ' seconds')::interval) and
 												(now() - (:check_delay || ' seconds')::interval)) a, 								    
-												(select count(*) as n from observation_exp where channel_id = :channel_id and result_time between
+												(select count(*) as n from observation_cache where channel_id = :channel_id and result_time between
 												(now() - ( (10*:sampling_interval+:check_delay) || ' seconds')::interval) and
 												(now() - (:check_delay || ' seconds')::interval)) b""", ['channel_id':cha.id, 'sampling_interval':cha.sampling_interval,'check_delay':cha.check_delay])
 								lastCount = s.sum

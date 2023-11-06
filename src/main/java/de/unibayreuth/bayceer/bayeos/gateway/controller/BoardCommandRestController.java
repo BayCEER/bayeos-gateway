@@ -45,7 +45,7 @@ public class BoardCommandRestController extends AbstractController {
 			return new ResponseEntity<String>("No command found", HttpStatus.OK);
 		}
 		User user = userSession.getUser();
-		if (!user.inNullDomain()) {
+		if (!user.inDefaultDomain()) {
 			checkWrite(bc.getBoard());	
 		}		
 		repoCommand.delete(bc);
@@ -60,7 +60,7 @@ public class BoardCommandRestController extends AbstractController {
 		
 		Board board = repoBoard.findById(id).orElseThrow(()-> new EntityNotFoundException());	;		
 		User user = userSession.getUser();
-		if (!user.inNullDomain()) {
+		if (!user.inDefaultDomain()) {
 			checkRead(board);	
 		}									
 		return repoCommand.findAll(input, null, boardId(id));

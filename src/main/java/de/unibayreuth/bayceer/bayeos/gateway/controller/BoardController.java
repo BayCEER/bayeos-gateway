@@ -28,6 +28,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardGroupRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardTemplateRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.ContactRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.InfluxConnectionRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.BoardTemplateService;
 
 @Controller
@@ -56,6 +57,9 @@ public class BoardController extends AbstractController {
 	
 	@Autowired
 	NotificationRepository repoNotification;
+	
+	@Autowired
+	InfluxConnectionRepository repoInfluxConnection;
 		
 	@RequestMapping(value = { "/", "/boards" }, method = RequestMethod.GET)
 	public String list(Model model) {
@@ -71,6 +75,7 @@ public class BoardController extends AbstractController {
 		}
 		model.addAttribute("board", b);
 		model.addAttribute("groups", repoGroup.findAll(userSession.getUser(), null));
+		model.addAttribute("influxConnections", repoInfluxConnection.findAll(userSession.getUser(),null));
 		model.addAttribute("tab", tab);
 		return "editBoard";
 	}

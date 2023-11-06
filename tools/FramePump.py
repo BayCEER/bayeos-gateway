@@ -9,8 +9,8 @@ import math
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(message)s")                
 
-NAME = 'FramePump'
-URL = 'http://localhost:5533/gateway/frame/saveFlat'
+NAME = 'Modem1'
+URL = 'http://localhost:5535/gateway-influx/frame/saveFlat'
 USER= 'root'
 PASSWORD = 'bayeos'
 PATH = path.join(tempfile.gettempdir(),'bayeos-device')
@@ -25,7 +25,7 @@ sender.start()
 theta=0
 u = 2
 while True:
-    writer.save({"theta":theta,"u":u},origin="Wind")        
+    writer.save({"theta":theta,"u":u},origin="Modem1/WindVane/P0")        
     theta+=10    
     if theta > 360:
         theta = 0

@@ -13,7 +13,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th th:if="${#authentication.principal.inNullDomain()}">
+            <th th:if="${#authentication.principal.inDefaultDomain()}">
               <a
                 class="sorted"
                 sd:pagination-sort="domainName"
@@ -35,7 +35,7 @@
         </thead>
         <tbody>
           <tr th:each="i : ${intervals}">
-            <td th:if="${#authentication.principal.inNullDomain()}">
+            <td th:if="${#authentication.principal.inDefaultDomain()}">
               <a
                 th:if="${i.domain} != null"
                 th:href="@{/domains/{id}(id=${i.domain.id})}"
@@ -53,10 +53,9 @@
                 >Name A</a
               >
             </td>
-            <td>
-              <div class="pull-right">
+            <td class="pull-right">              
                 <th:block
-                  th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}"
+                  th:if="${@accessService.isWriteable(i)}"
                 >
                   <div
                     th:replace="table::edit(@{'/intervals/' + ${i.id}},false)"
@@ -64,8 +63,7 @@
                   <div
                     th:replace="table::delete(@{'/intervals/delete/' + ${i.id}},false)"
                   ></div>
-                </th:block>
-              </div>
+                </th:block>              
             </td>
           </tr>
         </tbody>

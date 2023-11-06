@@ -17,7 +17,7 @@
               <table class="table table-striped">
                 <thead>
                   <tr>
-                    <th th:if="${#authentication.principal.inNullDomain()}">
+                    <th th:if="${#authentication.principal.inDefaultDomain()}">
                       <a
                         class="sorted"
                         sd:pagination-sort="domainName"
@@ -106,7 +106,7 @@
                 </thead>
                 <tbody>
                   <tr th:each="u : ${users}">
-                    <td th:if="${#authentication.principal.inNullDomain()}">
+                    <td th:if="${#authentication.principal.inDefaultDomain()}">
                       <a
                         th:if="${u.domain} != null"
                         th:href="@{/domains/{id}(id=${u.domain.id})}"

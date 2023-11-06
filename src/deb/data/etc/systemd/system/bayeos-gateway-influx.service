@@ -1,0 +1,9 @@
+[Unit]
+Description=bayeos-gateway-influx
+
+[Service]
+User=bayeos
+ExecStart=/var/lib/bayeos-gateway-influx/bayeos-gateway-influx.jar
+
+[Install]
+WantedBy=multi-user.target

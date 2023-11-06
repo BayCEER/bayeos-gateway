@@ -19,8 +19,7 @@ public class Unit extends NamedDomainEntity  {
 
 	private String abbrevation;
 
-	@Column(name="db_unit_id")
-	private Integer dbUnitId;
+	
 
 	public String getAbbrevation() {
 		return abbrevation;
@@ -30,12 +29,6 @@ public class Unit extends NamedDomainEntity  {
 		this.abbrevation = abbrevation;
 	}
 
-	public Integer getDbUnitId() {
-		return dbUnitId;
-	}
 
-	public void setDbUnitId(Integer dbUnitId) {
-		this.dbUnitId = dbUnitId;
-	}
 	
 }

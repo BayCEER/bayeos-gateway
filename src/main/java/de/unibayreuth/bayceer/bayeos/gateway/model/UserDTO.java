@@ -45,7 +45,7 @@ public class UserDTO {
 		this.name = u.getName();
 		u.setFullName();
 		this.fullName = u.getFullName();
-		if (!u.inNullDomain()) {
+		if (!u.inDefaultDomain()) {
 			this.domain = u.getDomain().getName();
 		}				
 	}

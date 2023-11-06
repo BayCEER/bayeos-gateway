@@ -65,12 +65,9 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 	@Column(name="last_result_value",insertable=false,updatable=false)
 	private Float lastResultValue;
 	
-	
-	@Column(name="db_series_id")
-	private Integer dbSeriesId;
-
-	@Column(name="db_exclude_auto_export")
-	private Boolean dbExcludeAutoExport = false;
+		
+	@Column(name="export")
+	private Boolean export = true;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="board_id", nullable = false)
@@ -145,12 +142,12 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 		}		   			
 	}
 
-	public Boolean getAutoExport(){
-		return !this.dbExcludeAutoExport;
+	public Boolean getExport(){
+		return export;
 	}
 	
-	public void setAutoExport(Boolean autoExport) {
-		this.setDbExcludeAutoExport(!autoExport);
+	public void setExport(Boolean export) {
+		this.setExport(export);
 	}
 
 	
@@ -359,30 +356,7 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 		this.lastResultValue = lastResultValue;
 	}
 
-
-
-	public Integer getDbSeriesId() {
-		return dbSeriesId;
-	}
-
-
-
-	public void setDbSeriesId(Integer dbSeriesId) {
-		this.dbSeriesId = dbSeriesId;
-	}
-
-
-
-	public Boolean getDbExcludeAutoExport() {
-		return dbExcludeAutoExport;
-	}
-
-
-
-	public void setDbExcludeAutoExport(Boolean dbExcludeAutoExport) {
-		this.dbExcludeAutoExport = dbExcludeAutoExport;
-	}
-
+	
 
 
 	public Board getBoard() {

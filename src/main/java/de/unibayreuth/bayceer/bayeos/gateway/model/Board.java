@@ -55,20 +55,17 @@ public class Board extends NamedDomainEntity {
 	@OneToMany(mappedBy="board")
 	List<Notification> notifications;
 	
-	Integer dbFolderId;
 	
-	Boolean dbAutoExport = false;
+	Boolean export = false;
 	
 	Boolean denyNewChannels = false;
-	
 	
 	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)	
 	List<Channel> channels;
 		
 	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)
 	List<VirtualChannel> virtualChannels;
-			
-	
+				
 	@JsonView(DataTablesOutput.View.class)	
 	@Formula("(select get_board_status(id))")
 	Integer channelStatus;
@@ -77,6 +74,13 @@ public class Board extends NamedDomainEntity {
 	@JoinColumn(name = "board_group_id")
 	@JsonView(DataTablesOutput.View.class)	
 	BoardGroup boardGroup;
+	
+	@ManyToOne  
+	@JoinColumn(name = "influx_connection_id")
+	InfluxConnection influxConnection;
+	
+	@Column(name="influx_measurement")
+	String influxMeasurement;
 	
 				
 	public Integer getStatus() {
@@ -208,21 +212,14 @@ public class Board extends NamedDomainEntity {
 	public void setLastResultTime(Date lastResultTime) {
 		this.lastResultTime = lastResultTime;
 	}
+	
 
-	public Integer getDbFolderId() {
-		return dbFolderId;
+	public Boolean getExport() {
+		return export;
 	}
 
-	public void setDbFolderId(Integer dbFolderId) {
-		this.dbFolderId = dbFolderId;
-	}
-
-	public Boolean getDbAutoExport() {
-		return dbAutoExport;
-	}
-
-	public void setDbAutoExport(Boolean dbAutoExport) {
-		this.dbAutoExport = dbAutoExport;
+	public void setExport(Boolean export) {
+		this.export = export;
 	}
 
 	public Boolean getDenyNewChannels() {
@@ -282,7 +279,23 @@ public class Board extends NamedDomainEntity {
 		return true;
 	}
 
-	
+    public InfluxConnection getInfluxConnection() {
+        return influxConnection;
+    }
 
-	
+    public void setInfluxConnection(InfluxConnection influxConnection) {
+        this.influxConnection = influxConnection;
+    }
+
+    public String getInfluxMeasurement() {
+        return influxMeasurement;
+    }
+
+    public void setInfluxMeasurement(String measurement) {
+        this.influxMeasurement = measurement;
+    }
+
+   
+
+   
 }

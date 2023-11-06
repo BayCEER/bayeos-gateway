@@ -11,6 +11,9 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import javassist.expr.Instanceof;
+import net.bytebuddy.utility.dispatcher.JavaDispatcher.Instance;
+
 @MappedSuperclass
 public abstract class UniqueEntity implements Serializable {
 	
@@ -33,7 +36,17 @@ public abstract class UniqueEntity implements Serializable {
 	
 	
 	
-		
+	@Override
+		public boolean equals(Object obj) {	
+	        if (obj == null) {
+	            return false;
+	        }
+	        
+	        if (obj.getClass() != this.getClass()) {
+	            return false;
+	        }
+		    return this.getId().equals(((UniqueEntity)obj).getId()) ;
+		}	
 		
 	
 }

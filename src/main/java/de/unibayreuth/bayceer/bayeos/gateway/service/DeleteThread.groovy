@@ -52,7 +52,7 @@ class DeleteThread implements Runnable {
 					obs = db.updateCount
 
 					log.info("Deleting cached observations older than ${retention}.")
-					db.execute("delete from observation_exp where insert_time < now() - ?::interval",[retention])
+					db.execute("delete from observation_cache where insert_time < now() - ?::interval",[retention])
 					obs_exported = db.updateCount
 										
 					log.info("Deleting messages older than ${retention}.")

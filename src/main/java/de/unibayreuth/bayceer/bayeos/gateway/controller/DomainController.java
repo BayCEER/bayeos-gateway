@@ -28,7 +28,7 @@ public class DomainController extends AbstractController {
 	
 	@RequestMapping(value="/domains/create", method=RequestMethod.GET)
 	public String create(Model model) throws AccessDeniedException {
-		if (userSession.getUser().inNullDomain()) {
+		if (userSession.getUser().inDefaultDomain()) {
 			model.addAttribute("domain", new Domain());
 			return "editDomain";
 		} else {
@@ -38,7 +38,7 @@ public class DomainController extends AbstractController {
 
 	@RequestMapping(value = "/domains/save", method = RequestMethod.POST)
 	public String save(@Valid Domain domain, BindingResult bindingResult, RedirectAttributes redirect, Locale locale) throws AccessDeniedException {
-		if (!userSession.getUser().inNullDomain()) {
+		if (!userSession.getUser().inDefaultDomain()) {
 			throw new AccessDeniedException("Failed to save domain");
 		}
 				
@@ -53,7 +53,7 @@ public class DomainController extends AbstractController {
 
 	@RequestMapping(value = "/domains", method = RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable) throws AccessDeniedException {
-		if (!userSession.getUser().inNullDomain()) {
+		if (!userSession.getUser().inDefaultDomain()) {
 			throw new AccessDeniedException("Failed to read domain");
 		}
 		model.addAttribute("domains", repo.findAll(pageable));		
@@ -62,7 +62,7 @@ public class DomainController extends AbstractController {
 
 	@RequestMapping(value = "/domains/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model) throws AccessDeniedException {
-		if (!userSession.getUser().inNullDomain()) {
+		if (!userSession.getUser().inDefaultDomain()) {
 			throw new AccessDeniedException("Failed to edit domain");
 		}				
 		model.addAttribute("domain", repo.findById(id).orElseThrow(()->new EntityNotFoundException()));
@@ -71,7 +71,7 @@ public class DomainController extends AbstractController {
 	
 	@RequestMapping(value="/domain/delete/{id}", method=RequestMethod.GET)
 	public String delete(@PathVariable Long id , RedirectAttributes redirect, Locale locale) throws AccessDeniedException {
-		if (!userSession.getUser().inNullDomain()) {
+		if (!userSession.getUser().inDefaultDomain()) {
 			throw new AccessDeniedException("Failed to delete domain");
 		}		
 		repo.deleteById(id);

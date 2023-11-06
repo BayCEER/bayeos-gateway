@@ -32,7 +32,7 @@
 						<div
 							th:replace="field::checkbox('denyNewChannels',#{board.denyNewChannels})"></div>
 						<div
-							th:replace="field::checkbox('dbAutoExport',#{board.autoExport})"></div>
+							th:replace="field::checkbox('export',#{board.export})"></div>
 					</div>
 				</div>
 
@@ -124,22 +124,45 @@
 						</div>
 						<div role="tabpanel" class="tab-pane fade" id="settings">
 						
-							<div th:replace="block::boardSettings(Checks)"></div>
 						
+							<div class="block">
+								<div class="block-header">Exports</div>
+								<div class="row">
+									<div class="col-sm-3">
+ 										<div th:replace="field::text(prop='influxMeasurement',label=#{board.influxMeasurement})"> 
+										</div>										
+									</div>									
+									<div class="col-sm-3">
+											<div
+							th:replace="field::select('influxConnection',#{e.influxConnection},${influxConnections})"></div>
+					</div>																			
+																	
+								</div>
+							</div>
+						
+							<div class="block">
+								<div class="block-header">Checks</div>
+								<div class="row">													
+									<div class="col-sm-3">
+										<div
+											th:replace="field::number(prop='samplingInterval',label=#{chkDev.samplingInt},step=1)"></div>
+										</div>
+									<div class="col-sm-3">
+										<div
+											th:replace="field::number(prop='checkDelay',label=#{chkDev.checkDelay},step=1)"></div>
+									</div>																
+								</div>
+							</div>
+														
+													
 							<div class="block">
 								<div class="block-header">Advanced Settings</div>
 								<div class="row">
-									<div class="col-sm-6">
+									<div class="col-sm-3">
 										<div th:replace="field::text(prop='origin',label=#{board.origin},required=true)"></div>
-									</div>
-									<div class="col-sm-6">										
-										<div th:replace="field::number(prop='dbFolderId',label=#{a.dbId},step=1)"></div>
-									</div>
+									</div>								
 								</div>
 							</div>							
-							
-							
-
 						</div>
 						<div role="tabpanel" class="tab-pane fade in" id="messages">
 							<table id="tableMessages"

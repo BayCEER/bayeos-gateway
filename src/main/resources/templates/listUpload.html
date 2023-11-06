@@ -24,7 +24,7 @@
       <table class="table table-condensed">
         <thead>
           <tr>
-            <th th:if="${#authentication.principal.inNullDomain()}">
+            <th th:if="${#authentication.principal.inDefaultDomain()}">
               <a
                 class="sorted"
                 sd:pagination-sort="domainName"
@@ -75,9 +75,9 @@
         </thead>
         <tbody>
           <tr th:each="f : ${uploads}">
-            <td th:if="${#authentication.principal.inNullDomain()}">
+            <td th:if="${#authentication.principal.inDefaultDomain()}">
               <a
-                th:if="${f.domainId} != null"
+                th:if="${f.domain.id} != null"
                 th:href="@{/domains/{id}(id=${f.domainId})}"
                 th:text="${f.domain.name}"
                 >Domain</a

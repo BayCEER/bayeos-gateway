@@ -43,7 +43,7 @@ public class FrameController extends AbstractController {
 				String sender = getSender(params);
 				List<String> frames = getFrames(params);
 				log.info("Received " + frames.size() + " frames from " + sender);															
-				if (frameService.saveFrames(userSession.getUser().getDomainId(), sender,frames)) {
+				if (frameService.saveFrames(userSession.getUser().getDomain().getId(), sender,frames)) {
 					log.debug("Frames saved.");					
 					HttpHeaders responseHeaders = new HttpHeaders();
 					responseHeaders.set("Content-Type", "application/x-www-form-urlencoded");

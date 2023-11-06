@@ -44,7 +44,7 @@ public class CustomUserDetails extends User implements UserDetails {
 
 		@Override
 		public String getUsername() {
-			if (!inNullDomain()) {
+			if (!inDefaultDomain()) {
 				return name + "@" + getDomain().getName();
 			} else {
 				return name;

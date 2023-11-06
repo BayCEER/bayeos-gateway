@@ -13,7 +13,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th th:if="${#authentication.principal.inNullDomain()}">
+            <th th:if="${#authentication.principal.inDefaultDomain()}">
               <a
                 class="sorted"
                 sd:pagination-sort="domainName"
@@ -33,15 +33,7 @@
                 th:text="#{a.abbrevation}"
                 >Abbrevation</a
               >
-            </th>
-            <th>
-              <a
-                class="sorted"
-                sd:pagination-sort="dbUnitId"
-                th:text="#{a.dbId}"
-                >Server ID</a
-              >
-            </th>
+            </th>            
             <th>
               <div class="pull-right">
                 <div th:replace="table::add(@{'/units/create'})"></div>
@@ -51,7 +43,7 @@
         </thead>
         <tbody>
           <tr th:each="u : ${units}">
-            <td th:if="${#authentication.principal.inNullDomain()}">
+            <td th:if="${#authentication.principal.inDefaultDomain()}">
               <a
                 th:if="${u.domain} != null"
                 th:href="@{/domains/{id}(id=${u.domain.id})}"
@@ -69,12 +61,11 @@
                 >Name A</a
               >
             </td>
-            <td th:text="${u.abbrevation}">Abbrevation A</td>
-            <td th:text="${u.dbUnitId}">Server ID</td>
-            <td>
-              <div class="pull-right">
+            <td th:text="${u.abbrevation}">Abbrevation A</td>           
+            <td class="pull-right">
+              
                 <th:block
-                  th:if="${(#authentication.principal.domainId eq u.domainId) or #authentication.principal.inNullDomain()}"
+                   th:if="${@accessService.isWriteable(u)}"
                 >
                   <div
                     th:replace="table::edit(@{'/units/' + ${u.id}},false)"
@@ -83,7 +74,7 @@
                     th:replace="table::delete(@{'/units/delete/' + ${u.id}},false)"
                   ></div>
                 </th:block>
-              </div>
+              
             </td>
           </tr>
         </tbody>

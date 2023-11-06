@@ -4,7 +4,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 
 public interface UserRepository extends DomainEntityRepository<User>{
 
-	User findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalseAndPasswordIsNotNull(String string);
+	User findFirstByNameIgnoreCaseAndDomainIdAndLockedIsFalseAndPasswordIsNotNull(String string,Long id);
 
 	User findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalseAndPasswordIsNotNull(String string,
 			String string2);

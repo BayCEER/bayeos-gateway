@@ -13,7 +13,7 @@
         <thead>        	                        
                 <tr>
                 	                                                	               	 	                  
-                   <th th:text="#{e.domain}" th:class="min-tablet-l" th:if="${#authentication.principal.inNullDomain()}">Domain</th>                                                         
+                   <th th:text="#{e.domain}" th:class="min-tablet-l" th:if="${#authentication.principal.inDefaultDomain()}">Domain</th>                                                         
                    <th th:text="#{board.origin}">Origin</th>                   
                    <th th:text="#{board.group}" class="min-tablet-l">Group</th>                   
                    <th th:text="#{board.name}" class="min-tablet-l">Name</th>
@@ -36,7 +36,7 @@
  			
  			
  			var columns = []; 			
- 			if (/*[[ ${#authentication.principal.inNullDomain()} ]]*/) { 				
+ 			if (/*[[ ${#authentication.principal.inDefaultDomain()} ]]*/) { 				
  				columns.push(
  				{data: 'domain.name', 
                     render: function(data,type,row) {
@@ -171,7 +171,7 @@
  			 			
  			
  			var stompClient = null;
- 			var socket = new SockJS('/gateway/websocket');
+ 			var socket = new SockJS('/gateway-influx/websocket');
  		    stompClient = Stomp.over(socket);
  		    
  		   	stompClient.connect({}, function (frame) {

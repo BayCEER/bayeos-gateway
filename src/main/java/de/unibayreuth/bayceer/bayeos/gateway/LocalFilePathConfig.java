@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class LocalFilePathConfig {
 	
-	@Value("${LOCAL_FILE_PATH:/var/lib/bayeos-gateway/uploads}")
+	@Value("${LOCAL_FILE_PATH:/var/lib/bayeos-gateway-influx/uploads}")
 	private String localFilePath;
 	
 	@Bean

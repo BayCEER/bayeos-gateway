@@ -1,22 +1,49 @@
-#!/bin/bash
+##!/usr/bin/env bash
 set -e
-if ! id bayeos > /dev/null 2>&1 
-then	
-	useradd bayeos
+PRG="$0"
+INSTALLDIR=/usr/share/bayeos-gateway-influx
+
+# System user bayeos
+if ! getent passwd bayeos > /dev/null; then
+        adduser --quiet --system --home /var/lib/bayeos --no-create-home \
+            --shell /bin/bash --group --gecos "BayEOS Administrator" bayeos
+fi 
+if ! getent group bayeos > /dev/null; then
+        addgroup --quiet --system bayeos
+fi
+if ! id -Gn bayeos | grep -qw bayeos; then
+    adduser --quiet bayeos bayeos
+fi 
+
+
+# Files 
+chown -R bayeos:bayeos /var/lib/bayeos-gateway-influx
+
+# DB 
+if su -c - postgres 'psql -c "\q" gateway_influx > /dev/null 2>&1'
+then
+ echo "Database found" 
+else
+ echo "Create database and db user ..."
+ su -c - postgres 'createuser -r -S -D gateway_influx 2>&1'
+ su -c - postgres 'psql -c "ALTER ROLE gateway_influx PASSWORD '\'gateway_influx\''" 2>&1'
+ su -c - postgres 'createdb -O gateway_influx -E UTF-8 gateway_influx 2>&1' 
+ su -c - postgres 'psql -d gateway_influx -c "create extension IF NOT EXISTS tablefunc" 2>&1' 
+ su -c - postgres 'psql -d gateway_influx -c "create extension IF NOT EXISTS plpgsql" 2>&1'
+ su -c - postgres 'psql -d gateway_influx -c "create extension IF NOT EXISTS plperl" 2>&1'
+ su -c - postgres 'psql -d gateway_influx -c "create extension IF NOT EXISTS plperlu" 2>&1' 
 fi
 
-systemctl start postgresql.service
+su -c - postgres 'psql -c "ALTER ROLE gateway_influx superuser;" 2>&1'
+java -Djava.security.egd=file:/dev/../dev/urandom -cp $INSTALLDIR/lib/*:$INSTALLDIR/drivers/* org.flywaydb.commandline.Main -url=jdbc:postgresql://localhost/gateway_influx -driver=org.postgresql.Driver -user=gateway_influx -password=gateway_influx -locations=filesystem:$INSTALLDIR/sql migrate
+su -c - postgres 'psql -c "ALTER ROLE gateway_influx nosuperuser;" 2>&1'
 
-chmod +x /usr/share/bayeos-gateway/*.sh
-su - postgres -c /usr/share/bayeos-gateway/pg_postinst.sh
+chmod 700 /var/lib/bayeos-gateway-influx/bayeos-gateway-influx.jar
+ln -sf /etc/bayeos-gateway-influx/application.properties /var/lib/bayeos-gateway-influx/application.properties
 
-chown -R bayeos:bayeos /var/lib/bayeos-gateway 
-chmod 700 /var/lib/bayeos-gateway/bayeos-gateway.jar
-ln -sf /etc/bayeos-gateway/application.properties /var/lib/bayeos-gateway/application.properties
-
-systemctl enable bayeos-gateway.service
-systemctl start bayeos-gateway.service
+systemctl enable bayeos-gateway-influx.service
+systemctl start bayeos-gateway-influx.service
 
 a2enmod proxy proxy_http ssl remoteip rewrite 
-a2enconf bayeos-gateway.conf
+a2enconf bayeos-gateway-influx.conf
 systemctl try-reload-or-restart apache2.service

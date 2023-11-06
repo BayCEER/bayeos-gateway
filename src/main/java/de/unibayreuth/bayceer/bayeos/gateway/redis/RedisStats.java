@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
@@ -19,11 +20,9 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
-@Component
+@Service
+@ConditionalOnProperty("REDIS_EVENTS")
 public class RedisStats implements Runnable {
-	
-	@Value("${REDIS_EVENTS:false}")
-	private Boolean redis_events;
 	
 	@Value("${REDIS_STATS_WAIT_SECS:120}")
 	private Integer redis_stats_wait_secs;
@@ -54,10 +53,9 @@ public class RedisStats implements Runnable {
 	}
 
 	@Override
-	public void run() {
-		
-		try {
-			
+	public void run() {		
+		try {			
+		    log.info("RedisStats started.");
 			while(true){
 				Thread.sleep(1000*redis_stats_wait_secs);
 				log.info("Pushing stats to redis.");
@@ -70,24 +68,14 @@ public class RedisStats implements Runnable {
 				} catch (JedisException e) {
 					log.error(e.getMessage());
 				}
-				
-			
-				
-			}
-			
-			
+			}			
 		} catch (InterruptedException e){
 			log.error(e.getMessage());
-		}
-		
-
+		}		
 	}
 	
 	@PostConstruct
 	public void start(){
-		if (redis_events) {
-			new Thread(this).start();	
-		}		
+		new Thread(this).start();			
 	}
-
 }

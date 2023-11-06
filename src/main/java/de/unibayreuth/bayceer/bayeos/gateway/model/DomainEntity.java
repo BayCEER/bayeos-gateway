@@ -14,21 +14,12 @@ public abstract class DomainEntity extends UniqueEntity {
 	public DomainEntity() {
 		super();
 	}
-	
-	
+		
 	@ManyToOne	
-	@JoinColumn(name = "domain_id", nullable=true)	
+	@JoinColumn(name = "domain_id", nullable=false)	
 	@JsonView(DataTablesOutput.View.class)
 	protected Domain domain;
-		
-	public Long getDomainId() {
-		if (domain != null) {
-			return domain.getId();
-		} else {
-			return null;
-		}
-	}
-
+			
 	public Domain getDomain() {
 		return domain;
 	}
@@ -37,6 +28,10 @@ public abstract class DomainEntity extends UniqueEntity {
 		this.domain = domain;
 	}
 	
+	public boolean inDefaultDomain() {
+        return this.domain.id == 1;
+    }
+    
 	
 	
 	

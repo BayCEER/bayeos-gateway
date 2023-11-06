@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -10,10 +8,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
-	<artifactId>bayeos-gateway</artifactId>
-	<version>2.9.3</version>
-	<name>bayeos-gateway</name>
-	<description>BayEOS Gateway</description>
+	<artifactId>bayeos-gateway-influx</artifactId>
+	<version>1.0.0</version>
+	<name>bayeos-gateway-influx</name>
+	<description>BayEOS Gateway Flux</description>
 
 	<licenses>
 		<license>
@@ -36,6 +34,9 @@
 		<build.year>${maven.build.timestamp}</build.year>
 		<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
 		<maven.compiler.release>11</maven.compiler.release>
+		
+		<okhttp3.version>4.9.3</okhttp3.version>
+		
 	</properties>
 
 
@@ -61,7 +62,7 @@
 									<goal>jdeb</goal>
 								</goals>
 								<configuration>
-									<deb>${project.build.directory}/bayeos-gateway-${project.version}+${release}.deb</deb>
+									<deb>${project.build.directory}/bayeos-gateway-influx-${project.version}+${release}.deb</deb>
 									<verbose>false</verbose>
 									<dataSet>
 										<data>
@@ -70,7 +71,7 @@
 										</data>
 										<data>
 											<src>${project.build.directory}/${project.build.finalName}.jar</src>
-											<dst>/var/lib/bayeos-gateway/bayeos-gateway.jar</dst>
+											<dst>/var/lib/bayeos-gateway-influx/bayeos-gateway-influx.jar</dst>
 											<type>file</type>
 										</data>
 									</dataSet>
@@ -86,7 +87,7 @@
 
 
 	<build>
-		<finalName>bayeos-gateway</finalName>
+		<finalName>bayeos-gateway-influx</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -237,8 +238,6 @@
 		</dependency>
 
 
-
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
@@ -322,7 +321,11 @@
 			<version>2.0.2</version>
 		</dependency>
 
-		
+		<dependency>
+			<groupId>com.influxdb</groupId>
+			<artifactId>influxdb-client-java</artifactId>
+			<version>6.6.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>

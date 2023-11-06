@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{main}">
+<head>
+<title th:text="#{e.influxConnection}">Edit Connection</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="#{e.influxConnection}">Influx Connection</h3>
+		<form method="post" action="#" th:action="@{/influxConnections}"
+			th:object="${influxConnection}">
+			<input type="hidden" th:field="*{id}" />
+			<div th:replace="field::selectDomain"></div>
+			<div
+				th:replace="field::text(prop='name',label=#{a.name},required=true)"></div>
+			<div
+				th:replace="field::text(prop='url',label=#{ic.url},required=true)"></div>
+			<div
+				th:replace="field::text(prop='token',label=#{ic.token},required=true)"></div>
+			<div
+				th:replace="field::text(prop='bucket',label=#{ic.bucket},required=true)"></div>
+			<div th:replace="field::checkbox('isDefault',#{ic.default})"></div>
+
+			<div class="block-action">
+				
+				<button th:if="${writeable}" th:text="#{action.save}" type="submit"
+					class="btn btn-primary">Save</button>
+
+				<a class="btn btn-default" id="check"> <span
+					class="glyphicon glyphicon-login"></span> <span
+					th:text="#{ic.testConnection}"></span>
+				</a>
+				
+				
+				<label for="check" id="check_result" class="label"></label>
+				
+								
+
+
+				<script type="text/javascript" class="init" th:inline="javascript">
+				/*<![CDATA[*/
+					const testMsg = [ [[ #{ic.testOK} ]],[[ #{ic.testPingError} ]],[[ #{ic.testReadError} ]],[[ #{ic.testWriteError} ]]];
+					
+					$(document).ready(function(){	
+						$('#check').click(function(){
+							$('#check').addClass("disabled");
+							$.ajax(
+					                {					                	
+					                  url: [[ @{'/rest/influx-connection/test'} ]] ,
+					                  contentType: 'application/json',           
+					                  data: JSON.stringify({
+					                	  url:$('#url').val(),token:$('#token').val(),bucket:$('#bucket').val()
+					                  }),
+					                  method: 'POST',	
+					                  timeout: 5000,
+					                  success: function(data,status){							                	  
+					                	  $("#check_result").text(testMsg[data]);					                	  
+					                	  $("#check_result").addClass((data==0)?"label-success":"label-danger");  
+					                	  
+					                  },
+					                  error: function(xhr,status,error){
+					                	  $("#check_result").text([[ #{ic.testInternalError} ]]);
+					                	  $("#check_result").addClass("label-danger");
+					                  }
+					                 });
+							
+							// Wait some seconds and erase result
+							setTimeout(function () {								
+								$('#check').removeClass("disabled");
+								 $("#check_result").text("")
+								 $("#check_result").removeClass("label-success label-danger")
+        					}, 5000);							
+						});
+						
+					});
+				
+					
+
+				/*]]>*/
+				</script>
+
+			</div>
+		</form>
+	</div>
+</body>
+</html>

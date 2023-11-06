@@ -1,6 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.persistence.EntityNotFoundException;
@@ -72,8 +71,7 @@ public class ChannelController extends AbstractController {
 		model.addAttribute("channel",c);		
 		model.addAttribute("intervals",repoInterval.findAll(userSession.getUser(),null));		
 		model.addAttribute("functions",repoFunction.findAll(userSession.getUser(),null));		
-		List<Spline> splines = (userSession.getDomain() == null)?repoSpline.findAllSplines():repoSpline.findSplines(userSession.getDomain().getId()); 
-		model.addAttribute("splines",splines);		
+		model.addAttribute("splines",repoSpline.findAll(userSession.getUser(),null));		
 		model.addAttribute("units",repoUnit.findAll(userSession.getUser(),null));
 		return "editChannel";	
 	}

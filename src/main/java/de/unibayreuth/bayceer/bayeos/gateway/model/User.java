@@ -9,7 +9,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.AssertTrue;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 
@@ -66,15 +65,7 @@ public class User extends NamedDomainEntity {
 		return role.equals(Role.USER);
 	}
 				
-	
-	public boolean inNullDomain() {
-		return this.domain == null;
-	}
-	
-	public Long getDomainId() {
-		return (domain == null)?null:domain.getId();
-	}
-
+			
 	public User() {
 		super();
 	}
@@ -171,8 +162,5 @@ public class User extends NamedDomainEntity {
 			this.fullName = WordUtils.capitalizeFully(((firstName==null)?"":firstName) + ((lastName==null)?"":" " + lastName));	
 		}			
 	}
-		
-	
-	
-	
+    		
 }

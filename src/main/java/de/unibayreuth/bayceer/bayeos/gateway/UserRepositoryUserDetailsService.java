@@ -25,7 +25,7 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
     	String[] context = name.split("@");
         User user;
     	if (context.length < 2) {
-    		user = userRepository.findFirstByNameIgnoreCaseAndDomainIsNullAndLockedIsFalseAndPasswordIsNotNull(context[0]);
+    		user = userRepository.findFirstByNameIgnoreCaseAndDomainIdAndLockedIsFalseAndPasswordIsNotNull(context[0],(long) 1);
     	} else {
     		user = userRepository.findFirstByNameIgnoreCaseAndDomainNameIgnoreCaseAndLockedIsFalseAndPasswordIsNotNull(context[0],context[1]);
     	}    		               

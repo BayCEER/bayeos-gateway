@@ -31,7 +31,7 @@
               <th>Id</th>
               <th
                 th:text="#{e.domain}"
-                th:if="${#authentication.principal.inNullDomain()}"
+                th:if="${#authentication.principal.inDefaultDomain()}"
               >
                 Domain
               </th>
@@ -43,7 +43,7 @@
           <tbody>
             <tr th:each="i : ${boards}">
               <th th:text="${i.id}"></th>
-              <td th:if="${#authentication.principal.inNullDomain()}">
+              <td th:if="${#authentication.principal.inDefaultDomain()}">
                 <a
                   th:if="${i.domain} != null"
                   th:href="@{/domains/{id}(id=${i.domain.id})}"

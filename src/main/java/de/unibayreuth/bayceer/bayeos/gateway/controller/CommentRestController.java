@@ -90,10 +90,10 @@ public class CommentRestController extends AbstractController {
 	@Transactional
 	public ResponseEntity delete(@PathVariable Long id) {
 		if (repo.existsById(id)) {
-			if (userSession.getUser().inNullDomain()) {
+			if (userSession.getUser().inDefaultDomain()) {
 				repo.deleteById(id);
 			} else {
-				if (repo.findOne(where(id(id)).and(domainId(userSession.getUser().getDomainId()))).orElseThrow(()-> new EntityNotFoundException()) != null) {
+				if (repo.findOne(where(id(id)).and(domainId(userSession.getUser().getDomain().getId()))).orElseThrow(()-> new EntityNotFoundException()) != null) {
 					repo.deleteById(id);
 				} else {
 					return new ResponseEntity<String>("Comment not found", HttpStatus.BAD_REQUEST);
@@ -111,10 +111,10 @@ public class CommentRestController extends AbstractController {
 	@RequestMapping(path = "/rest/comments/board/{id}", method = RequestMethod.POST)
 	public DataTablesOutput<Comment> findComments(@Valid @RequestBody DataTablesInput input,
 			@PathVariable final Long id) {
-		if (userSession.getUser().inNullDomain()) {
+		if (userSession.getUser().inDefaultDomain()) {
 			return repo.findAll(input, null, boardId(id));
 		} else {
-			return repo.findAll(input, null, where(boardId(id)).and(domainId(userSession.getUser().getDomainId())));
+			return repo.findAll(input, null, where(boardId(id)).and(domainId(userSession.getUser().getDomain().getId())));
 		}
 	}
 

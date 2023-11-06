@@ -10,13 +10,13 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.DomainEntityRepository;
 public interface DomainRightsRepository<T extends DomainEntity> extends DataTablesRepository<T, Long> {
 	
 	default void checkWrite(User u, DomainEntity d) {		
-		if (u.getDomain()!=null && u.getDomain()  != d. getDomain()) {
+		if (!u.inDefaultDomain() && u.getDomain()  != d.getDomain()) {
 			throw new AccessDeniedException("Missing rights to save domain object"); 
 		}
 	}
 	
 	default void checkRead(User u, DomainEntity d) {
-		if (u.getDomain() != null && u.getDomain()!= d.getDomain() && !d.getDomain().getName().matches(DomainEntityRepository.nullDomainReadable)){
+		if (!u.inDefaultDomain() && u.getDomain()!= d.getDomain() && !d.getDomain().getName().matches(DomainEntityRepository.defaultDomainReadable)){
 			throw new AccessDeniedException("Missing rights to read domain object");
 		}
 		

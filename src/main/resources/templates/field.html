@@ -125,19 +125,18 @@
 
 <div th:fragment="selectDomain">
 	
-	<th:block th:if="${domainFilter.domains.size() == 0}">		 	
-		<input type="hidden" name="domain" th:value="null"/>		
+ <th:block th:if="${domainFilter.domains.size() == 1}">		 	
+		<input type="hidden" name="domain" th:value="1"/>		
 	</th:block>
-	
-	<th:block th:if="${domainFilter.domains.size()>0 and #authentication.principal.domain == null}">						
+
+	<th:block th:if="${domainFilter.domains.size()>1 and #authentication.principal.domain.id == 1}">						
 		<div th:replace="field::select('domain',#{e.domain},${domainFilter.domains})"></div>
 	</th:block>				
 				
-	<th:block th:if="${domainFilter.domains.size()>0 and #authentication.principal.domain != null}">					
-		<input th:if="*{domain}!=null" type="hidden" name="domain" th:value="*{domain.id}"/>					
-		<input th:if="*{domain}==null" type="hidden" name="domain" th:value="null"/>
-	</th:block>				
-	 		
+	<th:block th:if="${domainFilter.domains.size()>1 and #authentication.principal.domain.id != 1}">					
+		<input type="hidden" name="domain" th:value="*{domain.id}"/>							
+	</th:block>
+
 </div>
 </body>
 </html>

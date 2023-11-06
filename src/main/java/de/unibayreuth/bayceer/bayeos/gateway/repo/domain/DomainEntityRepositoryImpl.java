@@ -27,7 +27,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJpaRepository<T, Long>
 		implements DomainEntityRepository<T> {
 
-	protected Boolean nullDomainReadable = false;
+	protected Boolean defaultDomainReadable = false;
 
 	private static final Sort sortDefault = Sort.by(Direction.ASC, "domain.name");
 
@@ -37,10 +37,10 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 		};
 	};
 
-	private Specification<T> domainOrNull(Long id) {
+	private Specification<T> domainOrDefault(Long id) {
 		return (root, query, cb) -> {
 			Path<Long> p = root.get("domain").get("id");
-			return cb.or(cb.equal(p, id), cb.isNull(p));
+			return cb.or(cb.equal(p, id), cb.equal(p,1));
 		};
 	};
 
@@ -58,18 +58,13 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 
 	public DomainEntityRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager);
-
 		// This represents hard coded rights !
-		if (entityInformation.getEntityName().matches(DomainEntityRepository.nullDomainReadable)) {
-			nullDomainReadable = true;
-		} else {
-			nullDomainReadable = false;
-		}
+		defaultDomainReadable = entityInformation.getEntityName().matches(DomainEntityRepository.defaultDomainReadable);		
 	}
 
 	@Override
 	public List<T> findAllSorted(User user, DomainFilter d, Sort sort) {
-		if (user.inNullDomain()) {
+		if (user.inDefaultDomain()) {
 			// Filter
 			if (d == null || d.getId() == null) {
 				return super.findAll(sort);
@@ -78,10 +73,10 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 			}
 		} else {
 			// Domain User
-			if (nullDomainReadable) {
-				return findAll(domainOrNull(user.getDomainId()), sort);
+			if (defaultDomainReadable) {
+				return findAll(domainOrDefault(user.getDomain().getId()), sort);
 			} else {
-				return findAll(domain(user.getDomainId()), sort);
+				return findAll(domain(user.getDomain().getId()), sort);
 			}
 		}
 	}
@@ -94,7 +89,7 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 
 	@Override
 	public Page<T> findAll(User user, DomainFilter d, Pageable pageable) {
-		if (user.inNullDomain()) {
+		if (user.inDefaultDomain()) {
 			// Filter
 			if (d == null || d.getId() == null) {
 				return super.findAll(pageable);
@@ -103,36 +98,36 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 			}
 		} else {
 			// Domain User
-			if (nullDomainReadable) {
-				return super.findAll(domainOrNull(user.getDomainId()), pageable);
+			if (defaultDomainReadable) {
+				return super.findAll(domainOrDefault(user.getDomain().getId()), pageable);
 			} else {
-				return super.findAll(domain(user.getDomainId()), pageable);
+				return super.findAll(domain(user.getDomain().getId()), pageable);
 			}
 		}
 	}
 
 	@Override
 	public T findOne(User user, Long id) {
-		if (user.inNullDomain()) { // all domain matches
+		if (user.inDefaultDomain()) { // all domain matches
 			return super.getById(id);
-		} else if (nullDomainReadable) {// coalesce user domain, null domain
-			return super.findOne(where(domainOrNull(user.getDomainId())).and(id(id)))
+		} else if (defaultDomainReadable) {// coalesce user domain, default domain
+			return super.findOne(where(domainOrDefault(user.getDomain().getId())).and(id(id)))
 					.orElseThrow(() -> new EntityNotFoundException());
 		} else { // user domain only
-			return super.findOne(where(domain(user.getDomainId())).and(id(id)))
+			return super.findOne(where(domain(user.getDomain().getId())).and(id(id)))
 					.orElseThrow(() -> new EntityNotFoundException());
 		}
 	}
 
 	@Override
 	public T findOneByName(User user, String name) {
-		if (user.inNullDomain()) {
+		if (user.inDefaultDomain()) {
 			return super.findOne(where(name(name))).orElseThrow(() -> new EntityNotFoundException());
-		} else if (nullDomainReadable) {
-			return super.findOne(where(name(name)).and(domainOrNull(user.getDomainId())))
+		} else if (defaultDomainReadable) {
+			return super.findOne(where(name(name)).and(domainOrDefault(user.getDomain().getId())))
 					.orElseThrow(() -> new EntityNotFoundException());
 		} else {
-			return super.findOne(where(name(name)).and(domain(user.getDomainId())))
+			return super.findOne(where(name(name)).and(domain(user.getDomain().getId())))
 					.orElseThrow(() -> new EntityNotFoundException());
 		}
 	}
@@ -141,7 +136,7 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 	public void delete(User user, Long id) {
 		T e = findOne(user, id);
 		if (e != null) {
-			if (user.inNullDomain() || user.getDomainId().equals(e.getDomainId())) {
+			if (user.inDefaultDomain() || user.getDomain().equals(e.getDomain())) {
 				super.delete(e);
 			} else {
 				throw new AccessDeniedException("Missing rights to delete foreign domain objects.");
@@ -153,7 +148,7 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 
 	@Override
 	public <S extends T> S save(User user, S entity) {
-		if (user.inNullDomain() || user.getDomainId().equals(entity.getDomainId())) {
+		if (user.inDefaultDomain() || user.getDomain().equals(entity.getDomain())) {
 			return super.save(entity);
 		} else {
 			throw new AccessDeniedException("Missing rights to save domain object.");
@@ -162,7 +157,7 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 
 	@Override
 	public DataTablesOutput<T> findAll(User user, DomainFilter d, DataTablesInput input) {
-		if (user.inNullDomain()) {
+		if (user.inDefaultDomain()) {
 			// Filter
 			if (d == null || d.getId() == null) {
 				return findDataTable(input, null);
@@ -171,8 +166,8 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 			}
 		} else {
 			// Domain User
-			if (nullDomainReadable) {
-				return findDataTable(input, domainOrNull(user.getDomain().getId()));
+			if (defaultDomainReadable) {
+				return findDataTable(input, domainOrDefault(user.getDomain().getId()));
 			} else {
 				return findDataTable(input, domain(user.getDomain().getId()));
 			}

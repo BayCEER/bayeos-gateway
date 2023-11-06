@@ -5,11 +5,11 @@
   layout:decorate="~{main}"
 >
   <head>
-    <title th:text="#{nav.contacts}">All contacts</title>
+    <title th:text="#{nav.influxConnections}">All connections</title>
   </head>
   <body>
     <div layout:fragment="content">
-      <h3 th:text="#{nav.contacts}">contacts</h3>
+      <h3 th:text="#{nav.influxConnections}">Connections</h3>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -27,37 +27,51 @@
               >
             </th>
             <th>
-              <div class="btn-group pull-right">
-                <div th:replace="table::add(@{'/contacts/create'})"></div>
+              <a class="sorted" sd:pagination-sort="isDefault" th:text="#{ic.default}"
+                >Default</a
+              >
+            </th>      
+                  
+                  
+            <th>
+              <div class="pull-right">
+                <div
+                  th:replace="table::add(@{'/influxConnections/create'})"
+                ></div>
               </div>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr th:each="i : ${contacts}">
+          <tr th:each="f : ${influxConnections}">
             <td th:if="${#authentication.principal.inDefaultDomain()}">
-              <a
-                th:if="${i.domain} != null"
-                th:href="@{/domains/{id}(id=${i.domain.id})}"
-                th:text="${i.domain.name}"
+              <a                
+                th:href="@{/domains/{id}(id=${f.domain.id})}"
+                th:text="${f.domain.name}"
                 >Domain</a
               >
             </td>
-            <td>
-              <a th:href="@{/contacts/{id}(id=${i.id})}" th:text="${i.email}"
-                >Email</a
+            <td>              
+              <a
+                th:href="@{/influxConnections/{id}(id=${f.id})}"
+                th:text="${f.name}"
+                >Name</a
               >
             </td>
             <td>
+            	<span th:if="${f.isDefault}" class="glyphicon glyphicon-ok"></span>
+            </td>
+            
+            <td>
               <div class="pull-right">
                 <th:block
-                  th:if="${@accessService.isWriteable(i)}"
+                  th:if="${@accessService.isWriteable(f)}"
                 >
                   <div
-                    th:replace="table::edit(@{'/contacts/' + ${i.id}},false)"
+                    th:replace="table::edit(@{'/influxConnections/' + ${f.id}},false)"
                   ></div>
                   <div
-                    th:replace="table::delete(@{'/contacts/delete/' + ${i.id}},false)"
+                    th:replace="table::delete(@{'/influxConnections/delete/' + ${f.id}},false)"
                   ></div>
                 </th:block>
               </div>

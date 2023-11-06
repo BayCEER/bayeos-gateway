@@ -19,7 +19,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 @NoRepositoryBean
 public interface DomainEntityRepository<T extends DomainEntity> extends JpaRepository<T, Long> {
 
-	public static final String nullDomainReadable = "(BoardTemplate|Function|Interval|Unit|Spline|ChannelFunction)";	
+	public static final String defaultDomainReadable = "(BoardTemplate|Function|Interval|Unit|Spline|ChannelFunction)";	
 	public List<T> findAll(User user, DomainFilter d);		
 	public List<T> findAllSorted(User user, DomainFilter d, Sort sort);	
 	public Page<T> findAll(User user, DomainFilter d, Pageable pageable);		

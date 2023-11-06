@@ -31,9 +31,7 @@ public class CalculateThread implements Runnable {
     @Autowired
     private FrameService frameService
 
-    @Value('${CALC_WAIT_SECS:120}')
-    private int waitSecs
-
+    
     @Autowired
     VirtualChannelRepository vcRepo
 
@@ -42,7 +40,11 @@ public class CalculateThread implements Runnable {
 
     @Autowired
     EventProducer eventProducer
+    
+    @Value('${CALC_WAIT_SECS:120}')
+    private int waitSecs
 
+    
     private Logger log = LoggerFactory.getLogger(CalculateThread.class)
 
     @Override
@@ -65,11 +67,13 @@ public class CalculateThread implements Runnable {
                         continue
                     } else {
                         def id = r.id // observation.id
-                        db.eachRow("""SELECT c.id, c.db_series_id, c.spline_id, f.name AS f_name, i.name AS i_name, c.filter_critical_values,c.critical_min,c.critical_max
-                                    FROM channel c 
+                        db.eachRow("""SELECT c.id, c.spline_id, f.name AS f_name, i.name AS i_name, 
+                                     c.filter_critical_values,c.critical_min,c.critical_max
+                                    FROM channel c  
                                     LEFT JOIN function f ON f.id = c.aggr_function_id 
                                     LEFT JOIN "interval" i ON i.id = c.aggr_interval_id
-                                    where c.db_series_id is not null and c.db_exclude_auto_export = false 
+                                    LEFT JOIN board b on b.id = c.board_id 
+                                    where c.export = true and b.export = true and c.name is not null and b.name is not null
                                     """){ cha ->
 
                                     rowCalculated = rowCalculated + db.executeUpdate("""
@@ -81,10 +85,10 @@ public class CalculateThread implements Runnable {
 
                                     // Move observations to cache table
                                     if (cha.i_name == null) {
-                                        db.execute("""insert into observation_exp select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<${ts}""")
+                                        db.execute("""insert into observation_cache select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<${ts}""")
                                         db.execute("""delete from observation where id<=${id} and channel_id=${cha.id} and result_time<${ts}""")
                                     } else {
-                                        db.execute("""insert into observation_exp select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<date_truncate(${ts}, ${cha.i_name}::interval);""")
+                                        db.execute("""insert into observation_cache select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<date_truncate(${ts}, ${cha.i_name}::interval);""")
                                         db.execute("""delete from observation where id<=${id} and channel_id=${cha.id} and result_time<date_truncate(${ts}, ${cha.i_name}::interval);""")
                                     }
                                     rowArchived = rowArchived + db.updateCount
@@ -133,8 +137,7 @@ public class CalculateThread implements Runnable {
                                         rowVC++
                                 }
                     }
-                    // Move calc records to observation_out
-                    db.execute("insert into observation_out select * from observation_calc")
+                    db.execute("insert into observation_out select * from observation_calc")//                                                                                                   
                     db.execute("delete from observation_calc")
                     exit = 0
                 } catch (SQLException e){

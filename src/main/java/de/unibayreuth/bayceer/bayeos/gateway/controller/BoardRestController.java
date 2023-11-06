@@ -89,7 +89,7 @@ public class BoardRestController {
 			"(select o.id, c.id as channel_id, o.result_time, o.result_value, c.spline_id from observation o, channel c " +  
 			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ? " +
 			"UNION " +  
-			"select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id from observation_exp o, channel c " + 
+			"select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id from observation_cache o, channel c " + 
 			"where c.id = o.channel_id and c.board_id = ? and o.result_time > ?" + 			
 			") z order by 1 asc";									
 
@@ -100,7 +100,7 @@ public class BoardRestController {
 			"from observation o, channel c where o.channel_id = c.id and c.board_id = ? and o.id > ? " +
 			"union " + 
 			"select o.id, c.id as channel_id, o.result_time , o.result_value, c.spline_id " +
-			"from observation_exp o, channel c where o.channel_id = c.id and c.board_id = ? and o.id > ?) a " +
+			"from observation_cache o, channel c where o.channel_id = c.id and c.board_id = ? and o.id > ?) a " +
 			"order by id asc;";	
 			
 			return jdbcTemplate.query(sql,new Object[]{boardId,lastRowId,boardId,lastRowId}, new ObservationMapper());

@@ -17,7 +17,7 @@ class BoardTemplateMarshaller {
 		xml.setOmitNullAttributes(true)
 		xml.setOmitEmptyAttributes(true)
 		xml.board(name:board.name,description:board.description,revision:board.revision,
-		dataSheet:board.dataSheet, samplingInterval:board.samplingInterval,checkDelay:board.checkDelay){
+		dataSheet:board.dataSheet, influxMeasurement:board.influxMeasurement, samplingInterval:board.samplingInterval,checkDelay:board.checkDelay){
 			board.templates.each { item ->
 				channel(nr:item.nr, name:item.name, phenomena:item.phenomena,aggrInterval:item.aggrInterval, aggrFunction:item.aggrFunction,
 				criticalMax:item.criticalMax,criticalMin:item.criticalMin,warningMax:item.warningMax,warningMin:item.warningMin,samplingInterval:item.samplingInterval,checkDelay:item.checkDelay){
@@ -40,7 +40,7 @@ class BoardTemplateMarshaller {
 	// XML Stream to Object 
 	public static BoardTemplate unmarshal(InputStream stream){
 		def n = new XmlParser().parse(stream)				
-		def template = new BoardTemplate(name:n['@name'],revision:n['@revision'],dataSheet:n['@dataSheet'], description:n['@description'])		
+		def template = new BoardTemplate(name:n['@name'],revision:n['@revision'],dataSheet:n['@dataSheet'], description:n['@description'],influxMeasurement:n['@influxMeasurement'])		
 		if (n['@samplingInterval']){
 			template.samplingInterval = Integer.valueOf(n['@samplingInterval'])
 		}

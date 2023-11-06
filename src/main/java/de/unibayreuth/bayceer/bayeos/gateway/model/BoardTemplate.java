@@ -13,11 +13,7 @@ import javax.persistence.OneToMany;
 public class BoardTemplate extends NamedDomainEntity  {
 		
 	private static final long serialVersionUID = 1784086458814880224L;
-	
-	
-			
-
-
+				
 	String description;	
 	String revision;
 	
@@ -47,6 +43,9 @@ public class BoardTemplate extends NamedDomainEntity  {
 
 	@Column(name="last_updated")	
 	Date lastUpdated;
+	
+    @Column(name="influx_measurement")
+    String influxMeasurement;
 
 	@OneToMany(mappedBy="boardTemplate", cascade=CascadeType.ALL)	
 	List<ChannelTemplate> templates = new ArrayList<>();
@@ -165,6 +164,14 @@ public class BoardTemplate extends NamedDomainEntity  {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+
+    public String getInfluxMeasurement() {
+        return influxMeasurement;
+    }
+
+    public void setInfluxMeasurement(String measurement) {
+        this.influxMeasurement = measurement;
+    }
 
 	
 

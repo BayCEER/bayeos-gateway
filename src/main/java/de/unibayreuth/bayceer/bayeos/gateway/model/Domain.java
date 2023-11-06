@@ -26,9 +26,7 @@ public class Domain extends UniqueEntity {
 	@NotNull
 	@Pattern(regexp="^\\S*$", message="{validation.nonWhiteSpace}")
     String name;
-	
-	Integer dbFolderId;
-	
+		
 	
 	@Override
 	public String toString() {
@@ -43,13 +41,7 @@ public class Domain extends UniqueEntity {
 		this.name = name;
 	}
 
-	public Integer getDbFolderId() {
-		return dbFolderId;
-	}
-
-	public void setDbFolderId(Integer dbFolderId) {
-		this.dbFolderId = dbFolderId;
-	}
+	
 		
 		
 }

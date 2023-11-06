@@ -19,8 +19,7 @@
         <input type="hidden" th:field="*{id}" />
         <div
           th:replace="field::text(prop='name',label=#{a.name},required=true)"
-        ></div>
-        <div th:replace="field::text('dbFolderId',#{a.dbId})"></div>
+        ></div>        
         <button th:text="#{action.save}" type="submit" class="btn btn-default">
           Save
         </button>

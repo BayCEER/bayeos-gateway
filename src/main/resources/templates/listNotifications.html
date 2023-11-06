@@ -21,7 +21,7 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th th:if="${#authentication.principal.inNullDomain()}">
+              <th th:if="${#authentication.principal.inDefaultDomain()}">
                 <a
                   class="sorted"
                   sd:pagination-sort="domainName"
@@ -66,7 +66,7 @@
           </thead>
           <tbody>
             <tr th:each="i : ${notifications}">
-              <td th:if="${#authentication.principal.inNullDomain()}">
+              <td th:if="${#authentication.principal.inDefaultDomain()}">
                 <div th:if="${i.board != null}">
                   <div th:if="${i.board.domain != null}">
                     <a

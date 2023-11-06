@@ -24,7 +24,7 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
 		// Add a domain name cookie
 		User u = (User)authentication.getPrincipal();				
-		Cookie cookie = new Cookie("DOMAIN", (u.getDomain()==null) ? "NULL":u.getDomain().getName());
+		Cookie cookie = new Cookie("DOMAIN",u.getDomain().getName());
 		cookie.setMaxAge(cookieMaxAge);		
 		response.addCookie(cookie);	
 		super.onAuthenticationSuccess( request, response, authentication );

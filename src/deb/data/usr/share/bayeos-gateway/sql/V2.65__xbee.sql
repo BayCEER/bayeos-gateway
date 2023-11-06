@@ -1,2 +1,0 @@
-CREATE UNIQUE INDEX IF NOT EXISTS observation_exp_id_cha_idx ON public.observation_exp USING btree (id, channel_id);
-CREATE UNIQUE INDEX IF NOT EXISTS observation_id_cha_idx ON public.observation USING btree (id, channel_id);

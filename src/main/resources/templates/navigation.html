@@ -52,7 +52,7 @@
                 </button>
               </div>
               <a class="navbar-brand" th:href="@{/}" href="/"
-                ><strong>BayEOS</strong> Gateway</a
+                ><strong>BayEOS</strong> Gateway Influx</a
               >
             </div>
 
@@ -87,7 +87,7 @@
                     ></a>
                     <ul class="dropdown-menu">
                       <li
-                        th:if="${currentUser.inNullDomain()}"
+                        th:if="${currentUser.inDefaultDomain()}"
                         th:classappend="${controllerName == 'Domain'}? 'active'"
                       >
                         <a th:href="@{/domains}">
@@ -103,6 +103,16 @@
                           <span class="glyphicon glyphicon-hdd"></span>
                           <span th:text="#{nav.boardTemplates}"
                             >Board Templates</span
+                          >
+                        </a>
+                      </li>
+                      <li
+                        th:classappend="${controllerName == 'InfluxConnection'}? 'active'"
+                      >
+                        <a th:href="@{/influxConnections}">
+                          <span class="glyphicon glyphicon-export"></span>
+                          <span th:text="#{nav.influxConnections}"
+                            >Influx Connections</span
                           >
                         </a>
                       </li>
@@ -207,7 +217,7 @@
                   >
                     <li
                       class="dropdown"
-                      th:if="${currentUser.inNullDomain() and domainFilter.domains.size()>0}"
+                      th:if="${currentUser.inDefaultDomain() and domainFilter.domains.size()>0}"
                     >
                       <a
                         href="#"

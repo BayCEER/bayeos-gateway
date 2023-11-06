@@ -18,9 +18,6 @@ public class BoardGroup extends NamedDomainEntity {
 	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.PERSIST)
 	@OrderBy("name")
 	List<Board> boards;
-
-	@Column(name="db_folder_id")
-	Integer dbFolderId;
 	
 	
 	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.REMOVE)
@@ -34,13 +31,6 @@ public class BoardGroup extends NamedDomainEntity {
 		this.boards = boards;
 	}
 
-	public Integer getDbFolderId() {
-		return dbFolderId;
-	}
-
-	public void setDbFolderId(Integer dbFolderId) {
-		this.dbFolderId = dbFolderId;
-	}
 			
 	@Transient
 	public Integer getBoardCount(){

@@ -63,7 +63,7 @@ public class ChannelRestController extends AbstractController{
 					"(select o.id,o.result_time,o.result_value,c.spline_id from observation o, channel c " +  
 					"where c.id = o.channel_id and c.id = ? and o.result_time between ? and ? " +
 					"UNION " +  
-					"select o.id, o.result_time , o.result_value, c.spline_id from observation_exp o, channel c " + 
+					"select o.id, o.result_time , o.result_value, c.spline_id from observation_cache o, channel c " + 
 					"where c.id = o.channel_id and c.id = ? and o.result_time between ? and ?" + 			
 					") z order by 2 asc";			
 			return jdbcTemplate.query(sql,new Object[]{id,startDate,endDate,id,startDate,endDate}, new ChannelNameMapper());						
@@ -74,7 +74,7 @@ public class ChannelRestController extends AbstractController{
 					"from observation o,channel c where o.channel_id = c.id and c.id = ? and o.id > ? " +
 					"union " + 
 					"select o.id,o.result_time,o.result_value,c.spline_id " +
-					"from observation_exp o, channel c where o.channel_id = c.id and c.id = ? and o.id > ?) a " +
+					"from observation_cache o, channel c where o.channel_id = c.id and c.id = ? and o.id > ?) a " +
 					"order by 2 asc;";						
 			return jdbcTemplate.query(sql,new Object[]{id,lastRowId,id,lastRowId}, new ChannelNameMapper());
 		}					
