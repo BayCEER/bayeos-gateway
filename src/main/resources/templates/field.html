@@ -130,7 +130,7 @@
 	</th:block>
 
 	<th:block th:if="${domainFilter.domains.size()>1 and #authentication.principal.domain.id == 1}">						
-		<div th:replace="field::select('domain',#{e.domain},${domainFilter.domains})"></div>
+		<div th:replace="field::select(prop='domain',label=#{e.domain},option=${domainFilter.domains},required=true)"></div>
 	</th:block>				
 				
 	<th:block th:if="${domainFilter.domains.size()>1 and #authentication.principal.domain.id != 1}">					
