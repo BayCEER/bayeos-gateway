@@ -17,6 +17,8 @@
 			<div
 				th:replace="field::text(prop='url',label=#{ic.url},required=true)"></div>
 			<div
+				th:replace="field::text(prop='org',label=#{ic.org},required=true)"></div>			
+			<div
 				th:replace="field::text(prop='token',label=#{ic.token},required=true)"></div>
 			<div
 				th:replace="field::text(prop='bucket',label=#{ic.bucket},required=true)"></div>
@@ -50,7 +52,7 @@
 					                  url: [[ @{'/rest/influx-connection/test'} ]] ,
 					                  contentType: 'application/json',           
 					                  data: JSON.stringify({
-					                	  url:$('#url').val(),token:$('#token').val(),bucket:$('#bucket').val()
+					                	  url:$('#url').val(),token:$('#token').val(),bucket:$('#bucket').val(), org:$('#org').val()
 					                  }),
 					                  method: 'POST',	
 					                  timeout: 5000,

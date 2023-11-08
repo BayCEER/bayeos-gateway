@@ -27,6 +27,19 @@
               >
             </th>
             <th>
+              <a class="sorted" sd:pagination-sort="org" th:text="#{ic.org}"
+                >Organization</a
+              >
+            </th>
+            
+            <th>
+              <a class="sorted" sd:pagination-sort="org" th:text="#{ic.bucket}"
+                >Bucket</a
+              >
+            </th>            
+                        
+            
+            <th>
               <a class="sorted" sd:pagination-sort="isDefault" th:text="#{ic.default}"
                 >Default</a
               >
@@ -58,6 +71,14 @@
                 >Name</a
               >
             </td>
+            
+            <td th:text="${f.org}">                                              
+            </td>
+            
+            <td th:text="${f.bucket}">                                              
+            </td>
+            
+            
             <td>
             	<span th:if="${f.isDefault}" class="glyphicon glyphicon-ok"></span>
             </td>

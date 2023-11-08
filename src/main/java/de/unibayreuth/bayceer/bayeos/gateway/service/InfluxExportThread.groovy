@@ -34,9 +34,6 @@ class InfluxExportThread implements Runnable{
     @Value('${INFLUX_BULK_SIZE:10000}')
     private int influxBulkSize
 
-    @Value('${INFLUX_ORG:bayeos}')
-    private String influxOrg
-
     @Autowired
     private DataSource dataSource
 
@@ -49,18 +46,7 @@ class InfluxExportThread implements Runnable{
     private Logger log = LoggerFactory.getLogger(InfluxExportThread.class)
 
 
-    public InfluxDBClient createInfluxClient(Long id) throws NoSuchElementException  {
-        InfluxDBClient cli = influxClients[id]
-        if (cli == null) {
-            def ic = repoCon.findById(id).orElseThrow()
-            def c = InfluxDBClientFactory.create(ic.url,ic.token.toCharArray(),influxOrg,ic.bucket);
-            influxClients[id] = c
-            return c
-        } else {
-            return cli
-        }
-    }
-    
+        
     @Override
     public void run() {
         try {
@@ -101,7 +87,7 @@ class InfluxExportThread implements Runnable{
                                 def cli = influxClients[rec.influx_connection_id]
                                 if (cli == null) {
                                     def ic = repoCon.findById(rec.influx_connection_id).orElseThrow()
-                                    cli = InfluxDBClientFactory.create(ic.url,ic.token.toCharArray(),influxOrg,ic.bucket);
+                                    cli = InfluxDBClientFactory.create(ic.url,ic.token.toCharArray(),ic.org,ic.bucket);                                    
                                     influxClients[rec.influx_connection_id] = cli
                                 }
                                 // Incomplete records are skipped
@@ -111,7 +97,7 @@ class InfluxExportThread implements Runnable{
                                     p.addField(rec.channel_name, rec.result_value)
                                     p.time(rec.result_time.toInstant(), WritePrecision.MS)
                                     p.addTag("origin",rec.board_origin)
-                                    p.addTag("board", rec.board_name)
+                                    p.addTag("board", rec.board_name)                                    
                                     writeApi.writePoint(p);
                                     records++
                                 }

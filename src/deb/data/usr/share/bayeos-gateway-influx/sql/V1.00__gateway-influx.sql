@@ -388,6 +388,7 @@ CREATE TABLE influx_connection (
 	id serial4 NOT NULL,
 	name text NOT NULL,
 	url text NOT NULL DEFAULT 'http://localhost:8086'::text,
+	org text NOT NULL,
 	"token" text NOT NULL,
 	bucket text NOT NULL DEFAULT 'bayeos'::text,
 	is_default bool NOT NULL DEFAULT false,

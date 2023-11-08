@@ -1,6 +1,5 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,9 +19,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.InfluxConnection;
 @RestController
 public class InfluxConnectionRestController {
 
-    @Value("${INFLUX_ORG:bayeos}")
-    private String influxOrg;
-
+    
     final int OK = 0;
     final int PING_ERROR = 1;
     final int READ_ERROR = 2;
@@ -35,7 +32,7 @@ public class InfluxConnectionRestController {
         try {
             // Create
 
-            c = InfluxDBClientFactory.create(ic.getUrl(), ic.getToken().toCharArray(), influxOrg, ic.getBucket());
+            c = InfluxDBClientFactory.create(ic.getUrl(), ic.getToken().toCharArray(), ic.getOrg(), ic.getBucket());
             // Ping
 
             if (!c.ping()) {

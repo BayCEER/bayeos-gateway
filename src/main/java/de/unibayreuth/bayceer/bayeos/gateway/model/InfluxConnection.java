@@ -7,8 +7,10 @@ public class InfluxConnection extends NamedDomainEntity{
     
     String url = "http://localhost:8086";
     String token;
-    String bucket = "bayeos";        
+    String bucket = "bayeos";
+    String org;
     Boolean isDefault = false;
+    
         
     public String getUrl() {
         return url;
@@ -34,5 +36,11 @@ public class InfluxConnection extends NamedDomainEntity{
     }
     public void setIsDefault(Boolean value) {
         this.isDefault = value;
+    }
+    public String getOrg() {
+        return org;
+    }
+    public void setOrg(String org) {
+        this.org = org;
     }    
 }
