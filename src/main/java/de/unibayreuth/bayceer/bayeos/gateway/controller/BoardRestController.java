@@ -79,7 +79,10 @@ public class BoardRestController extends AbstractController {
         return new ResponseEntity<Board>(board,HttpStatus.OK);
 	}
 	
- 
+	@RequestMapping(path ="/rest/boards", method = RequestMethod.GET)
+	public List<Board> getBoards(@RequestParam List<Long> id) {	    	    	        	   
+        return repo.findAllByIds(userSession.getUser(),domainFilter,id);	    	    	    
+	}
 	
 	
 	// See https://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html

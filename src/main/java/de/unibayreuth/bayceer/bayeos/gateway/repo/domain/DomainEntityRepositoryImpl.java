@@ -208,4 +208,19 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 
 	}
 
+    @Override
+    public List<T> findAllByIds(User user, DomainFilter d, List<Long> ids) {        
+       List<T> r = findAllById(ids);       
+       if (user.inNullDomain()) {
+           // Filter
+           if (d != null && d.getId() !=null) {
+               r.removeIf(t-> (t.getDomainId()!=d.getId()));
+           }                      
+       } else {
+           // User                      
+          r.removeIf(t -> ((t.getDomainId() == null && !nullDomainReadable) || (t.getDomainId()!=user.getDomainId()))  );           
+       }              
+       return r;
+    }
+
 }

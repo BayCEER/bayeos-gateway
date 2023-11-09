@@ -22,7 +22,9 @@ public interface DomainEntityRepository<T extends DomainEntity> extends JpaRepos
 	public static final String nullDomainReadable = "(BoardTemplate|Function|Interval|Unit|Spline|ChannelFunction)";	
 	public List<T> findAll(User user, DomainFilter d);		
 	public List<T> findAllSorted(User user, DomainFilter d, Sort sort);	
-	public Page<T> findAll(User user, DomainFilter d, Pageable pageable);		
+	public Page<T> findAll(User user, DomainFilter d, Pageable pageable);
+	public List<T> findAllByIds(User user, DomainFilter d, List<Long> ids);
+	
 	public T findOne(User user, Long id);	
 	public T findOneByName(User user, String name);
 	@Transactional
@@ -32,6 +34,8 @@ public interface DomainEntityRepository<T extends DomainEntity> extends JpaRepos
 	
 	
 	public DataTablesOutput<T> findAll(User user, DomainFilter d, DataTablesInput input);	
+	
+	 
 	
 	
 	

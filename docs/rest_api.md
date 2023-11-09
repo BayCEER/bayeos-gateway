@@ -8,6 +8,7 @@
   - [General Notes](#general-notes)
   - [Board](#board)
   	 - [Get board by ID](#get-board-by-id)
+  	 - [Get boards by IDs](#get-boards-by-ids)
   - [Board Comment](#board-comment)
     - [Create board comment](#create-board-comment)
     - [Update board comment](#update-board-comment)
@@ -34,7 +35,8 @@
 | 2021-03-18 | Oliver Archner | User API GET request support                    |
 | 2022-05-10 | Oliver Archner | Board command API added                         |
 | 2022-06-19 | Oliver Archner | Missing BoardCommand methods documented         |
-| 2023-10-06 | Oliver Archner | New BoardRestController.getBoard method added   |
+| 2023-11-06 | Oliver Archner | New BoardRestController.getBoard method added   |
+| 2023-11-09 | Oliver Archner | New BoardRestController.getBoards method added  |
 
 ## General Notes
 
@@ -146,6 +148,235 @@ Response Body:
 }
 ```
 
+### Get boards by ids 
+```javascript
+GET /gateway/rest/boards?id=2&id=4 HTTP/1.1
+Host: localhost:5533
+Accept: application/json
+Authorization: Basic cm9vdDpiYXllb3M=
+[
+    {
+        "id": 4,
+        "domain": null,
+        "name": "Wind Vane",
+        "samplingInterval": null,
+        "checkDelay": null,
+        "excludeFromNagios": false,
+        "filterCriticalValues": false,
+        "domainIdCreated": null,
+        "origin": "ME",
+        "lastRssi": null,
+        "lastResultTime": "2023-11-06T14:20:36.652+00:00",
+        "notifications": [],
+        "dbFolderId": null,
+        "dbAutoExport": false,
+        "denyNewChannels": false,
+        "channels": [
+            {
+                "id": 17,
+                "nr": "1",
+                "name": "Speed",
+                "phenomena": null,
+                "criticalMax": null,
+                "criticalMin": null,
+                "warningMax": null,
+                "warningMin": null,
+                "samplingInterval": null,
+                "checkDelay": null,
+                "excludeFromNagios": false,
+                "filterCriticalValues": false,
+                "statusValid": "ok",
+                "statusValidMsg": "Value Ok",
+                "channelCounts": null,
+                "lastResultTime": "2023-11-06T14:20:36.652+00:00",
+                "lastResultValue": 1.0,
+                "dbSeriesId": null,
+                "dbExcludeAutoExport": false,
+                "unit": null,
+                "spline": null,
+                "aggrInterval": null,
+                "aggrFunction": null,
+                "status": null,
+                "nagios": true,
+                "autoExport": true,
+                "statusComplete": null,
+                "quantity": "Speed"
+            },
+            {
+                "id": 16,
+                "nr": "2",
+                "name": "Direction",
+                "phenomena": null,
+                "criticalMax": null,
+                "criticalMin": null,
+                "warningMax": null,
+                "warningMin": null,
+                "samplingInterval": null,
+                "checkDelay": null,
+                "excludeFromNagios": false,
+                "filterCriticalValues": false,
+                "statusValid": "ok",
+                "statusValidMsg": "Value Ok",
+                "channelCounts": null,
+                "lastResultTime": "2023-11-06T14:20:36.652+00:00",
+                "lastResultValue": 2.0,
+                "dbSeriesId": null,
+                "dbExcludeAutoExport": false,
+                "unit": null,
+                "spline": null,
+                "aggrInterval": null,
+                "aggrFunction": null,
+                "status": null,
+                "nagios": true,
+                "autoExport": true,
+                "statusComplete": null,
+                "quantity": "Direction"
+            }
+        ],
+        "virtualChannels": [],
+        "channelStatus": 0,
+        "boardGroup": null,
+        "status": 0,
+        "nagios": true,
+        "channelNrs": [
+            "1",
+            "2"
+        ],
+        "rssiLevel": null,
+        "channelIds": [
+            17,
+            16
+        ],
+        "domainId": null
+    },
+    {
+        "id": 2,
+        "domain": null,
+        "name": null,
+        "samplingInterval": null,
+        "checkDelay": null,
+        "excludeFromNagios": false,
+        "filterCriticalValues": false,
+        "domainIdCreated": null,
+        "origin": "$SYS/ExportThread",
+        "lastRssi": null,
+        "lastResultTime": "2023-11-09T17:13:48.270+00:00",
+        "notifications": [],
+        "dbFolderId": null,
+        "dbAutoExport": false,
+        "denyNewChannels": false,
+        "channels": [
+            {
+                "id": 3,
+                "nr": "records",
+                "name": null,
+                "phenomena": null,
+                "criticalMax": null,
+                "criticalMin": null,
+                "warningMax": null,
+                "warningMin": null,
+                "samplingInterval": null,
+                "checkDelay": null,
+                "excludeFromNagios": false,
+                "filterCriticalValues": false,
+                "statusValid": "ok",
+                "statusValidMsg": "Value Ok",
+                "channelCounts": null,
+                "lastResultTime": "2023-11-09T17:13:48.270+00:00",
+                "lastResultValue": 0.0,
+                "dbSeriesId": null,
+                "dbExcludeAutoExport": false,
+                "unit": null,
+                "spline": null,
+                "aggrInterval": null,
+                "aggrFunction": null,
+                "status": null,
+                "nagios": true,
+                "autoExport": true,
+                "statusComplete": null,
+                "quantity": null
+            },
+            {
+                "id": 5,
+                "nr": "exit",
+                "name": null,
+                "phenomena": null,
+                "criticalMax": null,
+                "criticalMin": null,
+                "warningMax": null,
+                "warningMin": null,
+                "samplingInterval": null,
+                "checkDelay": null,
+                "excludeFromNagios": false,
+                "filterCriticalValues": false,
+                "statusValid": "ok",
+                "statusValidMsg": "Value Ok",
+                "channelCounts": null,
+                "lastResultTime": "2023-11-09T17:13:48.270+00:00",
+                "lastResultValue": -1.0,
+                "dbSeriesId": null,
+                "dbExcludeAutoExport": false,
+                "unit": null,
+                "spline": null,
+                "aggrInterval": null,
+                "aggrFunction": null,
+                "status": null,
+                "nagios": true,
+                "autoExport": true,
+                "statusComplete": null,
+                "quantity": null
+            },
+            {
+                "id": 10,
+                "nr": "millis",
+                "name": null,
+                "phenomena": null,
+                "criticalMax": null,
+                "criticalMin": null,
+                "warningMax": null,
+                "warningMin": null,
+                "samplingInterval": null,
+                "checkDelay": null,
+                "excludeFromNagios": false,
+                "filterCriticalValues": false,
+                "statusValid": "ok",
+                "statusValidMsg": "Value Ok",
+                "channelCounts": null,
+                "lastResultTime": "2023-11-09T17:13:48.270+00:00",
+                "lastResultValue": 15.0,
+                "dbSeriesId": null,
+                "dbExcludeAutoExport": false,
+                "unit": null,
+                "spline": null,
+                "aggrInterval": null,
+                "aggrFunction": null,
+                "status": null,
+                "nagios": true,
+                "autoExport": true,
+                "statusComplete": null,
+                "quantity": null
+            }
+        ],
+        "virtualChannels": [],
+        "channelStatus": 0,
+        "boardGroup": null,
+        "status": 0,
+        "nagios": true,
+        "channelNrs": [
+            "records",
+            "exit",
+            "millis"
+        ],
+        "rssiLevel": null,
+        "channelIds": [
+            3,
+            5,
+            10
+        ],
+        "domainId": null
+    }
+]
+```
 
 ## Board Comment
 
