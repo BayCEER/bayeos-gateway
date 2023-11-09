@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway-influx</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>bayeos-gateway-influx</name>
 	<description>BayEOS Gateway Flux</description>
 
@@ -209,6 +209,15 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			</dependency>
 
 		<dependency>
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
@@ -309,17 +318,7 @@
 			<version>1.4.1</version>
 		</dependency>
 
-		<dependency>
-			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
-			<artifactId>bayeos-password-file</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 
-		<dependency>
-			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
-			<artifactId>bayeos-xmlrpc</artifactId>
-			<version>2.0.2</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.influxdb</groupId>

@@ -50,6 +50,9 @@ class FileImportService implements Runnable {
 
 	@Autowired
 	private NotificationConfig notificationConfig
+    
+    @Value('${project.description}')
+    private String projectDescription
 
 	@Autowired
 	private DataSource dataSource
@@ -61,7 +64,7 @@ class FileImportService implements Runnable {
 
 	@Value('${LOCAL_FILE_EXPIRED_MONTH:3}')
 	private int expiredMonth
-
+    
 
 	private Logger log = LoggerFactory.getLogger(FileImportService.class)
 
@@ -125,7 +128,7 @@ class FileImportService implements Runnable {
                     c.setVariable("host",notificationConfig.getNotification_host())
                     mh.setText(templateEngine.process("fileImportNotification",c), true)
                     mh.setTo(usr.contact.email)
-                    mh.setSubject("BayEOS Gateway File Import")
+                    mh.setSubject("${projectDescription} File Import")
                     mh.setFrom(notificationConfig.getNotification_sender())
                     mailSender.send(msg)
                 } catch (Exception ex) {
@@ -133,7 +136,7 @@ class FileImportService implements Runnable {
                 }
             }                        
         } else {
-           log.warn("User:"+id+" not found.") 
+           log.warn("User ${id} not found.") 
         }		
 	}
 	

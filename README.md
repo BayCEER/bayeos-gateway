@@ -35,7 +35,7 @@ Main characteristics:
 
 ### Configuration
 
-- Open the URL `http://localhost/gateway` and log in as user 'root' with password 'bayeos'
+- Open the URL `http://localhost/gateway-influx` and log in as user 'root' with password 'bayeos'
 - Open the administration menu and change the default root password
 
 
@@ -45,6 +45,10 @@ Main characteristics:
 - **Oliver Archner** - _Developer_ - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 1.0.1, November 2023
+- Fix: Wrong path in notification and file import messages 
+- Fix: Dropped dependencies to bayeos-password and bayeos-xmlrpc
+
 ### Version 1.0.0, November 2023
 - Initial Version with InfluxDB export 
 

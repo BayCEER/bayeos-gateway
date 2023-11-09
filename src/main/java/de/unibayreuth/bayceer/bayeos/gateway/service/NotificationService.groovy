@@ -2,12 +2,15 @@ package de.unibayreuth.bayceer.bayeos.gateway.service;
 
 import javax.annotation.PostConstruct
 import javax.mail.internet.MimeMessage
+import javax.servlet.ServletContext
 import javax.sql.DataSource
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Component
+import org.springframework.beans.factory.annotation.Value
+
 
 import de.unibayreuth.bayceer.bayeos.gateway.NotificationConfig
 import groovy.sql.Sql
@@ -31,7 +34,10 @@ public class NotificationService implements Runnable {
 		
 	@Autowired
 	private NotificationConfig config
-
+    
+    @Value('${server.servlet.contextPath}')
+    private String contextPath
+    
 	private Logger log = LoggerFactory.getLogger(NotificationService.class)
 	
 	
@@ -144,16 +150,16 @@ public class NotificationService implements Runnable {
 				}
 				// Group
 				if (it.board_group_name != boardGroupName){					
-					body.append("<p>&nbsp;<a href=\"https://${config.notification_host}/gateway/groups/${it.board_group_id}\">Board Group ${it.board_group_name}</a><p>\n")
+					body.append("<p>&nbsp;<a href=\"https://${contextPath}/groups/${it.board_group_id}\">Board Group ${it.board_group_name}</a><p>\n")
 					boardGroupName = it.board_group_name
 				}
 				// Board
 				if (it.board_name != boardName){
-					body.append("<p>&nbsp;&nbsp;<a href=\"https://${config.notification_host}/gateway/boards/${it.board_id}\">Board ${it.board_name}</a><p>\n")
+					body.append("<p>&nbsp;&nbsp;<a href=\"https://${contextPath}/boards/${it.board_id}\">Board ${it.board_name}</a><p>\n")
 					boardName = it.board_name
 				}
 				// Channel
-				body.append("<p>&nbsp;&nbsp;&nbsp;<a href=\"https://${config.notification_host}/gateway/channels/${it.channel_id}\">Channel ${it.channel_name}</a>: ")	
+				body.append("<p>&nbsp;&nbsp;&nbsp;<a href=\"https://${contextPath}/channels/${it.channel_id}\">Channel ${it.channel_name}</a>: ")	
 				
 						
 				if (it.status_complete>0){
