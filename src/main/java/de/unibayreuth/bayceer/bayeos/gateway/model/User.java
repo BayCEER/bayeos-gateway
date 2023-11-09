@@ -9,7 +9,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.AssertTrue;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 
