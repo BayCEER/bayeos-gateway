@@ -63,6 +63,7 @@ Let's send the cpu load of our pc to a local gateway:
 
 ### Version 2.9.4, November 2023
 - New: BoardRestController.getBoard() 
+- New: BoardRestController.getBoards()
 
 ### Version 2.9.3, May  2023
 - Fixed: Wrong data type in obs_insert trigger
