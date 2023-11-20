@@ -2,6 +2,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import de.unibayreuth.bayceer.bayeos.gateway.DomainFilter;
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
+import de.unibayreuth.bayceer.bayeos.gateway.model.BoardDTO;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Observation;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
@@ -71,17 +73,22 @@ public class BoardRestController extends AbstractController {
 	
 	@RequestMapping(path ="/rest/board/{id}", method = RequestMethod.GET)
 	public ResponseEntity getBoard(@PathVariable Long id) {
-	    Board board = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());  ;       
+	 
+	    Board board = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());
         User user = userSession.getUser();
         if (!user.inNullDomain()) {
             checkRead(board);   
         }           
-        return new ResponseEntity<Board>(board,HttpStatus.OK);
+        return new ResponseEntity<BoardDTO>(new BoardDTO(board),HttpStatus.OK);
 	}
 	
 	@RequestMapping(path ="/rest/boards", method = RequestMethod.GET)
-	public List<Board> getBoards(@RequestParam List<Long> id) {	    	    	        	   
-        return repo.findAllByIds(userSession.getUser(),domainFilter,id);	    	    	    
+	public List<BoardDTO> getBoards(@RequestParam List<Long> id) {	    
+	    List<BoardDTO> boards = new ArrayList<>();
+	    for (Board b:repo.findAllByIds(userSession.getUser(),domainFilter,id)) {
+         boards.add(new BoardDTO(b));   
+        }
+        return boards;	    	    	    
 	}
 	
 	
