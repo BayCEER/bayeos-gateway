@@ -61,6 +61,9 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History
 
+### Version 2.9.6, November 2023
+- New: BoardRestController returns board.dbFolderId and channel.dbSeriesId
+
 ### Version 2.9.5, November 2023
 - Fixed: BoardRestController JSON serialization problems
 

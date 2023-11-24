@@ -7,6 +7,7 @@ public class BoardDTO extends NamedDomainEntity{
     
     public List<ChannelDTO> channels;
     private String origin;
+    private Integer dbFolderId;
     
         
     public BoardDTO(Board c) {        
@@ -19,6 +20,7 @@ public class BoardDTO extends NamedDomainEntity{
                channels.add(new ChannelDTO(channel));
            }           
        }
+       this.dbFolderId = c.dbFolderId;
     }
 
 
@@ -39,5 +41,15 @@ public class BoardDTO extends NamedDomainEntity{
 
     public void setChannels(List<ChannelDTO> channels) {
         this.channels = channels;
+    }
+
+
+    public Integer getDbFolderId() {
+        return dbFolderId;
+    }
+
+
+    public void setDbFolderId(Integer dbFolderId) {
+        this.dbFolderId = dbFolderId;
     }
 }

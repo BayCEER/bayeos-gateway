@@ -37,6 +37,7 @@
 | 2022-06-19 | Oliver Archner | Missing BoardCommand methods documented         |
 | 2023-11-06 | Oliver Archner | New BoardRestController.getBoard method added   |
 | 2023-11-09 | Oliver Archner | New BoardRestController.getBoards method added  |
+| 2023-11-24 | Oliver Archner | BoardResctController enhanced 					|
 
 ## General Notes
 
@@ -65,7 +66,8 @@ Response Body:
             "phenomena": "Wind Direction",
             "lastResultTime": "2023-11-20T14:05:25.057+00:00",
             "lastResultValue": 1.0,
-            "unit": "Degree"
+            "unit": "Degree",
+            "dbSeriesId": null
         },
         {
             "id": 20,
@@ -74,13 +76,14 @@ Response Body:
             "phenomena": "Wind Speed",
             "lastResultTime": "2023-11-20T14:05:25.057+00:00",
             "lastResultValue": 2.0,
-            "unit": "Meter per second"
+            "unit": "Meter per second",
+            "dbSeriesId": 12345678
         }
     ],
     "origin": "ME",
+    "dbFolderId": null,
     "domainId": null
 }
-
 
 ```
 
@@ -95,6 +98,46 @@ Authorization: Basic cm9vdDpiYXllb3M=
 Response Body:
 [
     {
+        "id": 2,
+        "domain": null,
+        "name": null,
+        "channels": [
+            {
+                "id": 10,
+                "nr": "millis",
+                "name": null,
+                "phenomena": null,
+                "lastResultTime": "2023-11-24T11:53:12.274+00:00",
+                "lastResultValue": 1.0,
+                "unit": null,
+                "dbSeriesId": null
+            },
+            {
+                "id": 2,
+                "nr": "records",
+                "name": null,
+                "phenomena": null,
+                "lastResultTime": "2023-11-24T11:53:12.274+00:00",
+                "lastResultValue": 0.0,
+                "unit": null,
+                "dbSeriesId": null
+            },
+            {
+                "id": 4,
+                "nr": "exit",
+                "name": null,
+                "phenomena": null,
+                "lastResultTime": "2023-11-24T11:53:12.274+00:00",
+                "lastResultValue": -1.0,
+                "unit": null,
+                "dbSeriesId": null
+            }
+        ],
+        "origin": "$SYS/ExportThread",
+        "dbFolderId": null,
+        "domainId": null
+    },
+    {
         "id": 4,
         "domain": null,
         "name": "Wind Vane",
@@ -106,7 +149,8 @@ Response Body:
                 "phenomena": "Wind Direction",
                 "lastResultTime": "2023-11-20T14:05:25.057+00:00",
                 "lastResultValue": 1.0,
-                "unit": "Degree"
+                "unit": "Degree",
+                "dbSeriesId": null
             },
             {
                 "id": 20,
@@ -115,50 +159,15 @@ Response Body:
                 "phenomena": "Wind Speed",
                 "lastResultTime": "2023-11-20T14:05:25.057+00:00",
                 "lastResultValue": 2.0,
-                "unit": "Meter per second"
+                "unit": "Meter per second",
+                "dbSeriesId": 12345678
             }
         ],
         "origin": "ME",
-        "domainId": null
-    },
-    {
-        "id": 2,
-        "domain": null,
-        "name": null,
-        "channels": [
-            {
-                "id": 4,
-                "nr": "exit",
-                "name": null,
-                "phenomena": null,
-                "lastResultTime": "2023-11-20T14:35:26.911+00:00",
-                "lastResultValue": -1.0,
-                "unit": null
-            },
-            {
-                "id": 10,
-                "nr": "millis",
-                "name": null,
-                "phenomena": null,
-                "lastResultTime": "2023-11-20T14:35:26.911+00:00",
-                "lastResultValue": 3.0,
-                "unit": null
-            },
-            {
-                "id": 2,
-                "nr": "records",
-                "name": null,
-                "phenomena": null,
-                "lastResultTime": "2023-11-20T14:35:26.911+00:00",
-                "lastResultValue": 0.0,
-                "unit": null
-            }
-        ],
-        "origin": "$SYS/ExportThread",
+        "dbFolderId": null,
         "domainId": null
     }
 ]
-
 ```
 
 ## Board Comment

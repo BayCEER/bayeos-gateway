@@ -10,6 +10,7 @@ public class ChannelDTO extends UniqueEntity{
     private Date lastResultTime;
     private Float lastResultValue;    
     private String unit;
+    private Integer dbSeriesId;
     
     public ChannelDTO(Channel channel) {    
         this.id = channel.getId();
@@ -20,7 +21,9 @@ public class ChannelDTO extends UniqueEntity{
         this.lastResultValue = channel.getLastResultValue();
         if (channel.getUnit() != null) {
             unit = channel.getUnit().getName();
-        }                
+        }  
+        this.dbSeriesId = channel.getDbSeriesId();
+        
     }
 
     public String getNr() {
@@ -69,6 +72,14 @@ public class ChannelDTO extends UniqueEntity{
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public Integer getDbSeriesId() {
+        return dbSeriesId;
+    }
+
+    public void setDbSeriesId(Integer dbSeriesId) {
+        this.dbSeriesId = dbSeriesId;
     }
 
    
