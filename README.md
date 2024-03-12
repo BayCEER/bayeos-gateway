@@ -60,6 +60,8 @@ Let's send the cpu load of our pc to a local gateway:
 - **Oliver Archner** - _Developer_ - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.9.8, March 2024
+- New: Show domains ordered by name in main
 
 ### Version 2.9.7, December 2023
 - Fixed: Out of range error in real_value()
