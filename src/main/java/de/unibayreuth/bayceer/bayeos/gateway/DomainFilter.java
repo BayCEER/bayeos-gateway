@@ -1,6 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -19,7 +20,7 @@ public class DomainFilter {
 	private Long id;
 	
 	public Iterable<Domain> getDomains(){
-		return repo.findAll();
+		return repo.findAll(Sort.by("name"));
 	}
 
 	public DomainRepository getRepo() {
