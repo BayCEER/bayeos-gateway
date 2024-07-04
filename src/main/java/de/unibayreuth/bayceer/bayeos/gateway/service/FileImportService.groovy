@@ -44,6 +44,9 @@ class FileImportService implements Runnable {
 
 	@Autowired
 	FrameService frameService
+    
+    @Autowired
+    FileUploadService uploadService
 
 	@Autowired(required = false)
 	private MailSender mailSender
@@ -96,12 +99,10 @@ class FileImportService implements Runnable {
 			c.add(GregorianCalendar.MONTH, expiredMonth * -1)
 			List<Upload> uploads = repo.findExpired(c.getTime())
 			uploads.each { u ->
-				localFilePath.resolve(u.name).toFile().delete()
-				repo.deleteById(u.id)
-			}
-			if (uploads.size()>0) {
-				log.info("${uploads.size} expired upload files deleted.")
-			}
+				if (uploadService.delete(u.id)) {
+                    log.info("Expired file ${u.uuid}.bin deleted.")
+                } 
+			}			
 			log.info("File import finished")
 		}
 	}
@@ -140,9 +141,8 @@ class FileImportService implements Runnable {
 	private Upload importFile(Upload u) {
 		log.info("Importing file: ${u.name}")
 		
-		String ext = u.extension()
-		String bin = u.uuid.toString() + ".bin"
-		File file = localFilePath.resolve(bin).toFile()
+		String ext = u.extension()		
+		File file = localFilePath.resolve(u.getLocalFileName()).toFile()
 		FileInputStream fin
 		try {
 			fin = new FileInputStream(file)		
