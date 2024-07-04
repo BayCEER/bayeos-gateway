@@ -65,6 +65,10 @@ public class Upload extends NamedDomainEntity {
 			return "";
 		}
 	}
+	
+	public String getLocalFileName() {
+	    return this.uuid.toString() + ".bin";
+	}
 
 	public UUID getUuid() {
 		return uuid;
