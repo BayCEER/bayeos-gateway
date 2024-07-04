@@ -100,7 +100,7 @@ public class UploadController extends AbstractController {
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition", String.format("attachment; filename=\"" + u.getName() + "\""));
 		response.setContentLength((int) u.getSize());
-		try(InputStream inputStream = new BufferedInputStream(new FileInputStream(localFilePath.resolve(u.getUuid().toString() + ".bin").toFile()))){
+		try(InputStream inputStream = new BufferedInputStream(new FileInputStream(localFilePath.resolve(u.getLocalFileName()).toFile()))){
 			FileCopyUtils.copy(inputStream, response.getOutputStream());
 		}
 	}

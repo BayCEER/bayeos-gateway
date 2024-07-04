@@ -51,9 +51,9 @@ class FileUploadService {
 		upload.user = userSession.getUser()
 		upload.domain = userSession.getDomain()
 						
-		String binFile = uuid.toString() + ".bin"	
+			
 		file.getInputStream().withStream { stream -> 
-			Files.copy(stream, localFilePath.resolve(binFile));
+			Files.copy(stream, localFilePath.resolve(upload.getLocalFileName()));
 		}	
 		repo.save(upload)
 		return true;
@@ -63,7 +63,7 @@ class FileUploadService {
 		Upload u = repo.getById(id);
 		if (u!=null) {
 			repo.delete(userSession.getUser(),id);
-			File f = localFilePath.resolve(u.getUuid().toString() + ".bin").toFile();
+			File f = localFilePath.resolve(u.getLocalFileName()).toFile();
 			return f.delete();
 		} else {
 			return false;
