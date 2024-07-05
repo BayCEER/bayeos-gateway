@@ -99,9 +99,9 @@ class FileImportService implements Runnable {
 			c.add(GregorianCalendar.MONTH, expiredMonth * -1)
 			List<Upload> uploads = repo.findExpired(c.getTime())
 			uploads.each { u ->
-			    localFilePath.resolve(u.getLocalFileName()).toFile().delete()
-			    repo.deleteById(u.id)
-                log.info("File ${u.uuid}.bin deleted.")                                 
+				if (uploadService.delete(u.id)) {
+                    log.info("Expired file ${u.uuid}.bin deleted.")
+                } 
 			}			
 			log.info("File import finished")
 		}

@@ -45,38 +45,20 @@
                 >File Name</a
               >
             </th>
-             <th>
+            <th>
               <a
                 class="sorted"
-                sd:pagination-sort="size"
-                th:text="#{upload.size}"
-                >Size</a
+                sd:pagination-sort="importStatus"
+                th:text="#{upload.importStatus}"
+                >Status</a
               >
             </th>
-           
-           
             <th>
               <a
                 class="sorted"
                 sd:pagination-sort="uploadTime"
                 th:text="#{upload.uploadTime}"
                 >Date of Upload</a
-              >
-            </th>
-             <th>
-              <a
-                class="sorted"
-                sd:pagination-sort="importStatus"
-                th:text="#{upload.importStatus}"
-                >Import Status</a
-              >
-            </th>
-            <th>
-              <a
-                class="sorted"
-                sd:pagination-sort="importMessage"
-                th:text="#{upload.importMessage}"
-                >Import Message</a
               >
             </th>
             <th>
@@ -106,13 +88,14 @@
               <span class="glyphicon glyphicon-file"></span>
               <span th:text="${f.name}"></span>
             </td>
-            <td th:text="${f.sizeAsString}"></td>
-            <td th:text="${{f.uploadTime}}"></td>            
+
             <td>
-             <span th:class="'label label-' + ${#strings.toLowerCase(f.importStatus)}" th:text="${f.importStatus}"></span>              
+              <span
+                th:class="'label label-' + ${#strings.toLowerCase(f.importStatus)}"
+                th:text="${f.importStatus}"
+              ></span>
             </td>
-            <td th:text="${{f.importMessage}}"></td>
-            
+            <td th:text="${{f.uploadTime}}"></td>
             <td>
               <div
                 th:replace="table::delete(@{'/uploads/deleteFile/' + ${f.id}},false)"

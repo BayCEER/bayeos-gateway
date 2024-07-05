@@ -62,9 +62,6 @@ Let's send the cpu load of our pc to a local gateway:
 ## History
 ### Version 2.9.8, March 2024
 - New: Show domains ordered by name in main
-- New: Show status details  
-- Fixed: Delete uploaded and imported files 
-- Fixed: Wrong max file parameter in application.properties 
 
 ### Version 2.9.7, December 2023
 - Fixed: Out of range error in real_value()
