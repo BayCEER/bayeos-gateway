@@ -58,8 +58,16 @@ class ExportThread implements Runnable  {
     private Client cli = null
     private Sql db
 
+    private String hostname = ""
+
     @Override
     public void run() {
+
+        try {
+            hostname = InetAddress.getLocalHost().getHostName()
+        } catch (UnknownHostException e) {
+            log.error("Hostname lookup failed")
+        }
         while(true) {
             try {
                 Thread.sleep(1000*waitSecs)
@@ -70,10 +78,10 @@ class ExportThread implements Runnable  {
                     log.info("ExportThread running")
                     cli = Client.getInstance()
                     db = new Sql(dataSource)
-        
+
                     // Authentication user root by ip
                     cli.connect(getExportUrL(),expUser,"")
-        
+
                     if (expHomeUnitId == null || !cli.nodeExists(expHomeUnitId, ObjektArt.MESS_EINHEIT)) {
                         log.info("Set home unit id to root")
                         expHomeUnitId = cli.getRoot(ObjektArt.MESS_EINHEIT).id
@@ -102,12 +110,9 @@ class ExportThread implements Runnable  {
                 def millis = (new Date()).getTime() - start.getTime()
                 frameService.saveFrame("\$SYS/ExportThread",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'records':${records},'millis':${millis}}".toString()))
                 log.info("ExportThread finished")
-                        
-                
             } catch (InterruptedException e) {
                 break;
             }
-        
         }
     }
 
@@ -149,7 +154,7 @@ class ExportThread implements Runnable  {
         try {
             def id = cli.newNode(pFolderId, group.name, ObjektArt.MESSUNG_ORDNER).getId()
             log.info("Created folder for group: ${group.name}")
-            updateFolderDescription(id, group.name, "Created by BayEOS-Gateway (${InetAddress.getLocalHost().getHostName()})".toString())
+            updateFolderDescription(id, group.name, "Created by BayEOS-Gateway (${hostname})".toString())
             db.execute("update board_group set db_folder_id = ${id} where id = ${group_id}")
             return true;
         } catch (XmlRpcException e) {
@@ -180,7 +185,7 @@ class ExportThread implements Runnable  {
         try {
             def id = cli.newNode(pFolderId, board.name, ObjektArt.MESSUNG_ORDNER).getId()
             log.info("Created folder for board: ${board.name}")
-            updateFolderDescription(id, board.name, "Created by BayEOS-Gateway (${InetAddress.getLocalHost().getHostName()}), Board (${board.origin})".toString())
+            updateFolderDescription(id, board.name, "Created by BayEOS-Gateway (${hostname}), Board (${board.origin})".toString())
             db.execute("update board set db_folder_id = ${id} where id = ${board_id}")
             return true
         } catch (XmlRpcException e){
