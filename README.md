@@ -59,12 +59,16 @@ Let's send the cpu load of our pc to a local gateway:
 - **Dr. Stefan Holzheu** - _Project lead_ - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 - **Oliver Archner** - _Developer_ - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
-## History
-### Version 2.9.8, March 2024
-- New: Show domains ordered by name in main
-- New: Show status details  
+## History 
+### Version 2.9.9, November 2024
+- Changed: Packages without debian version name 
+
+### Version 2.9.8, June 2024
+- New: Show domains ordered by name in main filter
+- New: Show import message and file size on upload file list
+- New: Show max file size limit on file upload page
 - Fixed: Delete uploaded and imported files 
-- Fixed: Wrong max file parameter in application.properties 
+- Fixed: max-file-size(10MB) and max-request-size(256MB) settings in application.properties 
 
 ### Version 2.9.7, December 2023
 - Fixed: Out of range error in real_value()
