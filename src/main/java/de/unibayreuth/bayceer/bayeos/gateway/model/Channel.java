@@ -67,6 +67,9 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 	@Column(name="last_result_value",insertable=false,updatable=false)
 	private Float lastResultValue;
 	
+	@Column(name="last_insert_time",insertable=false,updatable=false)
+	private Date lastInsertTime;
+	
 	
 	@Column(name="db_series_id")
 	private Integer dbSeriesId;
@@ -445,6 +448,18 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 	public void setAggrFunction(Function aggrFunction) {
 		this.aggrFunction = aggrFunction;
 	}
+
+
+
+    public Date getLastInsertTime() {
+        return lastInsertTime;
+    }
+
+
+
+    public void setLastInsertTime(Date lastInsertTime) {
+        this.lastInsertTime = lastInsertTime;
+    }
 	
 
 

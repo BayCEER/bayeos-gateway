@@ -58,6 +58,11 @@
             <td>
               <div class="pull-right">
                 <div
+                  th:replace="table::map(@{'/groups/map/' + ${i.id}})"
+                ></div>
+              </div>
+              <div class="pull-right">
+                <div
                   th:replace="table::edit(@{'/groups/' + ${i.id}},false)"
                 ></div>
               </div>

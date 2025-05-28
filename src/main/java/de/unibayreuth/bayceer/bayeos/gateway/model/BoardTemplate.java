@@ -47,6 +47,10 @@ public class BoardTemplate extends NamedDomainEntity  {
 
 	@Column(name="last_updated")	
 	Date lastUpdated;
+	
+	@Column(name="last_applied")   
+    Date lastApplied;
+
 
 	@OneToMany(mappedBy="boardTemplate", cascade=CascadeType.ALL)	
 	List<ChannelTemplate> templates = new ArrayList<>();
@@ -165,6 +169,14 @@ public class BoardTemplate extends NamedDomainEntity  {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+
+    public Date getLastApplied() {
+        return lastApplied;
+    }
+
+    public void setLastApplied(Date lastApplied) {
+        this.lastApplied = lastApplied;
+    }
 
 	
 

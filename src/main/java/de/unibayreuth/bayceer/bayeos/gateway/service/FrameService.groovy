@@ -58,6 +58,7 @@ class FrameService {
 		String origin
 		Integer id
 		Date lrt
+        Date lit
 		def channels = [:] 	// nr, id
 		def vchannels = [:] // channel_id, vc
 		Integer lrssi
@@ -112,13 +113,15 @@ class FrameService {
 
 					// Check if board exists
 					Board b = boards[res['origin']]
+                    def lit = new Date();
 					if (b == null) {																								
 						Long id = findOrSaveBoard(db,domainId,res['origin'])
-						b = new Board(id:id, domainId: domainId, origin:res['origin'], lrt:ts,lrssi:res['rssi'], channels:[:],
+						b = new Board(id:id, domainId: domainId, origin:res['origin'],lrt:ts,lit:lit,lrssi:res['rssi'], channels:[:],
 							 vchannels: vcRepo.findByBoardIdAndEvent(id,VirtualChannelEvent.insert))
 						boards[res['origin']] = b
 					} else {
 						b.lrt = ts
+                        b.lit = lit
 						b.lrssi = res['rssi']
 					}
 
@@ -214,7 +217,9 @@ class FrameService {
 			boards.each{ id, board ->
 				updateMetaInfo(db, board)
 				log.info("${board.records} observations for board ${board.origin} imported")				
-				eventProducer.addFrameEvent(new NewObservationEvent(board.id,board.origin,board.records))								
+				eventProducer.addFrameEvent(new NewObservationEvent(board.id,board.origin,board.records))
+                db.executeUpdate("update board set last_insert_time = ? where id = ?",[board.lit, board.id])
+                								
 			}			
 			return true
 
@@ -247,7 +252,8 @@ class FrameService {
 		if (b==null) {
 			log.info("Creating new board:${origin}")
 			def seq = db.firstRow("select nextval('board_id_seq') as id;")
-			db.execute """insert into board (id,domain_id,domain_id_created, origin) values (${seq.id},${domainId},${domainId},${origin});"""
+            def now = new Date();
+			db.execute """insert into board (id,domain_id,domain_id_created, origin, date_created) values (${seq.id},${domainId},${domainId},${origin},${now});"""
 			eventProducer.addFrameEvent(new NewBoardEvent(seq.id))
 			return seq.id
 		} else {

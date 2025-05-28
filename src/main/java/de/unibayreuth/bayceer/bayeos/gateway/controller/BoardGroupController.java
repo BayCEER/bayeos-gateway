@@ -1,6 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway.controller;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -13,15 +14,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
+import de.unibayreuth.bayceer.bayeos.gateway.model.BoardDTO;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardGroup;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
+import de.unibayreuth.bayceer.bayeos.gateway.model.ChannelDTO;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Notification;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.NotificationRepository;
@@ -182,6 +188,13 @@ public class BoardGroupController extends AbstractController {
 								
 	}
 	
+	@RequestMapping(value="/groups/map/{id}", method=RequestMethod.GET)
+    public String showMap(@PathVariable Long id , Model model, Locale locale) {
+	    BoardGroup g = repo.findOne(userSession.getUser(),id);
+	    model.addAttribute("name",getMsg("e.boardGroup", locale) + ' ' + g.getName());	    
+	    model.addAttribute("boards",g.getBoards());
+	    return "mapBoards";
+    }
 	
 	
 	

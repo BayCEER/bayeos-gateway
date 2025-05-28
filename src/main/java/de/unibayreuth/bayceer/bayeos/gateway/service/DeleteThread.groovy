@@ -22,10 +22,22 @@ class DeleteThread implements Runnable {
 	@Autowired
 	private DataSource dataSource
 
-	@Value('${DELETE_RETENTION:60 days}')
-	private String retention;
-
-	@Value('${DELETE_WAIT_SECS:120}')
+	@Value('${DELETE_OBS_RETENTION:60 days}')
+	private String obsRetention;
+    
+    @Value('${DELETE_MSG_RETENTION:60 days}')
+    private String msgRetention;
+    
+    @Value('${DELETE_TEMPLATE_RETENTION:1 years}')
+    private String templateRetention;
+    
+    @Value('${DELETE_BOARD_RETENTION:1 years}')
+    private String boardRetention;
+        
+    @Value('${DELETE_BOARD_GROUP_RETENTION:1 years}')
+    private String boardGroupRetention;
+    
+    @Value('${DELETE_WAIT_SECS:120}')
 	private int waitSecs;
 	
 	@Autowired
@@ -41,23 +53,38 @@ class DeleteThread implements Runnable {
 			def start = new Date()
 			def obs = 0
 			def obs_exported = 0
-			def msg = 0						 						
+			def msg = 0
+            def temps = 0
+            def boards = 0
+            def groups = 0						 						
 			try {
 				log.info("DeleteThread running")
 				def db = new Sql(dataSource)
 				
 				try {
-					log.info("Deleting observations older than ${retention}.")
-					db.execute("delete from observation where insert_time < now() - ?::interval",[retention])
+					log.info("Deleting observations older than ${obsRetention}.")
+					db.execute("delete from observation where insert_time < (now() - ?::interval)",[obsRetention])
 					obs = db.updateCount
 
-					log.info("Deleting cached observations older than ${retention}.")
-					db.execute("delete from observation_exp where insert_time < now() - ?::interval",[retention])
+					log.info("Deleting cached observations older than ${obsRetention}.")
+					db.execute("delete from observation_exp where insert_time < (now() - ?::interval)",[obsRetention])
 					obs_exported = db.updateCount
 										
-					log.info("Deleting messages older than ${retention}.")
-					db.execute("delete from message where insert_time < now() - ?::interval",[retention])
+					log.info("Deleting messages older than ${msgRetention}.")
+					db.execute("delete from message where insert_time < (now() - ?::interval)",[msgRetention])
 					msg = db.updateCount
+                    
+                    log.info("Deleting not applied templates since ${templateRetention}.")
+                    db.execute("delete from board_template where last_applied < (now() - ?::interval) or (last_applied is null and date_created < (now() - ?::interval))",[templateRetention,templateRetention])
+                    temps = db.updateCount
+                    
+                    log.info("Deleting inactive boards since ${boardRetention}.")
+                    db.execute("delete from board where last_insert_time < (now() - ?::interval) or (last_insert_time is null and date_created < (now() - ?::interval))",[boardRetention,boardRetention])
+                    boards = db.updateCount
+                    
+                    log.info("Deleting empty board groups since ${boardGroupRetention}.")                                                                                
+                    db.execute("delete from board_group where id not in (select board_group_id from board group by board_group_id) and date_created < (now() - ?::interval)",[boardGroupRetention])
+                    groups = db.updateCount                                        
 															
 					exit = 0
 				} catch (SQLException e){
@@ -68,7 +95,8 @@ class DeleteThread implements Runnable {
 					log.info("DeleteThread finished")
 				}
 				def millis = (new Date()).getTime() - start.getTime()
-				frameService.saveFrame("\$SYS/DeleteThread",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'obs':${obs},'obs_exported':${obs_exported},'msg':${msg},'millis':${millis}}".toString()))
+                def jsonMsg = "{'exit':${exit},'obs':${obs},'obs_exported':${obs_exported},'msg':${msg},'templates':${temps},'boards':${boards},'groups':${groups},'millis':${millis}}".toString()
+				frameService.saveFrame("\$SYS/DeleteThread",new LabeledFrame(NumberType.Float32,jsonMsg))
 				Thread.sleep(1000*waitSecs)
 			} catch (InterruptedException e){
 				break;

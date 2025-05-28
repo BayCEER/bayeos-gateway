@@ -28,6 +28,12 @@
 		th:text="#{action.export}"></span>
 </a>
 
+<!--  Map Button -->
+<a th:fragment="map(href)" class="btn btn-default btn-xs" th:href="${href}"> <span
+		class="glyphicon glyphicon-map-marker"></span> <span
+		th:text="#{action.map}"></span>
+</a>
+
 
 <!--  Pagination row below table  -->
 <div th:fragment="pagination" class="row">

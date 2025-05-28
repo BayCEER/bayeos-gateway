@@ -1,5 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service;
 
+import java.util.Date;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.BeanUtils;
@@ -169,6 +171,8 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 			BeanUtils.copyProperties(ct, c, new String[]{"id"});
 			
 		}
+		t.setLastApplied(new Date());
+		repoTemplate.save(t);
 		repoBoard.save(userSession.getUser(),b);	
 	}
 }

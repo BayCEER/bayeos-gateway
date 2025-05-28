@@ -1,5 +1,6 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
+
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
@@ -153,8 +154,19 @@ class ExportThread implements Runnable  {
         def pFolderId = group.domain_folder_id ?: expHomeFolderId
         try {
             def id = cli.newNode(pFolderId, group.name, ObjektArt.MESSUNG_ORDNER).getId()
-            log.info("Created folder for group: ${group.name}")
-            updateFolderDescription(id, group.name, "Created by BayEOS-Gateway (${hostname})".toString())
+            log.info("Created folder for group: ${group.name}")            
+            cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id, ObjektArt.MESSUNG_ORDNER.toString(),[
+                group.name,
+                "Created by BayEOS-Gateway (${hostname})".toString(),
+                null,
+                null,
+                null,
+                null,
+                2,
+                null,
+                null,
+                null
+            ] as Object[])                        
             db.execute("update board_group set db_folder_id = ${id} where id = ${group_id}")
             return true;
         } catch (XmlRpcException e) {
@@ -178,14 +190,29 @@ class ExportThread implements Runnable  {
     }
 
     private def createFolderForBoard(board_id) {
-        def board = db.firstRow("""select b.name, b.origin, b.board_group_id, b.domain_id, g.db_folder_id as group_folder_id, d.db_folder_id as domain_folder_id 
-				from board b left outer join board_group g on g.id = b.board_group_id
+        def board = db.firstRow("""select b.name, b.origin, b.board_group_id, b.domain_id, g.db_folder_id as group_folder_id, d.db_folder_id as domain_folder_id,
+                b.lat, b.lon, b.alt from board b left outer join board_group g on g.id = b.board_group_id
 				left outer join domain d on d.id = b.domain_id where b.id=${board_id}""")
         def pFolderId = board.group_folder_id ?: board.domain_folder_id ?: expHomeFolderId
         try {
             def id = cli.newNode(pFolderId, board.name, ObjektArt.MESSUNG_ORDNER).getId()
-            log.info("Created folder for board: ${board.name}")
-            updateFolderDescription(id, board.name, "Created by BayEOS-Gateway (${hostname}), Board (${board.origin})".toString())
+            log.info("Created folder for board: ${board.name}")        
+                        
+            cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id, ObjektArt.MESSUNG_ORDNER.toString(),[
+                board.name, 
+                "Created by BayEOS-Gateway (${hostname})",
+                null, 
+                null,
+                null,
+                null,
+                2,
+                board.lat,
+                board.lon,
+                board.alt
+                
+            ] as Object[])
+            
+                        
             db.execute("update board set db_folder_id = ${id} where id = ${board_id}")
             return true
         } catch (XmlRpcException e){
@@ -324,16 +351,6 @@ class ExportThread implements Runnable  {
         return expProto + "://" + expHost + ":" + expPort + expContext
     }
 
-    private def updateFolderDescription(id,name,desc) {
-        cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id, ObjektArt.MESSUNG_ORDNER.toString(),[
-            name,
-            desc,
-            null,
-            null,
-            null,
-            null,
-            2
-        ] as Object[])
-    }
+   
 }
 

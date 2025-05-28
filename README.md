@@ -60,6 +60,13 @@ Let's send the cpu load of our pc to a local gateway:
 - **Oliver Archner** - _Developer_ - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History 
+
+### Version 2.10.0 May 2025
+- New: Board location coordinates 
+- New: Board group map 
+- New: Board location export to server 
+- New: Garbage collector for not used board templates
+
 ### Version 2.9.9, November 2024
 - Changed: Packages without debian version name 
 

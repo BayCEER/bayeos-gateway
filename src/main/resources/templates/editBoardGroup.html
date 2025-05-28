@@ -159,14 +159,22 @@
           
           </div>
           
-          <div class="form-group block-action">
-            <button
-              th:text="#{action.save}"
-              type="submit"
-              class="btn btn-default"
-            >
-              Save
-            </button>
+          <div class="block-action">
+          		<button type="submit" name="save" class="btn btn-primary">
+						<span class="glyphicon glyphicon-save"></span> <span
+							th:text="#{action.save}"></span>
+				</button>
+				<a class="btn btn-default"
+						th:href="@{/groups/delete/} + ${group.id}"
+						th:onclick="#{dialog.confirm}"> <span
+						class="glyphicon glyphicon-remove"></span> <span
+						th:text="#{action.delete}"></span>
+				<a class="btn btn-default"
+						th:href="@{/groups/map/} + ${group.id}"> <span
+						class="glyphicon glyphicon-map-marker"></span> <span
+						th:text="#{action.map}"></span>
+					</a>
+            
           </div>
         </div>
       </form>

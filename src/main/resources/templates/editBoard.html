@@ -124,6 +124,35 @@
 						</div>
 						<div role="tabpanel" class="tab-pane fade" id="settings">
 						
+						
+							<div class="block">
+								<div class="block-header">Location</div>
+								<div class="row">
+
+									
+									
+									<div class="col-sm-3">
+										<div th:replace="field::number(prop='lat',label=#{board.lat})"></div>
+									</div>
+									<div class="col-sm-3">
+										<div th:replace="field::number(prop='lon',label=#{board.lon})"></div>
+									</div>
+									<div class="col-sm-3">
+										<div th:replace="field::number(prop='alt',label=#{board.alt})"></div>
+									</div>
+									
+									<div class="col-sm-3" th:if="${writeable}?:true")>
+									<div class="form-group">
+										<label th:text="#{board.setPosition}" class="control-label">Set Position</label>										
+										<a class="btn btn-default setPosition"><span class="glyphicon glyphicon-map-marker"></span>										
+										</a>										
+										</div>
+									
+									</div>
+									</div>
+																																
+							</div>
+						
 							<div th:replace="block::boardSettings(Checks)"></div>
 						
 							<div class="block">
@@ -313,6 +342,8 @@
 		         data: "enabled="+ $(this).prop('checked')		               			 			 				 
 		 		})															
 		 	});
+			
+		 
 		 
 		 // Table messages 
 		 $('#tableMessages').DataTable( {
@@ -454,6 +485,24 @@
             	 	      
         } );
              
+           
+           
+            
+         $('#settings').on('click','.setPosition', function () {        	         	
+        	 if (navigator.geolocation) {
+        		    navigator.geolocation.getCurrentPosition(
+        		    	(position) => {
+        		    		$('#lat').val(position.coords.latitude);        		    		
+        		    		$('#lon').val(position.coords.longitude);
+        		    		$('#alt').val(position.coords.altitude);
+        		    		// console.log(position.coords.accuracy);
+        		    		
+        		    	}, 
+        		    	() => alert("No position available"));
+        	  } else {
+        		    alert("Geolocation is not supported by this browser.");
+        	  }
+         });
              
          // Table comments 
 		 var comments = $('#tableComments').DataTable( {
@@ -531,6 +580,7 @@
               
                
              
+         
   
 		 });					
 	</script>

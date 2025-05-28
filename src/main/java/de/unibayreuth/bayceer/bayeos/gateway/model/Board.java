@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -15,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
@@ -52,6 +54,16 @@ public class Board extends NamedDomainEntity {
 	@Column(insertable=false,updatable=false)
 	Date lastResultTime;
 	
+	
+	/* Column is managed by import routines !! */
+    @Column(insertable=false,updatable=false)
+    Date dateCreated;
+    
+        /* Column is managed by import routines !! */
+    @Column(insertable=false,updatable=false)
+    Date lastInsertTime;
+    		
+		
 	@OneToMany(mappedBy="board")
 	List<Notification> notifications;
 	
@@ -60,6 +72,11 @@ public class Board extends NamedDomainEntity {
 	Boolean dbAutoExport = false;
 	
 	Boolean denyNewChannels = false;
+	
+	
+	Float lon;
+	Float lat;
+	Float alt;
 	
 	
 	@OneToMany(mappedBy="board", cascade=CascadeType.REMOVE)	
@@ -75,8 +92,11 @@ public class Board extends NamedDomainEntity {
 	
 	@ManyToOne	
 	@JoinColumn(name = "board_group_id")
-	@JsonView(DataTablesOutput.View.class)	
+	@JsonView(DataTablesOutput.View.class)
+	@JsonBackReference
 	BoardGroup boardGroup;
+	
+
 	
 				
 	public Integer getStatus() {
@@ -281,6 +301,47 @@ public class Board extends NamedDomainEntity {
 		}
 		return true;
 	}
+
+    
+    public Float getLon() {
+        return lon;
+    }
+
+    public void setLon(Float lon) {
+        this.lon = lon;
+    }
+
+    public Float getLat() {
+        return lat;
+    }
+
+    public void setLat(Float lat) {
+        this.lat = lat;
+    }
+
+    public Float getAlt() {
+        return alt;
+    }
+
+    public void setAlt(Float alt) {
+        this.alt = alt;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getLastInsertTime() {
+        return lastInsertTime;
+    }
+
+    public void setLastInsertTime(Date lastInsertTime) {
+        this.lastInsertTime = lastInsertTime;
+    }
 
 	
 
