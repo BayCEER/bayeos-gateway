@@ -1,6 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
 
+
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
@@ -15,7 +16,11 @@ import bayeos.frame.types.LabeledFrame
 import bayeos.frame.types.NumberType
 import de.unibayreuth.bayceer.bayeos.client.Client
 import groovy.sql.Sql
-import de.unibayreuth.bayceer.bayeos.objekt.ObjektArt
+import de.unibayreuth.bayceer.bayeos.objekt.Art
+import de.unibayreuth.bayceer.bayeos.objekt.Messung
+import de.unibayreuth.bayceer.bayeos.objekt.MessungOrdner
+import de.unibayreuth.bayceer.bayeos.objekt.Node
+
 
 
 @Service
@@ -83,18 +88,20 @@ class ExportThread implements Runnable  {
                     // Authentication user root by ip
                     cli.connect(getExportUrL(),expUser,"")
 
-                    if (expHomeUnitId == null || !cli.nodeExists(expHomeUnitId, ObjektArt.MESS_EINHEIT)) {
+                    if (expHomeUnitId == null || !cli.nodeExists(expHomeUnitId, Art.MESS_EINHEIT)) {
                         log.info("Set home unit id to root")
-                        expHomeUnitId = cli.getRoot(ObjektArt.MESS_EINHEIT).id
+                        expHomeUnitId = cli.getRoot(Art.MESS_EINHEIT).id
                     }
-                    if (expHomeFolderId == null || !cli.nodeExists(expHomeFolderId, ObjektArt.MESSUNG_ORDNER)) {
+                    if (expHomeFolderId == null || !cli.nodeExists(expHomeFolderId, Art.MESSUNG_ORDNER)) {
                         log.info("Set home folder id to root")
-                        expHomeFolderId = cli.getRoot(ObjektArt.MESSUNG_ORDNER).id
+                        expHomeFolderId = cli.getRoot(Art.MESSUNG_ORDNER).id
                     }
                     createNewFoldersForDomains()
                     createNewFoldersForGroups()
                     createNewFoldersForBoards()
                     createNewSeriesForChannels()
+                    syncFolderPropsForBoards()
+                    syncFolderPropsForChannels()
                     records = exportNewObservations()
                     exit = (records<0)?-1:0
                 } catch (Exception e){
@@ -132,7 +139,7 @@ class ExportThread implements Runnable  {
     private def createFolderForDomain(domain_id) {
         try {
             def dom = db.firstRow("select name from domain where id=${domain_id}")
-            def id = cli.newNode(expHomeFolderId, dom.name, ObjektArt.MESSUNG_ORDNER).getId()
+            def id = cli.newNode(expHomeFolderId, dom.name, Art.MESSUNG_ORDNER).getId()
             log.info("Created domain: ${dom.name}")
             db.execute("update domain set db_folder_id = ${id} where id = ${domain_id}")
         } catch (XmlRpcException e) {
@@ -153,26 +160,16 @@ class ExportThread implements Runnable  {
 				left join domain d on d.id = g.domain_id where g.id =${group_id}""")
         def pFolderId = group.domain_folder_id ?: expHomeFolderId
         try {
-            def id = cli.newNode(pFolderId, group.name, ObjektArt.MESSUNG_ORDNER).getId()
-            log.info("Created folder for group: ${group.name}")            
-            cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id, ObjektArt.MESSUNG_ORDNER.toString(),[
-                group.name,
-                "Created by BayEOS-Gateway (${hostname})".toString(),
-                null,
-                null,
-                null,
-                null,
-                2,
-                null,
-                null,
-                null
-            ] as Object[])                        
-            db.execute("update board_group set db_folder_id = ${id} where id = ${group_id}")
+            def node = cli.newNode(pFolderId, group.name, Art.MESSUNG_ORDNER)            
+            MessungOrdner m = cli.getNodeObjekt(node,MessungOrdner.class)
+            m.setBeschreibung("Created by BayEOS-Gateway (${hostname})")                        
+            cli.updateNodeObjekt(m);                                                                        
+            db.execute("update board_group set db_folder_id = ${node.id} where id = ${group_id}")
             return true;
         } catch (XmlRpcException e) {
             log.error(e.getMessage())
             // Fix
-            if (!cli.nodeExists(pFolderId,ObjektArt.MESSUNG_ORDNER)) {
+            if (!cli.nodeExists(pFolderId,Art.MESSUNG_ORDNER)) {
                 if (pFolderId == group.domain_folder_id) {
                     if (createFolderForDomain(group.domain_id)) {
                         return createFolderForGroup(group_id)
@@ -195,30 +192,20 @@ class ExportThread implements Runnable  {
 				left outer join domain d on d.id = b.domain_id where b.id=${board_id}""")
         def pFolderId = board.group_folder_id ?: board.domain_folder_id ?: expHomeFolderId
         try {
-            def id = cli.newNode(pFolderId, board.name, ObjektArt.MESSUNG_ORDNER).getId()
+            def node = cli.newNode(pFolderId, board.name, Art.MESSUNG_ORDNER)
             log.info("Created folder for board: ${board.name}")        
-                        
-            cli.getXmlRpcClient().execute("ObjektHandler.updateObjekt",id, ObjektArt.MESSUNG_ORDNER.toString(),[
-                board.name, 
-                "Created by BayEOS-Gateway (${hostname})",
-                null, 
-                null,
-                null,
-                null,
-                2,
-                board.lat,
-                board.lon,
-                board.alt
-                
-            ] as Object[])
-            
-                        
-            db.execute("update board set db_folder_id = ${id} where id = ${board_id}")
+            MessungOrdner m = cli.getNodeObjekt(node,MessungOrdner.class)
+            m.setBeschreibung("Created by BayEOS-Gateway (${hostname})")
+            m.setLat(board.lat)
+            m.setLon(board.lon)
+            m.setAlt(board.alt)            
+            cli.updateNodeObjekt(m);                                                
+            db.execute("update board set db_folder_id = ${m.getId()} where id = ${board_id}")
             return true
         } catch (XmlRpcException e){
             log.error(e.getMessage())
             // Fix
-            if (!cli.nodeExists(pFolderId,ObjektArt.MESSUNG_ORDNER)) {
+            if (!cli.nodeExists(pFolderId,Art.MESSUNG_ORDNER)) {
                 // GW -> D -> B -> C
                 if (pFolderId == board.domain_folder_id){
                     if (createFolderForDomain(board.domain_id)) {
@@ -246,10 +233,10 @@ class ExportThread implements Runnable  {
         def channel = db.firstRow("select c.*, b.db_folder_id from channel c join board b on c.board_id = b.id where c.id=${channel_id}")
         def sId
         try {
-            sId = cli.newNode(channel.db_folder_id, channel.name,ObjektArt.MESSUNG_MASSENDATEN).getId()
+            sId = cli.newNode(channel.db_folder_id, channel.name,Art.MESSUNG_MASSENDATEN).getId()
             log.info("Created new series for channel ${channel.name}")
         } catch (XmlRpcException e){
-            if (!cli.nodeExists(channel.db_folder_id,ObjektArt.MESSUNG_ORDNER)) {
+            if (!cli.nodeExists(channel.db_folder_id,Art.MESSUNG_ORDNER)) {
                 if (createFolderForBoard(channel.board_id)) {
                     return createSeriesForChannel(channel.id)
                 }
@@ -266,7 +253,9 @@ class ExportThread implements Runnable  {
     private def createReferenceForUnit(channel_db_series_id, unit_id){
         def unit = db.firstRow("select * from unit where id = ${unit_id}")
         try {
-            cli.setNodeReference(unit.db_unit_id,channel_db_series_id,ObjektArt.MESS_EINHEIT)
+            
+            
+            cli.setNodeReference(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT)
             log.info("Created reference on unit:${unit.name} for series ${channel_db_series_id}")
         } catch (XmlRpcException e){
             log.error(e.getMessage())
@@ -281,7 +270,7 @@ class ExportThread implements Runnable  {
     private def createUnitForUnit(unit_name, unit_id) {
         try {
             def parentId = expHomeUnitId
-            def fId = cli.newNode(parentId, unit_name, ObjektArt.MESS_EINHEIT).getId()
+            def fId = cli.newNode(parentId, unit_name, Art.MESS_EINHEIT).getId()
             log.info("Created unit: ${unit_name}")
             db.execute("update unit set db_unit_id = ${fId} where id = ${unit_id}")
         } catch (XmlRpcException e){
@@ -295,7 +284,7 @@ class ExportThread implements Runnable  {
         channelIds.each{ it ->
             def id = it[0]
             def series_id = it[1]
-            if (!cli.nodeExists(series_id,ObjektArt.MESSUNG_MASSENDATEN)) {
+            if (!cli.nodeExists(series_id,Art.MESSUNG_MASSENDATEN)) {
                 createSeriesForChannel(id)
             }
         }
@@ -349,6 +338,68 @@ class ExportThread implements Runnable  {
 
     private String getExportUrL() {
         return expProto + "://" + expHost + ":" + expPort + expContext
+    }
+    
+    private def syncFolderPropsForBoards() {        
+        db.eachRow("""select * from board where db_folder_id is not null and force_sync and db_auto_export;"""){ it ->
+                syncFolderPropsForBoard(it)                
+        }        
+    }
+    
+    private def syncFolderPropsForBoard(board) {        
+        
+        try {               
+                Node node = cli.getNode(board.db_folder_id);
+                if (node == null) {
+                    log.warn("Failed to resync ${board.id}")
+                    return
+                }            
+                MessungOrdner o = cli.getNodeObjekt(node,MessungOrdner.class)
+                o.setBezeichnung(board.name)
+                o.setLat(board.lat)
+                o.setLon(board.lon)
+                o.setAlt(board.alt)                                
+                cli.updateNodeObjekt(o)                               
+                                                        
+        } catch (XmlRpcException e){
+            log.error(e.getMessage())
+        } finally {            
+            db.execute("update board set force_sync = false where id = ${board.id}")
+        } 
+        return true
+    }
+    
+    private def syncFolderPropsForChannels() {        
+        db.eachRow("""select c.* from channel c join board b on b.id = c.board_id where b.db_folder_id is not null and b.db_auto_export 
+            and c.db_exclude_auto_export is false and c.db_series_id is not null and c.force_sync;"""){ it ->
+                syncFolderPropsForChannel(it)
+        }        
+    }
+    
+    private def syncFolderPropsForChannel(channel) {
+        
+        try {
+            Node node = cli.getNode(channel.db_series_id)
+            if (node == null) {
+                log.warn("Failed to resync channel ${channel.id}")
+                return
+            }
+            
+            Messung m = cli.getNodeObjekt(node, Messung.class)
+            m.setBezeichnung(channel.name)
+            cli.updateNodeObjekt(m)
+               
+            // TBD: Sync units 
+            // Get all references 
+            // Delete all unit references for series  
+            // Add a new unit reference for series           
+            
+        } catch (XmlRpcException e){
+            log.error(e.getMessage())
+        } finally {            
+            db.execute("update channel set force_sync = false where id = ${channel.id}")
+        } 
+        return true
     }
 
    

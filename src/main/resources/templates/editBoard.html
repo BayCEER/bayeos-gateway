@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	xmlns:sd="http://www.thymeleaf.org/spring-data" layout:decorate="~{main}">
+	xmlns:sd="http://www.thymeleaf.org/spring-data" 
+	layout:decorate="~{main}">
 <head>
-<title th:text="#{e.board}">Board</title>
+<title th:text="|#{e.board} ${board.nameOrOrigin}|">Board</title>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -158,11 +159,14 @@
 							<div class="block">
 								<div class="block-header">Advanced Settings</div>
 								<div class="row">
-									<div class="col-sm-6">
+									<div class="col-sm-4">
 										<div th:replace="field::text(prop='origin',label=#{board.origin},required=true)"></div>
 									</div>
-									<div class="col-sm-6">										
+									<div class="col-sm-4">										
 										<div th:replace="field::number(prop='dbFolderId',label=#{a.dbId},step=1)"></div>
+									</div>
+									<div class="col-sm-4">
+										<div th:replace="field::checkbox('forceSync',#{board.forceSync})"></div>
 									</div>
 								</div>
 							</div>							

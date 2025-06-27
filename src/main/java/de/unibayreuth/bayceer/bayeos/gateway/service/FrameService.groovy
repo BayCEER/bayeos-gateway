@@ -58,7 +58,7 @@ class FrameService {
 		String origin
 		Integer id
 		Date lrt
-        Date lit
+        Date lit = new Date()
 		def channels = [:] 	// nr, id
 		def vchannels = [:] // channel_id, vc
 		Integer lrssi
@@ -110,18 +110,19 @@ class FrameService {
 
 					// Parser sends ts as nano secs
 					Date ts = new Date((long)(res['ts']/(1000*1000)))
+                                       
 
 					// Check if board exists
 					Board b = boards[res['origin']]
-                    def lit = new Date();
+                    
 					if (b == null) {																								
 						Long id = findOrSaveBoard(db,domainId,res['origin'])
-						b = new Board(id:id, domainId: domainId, origin:res['origin'],lrt:ts,lit:lit,lrssi:res['rssi'], channels:[:],
+						b = new Board(id:id, domainId: domainId, origin:res['origin'],lrt:ts,lrssi:res['rssi'], channels:[:],
 							 vchannels: vcRepo.findByBoardIdAndEvent(id,VirtualChannelEvent.insert))
 						boards[res['origin']] = b
 					} else {
 						b.lrt = ts
-                        b.lit = lit
+                        b.lit = new Date()
 						b.lrssi = res['rssi']
 					}
 
@@ -215,11 +216,10 @@ class FrameService {
 
 			// Update channel and board meta data
 			boards.each{ id, board ->
-				updateMetaInfo(db, board)
+				updateChannelMetaInfo(db, board)
+                updateBoardMetaInfo(db, board)
 				log.info("${board.records} observations for board ${board.origin} imported")				
-				eventProducer.addFrameEvent(new NewObservationEvent(board.id,board.origin,board.records))
-                db.executeUpdate("update board set last_insert_time = ? where id = ?",[board.lit, board.id])
-                								
+				eventProducer.addFrameEvent(new NewObservationEvent(board.id,board.origin,board.records))                               								
 			}			
 			return true
 
@@ -252,7 +252,7 @@ class FrameService {
 		if (b==null) {
 			log.info("Creating new board:${origin}")
 			def seq = db.firstRow("select nextval('board_id_seq') as id;")
-            def now = new Date();
+            def now = new java.sql.Timestamp((new Date()).getTime())
 			db.execute """insert into board (id,domain_id,domain_id_created, origin, date_created) values (${seq.id},${domainId},${domainId},${origin},${now});"""
 			eventProducer.addFrameEvent(new NewBoardEvent(seq.id))
 			return seq.id
@@ -279,9 +279,16 @@ class FrameService {
 			return c.id
 		}
 	}
+    
+    
+    public void updateBoardMetaInfo(Sql db, Board board) throws SQLException {
+        def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [board.id])
+        db.executeUpdate("update board set last_insert_time = ?, last_result_time = ?,status_valid = ?,last_rssi = ? where id = ?",[new java.sql.Timestamp((board.lit).getTime()),b.lrt, b.status, board.lrssi, board.id])
+        
+    }
 
 
-	public void updateMetaInfo(Sql db, Board board) throws SQLException {
+	public void updateChannelMetaInfo(Sql db, Board board) throws SQLException {
 
 		def channels = board.channels
 		db.eachRow("""SELECT c.id as id, coalesce(c.sampling_interval, b.sampling_interval) as sampling_interval, 
@@ -339,14 +346,7 @@ class FrameService {
 							db.executeUpdate("update channel set last_result_value = ?, last_result_time = ?, status_valid = ?, status_valid_msg = ? , last_count = ? where id = ? and (last_result_time is null or last_result_time < ?)",
 								[obs.result_value, obs.result_time, status_valid, status_valid_msg.toString(), lastCount, cha.id, obs.result_time])
 						}
-
-						def b = db.firstRow("select max(last_result_time) lrt, max(status_valid) status from channel where board_id = ?", [board.id])
-						if (b.lrt == board.lrt){
-							db.executeUpdate("update board set last_result_time = ?,status_valid = ?,last_rssi = ? where id = ?",[b.lrt, b.status, board.lrssi, board.id])
-						} else {
-							db.executeUpdate("update board set last_result_time = ?,status_valid = ? where id = ?",[b.lrt, b.status, board.id])
-						}
-
+						
 					}
 				}
 	}

@@ -111,7 +111,9 @@ public class BoardTemplateServiceImpl implements BoardTemplateService {
 		Domain d = bt.getDomain();		
 		if (!d.getName().isEmpty()) {			
 			bt.setDomain(repoDomain.findById(Long.valueOf(d.getName())).orElseThrow(()-> new EntityNotFoundException()));
-		} 
+		} else {
+		    bt.setDomain(null);
+		}
 			
 		for (ChannelTemplate t: bt.getTemplates()){			
 			Unit u = t.getUnit();			

@@ -20,7 +20,16 @@ alter table board alter column date_created set not null;
 alter table board_group add date_created timestamptz;
 update board_group set date_created = now() where date_created is null;
 alter table board_group alter column date_created set default now();
-alter table board_group alter column date_created set not null; 
+alter table board_group alter column date_created set not null;
+
+/* Force sync with flag on boards and channels to trigger update of server properties by user */
+alter table board add column force_sync boolean default false not null;
+alter table channel add column force_sync boolean default false not null;
+ 
+ 
+
+
+
 
 
 

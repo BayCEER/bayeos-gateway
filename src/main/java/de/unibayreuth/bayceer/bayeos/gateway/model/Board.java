@@ -38,6 +38,10 @@ public class Board extends NamedDomainEntity {
 	@Column(name="filter_critical_values")
 	Boolean filterCriticalValues = false;
 	
+	// Flag to force update on attributes during export 
+	@Column(name="force_sync")
+	Boolean forceSync = false;
+	
 	@Transient	
 	Long domainIdCreated;
 		
@@ -59,7 +63,7 @@ public class Board extends NamedDomainEntity {
     @Column(insertable=false,updatable=false)
     Date dateCreated;
     
-        /* Column is managed by import routines !! */
+    /* Column is managed by import routines !! */
     @Column(insertable=false,updatable=false)
     Date lastInsertTime;
     		
@@ -341,6 +345,22 @@ public class Board extends NamedDomainEntity {
 
     public void setLastInsertTime(Date lastInsertTime) {
         this.lastInsertTime = lastInsertTime;
+    }
+    
+    public String getNameOrOrigin() {
+        if (name == null) {
+            return origin;
+        } else {
+            return name;
+        }
+    }
+
+    public Boolean getForceSync() {
+        return forceSync;
+    }
+
+    public void setForceSync(Boolean forceSync) {
+        this.forceSync = forceSync;
     }
 
 	

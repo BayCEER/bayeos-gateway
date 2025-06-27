@@ -37,7 +37,9 @@
               <div
                 th:replace="field::checkbox('autoExport',#{board.autoExport})"
               ></div>
-            </div>
+            	<div 
+            	th:replace="field::checkbox('forceSync',#{board.forceSync})"></div>
+			  </div>
           </div>
           <div class="row">
             <div class="col-sm-6">

@@ -22,7 +22,7 @@ Main characteristics:
 - Login as root
 - Install basic tools for installation  
   `apt-get update`  
-  `apt-get install wget gnupg`
+  `apt-get install wget gnupg lsb-release`
 - Import the repository key  
   `wget -O - http://www.bayceer.uni-bayreuth.de/repos/apt/conf/bayceer_repo.gpg.key |apt-key add -`
 - Add the BayCEER Debian repository  

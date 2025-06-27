@@ -4,7 +4,7 @@ Section: server
 Priority: optional
 Architecture: all
 Pre-Depends: default-jre-headless (>= 2:1.11)
-Depends: postgresql (>= 9.5), postgresql-contrib, postgresql-plperl, apache2, libpq-dev, libmath-spline-perl
+Depends: postgresql (<< 14.0), postgresql-contrib, postgresql-plperl, apache2, libpq-dev, libmath-spline-perl
 Recommends: ssl-cert
 Description: BayEOS Gateway
 Maintainer: oliver.archner@uni-bayreuth.de

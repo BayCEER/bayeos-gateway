@@ -67,15 +67,16 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 	@Column(name="last_result_value",insertable=false,updatable=false)
 	private Float lastResultValue;
 	
-	@Column(name="last_insert_time",insertable=false,updatable=false)
-	private Date lastInsertTime;
-	
-	
+		
 	@Column(name="db_series_id")
 	private Integer dbSeriesId;
 
 	@Column(name="db_exclude_auto_export")
 	private Boolean dbExcludeAutoExport = false;
+	
+	// Flag to force update on attributes during export 
+    @Column(name="force_sync")
+    Boolean forceSync = false;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="board_id", nullable = false)
@@ -451,15 +452,18 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 
 
 
-    public Date getLastInsertTime() {
-        return lastInsertTime;
+    public Boolean getForceSync() {
+        return forceSync;
     }
 
 
 
-    public void setLastInsertTime(Date lastInsertTime) {
-        this.lastInsertTime = lastInsertTime;
+    public void setForceSync(Boolean forceSync) {
+        this.forceSync = forceSync;
     }
+
+
+    
 	
 
 

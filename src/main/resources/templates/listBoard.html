@@ -16,8 +16,7 @@
                    <th th:text="#{e.domain}" th:class="min-tablet-l" th:if="${#authentication.principal.inNullDomain()}">Domain</th>                                                         
                    <th th:text="#{board.origin}">Origin</th>                   
                    <th th:text="#{board.group}" class="min-tablet-l">Group</th>                   
-                   <th th:text="#{board.name}" class="min-tablet-l">Name</th>
-                   <th th:text="#{board.rssi}" class="min-tablet-l">Rssi</th>
+                   <th th:text="#{board.name}" class="min-tablet-l">Name</th>                   
                    <th th:text="#{board.lrt}">Last Result Time</th>
                    <th th:text="#{board.status}">Status</th>
                    <th></th>
@@ -76,21 +75,7 @@
                       		}
                             
                       	}
-                    },
-                    {data: 'lastRssi', searchable: false,
-                    	render: function(data,type,row){
-                    		if (row.lastRssi != null) {
-                    				if (row.lastRssi != 0){
-                    					var url = /*[[ @{/resources/img/level_} ]]*/;
-        	        			    	return '<img src="' + url + rssiLevel(row.lastRssi) + '.gif"/>';	
-                    				} else {
-                    					return '';
-                    				}	                    			             			        
-            			    } else {
-            			        return '';
-            			    }
-                    	}
-                    },
+                    },                   
                     {data: 'lastResultTime', searchable: false,
                     	render: function(data,type,row){
                     		if (row.lastResultTime != null){
