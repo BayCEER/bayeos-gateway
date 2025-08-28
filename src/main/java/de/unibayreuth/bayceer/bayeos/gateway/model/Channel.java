@@ -133,7 +133,7 @@ public class Channel extends UniqueEntity implements Comparable<Channel>{
 	
 	public String getQuantity(){		
 		if (unit != null){
-			return this.name + "[" + getUnit().getName() + "]";
+			return this.name + " [" + getUnit().getName() + "]";
 		} else {
 			return name;
 		}
