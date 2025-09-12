@@ -66,7 +66,7 @@ Let's send the cpu load of our pc to a local gateway:
 - New: Board group map 
 - New: Board location export to server 
 - New: Board force sync flag to update server folder and series (names and location only)
-- New: Garbage collector for not used board templates
+- New: Retention policy on board template, board and board group
 - Fixed: Replaced internal with external Nashorn script engine
 
 ### Version 2.9.9, November 2024
