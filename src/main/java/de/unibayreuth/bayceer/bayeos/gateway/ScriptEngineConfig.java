@@ -1,8 +1,8 @@
 package de.unibayreuth.bayceer.bayeos.gateway;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,7 +11,9 @@ public class ScriptEngineConfig {
 
 	@Bean
 	public ScriptEngine scriptEngine(){
-		//TODO Use nashorn for java > 8
-		return new ScriptEngineManager().getEngineByName("js");
+		
+	    NashornScriptEngineFactory factory = new NashornScriptEngineFactory();	    
+        return factory.getScriptEngine();
+
 	}
 }

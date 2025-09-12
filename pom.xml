@@ -296,6 +296,12 @@
 			<artifactId>thymeleaf-spring-data-dialect</artifactId>
 			<version>3.5.0</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.openjdk.nashorn</groupId>
+			<artifactId>nashorn-core</artifactId>
+			<version>15.7</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.webflow</groupId>

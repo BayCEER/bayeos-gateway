@@ -12,6 +12,7 @@ function rssiLevel(rssi) {
     }
 }
 
+
 function statusClass(status) {
     if (status == 0){
         // OK
@@ -56,4 +57,28 @@ function statusText(status) {
         // DEFAULT
         return 'Default';
     }
+}
+
+function showSuccess(msg){
+	alert(msg,"alert-success")
+}
+
+function showWarning(msg) {
+	alert(msg,"alert-warning")
+
+}
+
+function showInfo(msg) {
+	alert(msg,"alert-info")
+}
+
+function showDanger(msg){
+	alert(msg,"alert-danger")
+
+}
+
+function alert(msg, cls){
+	$("#alert").addClass(cls);
+    $("#alertMessage").text(msg);
+    $("#alert").removeClass("hidden");	
 }

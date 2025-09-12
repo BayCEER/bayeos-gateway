@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
+import de.unibayreuth.bayceer.bayeos.gateway.model.BoardDTO;
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardTemplate;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
+import de.unibayreuth.bayceer.bayeos.gateway.model.LatLon;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Notification;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Point;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.NotificationRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardGroupRepository;
@@ -205,6 +208,28 @@ public class BoardController extends AbstractController {
 		repoNotification.deleteById(n.getId());	
 		return "redirect:/boards/" + b + "?tab=notifications";
 	}
+	
+	
+	@RequestMapping(value = "/boards/map/{id}")
+	public String showMap(@PathVariable("id") Long id, Model model, Locale locale) {
+	    Board b = repo.findOne(userSession.getUser(), id);
+	    model.addAttribute("id",id);
+	    model.addAttribute("name",getMsg("e.board", locale) + ' ' + b.getName());	    
+        model.addAttribute("point", new LatLon(b.getLat(),b.getLon()));
+        return "mapBoard";	    
+	}
+	
+	@RequestMapping(value = "/boards/map",method=RequestMethod.POST)
+	public String saveMap(@RequestParam("id") Long id, @RequestParam("lat") Float lat,@RequestParam("lon") Float lon, RedirectAttributes redirect, Locale locale ) {
+	    Board b = repo.findOne(userSession.getUser(),id);  	    
+	    b.setLat(lat);
+	    b.setLon(lon);	    
+	    repo.save(userSession.getUser(), b);        
+	    redirect.addFlashAttribute("globalMessage", getActionMsg("saved", locale));	    
+	    return "redirect:/boards/" + b.getId();     
+	}
+	
+	
 	
 	
 	

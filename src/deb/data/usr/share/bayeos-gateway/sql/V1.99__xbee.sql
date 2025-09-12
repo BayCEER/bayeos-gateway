@@ -118,28 +118,6 @@ CREATE TYPE time_value_flag AS (
 ALTER TYPE public.time_value_flag OWNER TO xbee;
 
 --
--- Name: _float_median(anyarray); Type: FUNCTION; Schema: public; Owner: xbee
---
-
-CREATE FUNCTION _float_median(_value anyarray) RETURNS double precision
-    LANGUAGE plpgsql
-    AS $$
-declare
-n bigint;
-a float[];
-begin
-a = sort(_value);
-n = array_upper(a,1);
-if (n%2=0) then
- return 0.5*(a[n/2] + a[n/2+1]);	
-else 
- return a[(n+1)/2];
-end if;
-end;$$;
-
-
-ALTER FUNCTION public._float_median(_value anyarray) OWNER TO xbee;
-
 --
 -- Name: date_truncate(timestamp with time zone, interval); Type: FUNCTION; Schema: public; Owner: xbee
 --
@@ -467,20 +445,6 @@ CREATE FUNCTION sort(anyarray) RETURNS anyarray
 
 
 ALTER FUNCTION public.sort(anyarray) OWNER TO xbee;
-
---
--- Name: median(anyelement); Type: AGGREGATE; Schema: public; Owner: xbee
---
-
-CREATE AGGREGATE median(anyelement) (
-    SFUNC = array_append,
-    STYPE = anyarray,
-    INITCOND = '{}',
-    FINALFUNC = _float_median
-);
-
-
-ALTER AGGREGATE public.median(anyelement) OWNER TO xbee;
 
 SET default_tablespace = '';
 

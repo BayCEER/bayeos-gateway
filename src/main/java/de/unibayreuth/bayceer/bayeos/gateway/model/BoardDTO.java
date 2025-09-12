@@ -8,7 +8,7 @@ public class BoardDTO extends NamedDomainEntity{
     public List<ChannelDTO> channels;
     private String origin;
     private Integer dbFolderId;
-    private Float Lng;
+    private Float Lon;
     private Float Lat;
     private Float Alt;
     
@@ -24,7 +24,7 @@ public class BoardDTO extends NamedDomainEntity{
            }           
        }
        this.dbFolderId = c.dbFolderId;
-       this.Lng=c.getLon();
+       this.Lon=c.getLon();
        this.Lat=c.getLat();
        this.Alt = c.getAlt();
     }
@@ -60,13 +60,13 @@ public class BoardDTO extends NamedDomainEntity{
     }
 
 
-    public Float getLng() {
-        return Lng;
+    public Float getLon() {
+        return Lon;
     }
 
 
-    public void setLng(Float lng) {
-        Lng = lng;
+    public void setLon(Float lon) {
+        Lon = lon;
     }
 
 

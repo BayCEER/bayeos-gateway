@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html  
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"  
+  layout:decorate="~{main}">
+<head>
+	<title th:text="|#{e.map} ${name}|">Map</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     <script th:src="@{/resources/js/leaflet.js}" src="../static/resources/js/leaflet.js"></script>
+     <style>
+      leaflet-popup {
+        position: absolute;
+        text-align: center;
+      }
+    </style>
+     
+</head>
+<body>
+<div layout:fragment="content">
+<form id="board" method="post" action="#" th:action="@{/boards/map}" th:object="${point}">
+ <input type="hidden" name="id" th:value="${id}" />
+ <div class="block">
+  <div class="block-header" th:text="#{e.location}">
+  </div>
+  	
+  
+  
+   <div class="row">
+		<div class="col-sm-6">
+			<div class="row">
+				<div class="col-sm-6">								
+					<div th:replace="field::number(prop='lat',label=#{board.lat})"></div>
+				</div>
+				<div class="col-sm-6">
+					<div th:replace="field::number(prop='lon',label=#{board.lon})"></div>
+				</div>
+			</div>					
+		</div>
+		<div class="col-sm-6">
+		
+			<div class="form-group">
+				<label class="control-label invisible">Action</label>
+				<a class="form-control btn btn-default" onclick="moveToCoordinate();" th:text="#{action.moveToCoordinate}">Move to</a>
+			</div>
+		</div>
+
+		
+				
+		
+								
+	</div> 
+ </div>
+ <div class="block">
+  <div class="block-header" th:text="#{e.map}">Map</div>
+    <div id="map" style="height: 600px; width: 100%;"></div>
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+    	
+    	const maxZoomLevel = 16;
+    	const boardLayer = L.layerGroup();    
+    	const point = /*[[ ${point} ]]*/ null;
+    	                
+        const marker = L.marker(L.latLng(0,0),{draggable:true}).addTo(boardLayer);        
+        const map = L.map("map", { editable: true, layers: [osm, boardLayer] }).fitWorld();
+       
+             	     	                	    	   		     	     	     	     	    	  
+      	marker.on("dragend", () => {      					
+      		setLatLonFromMarker();			
+      	});
+     	     	     	
+     	if (point.lat!=null && point.lon != null){
+     		marker.setLatLng(L.latLng(point.lat,point.lon));
+     		map.fitBounds(L.latLngBounds(marker.getLatLng(),marker.getLatLng()),{maxZoom: maxZoomLevel});  
+     	} else {
+     		
+     		if (!navigator.geolocation) {		
+     			showWarning([[ #{msg.noGeolocationWarning} ]]);       	 		                            	    
+    		} else {
+    			moveCurrentPosition();    			
+     		}
+     	}
+     	
+     	
+
+     	const overlays = {
+     			'Board': boardLayer
+     	};
+
+     	const layerControl = L.control.layers(baseLayers, overlays).addTo(map);
+     	
+     	
+     	 // Button move marker to current position
+        if (navigator.geolocation) {        	        	
+        	L.Control.Button = L.Control.extend({
+        	    options: {
+        	        position: 'topleft'
+        	    },
+        	    onAdd: function (map) {
+        	        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        	        var button = L.DomUtil.create('a', 'leaflet-control-button', container);
+        	        button.innerHTML = '<i class="material-icons" style="font-size:18px; padding-bottom: 3px; display: inline-flex; vertical-align: middle;">gps_fixed</i>';
+        	        L.DomEvent.disableClickPropagation(button);
+        	        L.DomEvent.on(button, 'click', function(){        	            
+            			moveCurrentPosition() 
+        	        });
+        	        container.title = [[ #{action.moveToDevicePosition} ]];
+        	        return container;
+        	    },
+        	    onRemove: function(map) {},
+        	});
+        	var control = new L.Control.Button()        	
+        	control.addTo(map);        		        	
+        }
+     	
+     	function setLatLonFromMarker(){
+     		var m = marker.getLatLng();			
+      		$("#lat").val(m.lat.toFixed(8));
+      		$("#lon").val(m.lng.toFixed(8));
+     	}
+     	
+     	function moveToCoordinate(){
+     		var latlng = L.latLng($("#lat").val(),$("#lon").val());
+     		marker.setLatLng(latlng);
+     		map.fitBounds(L.latLngBounds(latlng, latlng),{maxZoom: maxZoomLevel});     		     		
+     	}
+      	
+      	function moveCurrentPosition(){
+      		navigator.geolocation.getCurrentPosition(
+  			    	(p) => {
+  			    		var latlng = L.latLng(p.coords.latitude,p.coords.longitude)  			    		
+  			        	marker.setLatLng(latlng);
+  			    		setLatLonFromMarker();
+  			        	map.fitBounds(L.latLngBounds(latlng, latlng),{maxZoom: maxZoomLevel});
+  			        	showSuccess([[ #{msg.currentDevicePostionUsed} ]]);  			        	
+  			    	},     		    	
+  			    	() => {
+  			    		showDanger([[ #{msg.noPositionFoundWarning} ]]);  			    		
+  			    	}    		    	
+  	 		);
+      	}
+      	
+      	
+   	 		         	
+
+    /*]]>*/	
+    </script>
+ </div>    
+<div class="form-group block-action">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            th:text="#{action.save}"
+          >
+            Save
+          </button>          
+</div>
+</form>   
+</div>
+</body>
+</html>

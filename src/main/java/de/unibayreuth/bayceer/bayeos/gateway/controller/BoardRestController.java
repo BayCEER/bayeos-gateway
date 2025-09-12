@@ -92,6 +92,9 @@ public class BoardRestController extends AbstractController {
 	}
 	
 	
+	
+	
+	
 	// See https://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html
 	@RequestMapping(path="/rest/boards/chartData", method = RequestMethod.GET)
 	public List<Observation> chartData(@RequestParam Long boardId, @RequestParam Long lastRowId){	

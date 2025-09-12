@@ -346,8 +346,9 @@ class ExportThread implements Runnable  {
         }        
     }
     
-    private def syncFolderPropsForBoard(board) {        
+    private def syncFolderPropsForBoard(board) {
         
+        log.info("Sync properties of board(id:${board.id},name:${board.name})");        
         try {               
                 Node node = cli.getNode(board.db_folder_id);
                 if (node == null) {
@@ -355,10 +356,11 @@ class ExportThread implements Runnable  {
                     return
                 }            
                 MessungOrdner o = cli.getNodeObjekt(node,MessungOrdner.class)
-                o.setBezeichnung(board.name)
+                o.setBezeichnung(board.name)                
                 o.setLat(board.lat)
                 o.setLon(board.lon)
-                o.setAlt(board.alt)                                
+                o.setAlt(board.alt) 
+                                               
                 cli.updateNodeObjekt(o)                               
                                                         
         } catch (XmlRpcException e){
@@ -377,7 +379,7 @@ class ExportThread implements Runnable  {
     }
     
     private def syncFolderPropsForChannel(channel) {
-        
+        log.info("Sync properties of channel(id:${channel.id},name:${channel.name})")
         try {
             Node node = cli.getNode(channel.db_series_id)
             if (node == null) {

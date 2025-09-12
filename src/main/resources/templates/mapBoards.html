@@ -11,6 +11,7 @@
      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
+     <script th:src="@{/resources/js/leaflet.js}" src="../static/resources/js/leaflet.js"></script>
      <style>
       leaflet-popup {
         position: absolute;
@@ -20,11 +21,27 @@
      
 </head>
 <body>
-    <div layout:fragment="content">
-    
+    <div layout:fragment="content">           
+    <div class="block">     
+        <div class="block-header" th:text="|#{action.map}:${name}|">
+        </div>
         
-    <div class="block">
-        <div class="block-header" th:text="|#{action.map}:${name}|"></div>       
+        
+        <div class="btn-group">
+						<button class="btn btn-default btn-xs dropdown-toggle" type="button"
+							data-toggle="dropdown">
+							<span class="glyphicon glyphicon-hdd"> </span> <span
+								th:text="#{action.export}"></span> <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li>
+								<a onclick="exportLayer();">GeoJSON</a>
+							</li>							
+						</ul>
+					</div>
+        
+               
+               
         <table id="tableBoards" class="table table-hover nowrap col-sm-12">
                   <thead>
                     <tr>
@@ -54,6 +71,8 @@
         
        
       	<div id="map" style="height: 800px; width: 100%;"></div>
+      	
+      	
       	      	
         
             	     	 
@@ -65,7 +84,8 @@
   		"#f0ad4e",
   		"#d9534f"
 	]; 
-  
+  	
+   
    
    function getSVGMarker(color){
 	 return `<svg viewBox="0 0 500 820" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
@@ -82,11 +102,7 @@
 	const bName = /*[[ #{board.name} ]]*/ null;
 	const bStatus = /*[[ #{board.status} ]]*/ null;
 	
-    const map = L.map('map');			    
-	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
-		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-	}).addTo(map);			
+	const boardLayer = L.layerGroup();   	    			    
     var markers = L.featureGroup();	    
 	bs.forEach(b => {
 		if (b.lat && b.lon && b.status!==null){			
@@ -95,14 +111,14 @@
 		            className: 'icon',
 		            html: getSVGMarker(colors[b.status]),
 		            iconSize: [38, 95],	            	           
-		        })            
-		    });			
-			if (b.name){
-				var t =  `<h5><strong>${bOrigin}:</strong>${b.origin}</h5><h5><strong>${bName}:</strong>${b.name}</h5><h5><strong>${bStatus}:</strong>${b.status}</h5>`;				
-				marker.bindTooltip(t, {	              
+		        })		    
+			});			
+			
+			var t =  `<h5><strong>${bOrigin}:</strong>${b.origin}</h5><h5><strong>${bName}:</strong>${b.name}</h5><h5><strong>${bStatus}:</strong>${b.status}</h5>`;				
+			marker.bindTooltip(t, {	              
 		              offset: [0, 24],
-		    	});
-			}
+		    });
+			
 			marker.on('dblclick', function(e) {				  
 				  location.assign(`${contextBoards}/${b.id}`);  			
 			});
@@ -110,9 +126,40 @@
 			marker.addTo(markers);				
 		}
 	});
-	markers.addTo(map);
-	map.fitBounds(markers.getBounds())		
+	markers.addTo(boardLayer);
+	
+	const overlays = {
+   			'Board': boardLayer
+   	};
+		
 
+	const map = L.map("map", { editable: false, layers: [osm, boardLayer] }).fitBounds(markers.getBounds());		
+	const layerControl = L.control.layers(baseLayers, overlays).addTo(map);
+	
+	function exportLayer(){
+		   if (!navigator.clipboard) {			   
+	           showWarning("Clipboard not available");
+	           return;
+	       }
+		   		   
+		   var json = { type:"FeatureCollection",features:[]};		   		   		   		   		   		   
+		   bs.forEach(b => {
+				if (b.lat && b.lon){			
+					var marker = new L.marker([b.lat, b.lon]).toGeoJSON();
+					marker.properties.origin = b.origin;
+					marker.properties.name = b.name;
+					marker.properties.dbFolderId = b.dbFolderId;
+					json.features.push(marker);
+				}
+		   });
+		   	       		   		   
+		   navigator.clipboard.writeText(JSON.stringify(json)).then(function() {			   
+	           showInfo('Copied GeoJSON to clipboard');
+	       }, function(err) {
+	           showDanger('Could not copy: ', err);
+	       });
+	   }
+	
 /*]]>*/
 </script>
     
