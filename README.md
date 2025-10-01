@@ -14,7 +14,7 @@ Main characteristics:
 
 ### Prerequisites
 
-- Debian 11 (bullseye)
+- Debian {11|12|13}
 - Root login
 
 ### Installing
@@ -68,6 +68,7 @@ Let's send the cpu load of our pc to a local gateway:
 - New: Board force sync flag to update server folder and series (names and location only)
 - New: Retention policy on board template, board and board group
 - Fixed: Replaced internal with external Nashorn script engine
+- New: Debian 13 compatibility 
 
 ### Version 2.9.9, November 2024
 - Changed: Packages without debian version name 
