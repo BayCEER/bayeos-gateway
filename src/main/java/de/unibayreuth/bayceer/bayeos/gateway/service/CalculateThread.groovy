@@ -72,20 +72,22 @@ public class CalculateThread implements Runnable {
                                     where c.db_series_id is not null and c.db_exclude_auto_export = false 
                                     """){ cha ->
 
-                                    rowCalculated = rowCalculated + db.executeUpdate("""
-                                        insert into observation_calc (channel_id, result_time, result_value)
-                                        select ${cha.id},c.result_time, c.result_value from 
-                                        get_channel_time_value_flag(${ts},${cha.id},${cha.spline_id},${cha.f_name},${cha.i_name},
-                                        ${cha.filter_critical_values},${cha.critical_min}, ${cha.critical_max}) as c where c.flag < 1
-                                        """);
+                                    db.withTransaction {
+                                        rowCalculated = rowCalculated + db.executeUpdate("""
+                                            insert into observation_calc (channel_id, result_time, result_value)
+                                            select ${cha.id},c.result_time, c.result_value from 
+                                            get_channel_time_value_flag(${ts},${cha.id},${cha.spline_id},${cha.f_name},${cha.i_name},
+                                            ${cha.filter_critical_values},${cha.critical_min}, ${cha.critical_max}) as c where c.flag < 1
+                                            """);
 
-                                    // Move observations to cache table
-                                    if (cha.i_name == null) {
-                                        db.execute("""insert into observation_exp select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<${ts}""")
-                                        db.execute("""delete from observation where id<=${id} and channel_id=${cha.id} and result_time<${ts}""")
-                                    } else {
-                                        db.execute("""insert into observation_exp select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<date_truncate(${ts}, ${cha.i_name}::interval);""")
-                                        db.execute("""delete from observation where id<=${id} and channel_id=${cha.id} and result_time<date_truncate(${ts}, ${cha.i_name}::interval);""")
+                                        // Move observations to cache table
+                                        if (cha.i_name == null) {
+                                            db.execute("""insert into observation_exp select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<${ts}""")
+                                            db.execute("""delete from observation where id<=${id} and channel_id=${cha.id} and result_time<${ts}""")
+                                        } else {
+                                            db.execute("""insert into observation_exp select * from observation where id<=${id} and channel_id = ${cha.id} and result_time<date_truncate(${ts}, ${cha.i_name}::interval);""")
+                                            db.execute("""delete from observation where id<=${id} and channel_id=${cha.id} and result_time<date_truncate(${ts}, ${cha.i_name}::interval);""")
+                                        }
                                     }
                                     rowArchived = rowArchived + db.updateCount
                                 }
@@ -134,8 +136,10 @@ public class CalculateThread implements Runnable {
                                 }
                     }
                     // Move calc records to observation_out
-                    db.execute("insert into observation_out select * from observation_calc")
-                    db.execute("delete from observation_calc")
+                    db.withTransaction {  
+                        db.execute("insert into observation_out select * from observation_calc")
+                        db.execute("delete from observation_calc")                        
+                    }
                     exit = 0
                 } catch (SQLException e){
                     log.error(e.getMessage())
