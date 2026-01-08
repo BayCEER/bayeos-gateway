@@ -11,6 +11,7 @@ public class BoardDTO extends NamedDomainEntity{
     private Float Lon;
     private Float Lat;
     private Float Alt;
+    private Integer channelStatus;
     
         
     public BoardDTO(Board c) {        
@@ -27,6 +28,7 @@ public class BoardDTO extends NamedDomainEntity{
        this.Lon=c.getLon();
        this.Lat=c.getLat();
        this.Alt = c.getAlt();
+       this.setChannelStatus(c.getChannelStatus());
     }
 
 
@@ -87,5 +89,15 @@ public class BoardDTO extends NamedDomainEntity{
 
     public void setAlt(Float alt) {
         Alt = alt;
+    }
+
+
+    public Integer getChannelStatus() {
+        return channelStatus;
+    }
+
+
+    public void setChannelStatus(Integer channelStatus) {
+        this.channelStatus = channelStatus;
     }
 }

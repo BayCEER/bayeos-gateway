@@ -15,7 +15,7 @@ import javax.persistence.Transient;
 public class BoardGroup extends NamedDomainEntity {
 		
 	
-	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.PERSIST)
+	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.ALL)
 	@OrderBy("name")
 	List<Board> boards;
 
@@ -23,7 +23,7 @@ public class BoardGroup extends NamedDomainEntity {
 	Integer dbFolderId;
 	
 	
-	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="boardGroup", cascade=CascadeType.ALL)
 	List<Notification> notifications;
 		
 	public List<Board> getBoards() {

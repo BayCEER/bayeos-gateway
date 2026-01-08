@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -16,7 +15,6 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
@@ -97,7 +95,6 @@ public class Board extends NamedDomainEntity {
 	@ManyToOne	
 	@JoinColumn(name = "board_group_id")
 	@JsonView(DataTablesOutput.View.class)
-	@JsonBackReference
 	BoardGroup boardGroup;
 	
 

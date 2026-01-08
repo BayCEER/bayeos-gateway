@@ -61,14 +61,15 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History 
 
-### Version 2.10.0 Sept 2025
+### Version 2.10.0 Jan 2026
 - New: Board location coordinates 
 - New: Board group map 
 - New: Board location export to server 
 - New: Board force sync flag to update server folder and series (names and location only)
 - New: Retention policy on board template, board and board group
-- Fixed: Replaced internal with external Nashorn script engine
 - New: Debian 13 compatibility 
+- Fixed: Replaced internal with external Nashorn script engine
+- Fixed: Duplicate key issues in CalculateThread
 
 ### Version 2.9.9, November 2024
 - Changed: Packages without debian version name 
