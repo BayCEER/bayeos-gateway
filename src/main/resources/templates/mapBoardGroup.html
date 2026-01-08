@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{main}">
+<head>
+<title th:text="|#{e.map} ${name}|">Map</title>
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+	integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+	crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+	integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+	crossorigin=""></script>
+<script th:src="@{/resources/js/leaflet.js}"
+	src="../static/resources/js/leaflet.js"></script>
+<style>
+leaflet-popup {
+	position: absolute;
+	text-align: center;
+}
+</style>
+
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="block">
+			<div class="block-header" th:text="|#{action.map}:${name}|"></div>			
+			<table id="tableBoards" class="table table-hover nowrap col-sm-12">
+				<thead>
+					<tr>
+						<th th:text="#{board.origin}">Origin</th>
+						<th th:text="#{board.name}">Name</th>
+						<th th:text="#{board.lrt}">Last Result Time</th>
+						<th th:text="#{board.status}">Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="i : ${group.getBoards()}">
+						<td><a th:href="@{'/boards/' + ${i.id}}"
+							th:text="${i.origin}"></a></td>
+						<td th:text="${i.name}">Name</td>
+						<td th:text="${{i.lastResultTime}}">2001</td>
+						<td>
+							<div th:replace="~{field::status(${i.status})}"></div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div id="map" style="height: 800px; width: 100%;"></div>
+			<script th:inline="javascript">
+				/*<![CDATA[*/
+					const bOrigin = [[ #{board.origin} ]];
+					const bName = [[ #{board.name} ]];
+					const bStatus = [[ #{board.status} ]];
+					const bs = [[ ${boards} ]];
+					const contextBoards = [[ @{'/boards'} ]];
+					const boardLayer = L.layerGroup();   	    			    
+				    var markers = L.featureGroup();	    
+					bs.forEach(b => {
+						if (b.lat && b.lon && b.status!==null){			
+							var marker = new L.marker([b.lat, b.lon],	{
+						        icon: L.divIcon({
+						            className: 'icon',
+						            html: getSVGMarker(markerColors[b.channelStatus]),
+						            iconSize: [38, 95],	            	           
+						        })		    
+							});										
+							var t =  `<h5><strong>${bOrigin}:</strong>${b.origin}</h5><h5><strong>${bName}:</strong>${b.name}</h5><h5><strong>${bStatus}:</strong>${b.channelStatus}</h5>`;				
+							marker.bindTooltip(t, {	              
+						              offset: [0, 24],
+						    });
+							
+							marker.on('dblclick', function(e) {				  
+								  location.assign(`${contextBoards}/${b.id}`);  			
+							});
+							
+							marker.addTo(markers);				
+						}
+					});
+					markers.addTo(boardLayer);
+					
+					const overlays = {
+				   			'Board': boardLayer
+				   	};
+						
+
+					const map = L.map("map", { editable: false, layers: [osm, boardLayer] })
+					if (markers.getBounds().isValid()){
+						map.fitBounds(markers.getBounds());
+					} else {
+						map.fitWorld();
+					}
+					const layerControl = L.control.layers(baseLayers, overlays).addTo(map);
+					
+				/*]]>*/
+		</script>
+		</div>
+		<div class="block-action">
+		<a class="btn btn-default" th:href="@{/groups/geojson/} + ${group.id}">
+		<span class="glyphicon glyphicon-save"></span> <span th:text="|#{action.saveAs} GeoJSON|"></span></a>
+		</div>
+	</div>
+
+</body>
+</html>
