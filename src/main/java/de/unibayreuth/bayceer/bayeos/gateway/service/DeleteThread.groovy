@@ -62,30 +62,44 @@ class DeleteThread implements Runnable {
 				def db = new Sql(dataSource)
 				
 				try {
-					log.info("Deleting observations older than ${obsRetention}.")
+					
 					db.execute("delete from observation where insert_time < (now() - ?::interval)",[obsRetention])
 					obs = db.updateCount
-
-					log.info("Deleting cached observations older than ${obsRetention}.")
+                    if (obs > 0) { 
+                        log.info("${obs} observations older than ${obsRetention} deleted")
+                    }
+			
 					db.execute("delete from observation_exp where insert_time < (now() - ?::interval)",[obsRetention])
 					obs_exported = db.updateCount
-										
-					log.info("Deleting messages older than ${msgRetention}.")
+                    if (obs_exported>0) {
+                        log.info("${obs_exported} cached observations older than ${obsRetention} deleted")
+                    }
+                    															
 					db.execute("delete from message where insert_time < (now() - ?::interval)",[msgRetention])
 					msg = db.updateCount
-                    
-                    log.info("Deleting not applied templates since ${templateRetention}.")
+                    if (msg>0) {
+                        log.info("${msg} messages older than ${msgRetention} deleted")
+                    }
+                                        
                     db.execute("delete from board_template where last_applied < (now() - ?::interval) or (last_applied is null and date_created < (now() - ?::interval))",[templateRetention,templateRetention])
                     temps = db.updateCount
+                    if (temps>0) {
+                        log.info("${temps} not applied templates since ${templateRetention} deleted")
+                    }
                     
-                    log.info("Deleting inactive boards since ${boardRetention}.")
+                                        
                     db.execute("delete from board where last_insert_time < (now() - ?::interval) or (last_insert_time is null and date_created < (now() - ?::interval))",[boardRetention,boardRetention])
                     boards = db.updateCount
-                    
-                    log.info("Deleting empty board groups since ${boardGroupRetention}.")                                                                                
+                    if (boards>0) {
+                        log.info("${boards} inactive boards since ${boardRetention} deleted")
+                    }
+                                                                                                                                           
                     db.execute("delete from board_group where id not in (select board_group_id from board group by board_group_id) and date_created < (now() - ?::interval)",[boardGroupRetention])
-                    groups = db.updateCount                                        
-															
+                    groups = db.updateCount
+                    if (groups>0) {
+                        log.info("${groups} empty board groups since ${boardGroupRetention} deleted")
+                    }
+                    															
 					exit = 0
 				} catch (SQLException e){
 					log.error(e.getMessage())
