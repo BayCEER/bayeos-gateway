@@ -44,7 +44,7 @@
 		</div>
 		<div class="col-sm-6">
 		
-			<div class="form-group">
+			<div class="form-group" th:if="${writeable}">
 				<label class="control-label invisible">Action</label>
 				<a class="form-control btn btn-default" onclick="moveToCoordinate();" th:text="#{action.moveToCoordinate}">Move to</a>
 			</div>
@@ -156,6 +156,7 @@
             type="submit"
             class="btn btn-primary"
             th:text="#{action.save}"
+            th:if="${writeable}"
           >
             Save
           </button>          

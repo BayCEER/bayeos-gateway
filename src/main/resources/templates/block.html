@@ -72,14 +72,14 @@
 	</div>
 
 
-	<div th:fragment="virtualChannels(board)">
+	<div th:fragment="virtualChannels(board,writeable)">
 		<table class="table table-striped">
 			<thead>
 				<tr>
 					<th th:text="#{e.channel}"></th>					
 					<th>
-						<div class="btn-group pull-right">
-							<div
+						<div th:if="${writeable}" class="btn-group pull-right">
+							<div  
 								th:replace="table::add(@{'/newVirtualChannel?boardId=' + ${board.id}})"></div>
 						</div>
 					</th>
@@ -93,8 +93,8 @@
 					<a th:href="@{/virtualChannels/{id}(id=${vc.id})}"
 						th:text="${vc.getDeclaration()}">Channel Name</a></td>					
 					<td>
-						<div class="pull-right">
-							<div
+						<div class="pull-right" th:if="${writeable}">
+							<div 
 								th:replace="table::delete(@{'/virtualChannels/delete/' + ${vc.id}},false)"></div>
 						</div>
 					</td>

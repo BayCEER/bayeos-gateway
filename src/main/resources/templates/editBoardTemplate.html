@@ -101,7 +101,7 @@
                 <td>
                   <div class="pull-right" th:if="${writeable}">
                     <div
-                      th:replace="table::edit(@{'/channelTemplates/' + ${t.id}},false)"
+                      th:replace="table::details(@{'/channelTemplates/' + ${t.id}},false)"
                     ></div>
                     <div
                       th:replace="table::delete(@{'/channelTemplates/delete/' + ${t.id}},false)"

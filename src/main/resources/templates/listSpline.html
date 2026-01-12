@@ -72,7 +72,7 @@
                 th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}"
               >
                 <div
-                  th:replace="table::edit(@{'/splines/' + ${i.id}},${i.locked})"
+                  th:replace="table::details(@{'/splines/' + ${i.id}},${i.locked})"
                 ></div>
                 <div
                   th:replace="table::delete(@{'/splines/delete/' + ${i.id}},${i.locked})"

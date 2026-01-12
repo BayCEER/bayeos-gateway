@@ -48,7 +48,7 @@
                 <td>
                   <div th:if="${writeable}" class="pull-right">
                     <div
-                      th:replace="table::edit(@{'/knotpoints/' + ${k.id}},false)"
+                      th:replace="table::details(@{'/knotpoints/' + ${k.id}},false)"
                     ></div>
                     <div
                       th:replace="table::delete(@{'/knotpoints/delete/' + ${k.id}},false)"

@@ -36,7 +36,7 @@
             <td>
               <div class="pull-right">
                 <div
-                  th:replace="table::edit(@{'/domains/' + ${d.id}},false)"
+                  th:replace="table::details(@{'/domains/' + ${d.id}},false)"
                 ></div>
                 <div
                   th:replace="table::delete(@{'/domain/delete/' + ${d.id}},false)"

@@ -28,7 +28,7 @@
             <th th:text="#{nav.boards}"></th>
             <th th:text="#{board.lrt}"></th>
             <th th:text="#{board.status}"></th>
-            <th>
+            <th th:if="${writeable}">
               <div class="pull-right">
                 <div th:replace="table::add(@{'/groups/create'})"></div>
               </div>
@@ -63,10 +63,10 @@
               </div>
               <div class="pull-right">
                 <div
-                  th:replace="table::edit(@{'/groups/' + ${i.id}},false)"
+                  th:replace="table::details(@{'/groups/' + ${i.id}},false)"
                 ></div>
               </div>
-              <div class="pull-right">
+              <div class="pull-right" th:if="${writeable}">
                 <div
                   th:replace="table::delete(@{'/groups/delete/' + ${i.id}},false)"
                 ></div>

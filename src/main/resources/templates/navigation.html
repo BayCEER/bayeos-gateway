@@ -287,7 +287,7 @@
                       </li>
                       <li role="separator" class="divider"></li>
                       <li>
-                        <a th:href="@{/uploads/uploadFile}">
+                        <a th:if="${currentUser.isUser()}" th:href="@{/uploads/uploadFile}">
                           <span class="glyphicon glyphicon-import"> </span>
                           <span th:text="#{nav.upload}"></span>
                         </a>

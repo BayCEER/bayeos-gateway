@@ -22,6 +22,7 @@ import org.springframework.security.access.AccessDeniedException;
 
 import de.unibayreuth.bayceer.bayeos.gateway.DomainFilter;
 import de.unibayreuth.bayceer.bayeos.gateway.model.DomainEntity;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Permission;
 import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 
 public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJpaRepository<T, Long>
@@ -141,11 +142,10 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 	public void delete(User user, Long id) {
 		T e = findOne(user, id);
 		if (e != null) {
-			if (user.inNullDomain() || user.getDomainId().equals(e.getDomainId())) {
-				super.delete(e);
-			} else {
-				throw new AccessDeniedException("Missing rights to delete foreign domain objects.");
-			}
+		    if (!Permission.writeable(user, e)) {
+		        throw new AccessDeniedException("Missing rights to delete domain object.");
+		    }
+			super.delete(e);			
 		} else {
 			throw new EntityNotFoundException();
 		}
@@ -153,11 +153,10 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 
 	@Override
 	public <S extends T> S save(User user, S entity) {
-		if (user.inNullDomain() || user.getDomainId().equals(entity.getDomainId())) {
-			return super.save(entity);
-		} else {
-			throw new AccessDeniedException("Missing rights to save domain object.");
-		}
+	    if (!Permission.writeable(user, entity)) {
+	        throw new AccessDeniedException("Missing rights to save domain object.");	        
+	    }
+		return super.save(entity);		
 	}
 
 	@Override
@@ -210,16 +209,16 @@ public class DomainEntityRepositoryImpl<T extends DomainEntity> extends SimpleJp
 
     @Override
     public List<T> findAllByIds(User user, DomainFilter d, List<Long> ids) {        
-       List<T> r = findAllById(ids);       
-       if (user.inNullDomain()) {
-           // Filter
-           if (d != null && d.getId() !=null) {
-               r.removeIf(t-> (t.getDomainId()!=d.getId()));
-           }                      
-       } else {
-           // User                      
-          r.removeIf(t -> ((t.getDomainId() == null && !nullDomainReadable) || (t.getDomainId()!=user.getDomainId()))  );           
-       }              
+       List<T> r = findAllById(ids);
+       
+       // Domain Filter 
+       if (d != null && d.getId() !=null) {
+           r.removeIf(t-> (t.getDomainId()!=d.getId()));
+       }
+              
+       // Access                                 
+       r.removeIf(t -> (!Permission.readable(user, t))  );
+              
        return r;
     }
 

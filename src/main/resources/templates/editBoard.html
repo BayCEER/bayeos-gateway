@@ -8,6 +8,7 @@
 </head>
 <body>
 	<div layout:fragment="content">
+	
 		<form method="post" action="#" th:action="@{/boards}" th:object="${board}">
 			<input type="hidden" name="id" th:field="*{id}" />			
 			
@@ -78,7 +79,7 @@
 					<div class="tab-content">
 						<div role="tabpanel" class="tab-pane fade in" id="channels">
 																																		
-							<a class="btn btn-default btn-xs" th:if="${board.hasEmptyChannelNames()}" th:href="@{/boards/setChannelNamebyNumber/} + ${board.id}"  th:onclick="#{dialog.confirm}"
+							<a class="btn btn-default btn-xs" th:if="${board.hasEmptyChannelNames() && writeable}" th:href="@{/boards/setChannelNamebyNumber/} + ${board.id}"  th:onclick="#{dialog.confirm}"
 							th:text="#{channel.applyNrAsName}">Set channel names</a>
 		
 												
@@ -110,13 +111,13 @@
 											th:classappend="(${cha.statusComplete}) ? (${'td-' + cha.statusComplete.toString().toLowerCase()}):''"></td>
 										<td class="hidden-xs hidden-sm"><input
 											th:name="|nsw${cha.id}|" type="checkbox"
-											th:checked="${cha.nagios}" th:id="${cha.id}" data-size="mini"></input>
+											th:checked="${cha.nagios}" th:id="${cha.id}" data-size="mini" th:disabled="${!writeable}"></input>
 										</td>
 										<td class="hidden-xs hidden-sm">
 											<div
-												th:replace="table::edit(@{'/channels/' + ${cha.id}},false)"></div>
+												th:replace="table::details(@{'/channels/' + ${cha.id}},false)"></div>
 											<div
-												th:replace="table::delete(@{'/channels/delete/' + ${cha.id}},false)"></div>
+												th:replace="table::delete(@{'/channels/delete/' + ${cha.id}},${!writeable})"></div>
 
 										</td>
 									</tr>
@@ -166,7 +167,7 @@
 						<div role="tabpanel" class="tab-pane fade in" id="commands">			
 							<div class="block-action">
 									<div class="btn-group pull-right">
-									<a class="btn btn-xs btn-default"
+									<a th:if="${writeable}" class="btn btn-xs btn-default"
 										th:href="@{'/boardCommands/create/__${board.id}__'}"> <span
 										class="glyphicon glyphicon-plus"></span> <span
 										th:text="#{action.create}"></span>								
@@ -192,7 +193,7 @@
 						<div role="tabpanel" class="tab-pane fade in" id="comments">
 							<div class="block-action">
 								<div class="btn-group pull-right">
-								<a class="btn btn-xs btn-default"
+								<a th:if="${writeable}" class="btn btn-xs btn-default"
 									th:href="@{'/comments/create/__${board.id}__'}"> <span
 									class="glyphicon glyphicon-plus"></span> <span
 									th:text="#{action.create}"></span>								
@@ -214,7 +215,7 @@
 
 						</div>
 						<div role="tabpanel" class="tab-pane fade in" id="virtualChannels">										
-							<div th:replace="block::virtualChannels(${board})"></div>							
+							<div th:replace="block::virtualChannels(${board},${writeable})"></div>							
 						</div>
 						<div role="tabpanel" class="tab-pane fade" id="notifications">							
 								<table class="table table-striped">
@@ -222,7 +223,7 @@
 										<tr>
 											<th th:text="#{contact.email}"></th>																						
 											<th>
-												<div class="btn-group pull-right">
+												<div th:if="${writeable}" class="btn-group pull-right">
 													<div th:replace="table::add(@{'/boards/selectContacts/' + ${board.id}})"></div>
 												</div>
 											</th>
@@ -233,7 +234,7 @@
 											<td><a th:href="@{/contacts/{id}(id=${n.contact.id})}" th:text="${n.contact.email}"></a></td>
 											<td>
 												<div class="pull-right">
-													<div th:replace="table::delete(@{'/boards/removeNotification/' + ${n.id}},false)"></div>
+													<div th:if="${writeable}" th:replace="table::delete(@{'/boards/removeNotification/' + ${n.id}},false)"></div>
 												</div>
 											</td>
 										</tr>
@@ -247,12 +248,13 @@
 
 
 				<div class="block-action">
-					<button type="submit" name="save" class="btn btn-primary">
+					<button th:if="${writeable}" type="submit" name="save" class="btn btn-primary">
 						<span class="glyphicon glyphicon-save"></span> <span
 							th:text="#{action.save}"></span>
 					</button>
 
 					<a class="btn btn-default"
+						th:if="${writeable}"
 						th:href="@{/boards/delete/} + ${board.id}"
 						th:onclick="#{dialog.confirm}"> <span
 						class="glyphicon glyphicon-remove"></span> <span
@@ -269,7 +271,7 @@
 						th:text="#{action.map}"></span>
 					</a>
 
-					<div class="btn-group">
+					<div class="btn-group" th:if="${writeable}">
 						<button class="btn btn-default dropdown-toggle" type="button"
 							data-toggle="dropdown">
 							<span class="glyphicon glyphicon-hdd"> </span> <span
@@ -432,7 +434,7 @@
                     	 	var url = "url";
                         	var ret = '<td class="link">';                    	                        	     
                         	var url = /*[[ @{/boardCommands/edit/}]]*/;                        	
-            		        ret += '<a class="btn btn-xs btn-default" href="' + url + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + [[ #{action.edit} ]] + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default" href="' + url + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + [[ #{action.details} ]] + '</a>';
             		        ret += '<a class="btn btn-xs btn-default deleteCommand"><span class="glyphicon glyphicon-remove"></span> ' + [[ #{action.delete} ]] + '</a>';
             		        ret += '</td>';            		        
             			    return ret;
@@ -511,7 +513,7 @@
                     	 	var url = "url";
                         	var ret = '<td class="link">';                    	                        	     
                         	var url = /*[[ @{/comments/edit/}]]*/;                        	
-            		        ret += '<a class="btn btn-xs btn-default" href="' + url + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + [[ #{action.edit} ]] + '</a>';
+            		        ret += '<a class="btn btn-xs btn-default" href="' + url + row.id + '"><span class="glyphicon glyphicon-edit"></span> ' + [[ #{action.details} ]] + '</a>';
             		        ret += '<a class="btn btn-xs btn-default deleteComment"><span class="glyphicon glyphicon-remove"></span> ' + [[ #{action.delete} ]] + '</a>';
             		        ret += '</td>';            		        
             			    return ret;

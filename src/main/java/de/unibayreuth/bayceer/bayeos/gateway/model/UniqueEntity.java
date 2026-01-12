@@ -32,7 +32,17 @@ public abstract class UniqueEntity implements Serializable {
 	}
 	
 	
-	
+	@Override
+	public boolean equals(Object obj) {
+	    if (obj != null) { 
+	        if (obj instanceof UniqueEntity) {
+	            return ((UniqueEntity)obj).id == id;
+	        } 
+	        return false;	        
+	    } 
+	    return false;	    
+
+	}
 		
 		
 	

@@ -24,6 +24,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.Channel;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Contact;
 import de.unibayreuth.bayceer.bayeos.gateway.model.LatLon;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Notification;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Permission;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Point;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.DomainRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.NotificationRepository;
@@ -63,6 +64,7 @@ public class BoardController extends AbstractController {
 	@RequestMapping(value = { "/", "/boards" }, method = RequestMethod.GET)
 	public String list(Model model) {
 		model.addAttribute("boardSearch", boardSearch);
+		model.addAttribute("writeable",userSession.getUser().isUser());
 		return "listBoard";
 	}
 
@@ -75,6 +77,7 @@ public class BoardController extends AbstractController {
 		model.addAttribute("board", b);
 		model.addAttribute("groups", repoGroup.findAll(userSession.getUser(), null));
 		model.addAttribute("tab", tab);
+		model.addAttribute("writeable",isWriteable(b));
 		return "editBoard";
 	}
 
@@ -216,6 +219,8 @@ public class BoardController extends AbstractController {
 	    model.addAttribute("id",id);
 	    model.addAttribute("name",getMsg("e.board", locale) + ' ' + b.getName());	    
         model.addAttribute("point", new LatLon(b.getLat(),b.getLon()));
+        model.addAttribute("writeable",userSession.getUser().isUser());
+
         return "mapBoard";	    
 	}
 	

@@ -77,15 +77,18 @@ public class BoardGroupController extends AbstractController {
 	@RequestMapping(value="/groups",method=RequestMethod.GET)
 	public String list(Model model, @SortDefault("name") Pageable pageable){		
 		model.addAttribute("groups", repo.findAll(userSession.getUser(),domainFilter, pageable));
+		model.addAttribute("writeable",userSession.getUser().isUser());
 		return "listBoardGroup";
 	}
 	
 	
 	
 	@RequestMapping(value="/groups/{id}", method=RequestMethod.GET)
-	public String edit(@PathVariable Long id, Model model,@RequestParam(defaultValue = "boards") String tab, @Qualifier("boards") Pageable boardPage){	
-		model.addAttribute("group",repo.findOne(userSession.getUser(),id));
+	public String edit(@PathVariable Long id, Model model,@RequestParam(defaultValue = "boards") String tab, @Qualifier("boards") Pageable boardPage){
+	    BoardGroup g = repo.findOne(userSession.getUser(),id);
+		model.addAttribute("group",g);
 		model.addAttribute("tab", tab);
+		model.addAttribute("writeable",isWriteable(g));
 		return "editBoardGroup";		
 	}
 	

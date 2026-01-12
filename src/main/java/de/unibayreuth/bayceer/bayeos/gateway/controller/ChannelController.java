@@ -56,7 +56,7 @@ public class ChannelController extends AbstractController {
 	@RequestMapping(value="/channels/save", method=RequestMethod.POST)
 	public String save(@Valid Channel channel, BindingResult bindingResult, RedirectAttributes redirect, Locale locale){
 		if (bindingResult.hasErrors()){
-			return "editUser";
+			return "editChannel";
 		}						
 		checkWrite(repoBoard.findById(channel.getBoard().getId()).orElseThrow(() -> new EntityNotFoundException()));
 		Channel c = repo.save(channel);		
@@ -68,7 +68,8 @@ public class ChannelController extends AbstractController {
 	public String edit(@PathVariable Long id, Model model){		
 		Channel c = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());
 		if (c == null) throw new EntityNotFoundException("Entity not found");
-		checkWrite(c.getBoard());
+		
+		model.addAttribute("writeable",isWriteable(c.getBoard()));
 		model.addAttribute("channel",c);		
 		model.addAttribute("intervals",repoInterval.findAll(userSession.getUser(),null));		
 		model.addAttribute("functions",repoFunction.findAll(userSession.getUser(),null));		

@@ -99,7 +99,7 @@
                 th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}"
               >
                 <div
-                  th:replace="table::edit(@{'/boardTemplates/' + ${i.id}},false)"
+                  th:replace="table::details(@{'/boardTemplates/' + ${i.id}},false)"
                 ></div>
                 <div
                   th:replace="table::delete(@{'/boardTemplates/delete/' + ${i.id}},false)"

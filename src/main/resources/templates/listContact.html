@@ -54,7 +54,7 @@
                   th:if="${(#authentication.principal.domainId eq i.domainId) or #authentication.principal.inNullDomain()}"
                 >
                   <div
-                    th:replace="table::edit(@{'/contacts/' + ${i.id}},false)"
+                    th:replace="table::details(@{'/contacts/' + ${i.id}},false)"
                   ></div>
                   <div
                     th:replace="table::delete(@{'/contacts/delete/' + ${i.id}},false)"

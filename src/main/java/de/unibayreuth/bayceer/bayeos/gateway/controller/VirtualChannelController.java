@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.Board;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Permission;
 import de.unibayreuth.bayceer.bayeos.gateway.model.VirtualChannel;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.VirtualChannelRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.BoardRepository;
@@ -62,10 +63,10 @@ public class VirtualChannelController extends AbstractController {
 	
 	@RequestMapping(path="/virtualChannels/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable Long id, Model model){
-		 VirtualChannel vc = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());
-		 checkWrite(vc.getBoard());		 
+		 VirtualChannel vc = repo.findById(id).orElseThrow(()-> new EntityNotFoundException());		 	
 		 model.addAttribute(vc);
 		 model.addAttribute("channelFunctions",repoFunction.findAll(userSession.getUser(),null));
+		 model.addAttribute("writeable",isWriteable(vc.getBoard()));
 		 return "editVirtualChannel";
 	}
 	

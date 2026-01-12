@@ -13,7 +13,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.DomainFilter;
 import de.unibayreuth.bayceer.bayeos.gateway.UserSession;
 import de.unibayreuth.bayceer.bayeos.gateway.model.Domain;
 import de.unibayreuth.bayceer.bayeos.gateway.model.DomainEntity;
-import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.DomainEntityRepository;
+import de.unibayreuth.bayceer.bayeos.gateway.model.Permission;
 
 public abstract class AbstractController {
 	
@@ -57,32 +57,23 @@ public abstract class AbstractController {
 	
 		
 	protected  void checkWrite(DomainEntity d) {
-		Domain du = userDomain();		
-		if (du != null) {
-			if (d.getDomain() == null || du.getId() != d.getDomain().getId()) {
-				throw new AccessDeniedException("Missing rights to save domain object");
-			}
-		}			 		
+	    if (!isWriteable(d)) { 
+	        throw new AccessDeniedException("Missing rights to save domain object");
+	    }				 		
 	}
 	
 	protected boolean isWriteable(DomainEntity d) {
-		if (userDomain()!=null) {
-			Long dId = d.getDomainId();
-			Long uId = userSession.getUser().getDomainId();
-			return uId.equals(dId);			
-		} else {
-			return true;
-		}
-		
+	    return Permission.writeable(userSession.getUser(), d);		
+	}
+	
+	protected boolean isReadable(DomainEntity d) {
+	    return Permission.readable(userSession.getUser(), d);
 	}
 	
 	protected  void checkRead(DomainEntity d) {
-		Domain du = d.getDomain();
-		if (du != null) {
-			if (du.getId() != d.getDomain().getId() && !d.getDomain().getName().matches(DomainEntityRepository.nullDomainReadable)){
-				throw new AccessDeniedException("Missing rights to read domain object");
-			}	
-		}
+	    if (!isReadable(d)) {
+	        throw new AccessDeniedException("Missing rights to read domain object");
+	    }		
 	}
 	
 	

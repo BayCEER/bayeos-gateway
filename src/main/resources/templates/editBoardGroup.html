@@ -83,8 +83,8 @@
                       <th th:text="#{board.lrt}">Last Result Time</th>
                       <th th:text="#{board.status}">Status</th>
                       <th>
-                        <div class="pull-right">
-                          <div
+                        <div class="pull-right" th:if="${writable}">
+                          <div 
                             th:replace="table::add(@{'/groups/selectBoards/' + ${group.id}})"
                           ></div>
                         </div>
@@ -110,11 +110,11 @@
 
                       <td class="pull-right">
                         <div
-                          th:replace="table::edit(@{'/boards/' + ${i.id}},false)"
+                          th:replace="table::details(@{'/boards/' + ${i.id}},false)"
                         ></div>
-                        <div
-                          th:replace="table::delete(@{'/groups/removeBoard/' + ${i.id}},false)"
-                        ></div>
+                        <div th:if="${writeable}">
+                          <div th:replace="table::delete(@{'/groups/removeBoard/' + ${i.id}},false)"></div>
+                         </div>
                       </td>
                     </tr>
                   </tbody>
@@ -127,9 +127,11 @@
                       <th th:text="#{contact.email}"></th>
                       <th>
                         <div class="btn-group pull-right">
+                        <div th:if="${writeable}">
                           <div
                             th:replace="table::add(@{'/groups/selectContacts/' + ${group.id}})"
                           ></div>
+                          </div>
                         </div>
                       </th>
                     </tr>
@@ -144,9 +146,11 @@
                       </td>
                       <td>
                         <div class="pull-right">
+                        <div th:if="${writeable}">
                           <div
                             th:replace="table::delete(@{'/groups/removeNotification/' + ${n.id}},false)"
                           ></div>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -160,6 +164,7 @@
           </div>
           
           <div class="block-action">
+          		<div th:if="${writeable}">
           		<button type="submit" name="save" class="btn btn-primary">
 						<span class="glyphicon glyphicon-save"></span> <span
 							th:text="#{action.save}"></span>
@@ -169,6 +174,7 @@
 						th:onclick="#{dialog.confirm}"> <span
 						class="glyphicon glyphicon-remove"></span> <span
 						th:text="#{action.delete}"></span>
+				</div>
 				<a class="btn btn-default"
 						th:href="@{/groups/map/} + ${group.id}"> <span
 						class="glyphicon glyphicon-map-marker"></span> <span
