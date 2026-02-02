@@ -70,6 +70,7 @@ Let's send the cpu load of our pc to a local gateway:
 - New: Debian 13 compatibility 
 - Fixed: Replaced internal with external Nashorn script engine
 - Fixed: Duplicate key issues in CalculateThread
+- New: Readonly views for users belonging to role 'CHECK'
 
 ### Version 2.9.9, November 2024
 - Changed: Packages without debian version name 
