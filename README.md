@@ -61,6 +61,12 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History 
 
+### Version 2.10.2 Feb 2026
+- Fix: Wrong permission calculation for domain objects
+
+### Version 2.10.1 Feb 2026
+- Fix: Wrong permission calculation in editBoardGroup template
+
 ### Version 2.10.0 Jan 2026
 - New: Board location coordinates 
 - New: Board group map 
