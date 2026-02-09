@@ -16,7 +16,7 @@ private static boolean domainAccess(User u, DomainEntity d) {
    if (u.domain == null) {
        return true;
    } else {
-       return u.domain == d.domain;
+       return u.domain.equals(d.domain);
    }
     
 }
