@@ -11,6 +11,9 @@
 	
 		<form method="post" action="#" th:action="@{/boards}" th:object="${board}">
 			<input type="hidden" name="id" th:field="*{id}" />			
+			<input type="hidden" name="lat" th:field="*{lat}"/>
+			<input type="hidden" name="lon" th:field="*{lon}"/>
+			<input type="hidden" name="alt" th:field="*{alt}"/>
 			
 			<div id="props" class="block">
 				<div class="block-header" th:text="'ORIGIN:' + *{origin}"></div>
@@ -126,8 +129,6 @@
 						</div>
 						<div role="tabpanel" class="tab-pane fade" id="settings">
 						
-						
-							
 						
 							<div th:replace="block::boardSettings(Checks)"></div>
 						

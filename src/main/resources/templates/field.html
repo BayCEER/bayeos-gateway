@@ -26,10 +26,10 @@
 				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
 </div>
 
-<div th:fragment="number(prop,label)" th:with="step=${step}?:'any',disabled=!(${writeable}?:true), required=${required}?:false"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
+<div th:fragment="number(prop,label)" th:with="step=${step}?:'any',min=${min}?:'any',disabled=!(${writeable}?:true), required=${required}?:false"  th:class="${#fields.hasErrors('__${prop}__')} ? 'form-group has-error':'form-group'">
 				<label th:text="${label} + (${required} ? '*':'')" class="control-label">Text:</label>				 
-					<input th:if="${disabled}" type="number" class="form-control" th:field="*{__${prop}__}" th:required="${required}" th:step="${step}" disabled="true"/>
-					<input th:if="!${disabled}" type="number" class="form-control" th:field="*{__${prop}__}" th:required="${required}" th:step="${step}"/>				
+					<input th:if="${disabled}" type="number" class="form-control" th:field="*{__${prop}__}" th:required="${required}" th:step="${step}" th:min="${min}" disabled="true"/>
+					<input th:if="!${disabled}" type="number" class="form-control" th:field="*{__${prop}__}" th:required="${required}" th:step="${step}" th:min="${min}"/>				
 				<span th:if="${#fields.hasErrors('__${prop}__')}" class="help-block" th:errors="*{__${prop}__}">Name Error</span>
 </div>
 

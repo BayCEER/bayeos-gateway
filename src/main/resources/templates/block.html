@@ -31,11 +31,11 @@
 		<div class="row">
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('samplingInterval',#{chkDev.samplingInt})"></div>
+					th:replace="field::number(prop='samplingInterval',label=#{chkDev.samplingInt},step=1,min=1)"></div>
 			</div>
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number('checkDelay',#{chkDev.checkDelay})"></div>
+					th:replace="field::number(prop='checkDelay',label=#{chkDev.checkDelay},step=1,min=1)"></div>
 			</div>
 			<div class="col-sm-6"></div>
 		</div>
@@ -48,11 +48,11 @@
 		<div class="row">
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number(prop='samplingInterval',label=#{chkDev.samplingInt},step=1)"></div>
+					th:replace="field::number(prop='samplingInterval',label=#{chkDev.samplingInt},step=1,min=1)"></div>
 			</div>
 			<div class="col-sm-3">
 				<div
-					th:replace="field::number(prop='checkDelay',label=#{chkDev.checkDelay},step=1)"></div>
+					th:replace="field::number(prop='checkDelay',label=#{chkDev.checkDelay},step=1,min=1)"></div>
 			</div>
 			<div class="col-sm-6"></div>
 		</div>
@@ -62,7 +62,7 @@
 		<div class="block-header">Exports</div>
 		<div class="row">
 			<div class="col-sm-4">
-				<div th:replace="field::number(prop='dbSeriesId',label=#{a.dbId},step=1)"></div>
+				<div th:replace="field::number(prop='dbSeriesId',label=#{a.dbId},step=1,min=1)"></div>
 			</div>
 			<div class="col-sm-4">
 				<div th:replace="field::checkbox('filterCriticalValues',#{channel.filterCriticalValues})"></div>
