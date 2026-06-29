@@ -61,6 +61,9 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History 
 
+### Version 2.10.4 June 2026
+- Fix: ExportThread: TreeHandler.findOrSaveNode on all node operations
+
 ### Version 2.10.3 May 2026
 - Fix: Invalid sampling and check delay values
 - Fix: Saving a board is erasing coordinate values 

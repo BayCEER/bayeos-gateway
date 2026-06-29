@@ -97,9 +97,9 @@ class ExportThread implements Runnable  {
                         expHomeFolderId = cli.getRoot(Art.MESSUNG_ORDNER).id
                     }
                     createNewFoldersForDomains()
-                    createNewFoldersForGroups()
-                    createNewFoldersForBoards()
-                    createNewSeriesForChannels()
+                    syncGroups()
+                    syncBoards()
+                    syncChannels()
                     syncFolderPropsForBoards()
                     syncFolderPropsForChannels()
                     records = exportNewObservations()
@@ -130,17 +130,17 @@ class ExportThread implements Runnable  {
         new Thread(this).start()
     }
 
-    private def createNewFoldersForDomains() {
+    private def syncDomains() {
         db.eachRow("select id from domain where db_folder_id is null"){ it ->
-            createFolderForDomain(it.id);
+            syncFolderForDomain(it.id);
         }
     }
 
-    private def createFolderForDomain(domain_id) {
+    private def syncFolderForDomain(domain_id) {
         try {
+            log.info("")
             def dom = db.firstRow("select name from domain where id=${domain_id}")
-            def id = cli.newNode(expHomeFolderId, dom.name, Art.MESSUNG_ORDNER).getId()
-            log.info("Created domain: ${dom.name}")
+            def id = cli.findOrCreateNode(expHomeFolderId, dom.name, Art.MESSUNG_ORDNER).getId()
             db.execute("update domain set db_folder_id = ${id} where id = ${domain_id}")
         } catch (XmlRpcException e) {
             log.error(e.getMessage())
@@ -149,18 +149,18 @@ class ExportThread implements Runnable  {
         return true;
     }
 
-    private def createNewFoldersForGroups() {
+    private def syncGroups() {
         db.eachRow("select id from board_group where db_folder_id is null"){ it ->
-            createFolderForGroup(it.id);
+            syncFolderForGroup(it.id);
         }
     }
 
-    private def createFolderForGroup(group_id) {
+    private def syncFolderForGroup(group_id) {
         def group = db.firstRow("""select g.name, d.id as domain_id, d.db_folder_id as domain_folder_id from board_group g 
 				left join domain d on d.id = g.domain_id where g.id =${group_id}""")
         def pFolderId = group.domain_folder_id ?: expHomeFolderId
         try {
-            def node = cli.newNode(pFolderId, group.name, Art.MESSUNG_ORDNER)            
+            def node = cli.findOrCreateNode(pFolderId, group.name, Art.MESSUNG_ORDNER)            
             MessungOrdner m = cli.getNodeObjekt(node,MessungOrdner.class)
             m.setBeschreibung("Created by BayEOS-Gateway (${hostname})")                        
             cli.updateNodeObjekt(m);                                                                        
@@ -171,8 +171,8 @@ class ExportThread implements Runnable  {
             // Fix
             if (!cli.nodeExists(pFolderId,Art.MESSUNG_ORDNER)) {
                 if (pFolderId == group.domain_folder_id) {
-                    if (createFolderForDomain(group.domain_id)) {
-                        return createFolderForGroup(group_id)
+                    if (syncFolderForDomain(group.domain_id)) {
+                        return syncFolderForGroup(group_id)
                     }
                 }
             }
@@ -180,20 +180,19 @@ class ExportThread implements Runnable  {
         }
     }
 
-    private def createNewFoldersForBoards(){
+    private def syncBoards(){
         db.eachRow("SELECT id from board where db_folder_id is null and db_auto_export and name is not null"){ it ->
-            createFolderForBoard(it.id)
+            syncFolderForBoard(it.id)
         }
     }
 
-    private def createFolderForBoard(board_id) {
+    private def syncFolderForBoard(board_id) {
         def board = db.firstRow("""select b.name, b.origin, b.board_group_id, b.domain_id, g.db_folder_id as group_folder_id, d.db_folder_id as domain_folder_id,
                 b.lat, b.lon, b.alt from board b left outer join board_group g on g.id = b.board_group_id
 				left outer join domain d on d.id = b.domain_id where b.id=${board_id}""")
         def pFolderId = board.group_folder_id ?: board.domain_folder_id ?: expHomeFolderId
         try {
-            def node = cli.newNode(pFolderId, board.name, Art.MESSUNG_ORDNER)
-            log.info("Created folder for board: ${board.name}")        
+            def node = cli.findOrCreateNode(pFolderId, board.name, Art.MESSUNG_ORDNER)
             MessungOrdner m = cli.getNodeObjekt(node,MessungOrdner.class)
             m.setBeschreibung("Created by BayEOS-Gateway (${hostname})")
             m.setLat(board.lat)
@@ -208,13 +207,13 @@ class ExportThread implements Runnable  {
             if (!cli.nodeExists(pFolderId,Art.MESSUNG_ORDNER)) {
                 // GW -> D -> B -> C
                 if (pFolderId == board.domain_folder_id){
-                    if (createFolderForDomain(board.domain_id)) {
-                        return createFolderForBoard(board_id)
+                    if (syncFolderForDomain(board.domain_id)) {
+                        return syncFolderForBoard(board_id)
                     }
                     // GW -> G -> B -> C
                 } else if (pFolderId == board.group_folder_id) {
-                    if (createFolderForGroup(board.board_group_id)) {
-                        return createFolderForBoard(board_id)
+                    if (syncFolderForGroup(board.board_group_id)) {
+                        return syncFolderForBoard(board_id)
                     }
                 }
             }
@@ -222,56 +221,53 @@ class ExportThread implements Runnable  {
         }
     }
 
-    private def createNewSeriesForChannels(){
+    private def syncChannels(){
         db.eachRow("""select c.id from channel c join board b on b.id = c.board_id where b.db_folder_id is not null and c.name is not null and c.db_series_id is null and 
 			c.db_exclude_auto_export is false"""){ it ->
-                    createSeriesForChannel(it.id)
+                    syncSeriesForChannel(it.id)
                 }
     }
 
-    private def createSeriesForChannel(channel_id) {
+    private def syncSeriesForChannel(channel_id) {
         def channel = db.firstRow("select c.*, b.db_folder_id from channel c join board b on c.board_id = b.id where c.id=${channel_id}")
         def sId
         try {
-            sId = cli.newNode(channel.db_folder_id, channel.name,Art.MESSUNG_MASSENDATEN).getId()
-            log.info("Created new series for channel ${channel.name}")
+            sId = cli.findOrCreateNode(channel.db_folder_id, channel.name,Art.MESSUNG_MASSENDATEN).getId()            
         } catch (XmlRpcException e){
             if (!cli.nodeExists(channel.db_folder_id,Art.MESSUNG_ORDNER)) {
-                if (createFolderForBoard(channel.board_id)) {
-                    return createSeriesForChannel(channel.id)
+                if (syncFolderForBoard(channel.board_id)) {
+                    return syncSeriesForChannel(channel.id)
                 }
             }
             return false;
         }
         if (channel.unit_id){
-            createReferenceForUnit(sId, channel.unit_id)
+            syncChannelUnit(sId, channel.unit_id)
         }
         db.execute("update channel set db_series_id = ${sId} where id = ${channel.id}")
         return true
     }
 
-    private def createReferenceForUnit(channel_db_series_id, unit_id){
+    private def syncChannelUnit(channel_db_series_id, unit_id){
         def unit = db.firstRow("select * from unit where id = ${unit_id}")
         try {
-            
-            
-            cli.setNodeReference(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT)
-            log.info("Created reference on unit:${unit.name} for series ${channel_db_series_id}")
+            if (!cli.nodeRefExists(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT) {
+                cli.setNodeReference(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT);
+            }                        
         } catch (XmlRpcException e){
             log.error(e.getMessage())
-            if (createUnitForUnit(unit.name, unit_id)){
-                return createReferenceForUnit(channel_db_series_id, unit_id)
+            if (syncUnitForUnit(unit.name, unit_id)){
+                return syncChannelUnit(channel_db_series_id, unit_id)
             }
             return false
         }
         return true
     }
 
-    private def createUnitForUnit(unit_name, unit_id) {
+    private def syncUnitForUnit(unit_name, unit_id) {
         try {
             def parentId = expHomeUnitId
-            def fId = cli.newNode(parentId, unit_name, Art.MESS_EINHEIT).getId()
-            log.info("Created unit: ${unit_name}")
+            def fId = cli.findOrCreateNode(parentId, unit_name, Art.MESS_EINHEIT).getId()            
             db.execute("update unit set db_unit_id = ${fId} where id = ${unit_id}")
         } catch (XmlRpcException e){
             log.error(e.getMessage())
@@ -281,11 +277,13 @@ class ExportThread implements Runnable  {
     }
 
     private def validateChannels(channelIds){
+        log.info("Validating channels")        
         channelIds.each{ it ->
             def id = it[0]
             def series_id = it[1]
             if (!cli.nodeExists(series_id,Art.MESSUNG_MASSENDATEN)) {
-                createSeriesForChannel(id)
+                log.info("Series for channel not found")
+                syncSeriesForChannel(id)
             }
         }
     }
@@ -346,9 +344,7 @@ class ExportThread implements Runnable  {
         }        
     }
     
-    private def syncFolderPropsForBoard(board) {
-        
-        log.info("Sync properties of board(id:${board.id},name:${board.name})");        
+    private def syncFolderPropsForBoard(board) {                        
         try {               
                 Node node = cli.getNode(board.db_folder_id);
                 if (node == null) {
@@ -379,7 +375,6 @@ class ExportThread implements Runnable  {
     }
     
     private def syncFolderPropsForChannel(channel) {
-        log.info("Sync properties of channel(id:${channel.id},name:${channel.name})")
         try {
             Node node = cli.getNode(channel.db_series_id)
             if (node == null) {
