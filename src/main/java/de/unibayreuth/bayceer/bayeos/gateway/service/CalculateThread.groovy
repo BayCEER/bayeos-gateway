@@ -102,7 +102,7 @@ public class CalculateThread implements Runnable {
                         log.info("Processing virtual channels")
                         db.eachRow("""select distinct vc.nr, vc.id, c.board_id, oc.result_time from observation_calc oc 
                                         join channel c on oc.channel_id = c.id 
-                                        join virtual_channel vc on vc.board_id = c.board_id and vc."event" = 'calculate'
+                                        join virtual_channel vc on vc.board_id = c.board_id and vc.event = 'calculate'
                                         join channel_binding cb on vc.id = cb.virtual_channel_id and cb.nr = c.nr order by oc.result_time asc;
                             """){ rec ->                                  
                                         def vc = vcRepo.findById(rec.id).orElse(null)
@@ -112,10 +112,10 @@ public class CalculateThread implements Runnable {
                                         }                                        
                                         log.debug("Calculate virtual channel:${vc} on board:${vc.board.origin}")
                                         def values  = [:]
-                                        for (b in vc.channelBindings) {
+                                        for (b in vc.channelBindings) {                                            
                                             if (b.value == null && b.nr != null) {
                                                 def val = db.firstRow("""select oc.result_value from observation_calc oc join channel c on oc.channel_id = c.id
-                                                  where oc.result_time = ${rec.result_time} and c.nr = ${b.nr}""")
+                                                  where oc.result_time = ${rec.result_time} and c.nr = ${b.nr} and c.board_id = ${rec.board_id}""")
                                                 if (val == null) {
                                                     log.warn("Function value not found.")
                                                     return

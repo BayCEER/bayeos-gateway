@@ -61,8 +61,10 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History 
 
-### Version 2.10.4 June 2026
-- Fix: ExportThread: TreeHandler.findOrSaveNode on all node operations
+### Version 2.10.4 July 2026
+- Fix: ExportThread: Clean invalid mapping of server ids on domain, board_group, board and channel
+- Fix: ExportThread: Drop validateChannels(channelIds) function
+- Fix: CalculateThread: Wrong data records in virtual channels with 'calculate' flag 
 
 ### Version 2.10.3 May 2026
 - Fix: Invalid sampling and check delay values

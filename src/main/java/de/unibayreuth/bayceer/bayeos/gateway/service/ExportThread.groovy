@@ -16,10 +16,13 @@ import bayeos.frame.types.LabeledFrame
 import bayeos.frame.types.NumberType
 import de.unibayreuth.bayceer.bayeos.client.Client
 import groovy.sql.Sql
+import de.unibayreuth.bayceer.bayeos.objekt.ArrayConverter
+import de.unibayreuth.bayceer.bayeos.objekt.ArraySerializationException
 import de.unibayreuth.bayceer.bayeos.objekt.Art
 import de.unibayreuth.bayceer.bayeos.objekt.Messung
 import de.unibayreuth.bayceer.bayeos.objekt.MessungOrdner
 import de.unibayreuth.bayceer.bayeos.objekt.Node
+import de.unibayreuth.bayceer.bayeos.objekt.Objekt
 
 
 
@@ -87,7 +90,8 @@ class ExportThread implements Runnable  {
 
                     // Authentication user root by ip
                     cli.connect(getExportUrL(),expUser,"")
-
+                    
+                    
                     if (expHomeUnitId == null || !cli.nodeExists(expHomeUnitId, Art.MESS_EINHEIT)) {
                         log.info("Set home unit id to root")
                         expHomeUnitId = cli.getRoot(Art.MESS_EINHEIT).id
@@ -96,7 +100,7 @@ class ExportThread implements Runnable  {
                         log.info("Set home folder id to root")
                         expHomeFolderId = cli.getRoot(Art.MESSUNG_ORDNER).id
                     }
-                    createNewFoldersForDomains()
+                    syncDomains()
                     syncGroups()
                     syncBoards()
                     syncChannels()
@@ -129,18 +133,66 @@ class ExportThread implements Runnable  {
     public void start(){
         new Thread(this).start()
     }
-
+    
+    
+    private def invalidIds(List<Integer> ids, String art) {       
+        Vector idVec = new Vector<Integer>();
+        idVec.addAll(ids);
+        Vector<Vector<Object>> vec = (Vector<Vector<Object>>) cli.getXmlRpcClient().execute("ObjektHandler.getObjekte",idVec, art);
+        for (Iterator<Vector<Object>> it = vec.iterator(); it.hasNext();) {
+            try {
+                Objekt o =  (Objekt) ArrayConverter.toObject(Objekt.class, it.next().toArray());                
+                ids.remove((Object)o.id)                                
+            } catch (ArraySerializationException e) {
+                throw new XmlRpcException(0, e.getMessage());
+            }            
+        }         
+        return ids        
+    }
+    
+    
+    private def cleanInvalidMapping(table) {
+        
+        log.debug("Clean invalid mappings for ${table}")
+                        
+        def art = Art.MESSUNG_ORDNER
+        if (table == "channel") {
+            art = Art.MESSUNG_MASSENDATEN
+        }
+        
+        def idCol = "db_folder_id"
+        if (table == "channel") {
+          idCol = "db_series_id"
+        }
+        
+        def sql = "select ${idCol} as id from ${table} where ${idCol} is not null".toString()  
+        def doms = db.rows(sql)
+        def List<Integer>ids = doms.collect { it.id }
+        invalidIds(ids, art).each { id ->
+            if (table == "domain" || table == "board_group") {
+                db.execute("update ${table} set ${idCol} = null where ${idCol} = ${id}".toString())                
+            } else if (table == "board") {
+                db.execute("update ${table} set ${idCol} = null, db_auto_export = false where ${idCol} = ${id}".toString())
+            } else if (table == "channel") {
+                db.execute("update ${table} set ${idCol} = null, db_exclude_auto_export = true where ${idCol} = ${id}".toString())                
+            }
+            log.warn("Cleaned invalid id:${id} for ${table}")            
+        }                
+    }
+    
+    
     private def syncDomains() {
-        db.eachRow("select id from domain where db_folder_id is null"){ it ->
+        cleanInvalidMapping("domain")                        
+        db.eachRow("select id from domain where db_folder_id is null"){ it ->            
             syncFolderForDomain(it.id);
         }
     }
 
     private def syncFolderForDomain(domain_id) {
-        try {
-            log.info("")
+        try {            
             def dom = db.firstRow("select name from domain where id=${domain_id}")
-            def id = cli.findOrCreateNode(expHomeFolderId, dom.name, Art.MESSUNG_ORDNER).getId()
+            def id = cli.newNode(expHomeFolderId, dom.name, Art.MESSUNG_ORDNER).getId()
+            log.info("Domain folder: ${dom.name} created")
             db.execute("update domain set db_folder_id = ${id} where id = ${domain_id}")
         } catch (XmlRpcException e) {
             log.error(e.getMessage())
@@ -150,17 +202,19 @@ class ExportThread implements Runnable  {
     }
 
     private def syncGroups() {
-        db.eachRow("select id from board_group where db_folder_id is null"){ it ->
+        cleanInvalidMapping("board_group")
+        db.eachRow("select id from board_group where db_folder_id is null"){ it ->            
             syncFolderForGroup(it.id);
         }
     }
 
-    private def syncFolderForGroup(group_id) {
+    private def syncFolderForGroup(group_id) {        
         def group = db.firstRow("""select g.name, d.id as domain_id, d.db_folder_id as domain_folder_id from board_group g 
 				left join domain d on d.id = g.domain_id where g.id =${group_id}""")
         def pFolderId = group.domain_folder_id ?: expHomeFolderId
         try {
-            def node = cli.findOrCreateNode(pFolderId, group.name, Art.MESSUNG_ORDNER)            
+            def node = cli.newNode(pFolderId, group.name, Art.MESSUNG_ORDNER)
+            log.info("Group folder: ${group.name} created")            		
             MessungOrdner m = cli.getNodeObjekt(node,MessungOrdner.class)
             m.setBeschreibung("Created by BayEOS-Gateway (${hostname})")                        
             cli.updateNodeObjekt(m);                                                                        
@@ -181,6 +235,7 @@ class ExportThread implements Runnable  {
     }
 
     private def syncBoards(){
+        cleanInvalidMapping("board")
         db.eachRow("SELECT id from board where db_folder_id is null and db_auto_export and name is not null"){ it ->
             syncFolderForBoard(it.id)
         }
@@ -192,7 +247,8 @@ class ExportThread implements Runnable  {
 				left outer join domain d on d.id = b.domain_id where b.id=${board_id}""")
         def pFolderId = board.group_folder_id ?: board.domain_folder_id ?: expHomeFolderId
         try {
-            def node = cli.findOrCreateNode(pFolderId, board.name, Art.MESSUNG_ORDNER)
+            def node = cli.newNode(pFolderId, board.name, Art.MESSUNG_ORDNER)          		
+            log.info("Board folder: ${board.name} created")        
             MessungOrdner m = cli.getNodeObjekt(node,MessungOrdner.class)
             m.setBeschreibung("Created by BayEOS-Gateway (${hostname})")
             m.setLat(board.lat)
@@ -222,6 +278,7 @@ class ExportThread implements Runnable  {
     }
 
     private def syncChannels(){
+        cleanInvalidMapping("channel")
         db.eachRow("""select c.id from channel c join board b on b.id = c.board_id where b.db_folder_id is not null and c.name is not null and c.db_series_id is null and 
 			c.db_exclude_auto_export is false"""){ it ->
                     syncSeriesForChannel(it.id)
@@ -229,10 +286,12 @@ class ExportThread implements Runnable  {
     }
 
     private def syncSeriesForChannel(channel_id) {
+        
         def channel = db.firstRow("select c.*, b.db_folder_id from channel c join board b on c.board_id = b.id where c.id=${channel_id}")
         def sId
         try {
-            sId = cli.findOrCreateNode(channel.db_folder_id, channel.name,Art.MESSUNG_MASSENDATEN).getId()            
+            sId = cli.newNode(channel.db_folder_id, channel.name,Art.MESSUNG_MASSENDATEN).getId()
+            log.info("Series for channel ${channel.name} created")
         } catch (XmlRpcException e){
             if (!cli.nodeExists(channel.db_folder_id,Art.MESSUNG_ORDNER)) {
                 if (syncFolderForBoard(channel.board_id)) {
@@ -252,6 +311,7 @@ class ExportThread implements Runnable  {
         def unit = db.firstRow("select * from unit where id = ${unit_id}")
         try {
             if (!cli.nodeRefExists(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT) {
+            	log.info("Reference on unit:${unit.name} for series ${channel_db_series_id} set")
                 cli.setNodeReference(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT);
             }                        
         } catch (XmlRpcException e){
@@ -265,27 +325,18 @@ class ExportThread implements Runnable  {
     }
 
     private def syncUnitForUnit(unit_name, unit_id) {
+        log.info("syncUnitForUnit:${unit_id}")
+        
         try {
             def parentId = expHomeUnitId
-            def fId = cli.findOrCreateNode(parentId, unit_name, Art.MESS_EINHEIT).getId()            
+            def fId = cli.newNode(parentId, unit_name, Art.MESS_EINHEIT).getId()
+            log.info("Unit: ${unit_name} created")
             db.execute("update unit set db_unit_id = ${fId} where id = ${unit_id}")
         } catch (XmlRpcException e){
             log.error(e.getMessage())
             return false
         }
         return true
-    }
-
-    private def validateChannels(channelIds){
-        log.info("Validating channels")        
-        channelIds.each{ it ->
-            def id = it[0]
-            def series_id = it[1]
-            if (!cli.nodeExists(series_id,Art.MESSUNG_MASSENDATEN)) {
-                log.info("Series for channel not found")
-                syncSeriesForChannel(id)
-            }
-        }
     }
 
     private def exportNewObservations() {
@@ -296,15 +347,10 @@ class ExportThread implements Runnable  {
         def records = 0
         try {
             while (true){
-                def row = 0
-                Set channelIds = []
+                def row = 0                
                 db.eachRow("""SELECT o.id, c.id as channel_id, c.db_series_id, o.result_time,o.result_value FROM 
 							observation_out o join channel c on o.channel_id = c.id where c.db_series_id is not null order by o.id asc limit ${expBulkSize};""") {
                             id = it.id
-                            channelIds.add([
-                                it.channel_id,
-                                it.db_series_id
-                            ])
                             dout.writeInt(it.db_series_id)
                             dout.writeLong(it.result_time.getTime())
                             dout.writeFloat(it.result_value)
@@ -314,11 +360,9 @@ class ExportThread implements Runnable  {
                     dout.flush()
 
                 if (!cli.getXmlRpcClient().execute("MassenTableHandler.upsertByteRows",[bout.toByteArray()] as Object[])) {
-                    bout.reset()
-                    validateChannels(channelIds)
-                    continue;
+                    log.error("Export failed")
+                    return -1
                 }
-
 
                 log.info("${row} records exported")
                 records = records + row
