@@ -61,6 +61,10 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History 
 
+### Version 2.10.5 July 2026
+- Fix: Add unique constraint on channel_function_parameter
+- Fix: Add unique constraint on virtual_channel
+
 ### Version 2.10.4 July 2026
 - Fix: ExportThread: Clean invalid mapping of server ids on domain, board_group, board and channel
 - Fix: ExportThread: Drop validateChannels(channelIds) function

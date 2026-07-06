@@ -1,0 +1,2 @@
+ALTER TABLE virtual_channel ADD CONSTRAINT virtual_channel_unique UNIQUE (nr,board_id);
+ALTER TABLE channel_function_parameter ADD CONSTRAINT channel_function_parameter_unique UNIQUE (name,channel_function_id);
