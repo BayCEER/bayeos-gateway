@@ -16,6 +16,8 @@ public interface BoardRepository extends DomainEntityRepository<Board>{
 	public List<Board> findByBoardGroup(BoardGroup g);
 	
 	public Board findByOriginAndDomain(String origin, Domain domain);
+
+	public Board findByOriginIgnoreCaseAndDomain(String origin, Domain domain);
 	
 	public Board findByIdAndDomain(Long id, Domain domain);
 			
