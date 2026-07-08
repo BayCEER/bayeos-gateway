@@ -310,7 +310,7 @@ class ExportThread implements Runnable  {
     private def syncChannelUnit(channel_db_series_id, unit_id){
         def unit = db.firstRow("select * from unit where id = ${unit_id}")
         try {
-            if (!cli.nodeRefExists(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT) {
+            if (!cli.nodeRefExists(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT)) {
             	log.info("Reference on unit:${unit.name} for series ${channel_db_series_id} set")
                 cli.setNodeReference(unit.db_unit_id,channel_db_series_id,Art.MESS_EINHEIT);
             }                        
