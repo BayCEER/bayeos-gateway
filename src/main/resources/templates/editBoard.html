@@ -139,7 +139,7 @@
 										<div th:replace="field::text(prop='origin',label=#{board.origin},required=true)"></div>
 									</div>
 									<div class="col-sm-4">										
-										<div th:replace="field::number(prop='dbFolderId',label=#{a.dbId},step=1)"></div>
+										<div th:replace="field::number(prop='dbFolderId',label=#{a.dbId},writeable=false)"></div>
 									</div>
 									<div class="col-sm-4">
 										<div th:replace="field::checkbox('forceSync',#{board.forceSync})"></div>

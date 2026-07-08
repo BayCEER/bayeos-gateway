@@ -24,7 +24,7 @@
         <div
           th:replace="field::text(prop='abbrevation',label=#{a.abbrevation})"
         ></div>
-        <div th:replace="field::text(prop='dbUnitId',label=#{a.dbId})"></div>
+        <div th:replace="field::number(prop='dbUnitId',label=#{a.dbId},writeable=false)"></div>
         <button
           th:if="${writeable}"
           th:text="#{action.save}"
