@@ -61,6 +61,10 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History 
 
+### Version 2.11.0 July 2026
+- New: New board end point to query boards by origin and domain.  
+- Fix: Disable editing of BayEOS server id on domain, board, channel, board group and unit entities 
+
 ### Version 2.10.5 July 2026
 - Fix: Add unique constraint on channel_function_parameter
 - Fix: Add unique constraint on virtual_channel
