@@ -151,38 +151,9 @@ class ExportThread implements Runnable  {
     }
     
     
-    private def cleanInvalidMapping(table) {
-        
-        log.debug("Clean invalid mappings for ${table}")
-                        
-        def art = Art.MESSUNG_ORDNER
-        if (table == "channel") {
-            art = Art.MESSUNG_MASSENDATEN
-        }
-        
-        def idCol = "db_folder_id"
-        if (table == "channel") {
-          idCol = "db_series_id"
-        }
-        
-        def sql = "select ${idCol} as id from ${table} where ${idCol} is not null".toString()  
-        def doms = db.rows(sql)
-        def List<Integer>ids = doms.collect { it.id }
-        invalidIds(ids, art).each { id ->
-            if (table == "domain" || table == "board_group") {
-                db.execute("update ${table} set ${idCol} = null where ${idCol} = ${id}".toString())                
-            } else if (table == "board") {
-                db.execute("update ${table} set ${idCol} = null, db_auto_export = false where ${idCol} = ${id}".toString())
-            } else if (table == "channel") {
-                db.execute("update ${table} set ${idCol} = null, db_exclude_auto_export = true where ${idCol} = ${id}".toString())                
-            }
-            log.warn("Cleaned invalid id:${id} for ${table}")            
-        }                
-    }
+       
     
-    
-    private def syncDomains() {
-        cleanInvalidMapping("domain")                        
+    private def syncDomains() {                     
         db.eachRow("select id from domain where db_folder_id is null"){ it ->            
             syncFolderForDomain(it.id);
         }
@@ -202,7 +173,6 @@ class ExportThread implements Runnable  {
     }
 
     private def syncGroups() {
-        cleanInvalidMapping("board_group")
         db.eachRow("select id from board_group where db_folder_id is null"){ it ->            
             syncFolderForGroup(it.id);
         }
@@ -235,7 +205,6 @@ class ExportThread implements Runnable  {
     }
 
     private def syncBoards(){
-        cleanInvalidMapping("board")
         db.eachRow("SELECT id from board where db_folder_id is null and db_auto_export and name is not null"){ it ->
             syncFolderForBoard(it.id)
         }
@@ -278,7 +247,6 @@ class ExportThread implements Runnable  {
     }
 
     private def syncChannels(){
-        cleanInvalidMapping("channel")
         db.eachRow("""select c.id from channel c join board b on b.id = c.board_id where b.db_folder_id is not null and c.name is not null and c.db_series_id is null and 
 			c.db_exclude_auto_export is false"""){ it ->
                     syncSeriesForChannel(it.id)
