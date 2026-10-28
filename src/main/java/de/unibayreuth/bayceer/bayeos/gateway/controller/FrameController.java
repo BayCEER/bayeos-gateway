@@ -21,80 +21,85 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.unibayreuth.bayceer.bayeos.gateway.model.BoardCommand;
+import de.unibayreuth.bayceer.bayeos.gateway.redis.RedisFrames;
 import de.unibayreuth.bayceer.bayeos.gateway.repo.datatable.BoardCommandRepository;
 import de.unibayreuth.bayceer.bayeos.gateway.service.FrameService;
 
 @Controller
 public class FrameController extends AbstractController {
-	
+
 	@Autowired
 	FrameService frameService;
-	
-	@Autowired 
+
+	@Autowired
+	RedisFrames frameSpoolService;
+
+	@Autowired
 	BoardCommandRepository repoCommand;
-	
+
 	private Logger log = LoggerFactory.getLogger(FrameController.class);
 
 	@RequestMapping(path = "/frame/saveFlat", method = RequestMethod.POST, headers = "Content-Type=application/x-www-form-urlencoded")
 	@ResponseBody
-	public ResponseEntity saveFlat(@RequestParam MultiValueMap<String,String> params, HttpServletRequest request) {						
-			
-			try {				
-				String sender = getSender(params);
-				List<String> frames = getFrames(params);
-				log.info("Received " + frames.size() + " frames from " + sender);															
-				if (frameService.saveFrames(userSession.getUser().getDomainId(), sender,frames)) {
-					log.debug("Frames saved.");					
-					HttpHeaders responseHeaders = new HttpHeaders();
-					responseHeaders.set("Content-Type", "application/x-www-form-urlencoded");
-					return new ResponseEntity<String>(getCallback(sender), responseHeaders, HttpStatus.OK);
-															
-				} else {
-					log.warn("Failed to save frames.");
-					return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-								
-			} catch (RuntimeException e){
-				log.error(e.getMessage());
+	public ResponseEntity saveFlat(@RequestParam MultiValueMap<String, String> params, HttpServletRequest request) {
+
+		try {
+			String sender = getSender(params);
+			List<String> frames = getFrames(params);
+			log.info("Received " + frames.size() + " frames from " + sender);
+			frameSpoolService.write(request, sender, frames);
+			if (frameService.saveFrames(userSession.getUser().getDomainId(), sender, frames)) {
+				log.debug("Frames saved.");
+				HttpHeaders responseHeaders = new HttpHeaders();
+				responseHeaders.set("Content-Type", "application/x-www-form-urlencoded");
+				return new ResponseEntity<String>(getCallback(sender), responseHeaders, HttpStatus.OK);
+
+			} else {
 				log.warn("Failed to save frames.");
 				return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-			} 
-			
+			}
+
+		} catch (RuntimeException e) {
+			log.error(e.getMessage());
+			log.warn("Failed to save frames.");
+			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
-	
-	private String getSender(MultiValueMap<String,String> params){
-		String sender = "unknown";			
-		if (params.containsKey("sender")){
+
+	private String getSender(MultiValueMap<String, String> params) {
+		String sender = "unknown";
+		if (params.containsKey("sender")) {
 			sender = params.get("sender").get(0);
-		} 
+		}
 		return sender;
 	}
-	
-	private String getCallback(String sender) {						
 
-		StringBuffer bf = new StringBuffer();		
-		BoardCommand cmd = repoCommand.findFirstPendingByOrigin(sender);		
-		if (cmd !=null) {
-			bf.append("bayeosframe=");				
-			bayeos.frame.types.BoardCommand fc = new bayeos.frame.types.BoardCommand(cmd.getKind().byteValue(),cmd.getPayload().getBytes());			
+	private String getCallback(String sender) {
+
+		StringBuffer bf = new StringBuffer();
+		BoardCommand cmd = repoCommand.findFirstPendingByOrigin(sender);
+		if (cmd != null) {
+			bf.append("bayeosframe=");
+			bayeos.frame.types.BoardCommand fc = new bayeos.frame.types.BoardCommand(cmd.getKind().byteValue(),
+					cmd.getPayload().getBytes());
 			bf.append(Base64.getEncoder().encodeToString(fc.getBytes()));
-		}					
-		return bf.toString();		 				
+		}
+		return bf.toString();
 	}
-	
-	private List<String> getFrames(MultiValueMap<String,String> params){
-		List<String> frames = new ArrayList<String>();			
-		frames.addAll(params.get("bayeosframes[]"));						
-		if (params.containsKey("bayeosframe")){
-			frames.addAll(params.get("bayeosframe"));	
+
+	private List<String> getFrames(MultiValueMap<String, String> params) {
+		List<String> frames = new ArrayList<String>();
+		frames.addAll(params.get("bayeosframes[]"));
+		if (params.containsKey("bayeosframe")) {
+			frames.addAll(params.get("bayeosframe"));
 		}
 		return frames;
 	}
 
 	@RequestMapping(value = "/postFrame", method = RequestMethod.GET)
-    public String postFrame(Model model) {    	
-        return "postFrame";
-    }
-
+	public String postFrame(Model model) {
+		return "postFrame";
+	}
 
 }
