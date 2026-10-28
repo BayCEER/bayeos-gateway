@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.StreamEntryID;
 import redis.clients.jedis.exceptions.JedisException;
 
 @Component
@@ -27,12 +28,16 @@ public class RedisFrames {
     
     @Value("${REDIS_FRAMES:false}")
     private Boolean redis_frames;
-    
+        
+    @Value("${REDIS_FRAMES_MAXLEN:10000}")
+    private long maxLen;
+   
     @Autowired
     JedisPool jedisPool;
 
     private Logger log = LoggerFactory.getLogger(RedisFrames.class);
-
+    
+    
     public void write(HttpServletRequest req, String sender, List<String> frames) {
         if (!redis_frames)
             return;
@@ -42,9 +47,19 @@ public class RedisFrames {
             m.put("authorization", req.getHeader("Authorization"));
             m.put("sender", sender);
             m.put("frames", frames);
-            jedis.rpush(key, new ObjectMapper().writeValueAsString(m));
+            
+            Map<String, String> fields = new LinkedHashMap<>();
+            fields.put("payload", new ObjectMapper().writeValueAsString(m));
+            
+            if (maxLen > 0) {                
+                jedis.xadd(key, StreamEntryID.NEW_ENTRY, fields, maxLen, true);
+            } else {
+                jedis.xadd(key, StreamEntryID.NEW_ENTRY, fields);
+            }
         } catch (JedisException | JsonProcessingException e) {
-            log.error("Failed publish frames on redis", e);
+            log.error("Failed to publish frames on redis stream", e);
         }
     }
+
+    
 }
