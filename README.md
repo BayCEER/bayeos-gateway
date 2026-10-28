@@ -61,6 +61,9 @@ Let's send the cpu load of our pc to a local gateway:
 
 ## History 
 
+### Version 2.12.0 October 2026
+- New: Publish frames as redis stream
+
 ### Version 2.11.0 July 2026
 - New: New board end point to query boards by origin and domain.  
 - Fix: Disable editing of BayEOS server id on domain, board, channel, board group and unit entities 
