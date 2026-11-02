@@ -1,11 +1,11 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service
 
-import bayeos.frame.types.LabeledFrame
+import de.unibayreuth.bayceer.bayeos.frame.types.LabeledFrame
 import groovy.sql.Sql
 import java.sql.SQLException
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
-import bayeos.frame.types.NumberType
+import de.unibayreuth.bayceer.bayeos.frame.types.NumberType
 
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,22 +22,22 @@ class DeleteThread implements Runnable {
 	@Autowired
 	private DataSource dataSource
 
-	@Value('${DELETE_OBS_RETENTION:60 days}')
+	@Value('${GW_DELETE_OBS_RETENTION:60 days}')
 	private String obsRetention;
     
-    @Value('${DELETE_MSG_RETENTION:60 days}')
+    @Value('${GW_DELETE_MSG_RETENTION:60 days}')
     private String msgRetention;
     
-    @Value('${DELETE_TEMPLATE_RETENTION:1 years}')
+    @Value('${GW_DELETE_TEMPLATE_RETENTION:1 years}')
     private String templateRetention;
     
-    @Value('${DELETE_BOARD_RETENTION:1 years}')
+    @Value('${GW_DELETE_BOARD_RETENTION:1 years}')
     private String boardRetention;
         
-    @Value('${DELETE_BOARD_GROUP_RETENTION:1 years}')
+    @Value('${GW_DELETE_BOARD_GROUP_RETENTION:1 years}')
     private String boardGroupRetention;
     
-    @Value('${DELETE_WAIT_SECS:120}')
+    @Value('${GW_DELETE_WAIT_SECS:120}')
 	private int waitSecs;
 	
 	@Autowired

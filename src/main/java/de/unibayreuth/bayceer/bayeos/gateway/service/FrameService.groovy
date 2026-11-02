@@ -14,10 +14,10 @@ import org.postgresql.copy.CopyIn
 import org.postgresql.copy.CopyManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import bayeos.frame.FrameParserException
-import bayeos.frame.Parser
-import bayeos.frame.types.ByteFrame
-import bayeos.frame.types.MapUtils
+import de.unibayreuth.bayceer.bayeos.frame.FrameParserException
+import de.unibayreuth.bayceer.bayeos.frame.Parser
+import de.unibayreuth.bayceer.bayeos.frame.types.ByteFrame
+import de.unibayreuth.bayceer.bayeos.frame.types.MapUtils
 import de.unibayreuth.bayceer.bayeos.gateway.event.EventProducer
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewBoardEvent
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewChannelEvent

@@ -17,7 +17,7 @@ public class EventConfig {
 	@Autowired
 	RedisListener js;	
 	
-	@Value("${REDIS_EVENTS:false}")
+	@Value("${GW_REDIS_EVENTS:false}")
 	private Boolean redis_events;
 	
 	@Bean 

@@ -1,3 +1,0 @@
-#!/bin/bash
-set -e
-systemctl stop bayeos-gateway.service

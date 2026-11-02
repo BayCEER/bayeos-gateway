@@ -9,19 +9,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class NotificationConfig {
 	
-	@Value("${NOTIFICATION:false}")
+	@Value("${GW_NOTIFICATION:false}")
 	private Boolean notification;
 	
-	@Value("${NOTIFICATION_HOST:}")
+	@Value("${GW_NOTIFICATION_HOST:}")
 	private String notification_host;
 	
-	@Value("${NOTIFICATION_WAIT_SECS:60}")
+	@Value("${GW_NOTIFICATION_WAIT_SECS:60}")
 	private int notification_wait_secs = 60;
 	
-	@Value("${NOTIFICATION_MAX_SOFT_STATES:4}")
+	@Value("${GW_NOTIFICATION_MAX_SOFT_STATES:4}")
 	private int notification_max_soft_states = 4;
 	
-	@Value("${NOTIFICATION_SENDER:}")
+	@Value("${GW_NOTIFICATION_SENDER:}")
 	private String notification_sender;
 
 	

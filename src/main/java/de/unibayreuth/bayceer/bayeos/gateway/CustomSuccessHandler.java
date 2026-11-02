@@ -16,7 +16,7 @@ import de.unibayreuth.bayceer.bayeos.gateway.model.User;
 public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 	
 			
-	@Value("${COOKIE_MAX_AGE:1209600}")
+	@Value("${GW_COOKIE_MAX_AGE:1209600}")
 	private int cookieMaxAge;
 	
 	

@@ -22,10 +22,10 @@ import redis.clients.jedis.exceptions.JedisException;
 @Component
 public class RedisStats implements Runnable {
 	
-	@Value("${REDIS_EVENTS:false}")
+	@Value("${GW_REDIS_EVENTS:false}")
 	private Boolean redis_events;
 	
-	@Value("${REDIS_STATS_WAIT_SECS:120}")
+	@Value("${GW_REDIS_STATS_WAIT_SECS:120}")
 	private Integer redis_stats_wait_secs;
 	
 	@Autowired

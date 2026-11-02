@@ -3,7 +3,7 @@ package de.unibayreuth.bayceer.bayeos.gateway.reader;
 import java.io.IOException;
 import java.io.InputStream;
 
-import bayeos.binary.ByteArray;
+import de.unibayreuth.bayceer.bayeos.binary.ByteArray;
 
 public class BDBReader  {
 	

@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-gateway</artifactId>
-	<version>2.12.0</version>
+	<version>3.0.0</version>
 	<name>bayeos-gateway</name>
 	<description>BayEOS Gateway</description>
 
@@ -38,52 +38,6 @@
 	</properties>
 
 
-	<profiles>
-		<profile>
-			<id>prod</id>
-			<properties>
-				<skipTests>true</skipTests>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>jdeb</artifactId>
-						<groupId>org.vafer</groupId>
-						<version>1.5</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>jdeb</goal>
-								</goals>
-								<configuration>
-									<deb>${project.build.directory}/bayeos-gateway-${project.version}.deb</deb>
-									<verbose>false</verbose>
-									<dataSet>
-										<data>
-											<src>${project.build.directory}/deb/data</src>
-											<type>directory</type>
-										</data>
-										<data>
-											<src>${project.build.directory}/${project.build.finalName}.jar</src>
-											<dst>/var/lib/bayeos-gateway/bayeos-gateway.jar</dst>
-											<type>file</type>
-										</data>
-									</dataSet>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-	</profiles>
-
-
 	<build>
 		<finalName>bayeos-gateway</finalName>
 		<resources>
@@ -102,24 +56,6 @@
 					<include>**/*.properties</include>
 					<include>**/*.xml</include>
 				</includes>
-			</resource>
-			<resource>
-				<directory>src/deb</directory>
-				<filtering>true</filtering>
-				<excludes>
-					<exclude>**/*.jar</exclude>
-					<exclude>**/*.sql</exclude>
-				</excludes>
-				<targetPath>${project.build.directory}/deb</targetPath>
-			</resource>
-			<resource>
-				<directory>src/deb</directory>
-				<filtering>false</filtering>
-				<includes>
-					<include>**/*.jar</include>
-					<include>**/*.sql</include>
-				</includes>
-				<targetPath>${project.build.directory}/deb</targetPath>
 			</resource>
 		</resources>
 		<plugins>
@@ -174,38 +110,12 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.jupiter</groupId>
-					<artifactId>junit-jupiter-engine</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -249,6 +159,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.novell.ldap</groupId>
 			<artifactId>jldap</artifactId>
 			<version>4.3</version>
@@ -287,12 +202,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity5</artifactId>
 		</dependency>
@@ -318,20 +227,28 @@
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-frame-parser</artifactId>
-			<version>1.4.1</version>
+			<version>1.4.2</version>
+		</dependency>
+		
+				<dependency>
+			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
+			<artifactId>bayeos-api-java</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
-		<dependency>
-			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
-			<artifactId>bayeos-password-file</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 
 		<dependency>
-			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
-			<artifactId>bayeos-xmlrpc</artifactId>
-			<version>2.3.0</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.15</version>
+		</dependency>
+
+		
 
 		
 

@@ -59,10 +59,10 @@ class FileImportService implements Runnable {
 
 	private final static int FRAMES_PER_POST = 1000
 
-	@Value('${LOCAL_FILE_WAIT_SECS:600}')
+	@Value('${GW_LOCAL_FILE_WAIT_SECS:600}')
 	private int waitSecs
 
-	@Value('${LOCAL_FILE_EXPIRED_MONTH:3}')
+	@Value('${GW_LOCAL_FILE_EXPIRED_MONTH:3}')
 	private int expiredMonth
 
 

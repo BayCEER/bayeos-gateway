@@ -44,7 +44,7 @@ public class UploadController extends AbstractController {
 	@Autowired
 	Path localFilePath;
 	
-	@Value("${LOCAL_FILE_EXPIRED_MONTH:3}")
+	@Value("${GW_LOCAL_FILE_EXPIRED_MONTH:3}")
 	private int localFileExpiredMonth;
 
 

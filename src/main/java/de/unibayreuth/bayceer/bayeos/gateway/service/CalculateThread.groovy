@@ -1,10 +1,10 @@
 package de.unibayreuth.bayceer.bayeos.gateway.service;
 
-import bayeos.frame.types.LabeledFrame
-import bayeos.frame.types.MapUtils
-import bayeos.frame.types.NumberType
-import bayeos.frame.types.OriginFrame
-import bayeos.frame.types.TimestampFrame
+import de.unibayreuth.bayceer.bayeos.frame.types.LabeledFrame
+import de.unibayreuth.bayceer.bayeos.frame.types.MapUtils
+import de.unibayreuth.bayceer.bayeos.frame.types.NumberType
+import de.unibayreuth.bayceer.bayeos.frame.types.OriginFrame
+import de.unibayreuth.bayceer.bayeos.frame.types.TimestampFrame
 import de.unibayreuth.bayceer.bayeos.gateway.event.EventProducer
 import de.unibayreuth.bayceer.bayeos.gateway.service.FrameService.Board
 import de.unibayreuth.bayceer.bayeos.gateway.event.NewChannelEvent
@@ -31,7 +31,7 @@ public class CalculateThread implements Runnable {
     @Autowired
     private FrameService frameService
 
-    @Value('${CALC_WAIT_SECS:120}')
+    @Value('${GW_CALC_WAIT_SECS:120}')
     private int waitSecs
 
     @Autowired
