@@ -31,7 +31,7 @@ public class CalculateThread implements Runnable {
     @Autowired
     private FrameService frameService
 
-    @Value('${GW_CALC_WAIT_SECS:120}')
+    @Value('${GW_CALC_WAIT_SECS}')
     private int waitSecs
 
     @Autowired
@@ -150,12 +150,14 @@ public class CalculateThread implements Runnable {
                 }
                 def millis = (new Date()).getTime() - start.getTime()
                 frameService.saveFrame("\$SYS/CalculateThread",new LabeledFrame(NumberType.Float32,"{'exit':${exit},'calculated':${rowCalculated},'vc':${rowVC},'archived':${rowArchived},'millis':${millis}}".toString()))
-            } catch (InterruptedException e) {
+            }catch(
+
+    InterruptedException e)
+    {
                 log.error(e.getMessage())
                 break
             }
-        }
-    }
+    }}
 
 
 

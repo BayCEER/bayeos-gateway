@@ -11,10 +11,10 @@ import redis.clients.jedis.JedisPoolConfig;
 @Configuration
 public class RedisConfig {
 	
-	@Value("${GW_REDIS_HOST:localhost}")
+	@Value("${GW_REDIS_HOST}")
 	private String redis_host;
 
-	@Value("${GW_REDIS_PORT:6379}")
+	@Value("${GW_REDIS_PORT}")
 	private Integer redis_port;
 	
 	@Bean	

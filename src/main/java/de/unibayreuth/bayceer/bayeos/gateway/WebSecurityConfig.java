@@ -36,35 +36,35 @@ import de.unibayreuth.bayceer.bayeos.gateway.repo.domain.UserRepository;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		
-	@Value("${GW_LDAP_AUTH:false}")
+	@Value("${GW_LDAP_AUTH}")
 	private Boolean ldap_auth;
 	
-	@Value("${GW_LDAP_DN:cn=%s}")
+	@Value("${GW_LDAP_DN}")
 	private String ldap_dn;
 		
-	@Value("${GW_LDAP_HOST:localhost}")
+	@Value("${GW_LDAP_HOST}")
 	private String ldap_host;
 	
-	@Value("${GW_LDAP_PORT:636}")
+	@Value("${GW_LDAP_PORT}")
 	private int ldap_port;
 	
-	@Value("${GW_LDAP_SSL:true}")
+	@Value("${GW_LDAP_SSL}")
 	private Boolean ldap_ssl;
 	
-	@Value("${GW_LDAP_VERSION:3}")	
+	@Value("${GW_LDAP_VERSION}")	
 	private int ldap_version;
 	
-	@Value("${GW_LDAP_REFINE_USER:true}")
+	@Value("${GW_LDAP_REFINE_USER}")
 	private Boolean ldap_refine_user;
 	
-	@Value("${GW_LDAP_SN:sn}")
+	@Value("${GW_LDAP_SN}")
 	private String ldap_sn;
 		
-	@Value("${GW_LDAP_GIVEN_NAME:givenName}")
+	@Value("${GW_LDAP_GIVEN_NAME}")
 	private String ldap_givenName;
 	
 				
-	@Value("${GW_COOKIE_MAX_AGE:1209600}")
+	@Value("${GW_COOKIE_MAX_AGE}")
 	private int cookieMaxAge;
 	 	
 	@Autowired

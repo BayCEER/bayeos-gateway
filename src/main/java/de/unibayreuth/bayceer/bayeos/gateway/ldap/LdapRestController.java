@@ -23,28 +23,28 @@ import com.novell.ldap.LDAPSearchResults;
 @RestController
 public class LdapRestController {
 
-	@Value("${GW_LDAP_BASE:ou=users}")
+	@Value("${GW_LDAP_BASE}")
 	private String ldap_base;
 
-	@Value("${GW_LDAP_HOST:localhost}")
+	@Value("${GW_LDAP_HOST}")
 	private String ldap_host;
 
-	@Value("${GW_LDAP_PORT:636}")
+	@Value("${GW_LDAP_PORT}")
 	private int ldap_port;
 
-	@Value("${GW_LDAP_SSL:true}")
+	@Value("${GW_LDAP_SSL}")
 	private Boolean ldap_ssl;
 
-	@Value("${GW_LDAP_VERSION:3}")
+	@Value("${GW_LDAP_VERSION}")
 	private int ldap_version;
 
-	@Value("${GW_LDAP_SN:sn}")
+	@Value("${GW_LDAP_SN}")
 	private String ldap_sn;
 
-	@Value("${GW_LDAP_GIVEN_NAME:givenName}")
+	@Value("${GW_LDAP_GIVEN_NAME}")
 	private String ldap_givenName;
 
-	@Value("${GW_LDAP_SEARCH:false}")
+	@Value("${GW_LDAP_SEARCH}")
 	public boolean ldap_search;
 
 	private Logger log = LoggerFactory.getLogger(LdapRestController.class);
