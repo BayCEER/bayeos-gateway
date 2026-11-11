@@ -37,16 +37,7 @@ RUN mvn -q -DskipTests package
 
 FROM eclipse-temurin:11-jre
 
-RUN set -eux; \
-	groupadd --gid 10001 bayeos; \
-	useradd --uid 10001 --gid bayeos --home-dir /var/lib/bayeos-gateway --create-home bayeos; \
-	mkdir -p /data/uploads; \
-	chown -R bayeos:bayeos /var/lib/bayeos-gateway /data
-
 COPY --from=builder /build/target/bayeos-gateway.jar /var/lib/bayeos-gateway/bayeos-gateway.jar
-
-USER bayeos
-WORKDIR /var/lib/bayeos-gateway
 
 EXPOSE 5533
 
