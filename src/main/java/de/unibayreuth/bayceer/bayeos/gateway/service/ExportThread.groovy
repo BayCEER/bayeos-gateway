@@ -155,21 +155,41 @@ private String unitAbbrevation(unit_id){if(unit_id==null){return null}
         def unit=db.firstRow("select abbrevation from unit where id = ?",[unit_id])
         return unit?.abbrevation?.trim()?:null}
 
-private def exportNewObservations(){log.info("Exporting observations")
+    private def exportNewObservations(){log.info("Exporting observations")
         def records=0
         try{while(true){def rows=db.rows("""SELECT o.id, c.db_series_id, o.result_time, o.result_value FROM
                             observation_out o join channel c on o.channel_id=c.id
                             where c.db_series_id is not null order by o.id asc limit ${expBulkSize};""")
                 if(rows.isEmpty()){break}
                 def batch=cli.timeseries().writeBatch().chunkSize(expBulkSize)
+                def validPoints=0
+                def skipped=0
                 rows.groupBy{it.db_series_id}.each{series_id,seriesRows->
-                    def scope=batch.series(series_id)
+                    def scope=null
                     seriesRows.each{r->
-                        scope.point(r.result_time.toInstant(),(double)r.result_value)}}
-                batch.send()
+                        if(r.result_time==null||r.result_value==null){
+                            skipped++
+                            return
+                        }
+                        def value=(double)r.result_value
+                        if(value.isNaN()||value.isInfinite()){
+                            skipped++
+                            return
+                        }
+                        if(scope==null){scope=batch.series(series_id as long)}
+                        scope.point(r.result_time.toInstant(),value)
+                        validPoints++}}
+                if(validPoints>0){
+                    batch.send()
+                }
                 def last=rows.last().id
-                log.info("${rows.size()} records exported")
-                records=records+rows.size()
+                if(skipped>0){
+                    log.warn("Skipped ${skipped} observation(s) with null or non-finite values/timestamps")
+                }
+                if(validPoints>0){
+                    log.info("${validPoints} records exported")
+                    records=records+validPoints
+                }
                 db.execute("delete from observation_out where id <= ?",[last])}}catch(Exception e){log.error(e.getMessage())
             records=-1}
         return records;}
